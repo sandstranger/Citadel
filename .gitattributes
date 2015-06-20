@@ -1,0 +1,3 @@
+Assets/Scenes/** !text !filter !merge !diff
+Assets/Prefabs/Levels/** !text !filter !merge !diff
+Assets/Resources/** !text !filter !merge !diff
