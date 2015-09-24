@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: b8bdc991b33544142a4d3469ea516979
-timeCreated: 1433019824
+guid: 7589bb71467639d47a5a46da4a43363e
+timeCreated: 1442887725
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -9,7 +9,7 @@ ModelImporter:
     400000: //RootNode
     2300000: //RootNode
     3300000: //RootNode
-    4300000: camera_mesh
+    4300000: switch3
     7400000: Default Take
     9500000: //RootNode
   materials:
@@ -21,6 +21,10 @@ ModelImporter:
     bakeSimulation: 0
     optimizeGameObjects: 0
     motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
     animationCompression: 1
     animationRotationError: .5
     animationPositionError: .5

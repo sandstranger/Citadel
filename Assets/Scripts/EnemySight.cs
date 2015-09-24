@@ -6,22 +6,22 @@ public class EnemySight : MonoBehaviour {
 	public bool playerInSight;
 	public Vector3 lastKnownPosition;
 	public Vector3 resetPosition;
-	private NavMeshAgent nav;
+	//private NavMeshAgent nav;
 	private GameObject player;
 	private AudioSource playerSound;
 	private SphereCollider col;
-	private PlayerHealth playerHealth;
-	private Vector3 previousFrameSighting;
+	//private PlayerHealth playerHealth;
+	//private Vector3 previousFrameSighting;
 
 	void Awake () {
-		nav = GetComponent<NavMeshAgent>();
+		//nav = GetComponent<NavMeshAgent>();
 		col = GetComponent<SphereCollider>();
 		player = GameObject.FindGameObjectWithTag("Player");
 		playerSound = player.GetComponent<AudioSource>();
-		playerHealth = player.GetComponent<PlayerHealth>();
+		//playerHealth = player.GetComponent<PlayerHealth>();
 		resetPosition = new Vector3(0f,-100000f,0f);
-		previousFrameSighting = resetPosition;
 		lastKnownPosition = resetPosition;
+		//previousFrameSighting = resetPosition;
 	}
 
 	void OnTriggerStay (Collider other) {
