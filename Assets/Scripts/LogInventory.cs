@@ -17,7 +17,7 @@ public class LogInventory : MonoBehaviour {
 	}
 
 	void Update () {
-		if(Input.GetKeyDown(uKey)) {
+		if(Input.GetButtonDown("PlayRecentLog")) {
 			if (lastAddedIndex != -1) {
 				SFXClip = Const.a.audioLogs[lastAddedIndex];
 				SFXSource.PlayOneShot(SFXClip);
