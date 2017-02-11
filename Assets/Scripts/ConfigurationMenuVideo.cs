@@ -8,13 +8,13 @@ public class ConfigurationMenuVideo : MonoBehaviour {
 	private Dropdown resSelector;
 
 	void Awake () {
-		List<int> widths = new List<int>();
-		List<int> heights = new List<int>();
+		//List<int> widths = new List<int>();
+		//List<int> heights = new List<int>();
 		resolutions = Screen.resolutions;
 		resSelector = GetComponent<Dropdown>();
 		List<string> resList = new List<string>();
 		for (int i=0;i<resolutions.Length;i++) {
-			widths.Add(resolutions[i].width);
+			//widths.Add(resolutions[i].width);
 			resList.Add(resolutions[i].width.ToString() + "x" + resolutions[i].height);
 		}
 		resSelector.ClearOptions();
