@@ -31,11 +31,26 @@ public class PuzzleGrid : MonoBehaviour {
 	public Sprite gridAlwaysOn0;
 	public Sprite gridAlwaysOn1;
 	public Image outputNode;
+	public enum GridColorTheme {Gray,Green,Blue};
+	public GridColorTheme theme;
 
 	public bool puzzleSolved;
 
 	void Awake () {
 		puzzleSolved = false;
+		EvaluatePuzzle();
+		UpdateCellImages();
+	}
+
+	public void SendGrid(bool[] states, CellType[] types, GridType gtype, int start, int end, int w, int h, GridColorTheme colors) {
+		grid = states;
+		cellType = types;
+		gridType = gtype;
+		sourceIndex = start;
+		outputIndex = end;
+		width = w;
+		height = h;
+		theme = colors;
 		EvaluatePuzzle();
 		UpdateCellImages();
 	}
