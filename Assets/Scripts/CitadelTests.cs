@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 #endif
 
-public class Tests : MonoBehaviour {
+public class CitadelTests : MonoBehaviour {
 	public GameObject[] lightContainers; // Can't use LevelManager's since
 										 // there is no instance unless in Play
 										 // mode.
@@ -27,6 +27,10 @@ public class Tests : MonoBehaviour {
 	private bool[] levelDataLoaded;
 	private int getValreadInt;
 	private float getValreadFloat;
+
+	public List<GameObject> allGOs;
+	public List<GameObject> allParents;
+
 
 	[HideInInspector] public string buttonLabel = "Run Tests";
 
@@ -42,6 +46,19 @@ public class Tests : MonoBehaviour {
 							  + testTimer.Elapsed.ToString());
 	}
 
+	public void SetupLists() {
+		int i=0;
+		int k=0;
+		allGOs = new List<GameObject>();
+		allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
+		for (i=0;i<allParents.Count;i++) {
+			Component[] compArray = allParents[i].GetComponentsInChildren(typeof(Transform),true);
+			for (k=0;k<compArray.Length;k++) {
+				allGOs.Add(compArray[k].gameObject); // Add to full list, separate so we don't infinite loop
+			}
+		}
+	}
+
 	public void Run() {
 		#if UNITY_EDITOR
 		Stopwatch testTimer = new Stopwatch();
@@ -49,15 +66,7 @@ public class Tests : MonoBehaviour {
 
 		int i=0;
 		int k=0;
-		List<GameObject> allGOs = new List<GameObject>();
-		List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
-		for (i=0;i<allParents.Count;i++) {
-			Component[] compArray = allParents[i].GetComponentsInChildren(typeof(Transform),true);
-			for (k=0;k<compArray.Length;k++) {
-				allGOs.Add(compArray[k].gameObject); // Add to full list, separate so we don't infinite loop
-			}
-		}
-
+		SetupLists();
 		ButtonSwitch bsTemp = null;
 		ChargeStation csTemp = null;
 		CyberAccess caTemp = null;
