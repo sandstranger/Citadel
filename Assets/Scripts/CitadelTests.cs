@@ -14,7 +14,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 #endif
 
-public class Tests : MonoBehaviour {
+public class CitadelTests : MonoBehaviour {
 	public GameObject[] lightContainers; // Can't use LevelManager's since
 										 // there is no instance unless in Play
 										 // mode.
@@ -27,6 +27,10 @@ public class Tests : MonoBehaviour {
 	private bool[] levelDataLoaded;
 	private int getValreadInt;
 	private float getValreadFloat;
+
+	public List<GameObject> allGOs;
+	public List<GameObject> allParents;
+
 
 	[HideInInspector] public string buttonLabel = "Run Tests";
 
@@ -42,11 +46,7 @@ public class Tests : MonoBehaviour {
 							  + testTimer.Elapsed.ToString());
 	}
 
-	public void Run() {
-		#if UNITY_EDITOR
-		Stopwatch testTimer = new Stopwatch();
-		testTimer.Start();
-
+	public void SetupLists() {
 		int i=0;
 		int k=0;
 		List<GameObject> allGOs = new List<GameObject>();
@@ -57,7 +57,16 @@ public class Tests : MonoBehaviour {
 				allGOs.Add(compArray[k].gameObject); // Add to full list, separate so we don't infinite loop
 			}
 		}
+	}
 
+	public void Run() {
+		#if UNITY_EDITOR
+		Stopwatch testTimer = new Stopwatch();
+		testTimer.Start();
+
+		int i=0;
+		int k=0;
+		SetupLists();
 		ButtonSwitch bsTemp = null;
 		ChargeStation csTemp = null;
 		CyberAccess caTemp = null;
@@ -457,7 +466,7 @@ public class Tests : MonoBehaviour {
 			ElevatorButton evb = allGOs[i].GetComponent<ElevatorButton>();
 			if (evb != null) {
 				num_ElevatorButton++;
-				if (evb.GetComponentInChildren<Text>() == null) { UnityEngine.Debug.Log(script + " is missing childText Text component."); issueCount_ElevatorButton++; }
+				if (evb.GetComponentInChildren<Text>(true) == null) { UnityEngine.Debug.Log(script + " is missing childText Text component."); issueCount_ElevatorButton++; }
 			}
 
 			script = "MouseLookScript";
