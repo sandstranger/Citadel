@@ -1,82 +1,14 @@
 fileFormatVersion: 2
-guid: 663e5df8ec5912041997bfae226a4df3
+guid: 5b14632e67194b1d9b48bf6b915bd86e
 ModelImporter:
   serializedVersion: 20300
-  internalIDToNameTable:
-  - first:
-      1: 100000
-    second: //RootNode
-  - first:
-      1: 100002
-    second: stor1_7_mesh
-  - first:
-      1: 100004
-    second: stor1_7_mesh_edge1
-  - first:
-      1: 100006
-    second: stor1_7_mesh_edge2
-  - first:
-      4: 400000
-    second: //RootNode
-  - first:
-      4: 400002
-    second: stor1_7_mesh
-  - first:
-      4: 400004
-    second: stor1_7_mesh_edge1
-  - first:
-      4: 400006
-    second: stor1_7_mesh_edge2
-  - first:
-      23: 2300000
-    second: //RootNode
-  - first:
-      23: 2300002
-    second: stor1_7_mesh
-  - first:
-      23: 2300004
-    second: stor1_7_mesh_edge1
-  - first:
-      23: 2300006
-    second: stor1_7_mesh_edge2
-  - first:
-      33: 3300000
-    second: //RootNode
-  - first:
-      33: 3300002
-    second: stor1_7_mesh
-  - first:
-      33: 3300004
-    second: stor1_7_mesh_edge1
-  - first:
-      33: 3300006
-    second: stor1_7_mesh_edge2
-  - first:
-      43: 4300000
-    second: stor1_7_mesh
-  - first:
-      43: 4300002
-    second: stor1_7_mesh_edge2
-  - first:
-      43: 4300004
-    second: stor1_7_mesh_edge1
-  - first:
-      74: 7400000
-    second: Default Take
-  - first:
-      95: 9500000
-    second: //RootNode
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: stor1_7__stor1_7_png
-    second: {fileID: 2100000, guid: 9ebd511acebb4e64ab4a1e8a04e53dfa, type: 2}
+  internalIDToNameTable: []
+  externalObjects: {}
   materials:
     materialImportMode: 0
     materialName: 0
     materialSearch: 1
-    materialLocation: 0
+    materialLocation: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
@@ -111,12 +43,12 @@ ModelImporter:
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
-    fileIdsGeneration: 1
+    fileIdsGeneration: 2
     swapUVChannels: 0
-    generateSecondaryUV: 1
+    generateSecondaryUV: 0
     useFileUnits: 1
     keepQuads: 0
-    weldVertices: 0
+    weldVertices: 1
     bakeAxisConversion: 0
     preserveHierarchy: 0
     skinWeightsMode: 0
@@ -137,7 +69,7 @@ ModelImporter:
     normalImportMode: 0
     tangentImportMode: 3
     normalCalculationMode: 4
-    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 1
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
@@ -156,15 +88,15 @@ ModelImporter:
     globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 1
+    hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 0
   humanoidOversampling: 1
   avatarSetup: 0
-  addHumanoidExtraRootOnlyWhenUsingAvatar: 0
-  remapMaterialsIfMaterialImportModeIsNone: 1
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
   additionalBone: 0
   userData: 
   assetBundleName: 
