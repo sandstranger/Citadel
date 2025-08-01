@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
@@ -15,7 +16,7 @@ using UnityEngine.Networking;
 	using UnityEditor.SceneManagement;
 #endif
 
-// Globally accessible utility functions for parsing values, generating save
+	// Globally accessible utility functions for parsing values, generating save
 // strings, converting enumerated and integer values, and other helpful things.
 //
 // Most of this is for saving.
@@ -332,7 +333,7 @@ public class Utils {
         return Application.persistentDataPath;
     }
 
-	public static StreamReader ReadStreamingAsset(string fName) {
+	public static async Task<StreamReader> ReadStreamingAsset(string fName) {
         StreamReader dataReader = null;
         string basePath = Application.streamingAssetsPath;
         string fPath = SafePathCombine(basePath, fName);
@@ -340,9 +341,7 @@ public class Utils {
             // Android: Use UnityWebRequest to read from streamingAssetsPath
             UnityWebRequest request = UnityWebRequest.Get(fPath);
             var operation = request.SendWebRequest();
-
-            // Synchronous wait (consider async for better performance)
-            while (!operation.isDone) { }
+            await operation.ToTask();
             if (request.result == UnityWebRequest.Result.Success) {
                 byte[] bytes = request.downloadHandler.data;
                 MemoryStream memStr = new MemoryStream(bytes);

@@ -2,11 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics; // Stopwatch
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -34,6 +33,8 @@ using UnityEngine.Networking;
 // UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion 1200
 // TextLocalization 1300
 
+public class SetLightsToImportant
+{
 public class Const : MonoBehaviour {
 	public float shadowThreshold = 0.03f;
 	//Item constants
@@ -387,8 +388,10 @@ public class Const : MonoBehaviour {
 	}
 
 	public void Awake() {
+#if !UNITY_ANDROID		
 		TARGET_FPS = 144;
 		Application.targetFrameRate = TARGET_FPS;
+#endif
 		SetA(); // Create a new instance so that it can be accessed globally.
 				// MOST IMPORTANT PART!!
 
@@ -460,7 +463,7 @@ public class Const : MonoBehaviour {
 		return (numberOfRaycastsThisFrame > maxRaycastsPerFrame);
 	}
 
-    public void LoadTextForLanguage(int lang) {
+    public async void LoadTextForLanguage(int lang) {
 // 		UnityEngine.Debug.Log("Loading language: " + lang.ToString());
         string readline; // variable to hold each string read in from the file
         int currentline = 0;
@@ -476,7 +479,7 @@ public class Const : MonoBehaviour {
 			case 7: tF = "text_portugues.txt"; break; // Portugese
         }
 
-        StreamReader dataReader = Utils.ReadStreamingAsset(tF);
+        StreamReader dataReader = await Utils.ReadStreamingAsset(tF);
 		if (stringTable.Length < 1025) stringTable = new string[1025];
         using (dataReader) {
             do {
@@ -611,7 +614,7 @@ public class Const : MonoBehaviour {
 		if (eventSystem != null) eventSystem.SetActive(true);
 	}
 
-	public void LoadAudioLogMetaData() {
+	public async void LoadAudioLogMetaData() {
 		// The following to be assigned to the arrays in the Unity Const data structure
 		int readIndexOfLog, readLogImageLHIndex, readLogImageRHIndex; // look-up index for assigning the following data on the line in the file to the arrays
 		StringBuilder readLogText = new StringBuilder(); // loaded into string audioLogSpeech2Text[]
@@ -629,7 +632,7 @@ public class Const : MonoBehaviour {
 			case 7: tF = "logs_text_portugues.txt"; break; // Portugese
         }
 
-		StreamReader dataReader = Utils.ReadStreamingAsset(tF);
+		StreamReader dataReader = await Utils.ReadStreamingAsset(tF);
 		using (dataReader) {
 			do {
 				int i = 0;
@@ -664,11 +667,11 @@ public class Const : MonoBehaviour {
 		}
 	}
 
-	private void LoadDamageTablesData () {
+	private async void LoadDamageTablesData () {
 		string readline; // variable to hold each string read in from the file
 		int currentline = 0;
 		int readInt = 0;
-		StreamReader dataReader = Utils.ReadStreamingAsset("damage_tables.txt");
+		StreamReader dataReader = await Utils.ReadStreamingAsset("damage_tables.txt");
 		using (dataReader) {
 			do {
 				int i = 0;
@@ -696,13 +699,13 @@ public class Const : MonoBehaviour {
 		}
 	}
 
-	private void LoadCreditsData () {
+	private async void LoadCreditsData () {
 		creditsText = new string[21];
 		string readline; // variable to hold each string read in from the file
 		int pagenum = 0;
 		creditsLength = 1;
 		StringBuilder page = new StringBuilder();
-		StreamReader dataReader = Utils.ReadStreamingAsset("credits.txt");
+		StreamReader dataReader = await Utils.ReadStreamingAsset("credits.txt");
 		using (dataReader) {
 			do {
 				// Read the next line
@@ -781,7 +784,7 @@ public class Const : MonoBehaviour {
 		a.introNotPlayed = setIntroNotPlayed;
 	}
 
-	private void LoadEnemyTablesData() {
+	private async void LoadEnemyTablesData() {
 		int numberOfNPCs = 29;
 		nameForNPC = new string[numberOfNPCs];
 		attackTypeForNPC = new AttackType[numberOfNPCs];
@@ -862,7 +865,7 @@ public class Const : MonoBehaviour {
 		int readInt = 0;
 		int i = 0;
 		int refIndex = 0;
-		StreamReader dataReader = Utils.ReadStreamingAsset("enemy_tables.csv");
+		StreamReader dataReader = await Utils.ReadStreamingAsset("enemy_tables.csv");
 		using (dataReader) {
 			do {
 				i = 0;
@@ -1580,26 +1583,26 @@ CreateBlackTexture:
 		startingNewGame = false;
 		introNotPlayed = false;
 		WriteDatForIntroPlayed(introNotPlayed); // reset
-		StartCoroutine(Const.a.LoadRoutine(saveFileIndex,false));
+		Const.a.LoadRoutine(saveFileIndex, false);
 	}
 
 	// LOAD 2. Called from Load menu or Quick Load.
 	// LOAD 6. Called from Const.a.Start().
-	public IEnumerator LoadRoutine(int saveFileIndex, bool actual) {
+	public async void LoadRoutine(int saveFileIndex, bool actual) {
 		Stopwatch loadTimer = new Stopwatch();
 		Stopwatch loadUpdateTimer = new Stopwatch(); // For loading % indicator.
 		loadTimer.Start();
 		loading = true;
 		UnityEngine.Debug.Log("Start of Load for index " + saveFileIndex.ToString());
-		yield return null; // Update the view to show ShowLoading changes.
-
+		await Task.Yield();
+		
 		string readline; 					// Initialize temporary variables.
 		int numSaveablesFromSavefile = 0;
 		int i,j,k;
 		GameObject currentGameObjectInScene = null;
 		List<GameObject> saveableGameObjectsInScene = new List<GameObject>();
 		loadPercentText.text = "Preparing...";
-		yield return null; // Update progress text.
+		await Task.Yield();
 
 		SaveObject.currentObjectInfo = "Start of Load...";
 
@@ -1616,18 +1619,18 @@ CreateBlackTexture:
 			LevelManager.a.UnloadLevelDynamicObjects(i,false); // Delete them all!
 			LevelManager.a.UnloadLevelNPCs(i); // Delete them all!
 			loadPercentText.text = "Preparing level " + i.ToString();
-			yield return new WaitForSeconds(0.1f); // Update progress text.
+			await Task.Delay(TimeSpan.FromSeconds(0.1f));
 		}
 
 		loadPercentText.text = "Open Save File         ";
-		yield return null; // Update progress text.
+		await Task.Yield();
 
 		List<string> readFileList = new List<string>();
 		int index = 0; // Caching since it will be iterated over in a loop.
 		string[] entries = new string[2048]; // Holds pipe | delimited strings
 											 // on individual lines.
 		string lName = "sav" + saveFileIndex.ToString() + ".txt";
-		StreamReader sr = Utils.ReadStreamingAsset(lName);
+		StreamReader sr = await Utils.ReadStreamingAsset(lName);
 		List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
 		if (sr != null) {
 			// Read the file into a list, line by line
@@ -1640,7 +1643,7 @@ CreateBlackTexture:
 			}
 
 			loadPercentText.text = "Load Quest Data...     ";
-			yield return null; // to update the sprint
+			await Task.Yield();
 			int numSaveFileLines = readFileList.Count;
 			numSaveablesFromSavefile = numSaveFileLines - 3;
 
@@ -1673,8 +1676,8 @@ CreateBlackTexture:
 			difficultyPuzzle = Utils.GetIntFromString(entries[index],"difficultyPuzzle"); index++;
 			difficultyCyber = Utils.GetIntFromString(entries[index],"difficultyCyber"); index++;
 			loadPercentText.text = "Preprocess Save File...";
-			yield return null;
-
+			await Task.Yield();
+			
 			// First pass to initialize tracking arrays:
 			// - saveFile_Line_SaveID, This holds the full list of all unique IDs.
 			// - saveableIsInstantiated, True if object is instantiated prefab.
@@ -1691,7 +1694,7 @@ CreateBlackTexture:
 			}
 
 			loadPercentText.text = "Preprocess Arrays...   ";
-			yield return null;
+			await Task.Yield();
 			index = 3;
 			SaveObject currentSaveObjectInScene;
 
@@ -1728,7 +1731,7 @@ CreateBlackTexture:
 			//   we need to skip it for later and instantiate them all.
 			loadPercentText.text = "Loading Static Objects: 0.0% (    0 / "
 								   + numSaveablesFromSavefile.ToString() + ")";
-			yield return null;
+			await Task.Yield();
 			loadUpdateTimer.Start(); // For loading update
 			float perc = 0f;
 			for (i = 3; i < numSaveFileLines; i++) {
@@ -1778,7 +1781,7 @@ CreateBlackTexture:
 					loadUpdateTimer.Start();
 					Cursor.lockState = CursorLockMode.None;
 					Cursor.visible = true;
-					yield return null;
+					await Task.Yield();
 				}
 			}
 			loadUpdateTimer.Stop();
@@ -1867,7 +1870,7 @@ CreateBlackTexture:
 					loadUpdateTimer.Start();
 					Cursor.lockState = CursorLockMode.None;
 					Cursor.visible = true;
-					yield return null;
+					await Task.Yield();
 				}
 			}
 			
@@ -1912,7 +1915,7 @@ CreateBlackTexture:
 		}
 		
 		loadPercentText.text = "Re-register targets...";
-		yield return null;
+		await Task.Yield();
 		for (i=0;i<allParents.Count;i++) {
 			Component[] compArray = allParents[i].GetComponentsInChildren(typeof(TargetIO),true); // find all SaveObject components, including inactive (hence the true here at the end)
 			for (k=0;k<compArray.Length;k++) {
@@ -1927,12 +1930,12 @@ CreateBlackTexture:
 		allParents = null; // Done with it.
 		ResetPauseLists();
 		loadPercentText.text = "Re-init cull systems...";
-		yield return null;
+		await Task.Yield();
 		DynamicCulling.a.Cull_Init();
 		DynamicCulling.a.CullCore();
 		loadPercentText.text = "Cleaning Up...";
-		yield return null;
-
+		await Task.Yield();
+		
  		System.GC.Collect(); // Collect it all!
 		System.GC.WaitForPendingFinalizers();
 		AutoSplitterData.isLoading = false;
