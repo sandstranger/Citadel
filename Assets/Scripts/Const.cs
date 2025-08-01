@@ -33,8 +33,6 @@ using UnityEngine.Networking;
 // UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion 1200
 // TextLocalization 1300
 
-public class SetLightsToImportant
-{
 public class Const : MonoBehaviour {
 	public float shadowThreshold = 0.03f;
 	//Item constants
