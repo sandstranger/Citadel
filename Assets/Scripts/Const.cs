@@ -581,7 +581,7 @@ public class Const : MonoBehaviour {
 			PauseScript.a.mainMenu.SetActive(false);
 			SceneTransitionHandler sth = loadGameIndicator.GetComponent<SceneTransitionHandler>();
 			sth.Load();
-		} else if (newGameIndicator != null || Application.platform == RuntimePlatform.Android) {
+		} else if (newGameIndicator != null) { 
 			UnityEngine.Debug.Log("newGameIndicator.name: " + newGameIndicator.name);
 			Utils.SafeDestroy(newGameIndicator);
 			GoIntoGame();				  // Start of the game!!
