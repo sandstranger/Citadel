@@ -22,7 +22,7 @@ public class TextureStaticNoise : MonoBehaviour {
 	}
 
 	void FillTexture () {
-		if (texture.width != resolution) texture.Resize(resolution, resolution);
+		if (texture.width != resolution) texture.Reinitialize(resolution, resolution);
 		for (int y=0; y<resolution; y++) {
 			for (int x=0; x<resolution; x++) {
 				texture.SetPixel(x, y, Color.white * Random.value);
