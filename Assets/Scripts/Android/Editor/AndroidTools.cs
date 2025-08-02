@@ -84,8 +84,6 @@ namespace Android.Tools
                 {
                     hasMesh = true;
                 }
-
-                
                 
                 // Если меша нет - добавляем в результаты
                 if (!hasMesh)

@@ -342,7 +342,7 @@ public class Utils {
             UnityWebRequest request = UnityWebRequest.Get(fPath);
             var operation = request.SendWebRequest();
             await operation.ToTask();
-            if (request.result == UnityWebRequest.Result.Success) {
+            if (request.result == UnityWebRequest.Result.Success && request.downloadedBytes > 0) {
                 byte[] bytes = request.downloadHandler.data;
                 MemoryStream memStr = new MemoryStream(bytes);
                 dataReader = new StreamReader(memStr, Encoding.ASCII);
