@@ -17,6 +17,7 @@
 *.pidb
 *.booproj
 *.cs.swp
+*.dwlt
 
 # Unity3D generated meta files
 *.pidb.meta
@@ -44,6 +45,7 @@ Assets/StreamingAssets/music/*.wav.meta
 Assets/StreamingAssets/music/looped/*.wav
 Assets/StreamingAssets/music/looped/*.wav.meta
 Assets/StreamingAssets/Screenshots/
+UserSettings/Layouts/
 
 ![Ll]ibrary/PackageCache/com.oddworm.texture2darrayimportpipeline@4befff7b72/*
 ![Ll]ibrary/BuildSettings.asset
