@@ -60,7 +60,7 @@ public class LevelManager : MonoBehaviour {
 		if (a == null) a = this;
 	}
 	
-	async void Awake () {
+	void Awake () {
 		SetA();
 		if (currentLevel < 0) {
 			if (Const.a == null) return;
@@ -84,7 +84,7 @@ public class LevelManager : MonoBehaviour {
 		for (int i=0;i<14;i++) levelDataLoaded[i] = false;
 		ResetSaveStrings();
 		LoadDynamicObjectsSavestrings(true);
-		await LoadLevelData(currentLevel);
+		LoadLevelData(currentLevel);
 	}
 
 	public static bool LevNumInBounds(int levnum) {
@@ -229,7 +229,7 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	// Make sure relevant data and objects are loaded in and present for the level.
-	public async Task LoadLevelData(int levnum) {
+	public void LoadLevelData(int levnum) {
 		if (!LevNumInBounds(currentLevel)) { // In a test or editor space.
 			levelDataLoaded[levnum] = true;
 			return;
@@ -237,7 +237,7 @@ public class LevelManager : MonoBehaviour {
 		if (levelDataLoaded[levnum]) return; // Already loaded.
 
 // 		Debug.Log("Loading level data for " + levnum.ToString());
-		await LoadLevelLights(levnum);
+		LoadLevelLights(levnum);
 		LoadLevelGeometry(levnum);
 		LoadLevelDynamicObjects(levnum);
 		Music.a.LoadLevelMusic(levnum);
@@ -245,7 +245,7 @@ public class LevelManager : MonoBehaviour {
 		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + SaveLoad.numLightsWithShadows.ToString());
 	}
 
-	public async void LoadLevel(int levnum, Vector3 targetPosition) {
+	public void LoadLevel(int levnum, Vector3 targetPosition) {
 		if (!LevNumInBounds(levnum)) { Debug.LogWarning("levnum out of bounds"); return; }
 
 		// NOTE: Check this first since the button for the current level has a null destination.  This is fine and expected.
@@ -288,7 +288,7 @@ public class LevelManager : MonoBehaviour {
 			Debug.Log("AutoSplitterData missionSplitID incremented: " + AutoSplitterData.missionSplitID.ToString());
 		}
 		
-		await PostLoadLevelSetupSystems();
+		PostLoadLevelSetupSystems();
 		if (currentLevel != 13) {
 			DynamicCulling.a.Cull_Init();
 			System.GC.Collect();
@@ -302,25 +302,25 @@ public class LevelManager : MonoBehaviour {
 		DynamicCulling.a.CullCore(); // For Level 10, visible screen with camera view can't update until cams awake.
 	}
 
-	public async void LoadLevelFromSave(int levnum) {
+	public void LoadLevelFromSave(int levnum) {
 		if (!LevNumInBounds(levnum)) return;
 
 // 		Debug.Log("LevelManager LoadLevelFromSave()");
-		await LoadLevelData(levnum); // Let this function check and load data if it isn't yet.
+		LoadLevelData(levnum); // Let this function check and load data if it isn't yet.
 		currentLevel = levnum; // Set current level to be the new level
 		DisableAllNonOccupiedLevelsExcept(currentLevel); // Unload last level.
 		levels[currentLevel].SetActive(true); // Load new level
-		await PostLoadLevelSetupSystems();
+		PostLoadLevelSetupSystems();
 	}
 
-	private async Task PostLoadLevelSetupSystems() {
+	private void PostLoadLevelSetupSystems() {
 		Music.a.inCombat = false;
 		Music.a.SFXMain.Stop();
 		Music.a.SFXOverlay.Stop();
 		Music.a.levelEntry = true;
 		PlayerHealth.a.radiationArea = false;
 		PlayerMovement.a.ladderState = 0;
-		await LoadLevelData(currentLevel);
+		LoadLevelData(currentLevel);
 		Automap.a.SetAutomapExploredReference(currentLevel);
 		Automap.a.automapBaseImage.overrideSprite = Automap.a.automapsBaseImages[currentLevel];
 		Const.a.ClearActiveAutomapOverlays(); // After other levels turned off.
@@ -616,7 +616,7 @@ public class LevelManager : MonoBehaviour {
 		compArray = null;
 	}
 
-	public async Task LoadLevelLights(int curlevel) {
+	public async void LoadLevelLights(int curlevel) {
 		if (curlevel > 12) return;
 		if (curlevel > (lightContainers.Length - 1)) return;
 		if (curlevel < 0) return;
