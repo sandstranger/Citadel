@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -117,13 +116,13 @@ public class LevelManager : MonoBehaviour {
 	
 	// Used in a couple places, bit slow to return list but it's only part of
 	// loads and transitions between levels.
-	public async Task<List<string>> ReadDynamicObjectFileList(int lev) {
+	public List<string> ReadDynamicObjectFileList(int lev) {
 		List<string> readFileList = new List<string>();
 		if (lev > (levelScripts.Length - 1)) return readFileList;
 		if (!LevNumInBounds(lev)) return readFileList;
 
 		string dynName = "CitadelScene_dynamics_level"+lev.ToString()+".txt";
-		StreamReader sf = await Utils.ReadStreamingAsset(dynName);
+		StreamReader sf = Utils.ReadStreamingAsset(dynName);
 		if (sf == null) { UnityEngine.Debug.Log("Dynamic objects filepath invalid"); return readFileList; }
 
 		string readline;
@@ -140,10 +139,10 @@ public class LevelManager : MonoBehaviour {
 		return readFileList;
 	}
 	
-	public async void LoadDynamicObjectsSavestrings(bool skipCurrent) {
+	public void LoadDynamicObjectsSavestrings(bool skipCurrent) {
 		ResetSaveStrings();		
 		for (int i=0;i<14;i++) {			
-			List<string> readFileList = await ReadDynamicObjectFileList(i);
+			List<string> readFileList = ReadDynamicObjectFileList(i);
 			for (int j=0;j<readFileList.Count;j++) {
 				DynamicObjectsSavestrings[i].Add(readFileList[j]);
 			}
@@ -530,12 +529,12 @@ public class LevelManager : MonoBehaviour {
 		}
 	}
 	
-	public async void LoadLevelGeometry(int curlevel) {
+	public void LoadLevelGeometry(int curlevel) {
 		if (curlevel > (geometryContainers.Length - 1)) return;
 		if (curlevel < 0) return;
 		
 		string gName = "CitadelScene_geometry_level"+curlevel.ToString()+".txt";
-		StreamReader sf = await Utils.ReadStreamingAsset(gName);
+		StreamReader sf = Utils.ReadStreamingAsset(gName);
 		if (sf == null) {
 			UnityEngine.Debug.Log("Geometry input file path invalid");
 			return;
@@ -616,13 +615,13 @@ public class LevelManager : MonoBehaviour {
 		compArray = null;
 	}
 
-	public async void LoadLevelLights(int curlevel) {
+	public void LoadLevelLights(int curlevel) {
 		if (curlevel > 12) return;
 		if (curlevel > (lightContainers.Length - 1)) return;
 		if (curlevel < 0) return;
 
 		string lName = "CitadelScene_lights_level"+curlevel.ToString()+".txt";
-		StreamReader sf = await Utils.ReadStreamingAsset(lName);
+		StreamReader sf = Utils.ReadStreamingAsset(lName);
 		if (sf == null) {
 			UnityEngine.Debug.Log("Lights input file path invalid");
 			return;

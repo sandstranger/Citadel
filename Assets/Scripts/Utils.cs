@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
@@ -16,7 +15,7 @@ using UnityEngine.Networking;
 	using UnityEditor.SceneManagement;
 #endif
 
-	// Globally accessible utility functions for parsing values, generating save
+// Globally accessible utility functions for parsing values, generating save
 // strings, converting enumerated and integer values, and other helpful things.
 //
 // Most of this is for saving.
@@ -334,21 +333,18 @@ public class Utils {
         return Application.persistentDataPath;
     }
 
-	public static async Task<StreamReader> ReadStreamingAsset(string fName) {
+	public static StreamReader ReadStreamingAsset(string fName) {
         StreamReader dataReader = null;
         string basePath = Application.streamingAssetsPath;
         string fPath = SafePathCombine(basePath, fName);
         if (Application.platform == RuntimePlatform.Android) {
-            // Android: Use UnityWebRequest to read from streamingAssetsPath
-            UnityWebRequest request = UnityWebRequest.Get(fPath);
-            var operation = request.SendWebRequest();
-            await operation.ToTask();
-            if (request.result == UnityWebRequest.Result.Success && request.downloadedBytes > 0) {
-                byte[] bytes = request.downloadHandler.data;
+	        InitializeBetterStreamingassets();
+	        var bytes = BetterStreamingAssets.FileExists(fName) ? BetterStreamingAssets.ReadAllBytes(fPath) : Array.Empty<byte>();
+            if (bytes.Length > 0) {
                 MemoryStream memStr = new MemoryStream(bytes);
                 dataReader = new StreamReader(memStr, Encoding.ASCII);
             } else {
-                UnityEngine.Debug.LogError($"Failed to read {fPath} on Android: {request.error}");
+                UnityEngine.Debug.LogError($"Failed to read {fPath} on Android");
                 return null; // No recovery needed for Android
             }
         } else {
