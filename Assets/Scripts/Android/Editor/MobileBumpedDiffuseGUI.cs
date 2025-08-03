@@ -9,6 +9,7 @@ public class MobileBumpedDiffuseGUI : ShaderGUI
         // Основные свойства
         MaterialProperty mainTex = FindProperty("_MainTex", properties);
         MaterialProperty bumpMap = FindProperty("_BumpMap", properties);
+        var mainColor = FindProperty("_Color", properties);
         
         // Настройки рендера
         MaterialProperty renderType = FindProperty("_RenderType", properties);
@@ -23,6 +24,7 @@ public class MobileBumpedDiffuseGUI : ShaderGUI
         
         // Секция текстур
         editor.TexturePropertySingleLine(new GUIContent("Main Texture"), mainTex);
+        editor.ShaderProperty(mainColor, "Main Color");
         editor.TexturePropertySingleLine(new GUIContent("Normal Map"), bumpMap);
         
         // Настройка типа рендера

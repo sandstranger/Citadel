@@ -1,6 +1,7 @@
 Shader "Mobile/Bumped Diffuse Custom" {
 Properties {
     _MainTex ("Base (RGB)", 2D) = "white" {}
+    _Color ("Main Color", Color) = (1,1,1,1)
     [NoScaleOffset] _BumpMap ("Normalmap", 2D) = "bump" {}
     
     // Emission properties with toggle
@@ -29,6 +30,7 @@ SubShader {
     sampler2D _MainTex;
     sampler2D _BumpMap;
     sampler2D _EmissionMap;
+    half4 _Color;
     half4 _EmissionColor;
     half _Cutoff;
 
@@ -37,7 +39,7 @@ SubShader {
     };
     
     void surf (Input IN, inout SurfaceOutput o) {
-        half4 c = tex2D(_MainTex, IN.uv_MainTex);
+        half4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
 
         #if defined(_ALPHATEST_ON)
             clip(c.a - _Cutoff);

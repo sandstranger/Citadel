@@ -10,11 +10,13 @@ public class MobileBumpedSpecularGUI : ShaderGUI
         MaterialProperty mainTex = FindProperty("_MainTex", properties);
         MaterialProperty bumpMap = FindProperty("_BumpMap", properties);
         MaterialProperty specular = FindProperty("_SpecGlossMap", properties);
+
+        var mainColor = FindProperty("_Color", properties);
+        var specularColor = FindProperty("_Color", properties);
         
         // Настройки рендера
         MaterialProperty renderType = FindProperty("_RenderType", properties);
         MaterialProperty cutoff = FindProperty("_Cutoff", properties);
-        
         MaterialProperty shineess = FindProperty("_Shininess", properties);
         
         // Свойства эмиссии
@@ -24,11 +26,16 @@ public class MobileBumpedSpecularGUI : ShaderGUI
 
         EditorGUI.BeginChangeCheck();
         
-        // Секция текстур
+        EditorGUILayout.LabelField("Main Properties", EditorStyles.boldLabel);
         editor.TexturePropertySingleLine(new GUIContent("Main Texture"), mainTex);
+        editor.ShaderProperty(mainColor, "Main Color");
         editor.TexturePropertySingleLine(new GUIContent("Normal Map"), bumpMap);
-        editor.TexturePropertySingleLine(new GUIContent("Specular Map"), specular);
         
+        EditorGUILayout.LabelField("Specular Properties", EditorStyles.boldLabel);
+        editor.TexturePropertySingleLine(new GUIContent("Specular Map"), specular);
+        editor.ShaderProperty(specularColor, "Specular Color");
+        editor.ShaderProperty(shineess, "Shininess");
+
         // Настройка типа рендера
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Rendering Settings", EditorStyles.boldLabel);
@@ -42,7 +49,6 @@ public class MobileBumpedSpecularGUI : ShaderGUI
         }
         
         EditorGUILayout.Space();
-        editor.ShaderProperty(shineess, "Shininess");
         
         // Секция эмиссии
         EditorGUILayout.Space();

@@ -1,8 +1,10 @@
 Shader "Mobile/Bumped Specular Custom" {
 Properties {
     _MainTex ("Base (RGB)", 2D) = "white" {}
+    _Color ("Main Color", Color) = (1,1,1,1)
     [NoScaleOffset] _BumpMap ("Normalmap", 2D) = "bump" {}
-    
+
+    _SpecCustomColor ("Specular Color", Color) = (1,1,1,1)
     _SpecGlossMap ("Specular", 2D) = "white" {}
     _Shininess ("Shininess", Range (0, 1)) = 0
     
@@ -31,6 +33,9 @@ SubShader {
     #pragma shader_feature USE_EMISSION
     #pragma shader_feature _ALPHATEST_ON
     
+    half4 _Color;
+    half4 _SpecCustomColor;
+    
     sampler2D _MainTex;
     sampler2D _BumpMap;
     sampler2D _EmissionMap;
@@ -56,14 +61,16 @@ SubShader {
     }
     
     void surf (Input IN, inout SurfaceOutput o) {
-        half4 c = tex2D(_MainTex, IN.uv_MainTex);
+        half4 texColor = tex2D(_MainTex, IN.uv_MainTex) * _Color;
         half4 specGloss = tex2D(_SpecGlossMap, IN.uv_MainTex);
         
+        specGloss.rgb *= _SpecCustomColor.rgb;
+        
         #if defined(_ALPHATEST_ON)
-            clip(c.a - _Cutoff);
+            clip(texColor.a - _Cutoff);
         #endif
 
-        o.Albedo = c.rgb;
+        o.Albedo = texColor.rgb;
         o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_MainTex));
         o.Specular = specGloss.rgb;
         o.Gloss = specGloss.a;
@@ -75,7 +82,7 @@ SubShader {
             o.Emission = half3(0,0,0);
         #endif
 
-        o.Alpha = c.a;
+        o.Alpha = texColor.a;
     }
     ENDCG
 }
