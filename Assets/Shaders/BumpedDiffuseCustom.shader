@@ -10,22 +10,24 @@ Properties {
     _EmissionMap ("Emission", 2D) = "white" {}
 
     // Rendering options
-    [Enum(Opaque,0,Transparent,1,Cutout,2)] _RenderType("Render Type", Float) = 0
+    [Enum(Opaque,0,Transparent,1,Cutout,2,Fade,3)] _RenderType("Render Type", Float) = 0
     _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+    _Transparency("Transparency", Range(0,1)) = 1.0
 }
 
 SubShader {
     Tags { 
         "RenderType" = "Opaque"
         "PerformanceChecks" = "False"
+        "Queue" = "Geometry"
     }
     LOD 250
 
     CGPROGRAM
-
-    #pragma surface surf Lambert noforwardadd
+    #pragma surface surf Lambert noforwardadd alpha
     #pragma shader_feature USE_EMISSION
     #pragma shader_feature _ALPHATEST_ON
+    #pragma shader_feature _ALPHABLEND_ON
     
     sampler2D _MainTex;
     sampler2D _BumpMap;
@@ -33,6 +35,7 @@ SubShader {
     half4 _Color;
     half4 _EmissionColor;
     half _Cutoff;
+    half _Transparency;
 
     struct Input {
         float2 uv_MainTex;
@@ -40,7 +43,7 @@ SubShader {
     
     void surf (Input IN, inout SurfaceOutput o) {
         half4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
-
+        
         #if defined(_ALPHATEST_ON)
             clip(c.a - _Cutoff);
         #endif
@@ -56,7 +59,11 @@ SubShader {
             o.Emission = half3(0,0,0);
         #endif
         
-        o.Alpha = c.a;
+        #if defined(_ALPHABLEND_ON)
+            o.Alpha = c.a * _Transparency; // Fade режим
+        #else
+            o.Alpha = c.a; // Для других режимов
+        #endif
     }
     ENDCG
 }

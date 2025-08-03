@@ -14,23 +14,26 @@ Properties {
     _EmissionMap ("Emission", 2D) = "white" {}
 
     // Rendering options
-    [Enum(Opaque,0,Transparent,1,Cutout,2)] _RenderType("Render Type", Float) = 0
+    [Enum(Opaque,0,Transparent,1,Cutout,2,Fade,3)] _RenderType("Render Type", Float) = 0
     _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+    _Transparency("Transparency", Range(0,1)) = 1.0
 }
 
 SubShader {
     Tags { 
         "RenderType" = "Opaque"
         "PerformanceChecks" = "False"
+        "Queue" = "Geometry"
     }
     
     Cull off
     LOD 250
     
     CGPROGRAM
-    #pragma surface surf MobileBlinnPhong exclude_path:prepass halfasview novertexlights
+    #pragma surface surf MobileBlinnPhong alpha exclude_path:prepass halfasview novertexlights
     #pragma shader_feature USE_EMISSION
     #pragma shader_feature _ALPHATEST_ON
+    #pragma shader_feature _ALPHABLEND_ON
     
     half4 _Color;
     half4 _SpecCustomColor;
@@ -42,7 +45,8 @@ SubShader {
     half _Shininess;
     half4 _EmissionColor;
     half _Cutoff;
-    
+    half _Transparency;
+
     struct Input {
         float2 uv_MainTex;
     };
@@ -54,9 +58,17 @@ SubShader {
 
         half specPower = exp2(10 * _Shininess + 4);   // 16-1024
         half spec = pow(nh, specPower) * s.Gloss;
+        
         half4 c;
         c.rgb = (s.Albedo * _LightColor0.rgb * diff + _LightColor0.rgb * spec) * atten;
-        c.a = s.Alpha;
+        
+        // Поддержка Fade рендеринга
+        #if defined(_ALPHABLEND_ON)
+            c.a = s.Alpha * _Transparency;
+        #else
+            c.a = s.Alpha;
+        #endif
+        
         return c;
     }
     
@@ -74,6 +86,7 @@ SubShader {
         o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_MainTex));
         o.Specular = specGloss.rgb;
         o.Gloss = specGloss.a * _Shininess;
+        o.Alpha = texColor.a;
 
         #if defined(USE_EMISSION)
             half4 e = tex2D(_EmissionMap, IN.uv_MainTex);
@@ -81,8 +94,6 @@ SubShader {
         #else
             o.Emission = half3(0,0,0);
         #endif
-
-        o.Alpha = texColor.a;
     }
     ENDCG
 }

@@ -1,112 +1,137 @@
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class MobileBumpedSpecularGUI : ShaderGUI
 {
-    public override void OnGUI(MaterialEditor editor, MaterialProperty[] properties)
+    private enum RenderMode
     {
-        // Основные свойства
-        MaterialProperty mainTex = FindProperty("_MainTex", properties);
-        MaterialProperty bumpMap = FindProperty("_BumpMap", properties);
-        MaterialProperty specular = FindProperty("_SpecGlossMap", properties);
+        Opaque,
+        Transparent,
+        Cutout,
+        Fade
+    }
 
-        var mainColor = FindProperty("_Color", properties);
-        var specularColor = FindProperty("_SpecCustomColor", properties);
+    public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties)
+    {
+        Material material = materialEditor.target as Material;
         
-        // Настройки рендера
+        // Находим свойства
+        MaterialProperty mainTex = FindProperty("_MainTex", properties);
+        MaterialProperty color = FindProperty("_Color", properties);
+        MaterialProperty bumpMap = FindProperty("_BumpMap", properties);
+        
+        MaterialProperty specColor = FindProperty("_SpecCustomColor", properties);
+        MaterialProperty specGlossMap = FindProperty("_SpecGlossMap", properties);
+        MaterialProperty shininess = FindProperty("_Shininess", properties);
+        
+        MaterialProperty useEmission = FindProperty("_UseEmission", properties);
+        MaterialProperty emissionMap = FindProperty("_EmissionMap", properties);
+        MaterialProperty emissionColor = FindProperty("_EmissionColor", properties);
+        
         MaterialProperty renderType = FindProperty("_RenderType", properties);
         MaterialProperty cutoff = FindProperty("_Cutoff", properties);
-        MaterialProperty shineess = FindProperty("_Shininess", properties);
-        
-        // Свойства эмиссии
-        MaterialProperty useEmission = FindProperty("_UseEmission", properties);
-        MaterialProperty emissionColor = FindProperty("_EmissionColor", properties);
-        MaterialProperty emissionMap = FindProperty("_EmissionMap", properties);
+        MaterialProperty transparency = FindProperty("_Transparency", properties);
 
+        // Основные свойства
+        materialEditor.ShaderProperty(color, "Color");
+        materialEditor.ShaderProperty(mainTex, "Base Texture");
+        materialEditor.ShaderProperty(bumpMap, "Normal Map");
+        
+        // Свойства бликов
+        EditorGUILayout.Space();
+        materialEditor.ShaderProperty(specColor, "Specular Color");
+        materialEditor.ShaderProperty(specGlossMap, "Specular Map");
+        materialEditor.ShaderProperty(shininess, "Shininess");
+        
+        // Эмиссия
+        EditorGUILayout.Space();
+        materialEditor.ShaderProperty(useEmission, "Enable Emission");
+        if (useEmission.floatValue > 0)
+        {
+            materialEditor.ShaderProperty(emissionMap, "Emission Map");
+            materialEditor.ShaderProperty(emissionColor, "Emission Color");
+        }
+        
+        // Настройки рендеринга
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Rendering Options", EditorStyles.boldLabel);
+        
+        // Режим рендеринга
+        RenderMode mode = (RenderMode)renderType.floatValue;
         EditorGUI.BeginChangeCheck();
+        mode = (RenderMode)EditorGUILayout.EnumPopup("Rendering Mode", mode);
         
-        EditorGUILayout.LabelField("Main Properties", EditorStyles.boldLabel);
-        editor.TexturePropertySingleLine(new GUIContent("Main Texture"), mainTex);
-        editor.ShaderProperty(mainColor, "Main Color");
-        editor.TexturePropertySingleLine(new GUIContent("Normal Map"), bumpMap);
-        
-        EditorGUILayout.LabelField("Specular Properties", EditorStyles.boldLabel);
-        editor.TexturePropertySingleLine(new GUIContent("Specular Map"), specular);
-        editor.ShaderProperty(specularColor, "Specular Color");
-        editor.ShaderProperty(shineess, "Shininess");
-
-        // Настройка типа рендера
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Rendering Settings", EditorStyles.boldLabel);
-        int mode = (int)renderType.floatValue;
-        mode = EditorGUILayout.Popup("Render Type", mode, new[] {"Opaque", "Transparent", "Cutout"});
-        renderType.floatValue = mode;
-        
-        if (mode == 2) // Cutout
-        {
-            editor.ShaderProperty(cutoff, "Alpha Cutoff");
-        }
-        
-        EditorGUILayout.Space();
-        
-        // Секция эмиссии
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Emission", EditorStyles.boldLabel);
-        editor.ShaderProperty(useEmission, "Enable Emission");
-        
-        if (useEmission.floatValue > 0.5)
-        {
-            editor.TexturePropertyWithHDRColor(new GUIContent("Emission Map"), emissionMap, emissionColor, true);
-        }
-        else
-        {
-            editor.ShaderProperty(emissionColor, "Emission Color");
-        }
-        
-        // Применяем изменения
         if (EditorGUI.EndChangeCheck())
         {
-            // Обновляем теги рендера и ключевые слова
-            foreach (Material mat in editor.targets)
+            renderType.floatValue = (float)mode;
+            
+            // Устанавливаем ключевые слова и параметры рендеринга
+            switch (mode)
             {
-                // Управление ключевыми словами для эмиссии
-                if (useEmission.floatValue > 0.5)
-                    mat.EnableKeyword("USE_EMISSION");
-                else
-                    mat.DisableKeyword("USE_EMISSION");
-                
-                // Управление ключевыми словами для альфа-теста
-                if (mode == 2)
-                    mat.EnableKeyword("_ALPHATEST_ON");
-                else
-                    mat.DisableKeyword("_ALPHATEST_ON");
-                
-                // Настройка блендинга
-                if (mode == 1) // Transparent
-                {
-                    mat.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
-                    mat.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
-                    mat.renderQueue = 3000;
-                }
-                else if (mode == 2) // Cutout
-                {
-                    mat.SetInt("_SrcBlend", (int)BlendMode.One);
-                    mat.SetInt("_DstBlend", (int)BlendMode.Zero);
-                    mat.renderQueue = 2450;
-                }
-                else // Opaque
-                {
-                    mat.SetInt("_SrcBlend", (int)BlendMode.One);
-                    mat.SetInt("_DstBlend", (int)BlendMode.Zero);
-                    mat.renderQueue = 2000;
-                }
-                
-                // Обновление тега RenderType
-                string renderTag = mode == 0 ? "Opaque" : 
-                                 mode == 1 ? "Transparent" : "TransparentCutout";
-                mat.SetOverrideTag("RenderType", renderTag);
+                case RenderMode.Opaque:
+                    material.DisableKeyword("_ALPHATEST_ON");
+                    material.DisableKeyword("_ALPHABLEND_ON");
+                    material.SetOverrideTag("RenderType", "Opaque");
+                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Geometry;
+                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                    material.SetInt("_ZWrite", 1);
+                    break;
+                    
+                case RenderMode.Transparent:
+                    material.DisableKeyword("_ALPHATEST_ON");
+                    material.EnableKeyword("_ALPHABLEND_ON");
+                    material.SetOverrideTag("RenderType", "Transparent");
+                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    material.SetInt("_ZWrite", 0);
+                    break;
+                    
+                case RenderMode.Cutout:
+                    material.EnableKeyword("_ALPHATEST_ON");
+                    material.DisableKeyword("_ALPHABLEND_ON");
+                    material.SetOverrideTag("RenderType", "TransparentCutout");
+                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
+                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                    material.SetInt("_ZWrite", 1);
+                    break;
+                    
+                case RenderMode.Fade:
+                    material.DisableKeyword("_ALPHATEST_ON");
+                    material.EnableKeyword("_ALPHABLEND_ON");
+                    material.SetOverrideTag("RenderType", "Transparent");
+                    material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                    material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    material.SetInt("_ZWrite", 0);
+                    break;
             }
+        }
+        
+        // Дополнительные параметры для разных режимов
+        switch (mode)
+        {
+            case RenderMode.Cutout:
+                materialEditor.ShaderProperty(cutoff, "Alpha Cutoff");
+                break;
+                
+            case RenderMode.Transparent:
+            case RenderMode.Fade:
+                materialEditor.ShaderProperty(transparency, "Transparency");
+                break;
+        }
+        
+        // Кнопка сброса
+        EditorGUILayout.Space();
+        if (GUILayout.Button("Reset to Defaults"))
+        {
+            color.colorValue = Color.white;
+            specColor.colorValue = Color.white;
+            emissionColor.colorValue = Color.black;
+            shininess.floatValue = 0.5f;
+            transparency.floatValue = 1.0f;
         }
     }
 }
