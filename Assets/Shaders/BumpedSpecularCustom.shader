@@ -16,7 +16,6 @@ Properties {
     // Rendering options
     [Enum(Opaque,0,Transparent,1,Cutout,2)] _RenderType("Render Type", Float) = 0
     _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
-    [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull", Float) = 0
 }
 
 SubShader {
@@ -25,7 +24,7 @@ SubShader {
         "PerformanceChecks" = "False"
     }
     
-    Cull [_Cull]
+    Cull off
     LOD 250
     
     CGPROGRAM
