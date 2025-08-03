@@ -557,7 +557,7 @@ PlayerSettings:
   - m_BuildTarget: PS4
     m_EncodingQuality: 1
   - m_BuildTarget: Android
-    m_EncodingQuality: 1
+    m_EncodingQuality: 0
   m_BuildTargetGroupLightmapSettings:
   - m_BuildTarget: Standalone
     m_TextureStreamingEnabled: 0
