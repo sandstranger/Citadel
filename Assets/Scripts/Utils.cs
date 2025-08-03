@@ -335,20 +335,20 @@ public class Utils {
 
 	public static StreamReader ReadStreamingAsset(string fName) {
         StreamReader dataReader = null;
-        string basePath = Application.streamingAssetsPath;
-        string fPath = SafePathCombine(basePath, fName);
         if (Application.platform == RuntimePlatform.Android) {
 	        InitializeBetterStreamingassets();
-	        var bytes = BetterStreamingAssets.FileExists(fName) ? BetterStreamingAssets.ReadAllBytes(fPath) : Array.Empty<byte>();
+	        var bytes = BetterStreamingAssets.FileExists(fName) ? BetterStreamingAssets.ReadAllBytes(fName) : Array.Empty<byte>();
             if (bytes.Length > 0) {
                 MemoryStream memStr = new MemoryStream(bytes);
                 dataReader = new StreamReader(memStr, Encoding.ASCII);
             } else {
-                UnityEngine.Debug.LogError($"Failed to read {fPath} on Android");
+                UnityEngine.Debug.LogError($"Failed to read {fName} on Android");
                 return null; // No recovery needed for Android
             }
         } else {
-            // Windows/Linux/MacOS: Try streamingAssetsPath first
+	        string basePath = Application.streamingAssetsPath;
+	        string fPath = SafePathCombine(basePath, fName);
+	        // Windows/Linux/MacOS: Try streamingAssetsPath first
             if (File.Exists(fPath)) {
                 dataReader = new StreamReader(fPath, Encoding.ASCII);
             } else {
