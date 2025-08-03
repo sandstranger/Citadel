@@ -131,18 +131,18 @@ public class MainMenuHandler : MonoBehaviour {
 		ResetPages();
 		dataFound = false;
 		inCutscene = false;
+#if UNITY_ANDROID
+		dataFound = true;
 		Config.SetVolume();
-		if (Application.platform == RuntimePlatform.Android) {
-			dataFound = true;
-			Config.SetVolume();
-			GoToFrontPage();
-			CheckAndPlayIntro();
-			return;
-		}
+		GoToFrontPage();
+		CheckAndPlayIntro();
+#else		
+		Config.SetVolume();
 		FileBrowser.SetFilters(false,new FileBrowser.Filter("SHOCK RES Files",
 															".RES",".res"));
 		FileBrowser.SetDefaultFilter( ".RES" );
 		StartCoroutine(CheckDataFiles());
+#endif
 	}
 
 	// Improve menu performance.

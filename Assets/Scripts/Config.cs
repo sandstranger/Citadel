@@ -7,77 +7,23 @@ using UnityEngine.PostProcessing;
 // Handles configuration parsing for user settings.
 public class Config {
 	public static void LoadConfig() {
-		if (Application.platform == RuntimePlatform.Android) {
-			// Android Config (no read/write permissions.  Stupid security.
-			// ----------------------------------------------------------------
-
-	        // Graphics Configurations
-    		Const.a.GraphicsResWidth = Screen.width;
-    		Const.a.GraphicsResHeight = Screen.height;
-    		Const.a.GraphicsFullscreen = true;
-    		Const.a.GraphicsSSAO = false;
-    		Const.a.GraphicsBloom = false;
-			Const.a.GraphicsSEGI = false;
-    		Const.a.GraphicsFOV = 65;
-    		Const.a.GraphicsAAMode = 1;
-    		Const.a.GraphicsShadowMode = 0;
-    		Const.a.GraphicsSSRMode = 1;
-    		Const.a.GraphicsGamma = 50;
-			Const.a.GraphicsModelDetail = 0; // No detail, mobile
-    		Const.a.GraphicsVSync = false;
-    
-    		// Audio Configurations
-    		Const.a.AudioSpeakerMode = 1;
-    		Const.a.AudioReverb = true;
-    		Const.a.AudioVolumeMaster = 100;
-    		Const.a.AudioVolumeMusic = 20;
-    		Const.a.AudioVolumeMessage = 100;
-    		Const.a.AudioVolumeEffects = 100;
-    		Const.a.AudioLanguage = 0;
-    		Const.a.DynamicMusic = true;
-			Const.a.Footsteps = true;
-
-			// Input
-    		Const.a.MouseSensitivity = 20;
-     		Const.a.InputInvertLook = false;
-    		Const.a.InputInvertCyberspaceLook = false;
-    		Const.a.InputInvertInventoryCycling = false;
-    		Const.a.InputQuickItemPickup = true;
-    		Const.a.InputQuickReloadWeapons = true;
-    		// NoShootMode is irrelevant on Android due to touch widgets.
-			Const.a.HeadBob = true;
-
-    		// Apply settings effects
-    		SetVolume();
-    		Const.sprint(Const.a.stringTable[1016] // "Setting screen resolution to "
-    				     + Const.a.GraphicsResWidth.ToString()
-    				     + ", " + Const.a.GraphicsResHeight.ToString()
-    				     + ", " + Const.a.stringTable[1017] + ": "
-    				     + Const.a.GraphicsFullscreen.ToString());
-    		SetShadows();
-			SetModelDetail();
-    		SetBloom();
-			SetSEGI();
-    		SetSSR();
-    		SetBrightness();
-    		SetSSAO();
-    		SetFOV();
-    		SetAA();
-    		SetVSync();
-	        return;
-	    }
-
-	    // Normal Windows/Linux/Mac Config
-	    // --------------------------------------------------------------------
-	    
 		// The currently used config is always Config.ini.
 		string basePath = Utils.GetAppropriateDataPath();
 		Utils.ConfirmExistsMakeIfNot(basePath,"Config.ini");
 
-		// Graphics Configurations
+#if UNITY_EDITOR
+		Const.a.GraphicsResWidth = Screen.width;
+		Const.a.GraphicsResHeight = Screen.height;
+#elif !UNITY_ANDROID		
 		Const.a.GraphicsResWidth = AssignConfigInt("Graphics","ResolutionWidth");
 		Const.a.GraphicsResHeight = AssignConfigInt("Graphics","ResolutionHeight");
+#endif
+
+#if UNITY_ANDROID		
+		Const.a.GraphicsFullscreen = true;
+#else
 		Const.a.GraphicsFullscreen = AssignConfigBool("Graphics","Fullscreen");
+#endif		
 		Const.a.GraphicsSSAO = AssignConfigBool("Graphics","SSAO");
 		Const.a.GraphicsBloom = AssignConfigBool("Graphics","Bloom");
 		Const.a.GraphicsSEGI = AssignConfigBool("Graphics","SEGI");

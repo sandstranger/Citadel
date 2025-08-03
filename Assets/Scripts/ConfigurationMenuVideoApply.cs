@@ -7,6 +7,7 @@ public class ConfigurationMenuVideoApply : MonoBehaviour {
 	public Dropdown resolutionPicker;
 
 	public void OnApplyClick () {
+#if !UNITY_ANDROID		
 		int x = Screen.resolutions[resolutionPicker.value].width;
 		int y = Screen.resolutions[resolutionPicker.value].height;
 		Const.sprint(Const.a.stringTable[1016] + x.ToString() + ", "
@@ -17,5 +18,6 @@ public class ConfigurationMenuVideoApply : MonoBehaviour {
 		Const.a.GraphicsResWidth = Screen.resolutions[resolutionPicker.value].width;
 		Const.a.GraphicsResHeight = Screen.resolutions[resolutionPicker.value].height;
 		Config.WriteConfig();
+#endif
 	}
 }
