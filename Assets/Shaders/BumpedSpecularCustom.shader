@@ -39,17 +39,16 @@ SubShader {
     struct Input {
         float2 uv_MainTex;
     };
+    
+    inline half4 LightingMobileBlinnPhong (SurfaceOutput s, half3 lightDir, half3 halfDir, half atten)
+    {
+        half diff = max (0, dot (s.Normal, lightDir));
+        half nh = max (0, dot (s.Normal, halfDir));
+        half spec = pow (nh, s.Specular*128) * s.Gloss * _Shininess;
 
-    // Упрощенная модель освещения Blinn-Phong
-    inline half4 LightingMobileBlinnPhong (SurfaceOutput s, half3 lightDir, half3 viewDir, half atten) {
-        half3 halfVec = normalize(lightDir + viewDir);
-        half diff = max(0, dot(s.Normal, lightDir));
-        half nh = max(0, dot(s.Normal, halfVec));
-        half spec = pow(nh, s.Specular*128) * s.Gloss * _Shininess;
-        
         half4 c;
         c.rgb = (s.Albedo * _LightColor0.rgb * diff + _LightColor0.rgb * spec) * atten;
-        c.a = 0.0;
+        UNITY_OPAQUE_ALPHA(c.a);
         return c;
     }
     
