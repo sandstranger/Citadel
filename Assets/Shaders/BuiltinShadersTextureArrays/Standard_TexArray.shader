@@ -27,7 +27,6 @@ Shader "Custom/StandardTextureArray" {
             #pragma multi_compile_instancing
             #pragma vertex vertDeferred
             #pragma fragment fragDeferred
-            #include "UnityStandardCore.cginc"
             #include "UnityStandardCore_TexArray.cginc"
             ENDCG
         }
