@@ -1,4 +1,4 @@
-Shader "Mobile/Bumped Diffuse Custom" {
+Shader "Mobile/Bumped Diffuse Custom Alpha Support" {
 Properties {
     _MainTex ("Base (RGB)", 2D) = "white" {}
     _Color ("Main Color", Color) = (1,1,1,1)
@@ -24,7 +24,7 @@ SubShader {
     LOD 250
 
     CGPROGRAM
-    #pragma surface surf Lambert noforwardadd
+    #pragma surface surf Lambert noforwardadd alpha
     #pragma shader_feature USE_EMISSION
     #pragma shader_feature _ALPHATEST_ON
     #pragma shader_feature _ALPHABLEND_ON
