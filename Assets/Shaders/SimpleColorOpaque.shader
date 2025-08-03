@@ -27,7 +27,7 @@ Shader "Mobile/SimpleColorOpaque"
                 float4 vertex : SV_POSITION;
             };
 
-            fixed4 _Color;
+            half4 _Color;
             
             v2f vert (appdata v)
             {
@@ -36,7 +36,7 @@ Shader "Mobile/SimpleColorOpaque"
                 return o;
             }
             
-            fixed4 frag (v2f i) : SV_Target
+            half4 frag (v2f i) : SV_Target
             {
                 return _Color;
             }

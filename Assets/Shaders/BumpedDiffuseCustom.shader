@@ -29,15 +29,15 @@ SubShader {
     sampler2D _MainTex;
     sampler2D _BumpMap;
     sampler2D _EmissionMap;
-    fixed4 _EmissionColor;
-    fixed _Cutoff;
+    half4 _EmissionColor;
+    half _Cutoff;
 
     struct Input {
         float2 uv_MainTex;
     };
     
     void surf (Input IN, inout SurfaceOutput o) {
-        fixed4 c = tex2D(_MainTex, IN.uv_MainTex);
+        half4 c = tex2D(_MainTex, IN.uv_MainTex);
 
         #if defined(_ALPHATEST_ON)
             clip(c.a - _Cutoff);
@@ -48,7 +48,7 @@ SubShader {
         
         // Эмиссия
         #if defined(USE_EMISSION)
-            fixed4 e = tex2D(_EmissionMap, IN.uv_MainTex);
+            half4 e = tex2D(_EmissionMap, IN.uv_MainTex);
             o.Emission = e.rgb * _EmissionColor.rgb;
         #else
             o.Emission = half3(0,0,0);

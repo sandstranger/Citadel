@@ -24,7 +24,7 @@ SubShader {
     LOD 250
     CGPROGRAM
 
-    #pragma surface surf MobileBlinnPhong exclude_path:prepass halfasview novertexlights
+    #pragma surface surf MobileBlinnPhong exclude_path:prepass halfasview novertexlights nodeferred
     #pragma shader_feature USE_EMISSION
     #pragma shader_feature _ALPHATEST_ON
     
@@ -32,9 +32,9 @@ SubShader {
     sampler2D _BumpMap;
     sampler2D _EmissionMap;
     sampler2D _SpecGlossMap;    
-    fixed _Shininess;
-    fixed4 _EmissionColor;
-    fixed _Cutoff;
+    half _Shininess;
+    half4 _EmissionColor;
+    half _Cutoff;
 
     struct Input {
         float2 uv_MainTex;
@@ -42,20 +42,20 @@ SubShader {
 
     // Упрощенная модель освещения Blinn-Phong
     inline half4 LightingMobileBlinnPhong (SurfaceOutput s, half3 lightDir, half3 viewDir, half atten) {
-        fixed3 halfVec = normalize(lightDir + viewDir);
-        fixed diff = max(0, dot(s.Normal, lightDir));
-        fixed nh = max(0, dot(s.Normal, halfVec));
-        fixed spec = pow(nh, s.Specular*128) * s.Gloss * _Shininess;
+        half3 halfVec = normalize(lightDir + viewDir);
+        half diff = max(0, dot(s.Normal, lightDir));
+        half nh = max(0, dot(s.Normal, halfVec));
+        half spec = pow(nh, s.Specular*128) * s.Gloss * _Shininess;
         
-        fixed4 c;
+        half4 c;
         c.rgb = (s.Albedo * _LightColor0.rgb * diff + _LightColor0.rgb * spec) * atten;
         c.a = 0.0;
         return c;
     }
     
     void surf (Input IN, inout SurfaceOutput o) {
-        fixed4 c = tex2D(_MainTex, IN.uv_MainTex);
-        fixed4 specGloss = tex2D(_SpecGlossMap, IN.uv_MainTex);
+        half4 c = tex2D(_MainTex, IN.uv_MainTex);
+        half4 specGloss = tex2D(_SpecGlossMap, IN.uv_MainTex);
         
         #if defined(_ALPHATEST_ON)
             clip(c.a - _Cutoff);
@@ -68,7 +68,7 @@ SubShader {
         
         // Эмиссия
         #if defined(USE_EMISSION)
-            fixed4 e = tex2D(_EmissionMap, IN.uv_MainTex);
+            half4 e = tex2D(_EmissionMap, IN.uv_MainTex);
             o.Emission = e.rgb * _EmissionColor.rgb;
         #else
             o.Emission = half3(0,0,0);
