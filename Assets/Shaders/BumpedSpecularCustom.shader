@@ -14,6 +14,7 @@ Properties {
     // Rendering options
     [Enum(Opaque,0,Transparent,1,Cutout,2)] _RenderType("Render Type", Float) = 0
     _Cutoff ("Alpha Cutoff", Range(0,1)) = 0.5
+    [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull", Float) = 0
 }
 
 SubShader {
@@ -21,9 +22,11 @@ SubShader {
         "RenderType" = "Opaque"
         "PerformanceChecks" = "False"
     }
+    
+    Cull [_Cull]
     LOD 250
+    
     CGPROGRAM
-
     #pragma surface surf MobileBlinnPhong exclude_path:prepass halfasview novertexlights
     #pragma shader_feature USE_EMISSION
     #pragma shader_feature _ALPHATEST_ON
@@ -39,16 +42,16 @@ SubShader {
     struct Input {
         float2 uv_MainTex;
     };
-    
+
     inline half4 LightingMobileBlinnPhong (SurfaceOutput s, half3 lightDir, half3 halfDir, half atten)
     {
-        half diff = max (0, dot (s.Normal, lightDir));
-        half nh = max (0, dot (s.Normal, halfDir));
-        half spec = pow (nh, s.Specular*128) * s.Gloss * _Shininess;
+        half diff = max(0, dot(s.Normal, lightDir));
+        half nh = max(0, dot(s.Normal, halfDir));
+        half spec = pow(nh, s.Specular*128) * s.Gloss * _Shininess;
 
         half4 c;
         c.rgb = (s.Albedo * _LightColor0.rgb * diff + _LightColor0.rgb * spec) * atten;
-        UNITY_OPAQUE_ALPHA(c.a);
+        c.a = s.Alpha;
         return c;
     }
     
@@ -62,17 +65,16 @@ SubShader {
 
         o.Albedo = c.rgb;
         o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_MainTex));
-        o.Specular = specGloss.rgb;  // Цвет блика
-        o.Gloss = specGloss.a;       // Интенсивность блика
+        o.Specular = specGloss.rgb;
+        o.Gloss = specGloss.a;
         
-        // Эмиссия
         #if defined(USE_EMISSION)
             half4 e = tex2D(_EmissionMap, IN.uv_MainTex);
             o.Emission = e.rgb * _EmissionColor.rgb;
         #else
             o.Emission = half3(0,0,0);
         #endif
-        
+
         o.Alpha = c.a;
     }
     ENDCG
