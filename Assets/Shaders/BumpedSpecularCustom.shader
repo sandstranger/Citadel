@@ -42,7 +42,7 @@ SubShader {
     half _Shininess;
     half4 _EmissionColor;
     half _Cutoff;
-
+    
     struct Input {
         float2 uv_MainTex;
     };
@@ -51,8 +51,9 @@ SubShader {
     {
         half diff = max(0, dot(s.Normal, lightDir));
         half nh = max(0, dot(s.Normal, halfDir));
-        half spec = pow(nh, s.Specular*128) * s.Gloss * _Shininess;
 
+        half specPower = exp2(10 * _Shininess + 4);   // 16-1024
+        half spec = pow(nh, specPower) * s.Gloss;
         half4 c;
         c.rgb = (s.Albedo * _LightColor0.rgb * diff + _LightColor0.rgb * spec) * atten;
         c.a = s.Alpha;
@@ -72,8 +73,8 @@ SubShader {
         o.Albedo = texColor.rgb;
         o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_MainTex));
         o.Specular = specGloss.rgb;
-        o.Gloss = specGloss.a;
-        
+        o.Gloss = specGloss.a * _Shininess;
+
         #if defined(USE_EMISSION)
             half4 e = tex2D(_EmissionMap, IN.uv_MainTex);
             o.Emission = e.rgb * _EmissionColor.rgb;

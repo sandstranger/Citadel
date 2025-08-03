@@ -12,7 +12,7 @@ public class MobileBumpedSpecularGUI : ShaderGUI
         MaterialProperty specular = FindProperty("_SpecGlossMap", properties);
 
         var mainColor = FindProperty("_Color", properties);
-        var specularColor = FindProperty("_Color", properties);
+        var specularColor = FindProperty("_SpecCustomColor", properties);
         
         // Настройки рендера
         MaterialProperty renderType = FindProperty("_RenderType", properties);
