@@ -26,7 +26,6 @@ SubShader {
         "Queue" = "Geometry"
     }
     
-    Cull off
     LOD 250
     
     CGPROGRAM
