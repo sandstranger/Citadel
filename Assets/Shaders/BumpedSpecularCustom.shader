@@ -24,7 +24,7 @@ SubShader {
     LOD 250
     CGPROGRAM
 
-    #pragma surface surf MobileBlinnPhong exclude_path:prepass halfasview novertexlights nodeferred
+    #pragma surface surf MobileBlinnPhong exclude_path:prepass halfasview novertexlights
     #pragma shader_feature USE_EMISSION
     #pragma shader_feature _ALPHATEST_ON
     
