@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.gwiazdorrr.betterstreamingassets": {
+      "version": "https://github.com/gwiazdorrr/BetterStreamingAssets.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "103724d1001fc643412dbc089cccca3e2f07ce84"
+    },
     "com.oddworm.texture2darrayimportpipeline": {
       "version": "https://github.com/pschraut/UnityTexture2DArrayImportPipeline.git#1.5.0",
       "depth": 0,

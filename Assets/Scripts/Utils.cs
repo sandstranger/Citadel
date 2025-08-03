@@ -32,6 +32,7 @@ public class Utils {
 	public static char splitCharChar = '|';
 	public static CultureInfo en_US_Culture = new CultureInfo("en-US");
 
+	private static bool _betterStreamingAssetsInitialized = false;
 	private static bool getValparsed;
 	private static int getValreadInt;
 	private static float getValreadFloat;
@@ -395,8 +396,8 @@ public class Utils {
 			UnityEngine.Debug.LogWarning("basePath was null or whitespace passed to ConfirmExistsMakeIfNot");
 			return;
 		}
-
-		 // Recreate StreamingAssets or PersistentDataPath if it doesn't exist.
+		
+		// Recreate StreamingAssets or PersistentDataPath if it doesn't exist.
 		string targetPath = basePath;
 		if (basePath == Application.streamingAssetsPath &&
 			(Application.platform == RuntimePlatform.Android ||
@@ -421,22 +422,16 @@ public class Utils {
 			}
 		}
 
-		string rsrc = ResourcesPathCombine("StreamingAssetsRecovery",fileName);
-        TextAsset resourcesFile = (TextAsset)Resources.Load(rsrc);
-        if (resourcesFile != null) {
-			try {
-				// Recreate from Resources/StreamingAssetsRecovery/*
-				File.WriteAllBytes(strmAstPth, resourcesFile.bytes); // new, contents
-				if (File.Exists(strmAstPth)) {
-					UnityEngine.Debug.Log("File " + strmAstPth + " recreated");
-				} else {
-					UnityEngine.Debug.LogWarning("File " + strmAstPth + " failed to be created by File.WriteAllText!");
-				}
-			} catch (Exception ex) {
-				UnityEngine.Debug.LogError("Failed to recreate " + strmAstPth + ": " + ex.Message);
+		try {
+			InitializeBetterStreamingassets();
+			File.WriteAllBytes(strmAstPth, BetterStreamingAssets.ReadAllBytes(Path.Combine("StreamingAssetsRecovery", fileName)));
+			if (File.Exists(strmAstPth)) {
+				UnityEngine.Debug.Log("File " + strmAstPth + " recreated");
+			} else {
+				UnityEngine.Debug.LogWarning("File " + strmAstPth + " failed to be created by File.WriteAllText!");
 			}
-        } else {
-			UnityEngine.Debug.LogWarning("File " + fileName + " not found in the Resources/StreamingAssetsRecovery folder");
+		} catch (Exception ex) {
+			UnityEngine.Debug.LogError("Failed to recreate " + strmAstPth + ": " + ex.Message);
 		}
 	}
 
@@ -1913,7 +1908,16 @@ public class Utils {
 		// other two are tother.
 		return (count27 == 2 && count65 == 2);
 	}
-	
+
+	private static void InitializeBetterStreamingassets()
+	{
+		if (!_betterStreamingAssetsInitialized)
+		{
+			BetterStreamingAssets.Initialize();
+			_betterStreamingAssetsInitialized = true;
+		}
+	}
+    
 	#if UNITY_EDITOR
 		public static List<GameObject> GetAllObjectsOnlyInScene() {
 			List<GameObject> objectsInScene = new List<GameObject>();
