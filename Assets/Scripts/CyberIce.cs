@@ -8,8 +8,8 @@ public class CyberIce : MonoBehaviour {
 			col.gameObject.layer = 24; // Set to NPCBullet layer
 			Rigidbody rbody = col.gameObject.GetComponent<Rigidbody>();
 			if (rbody != null) {
-				Vector3 flip = rbody.velocity * -1f;
-				rbody.velocity = flip;
+				Vector3 flip = rbody.linearVelocity * -1f;
+				rbody.linearVelocity = flip;
 			}
 		}
 	}

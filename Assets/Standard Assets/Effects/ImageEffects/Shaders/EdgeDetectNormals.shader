@@ -68,26 +68,24 @@ Shader "Hidden/EdgeDetect" {
 		//	original.rgb = 0;
 
 		return len * lerp(original, _BgColor, _BgFade);			
-	}	
-	
-	inline half CheckSame (half2 centerNormal, float centerDepth, half4 theSample)
+	}
+
+	inline half CheckSame(half2 centerNormal, float centerDepth, half4 theSample)
 	{
 		// difference in normals
 		// do not bother decoding normals - there's no need here
 		half2 diff = abs(centerNormal - theSample.xy) * _Sensitivity.y;
-		half isSameNormal = (diff.x + diff.y) * _Sensitivity.y < 0.1;
+		half isSameNormal = ((diff.x + diff.y) * _Sensitivity.y < 0.1) ? 1.0 : 0.0;
 		// difference in depth
-		float sampleDepth = DecodeFloatRG (theSample.zw);
-		float zdiff = abs(centerDepth-sampleDepth);
+		float sampleDepth = DecodeFloatRG(theSample.zw);
+		float zdiff = abs(centerDepth - sampleDepth);
 		// scale the required threshold by the distance
-		half isSameDepth = zdiff * _Sensitivity.x < 0.09 * centerDepth;
-	
+		half isSameDepth = (zdiff * _Sensitivity.x < 0.09 * centerDepth) ? 1.0 : 0.0;
 		// return:
 		// 1 - if normals and depth are similar enough
 		// 0 - otherwise
-		
 		return isSameNormal * isSameDepth;
-	}	
+	}
 		
 	v2f vertRobert( appdata_img v ) 
 	{

@@ -127,14 +127,14 @@ public class FuncWall : MonoBehaviour {
 		switch (currentState) {
 			case FuncStates.Start:
 				transform.position = startPosition;
-				if (rbody.velocity.sqrMagnitude > 0) {
-					rbody.velocity = Const.a.vectorZero;
+				if (rbody.linearVelocity.sqrMagnitude > 0) {
+					rbody.linearVelocity = Const.a.vectorZero;
 				}
 				break;
 			case FuncStates.Target:
 				transform.position = targetPosition.transform.position;
-				if (rbody.velocity.sqrMagnitude > 0) {
-					rbody.velocity = Const.a.vectorZero;
+				if (rbody.linearVelocity.sqrMagnitude > 0) {
+					rbody.linearVelocity = Const.a.vectorZero;
 				}
 				break;
 			case FuncStates.MovingStart:

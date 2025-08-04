@@ -555,7 +555,7 @@ public class HealthManager : MonoBehaviour {
 			if (rbod == null) rbod = aic.GetComponent<Rigidbody>();
 			if (rbod != null) {
 				rbod.useGravity = false;
-				rbod.velocity = Vector3.zero;
+				rbod.linearVelocity = Vector3.zero;
 			}
 			Utils.Deactivate(aic.visibleMeshEntity);
 			aic.visibleMeshVisible = false;

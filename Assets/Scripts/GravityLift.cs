@@ -35,16 +35,16 @@ public class GravityLift : MonoBehaviour {
 
 		float topY = transform.position.y + (boxcol.size.y/2f);
 		float dist = topY - other.gameObject.transform.position.y + 0.48f;
-		float velY = otherRbody.velocity.y;
-		if (otherRbody.velocity.y < 0f) velY = 0f; // Saturate at bottom end.
+		float velY = otherRbody.linearVelocity.y;
+		if (otherRbody.linearVelocity.y < 0f) velY = 0f; // Saturate at bottom end.
 
 		if (dist < distancePaddingToTopPoint) {
 			Vector3 force = new Vector3(0f,9.81f - velY,0f);
 			otherRbody.AddForce(force,ForceMode.Acceleration);
 		} else {
-			if (otherRbody.velocity.y < (strength * otherRbody.mass)) {
+			if (otherRbody.linearVelocity.y < (strength * otherRbody.mass)) {
 				float yForce = ((strength * otherRbody.mass)
-								- otherRbody.velocity.y);
+								- otherRbody.linearVelocity.y);
 
 				if (initial
 					|| initialBurstFinished > PauseScript.a.relativeTime) {
@@ -64,8 +64,8 @@ public class GravityLift : MonoBehaviour {
 			PlayerMovement.a.gravliftState = true;
 		}
 
-		if (otherRbody.velocity.y < offStrengthFactor) {
-			float yForce = ((offStrengthFactor)-otherRbody.velocity.y);
+		if (otherRbody.linearVelocity.y < offStrengthFactor) {
+			float yForce = ((offStrengthFactor)-otherRbody.linearVelocity.y);
 			if (initial
 				|| initialBurstFinished > PauseScript.a.relativeTime) {
 

@@ -1320,11 +1320,11 @@ public class Utils {
 
 		StringBuilder s1 = new StringBuilder();
         s1.Clear();
-        s1.Append(FloatToString(rbody.velocity.x,"velocity.x"));
+        s1.Append(FloatToString(rbody.linearVelocity.x,"velocity.x"));
         s1.Append(splitChar);
-        s1.Append(FloatToString(rbody.velocity.y,"velocity.y"));
+        s1.Append(FloatToString(rbody.linearVelocity.y,"velocity.y"));
         s1.Append(splitChar);
-        s1.Append(FloatToString(rbody.velocity.z,"velocity.z"));
+        s1.Append(FloatToString(rbody.linearVelocity.z,"velocity.z"));
         s1.Append(splitChar);
         s1.Append(BoolToString(rbody.isKinematic,"isKinematic"));
         return s1.ToString();
@@ -1339,7 +1339,7 @@ public class Utils {
 		readFloaty = GetFloatFromString(entries[index],"velocity.y"); index++;
 		readFloatz = GetFloatFromString(entries[index],"velocity.z"); index++;
 		tempvec = new Vector3(readFloatx,readFloaty,readFloatz);
-		rbody.velocity = tempvec;
+		rbody.linearVelocity = tempvec;
 // 		CollisionDetectionMode oldCollision = rbody.collisionDetectionMode;
 		rbody.isKinematic = GetBoolFromString(entries[index],"isKinematic"); index++;
 // 		if (rbody.isKinematic) rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
@@ -1707,15 +1707,15 @@ public class Utils {
 
 				if (rbody != null && rbody.useGravity) {
 					rbody.WakeUp();
-					Vector3 originalVelocity = rbody.velocity;
+					Vector3 originalVelocity = rbody.linearVelocity;
 					if (go.layer == 10) dd.impactVelocity *= 0.5f;
 					rbody.AddExplosionForce(dd.impactVelocity, centerPoint, radius, 1f, ForceMode.Impulse);
-					Vector3 deltaV = rbody.velocity - originalVelocity;
+					Vector3 deltaV = rbody.linearVelocity - originalVelocity;
 					float damageScale = Mathf.Min(dd.damage / refDamage, maxScale);
 					float maxDeltaV = (baseSpeed + k * rbody.mass) * damageScale;
 					if (deltaV.magnitude > maxDeltaV) {
 						deltaV = deltaV.normalized * maxDeltaV;
-						rbody.velocity = originalVelocity + deltaV;
+						rbody.linearVelocity = originalVelocity + deltaV;
 					}
 				}
 			}

@@ -413,7 +413,7 @@ public class MouseLookScript : MonoBehaviour {
 		returnFromCyberspaceFinished = Time.time + 0.1f; // Prevent mouselook
 														 // messing it up.
 		PlayerMovement.a.inCyberSpace = false;
-		PlayerMovement.a.rbody.velocity = Const.a.vectorZero;
+		PlayerMovement.a.rbody.linearVelocity = Const.a.vectorZero;
 		PlayerMovement.a.leanCapsuleCollider.enabled = true;
 		hm.inCyberSpace = false;
 		inCyberSpace = false;
@@ -1029,7 +1029,7 @@ public class MouseLookScript : MonoBehaviour {
 												  shakeForce * 0.17f);
 		} else {
 			headBobZ = 0f;
-			Vector3 vel = PlayerMovement.a.rbody.velocity;
+			Vector3 vel = PlayerMovement.a.rbody.linearVelocity;
 			vel.y = 0f;
 			if (PlayerMovement.a.relForward + PlayerMovement.a.relSideways != 0
 				&& Const.a.HeadBob) {
@@ -1044,7 +1044,7 @@ public class MouseLookScript : MonoBehaviour {
 								* Mathf.Sign(bobTarget);
 				}
 
-				if (PlayerMovement.a.rbody.velocity.magnitude > 0.1f){
+				if (PlayerMovement.a.rbody.linearVelocity.magnitude > 0.1f){
 					headBobY = Mathf.SmoothDamp(headBobY,targetY + bobTarget,ref headBobYVel,Const.HeadBobRate);
 				}
 
@@ -1223,7 +1223,7 @@ public class MouseLookScript : MonoBehaviour {
 			if (rbody != null) {
 				rbody.isKinematic = false;
 				rbody.useGravity = true;
-				rbody.velocity = tossDir * tossForce;
+				rbody.linearVelocity = tossDir * tossForce;
 			}
 
 			UseableObjectUse uou = tossObject.GetComponent<UseableObjectUse>();
@@ -1253,7 +1253,7 @@ public class MouseLookScript : MonoBehaviour {
 			if (rbody != null) {
 				rbody.isKinematic = false;
 				rbody.useGravity = true;
-				rbody.velocity = tossDir * tossForce;
+				rbody.linearVelocity = tossDir * tossForce;
 			}
 			GrenadeActivate ga = tossObject.GetComponent<GrenadeActivate>();
 			if (ga != null) ga.Activate(); // Time to boom!

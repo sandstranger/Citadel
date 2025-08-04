@@ -580,7 +580,7 @@ public class WeaponFire : MonoBehaviour {
             beachball.transform.forward = tempVec.normalized;
             beachball.SetActive(true);
             Vector3 shove = beachball.transform.forward * shoveForce;
-            beachball.GetComponent<Rigidbody>().velocity = Const.a.vectorZero; // prevent random variation from the last shot's velocity
+            beachball.GetComponent<Rigidbody>().linearVelocity = Const.a.vectorZero; // prevent random variation from the last shot's velocity
             beachball.GetComponent<Rigidbody>().AddForce(shove, ForceMode.Impulse);
         }
 	}
@@ -1375,7 +1375,7 @@ public class WeaponFire : MonoBehaviour {
             Vector3 shove = beachball.transform.forward * shoveForce;
 
 			// Force starting with zero pior to adding impulse force.
-            beachball.GetComponent<Rigidbody>().velocity = Const.a.vectorZero;
+            beachball.GetComponent<Rigidbody>().linearVelocity = Const.a.vectorZero;
             beachball.GetComponent<Rigidbody>().AddForce(shove,ForceMode.Impulse);
         }
 	}

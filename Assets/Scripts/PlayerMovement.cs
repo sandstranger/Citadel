@@ -186,7 +186,7 @@ public class PlayerMovement : MonoBehaviour {
 		fatigueFinished2 = PauseScript.a.relativeTime;
 		ladderSFXFinished = PauseScript.a.relativeTime;
 		rbody = GetComponent<Rigidbody>();
-		oldVelocity = rbody.velocity;
+		oldVelocity = rbody.linearVelocity;
 		capsuleCollider = GetComponent<CapsuleCollider>();
 		capsuleHeight = capsuleCollider.height;
 		capsuleRadius = capsuleCollider.radius;
@@ -287,9 +287,9 @@ public class PlayerMovement : MonoBehaviour {
 
 	void FixedUpdate() {
 		// Readout for debugging in Inspector.
-		playerSpeedActual = rbody.velocity.magnitude;
+		playerSpeedActual = rbody.linearVelocity.magnitude;
 		
-		Vector2 hz = new Vector2(rbody.velocity.x, rbody.velocity.z);
+		Vector2 hz = new Vector2(rbody.linearVelocity.x, rbody.linearVelocity.z);
 		playerSpeedHorizontalActual = hz.magnitude;
 
 		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) return;
@@ -318,8 +318,8 @@ public class PlayerMovement : MonoBehaviour {
 		if (grav) ApplyGravity();
 
 		if (inCyberSpace) {
-			if (rbody.velocity.magnitude > playerSpeed && !CheatNoclip) {
-				rbody.velocity = rbody.velocity.normalized * playerSpeed;
+			if (rbody.linearVelocity.magnitude > playerSpeed && !CheatNoclip) {
+				rbody.linearVelocity = rbody.linearVelocity.normalized * playerSpeed;
 			}
 
 			CyberspaceMovement();
@@ -345,7 +345,7 @@ public class PlayerMovement : MonoBehaviour {
 		Jump();
 		FallDamage();
 		FeetRayChecks();
-		oldVelocity = rbody.velocity;
+		oldVelocity = rbody.linearVelocity;
 	}
 
 	// Parse surface below to allow for playing different footstep sets for
@@ -382,7 +382,7 @@ public class PlayerMovement : MonoBehaviour {
 			return;
 		}
 
-		if (rbody.velocity.sqrMagnitude <= 0.05f) {
+		if (rbody.linearVelocity.sqrMagnitude <= 0.05f) {
 			SFXClothes.Stop();
 		}
 
@@ -1035,8 +1035,8 @@ public class PlayerMovement : MonoBehaviour {
 			}
 		}
 
-		tempVecRbody = rbody.velocity;
-		Vector3 movDir = rbody.velocity;
+		tempVecRbody = rbody.linearVelocity;
+		Vector3 movDir = rbody.linearVelocity;
 		movDir.y = 0;
 		movDir = movDir.normalized;
 		if (Vector3.Dot(movDir,floorAng) < 0f && running) return;
@@ -1046,7 +1046,7 @@ public class PlayerMovement : MonoBehaviour {
 		if (CheatNoclip) {
 			deceleration = 0.05f;
 			// Prevent gravity from affecting and decelerate like a horizontal.
-			tempVecRbody.y = Mathf.SmoothDamp(rbody.velocity.y,0,
+			tempVecRbody.y = Mathf.SmoothDamp(rbody.linearVelocity.y,0,
 											  ref walkDeaccelerationVoly,
 											  deceleration);
 			if (isSprinting && running) return;
@@ -1055,24 +1055,24 @@ public class PlayerMovement : MonoBehaviour {
 				deceleration = walkDeaccelerationBooster;
 			}
 
-			tempVecRbody.y = rbody.velocity.y; // Don't affect gravity and let 
+			tempVecRbody.y = rbody.linearVelocity.y; // Don't affect gravity and let 
 											   // gravity keep pulling down.
 		}
 
-		tempVecRbody.x = Mathf.SmoothDamp(rbody.velocity.x,0,
+		tempVecRbody.x = Mathf.SmoothDamp(rbody.linearVelocity.x,0,
 										  ref walkDeaccelerationVolx,
 										  deceleration);
 
-		tempVecRbody.z = Mathf.SmoothDamp(rbody.velocity.z,0,
+		tempVecRbody.z = Mathf.SmoothDamp(rbody.linearVelocity.z,0,
 										  ref walkDeaccelerationVolz,
 										  deceleration);
 		if (inCyberSpace) {
-			tempVecRbody.y = Mathf.SmoothDamp(rbody.velocity.y,0,
+			tempVecRbody.y = Mathf.SmoothDamp(rbody.linearVelocity.y,0,
 											  ref walkDeaccelerationVolz,
 											  deceleration);
 		}
 
-		rbody.velocity = tempVecRbody;
+		rbody.linearVelocity = tempVecRbody;
 	}
 
 	void Lean() {
@@ -1292,7 +1292,7 @@ public class PlayerMovement : MonoBehaviour {
 		} else {
 			// Climbing off the ground
 			if (ladderSFXFinished < PauseScript.a.relativeTime
-				&& rbody.velocity.y > ladderSpeed * 0.5f) {
+				&& rbody.linearVelocity.y > ladderSpeed * 0.5f) {
 
 				SFX.pitch = (UnityEngine.Random.Range(0.8f,1.2f));
 				Utils.PlayOneShotSavable(SFX,SFXLadder,0.2f);
@@ -1318,7 +1318,7 @@ public class PlayerMovement : MonoBehaviour {
 		}
 
 		// Set vertical velocity towards 0 when climbing.
-		RigidbodySetVelocityY(rbody,(Mathf.SmoothDamp(rbody.velocity.y,0,
+		RigidbodySetVelocityY(rbody,(Mathf.SmoothDamp(rbody.linearVelocity.y,0,
 													  ref walkDeaccelerationVoly,
 													  deceleration)));
 	}
@@ -1342,7 +1342,7 @@ public class PlayerMovement : MonoBehaviour {
 			forForce *= 2.00f;
 		}
 
-		Vector3 movDir = rbody.velocity;
+		Vector3 movDir = rbody.linearVelocity;
 		movDir.y = 0;
 		movDir = movDir.normalized;
 		if (floorDot < 0.98f) {
@@ -1357,9 +1357,9 @@ public class PlayerMovement : MonoBehaviour {
 			if (relForward == 0 && relSideways == 0) runTime = 0;
 
 			rbody.AddRelativeForce(sidForce,upForce,forForce);
-			movDir = rbody.velocity; // Updated after force add.
+			movDir = rbody.linearVelocity; // Updated after force add.
 			movDir.y = 0;
-			if (floorDot > 0.9f) rbody.velocity = movDir;
+			if (floorDot > 0.9f) rbody.linearVelocity = movDir;
 			movDir = movDir.normalized;
 			if (fatigueFinished2 < PauseScript.a.relativeTime
 				&& movDir.sqrMagnitude > 0f && grounded
@@ -1393,7 +1393,7 @@ public class PlayerMovement : MonoBehaviour {
 		if (ladderState > 0) return;
 
 		// Handle fall damage (no impact damage in cyber space 5/5/18, JJ)
-		float velChange = Mathf.Abs((oldVelocity.y - rbody.velocity.y));
+		float velChange = Mathf.Abs((oldVelocity.y - rbody.linearVelocity.y));
 		if (velChange >= fallDamageSpeed) {
 			DamageData dd = new DamageData ();
 			float falltake = fallDamage - UnityEngine.Random.Range(0,68f);
@@ -1433,7 +1433,7 @@ public class PlayerMovement : MonoBehaviour {
 
 		leanTransform.localRotation = Quaternion.Euler(0, 0, 0);
 		leanTransform.localPosition = new Vector3(0,0,0);
-		if (rbody.velocity.magnitude > maxCyberUltimateSpeed) {
+		if (rbody.linearVelocity.magnitude > maxCyberUltimateSpeed) {
 			// Limit movement speed in all axes x,y,z in cyberspace
 			RigidbodySetVelocity(rbody, maxCyberUltimateSpeed);
 		}
@@ -1442,10 +1442,10 @@ public class PlayerMovement : MonoBehaviour {
 
 		if (GetInput.a.Forward()) {
 			if (turboFinished > PauseScript.a.relativeTime) {
-				if (Vector3.Project(rbody.velocity, (cameraObject.transform.forward)).magnitude < playerSpeed * 2f)
+				if (Vector3.Project(rbody.linearVelocity, (cameraObject.transform.forward)).magnitude < playerSpeed * 2f)
 					rbody.AddForce(cameraObject.transform.forward * walkAcceleration * 1.3f * 2f * Time.deltaTime,ForceMode.Acceleration); // double speed with turbo on
 			} else {
-				if (Vector3.Project(rbody.velocity, cameraObject.transform.forward).magnitude < playerSpeed)
+				if (Vector3.Project(rbody.linearVelocity, cameraObject.transform.forward).magnitude < playerSpeed)
 					rbody.AddForce(cameraObject.transform.forward * walkAcceleration * 1.3f * Time.deltaTime,ForceMode.Acceleration);
 			}
 			inputtingMovement = true;
@@ -1453,10 +1453,10 @@ public class PlayerMovement : MonoBehaviour {
 
 		if (GetInput.a.Backpedal()) {
 			if (turboFinished > PauseScript.a.relativeTime) {
-				if (Vector3.Project(rbody.velocity, (cameraObject.transform.forward * -1f)).magnitude < playerSpeed * 2f)
+				if (Vector3.Project(rbody.linearVelocity, (cameraObject.transform.forward * -1f)).magnitude < playerSpeed * 2f)
 				rbody.AddForce(cameraObject.transform.forward * walkAcceleration * 1.3f * 2f * Time.deltaTime * -1f,ForceMode.Acceleration); // double speed with turbo on
 			} else {
-				if (Vector3.Project(rbody.velocity, cameraObject.transform.forward * -1f).magnitude < playerSpeed) 
+				if (Vector3.Project(rbody.linearVelocity, cameraObject.transform.forward * -1f).magnitude < playerSpeed) 
 				rbody.AddForce(cameraObject.transform.forward * walkAcceleration * 1.3f * Time.deltaTime * -1f,ForceMode.Acceleration);
 			}
 			inputtingMovement = true;
@@ -1464,10 +1464,10 @@ public class PlayerMovement : MonoBehaviour {
 
 		if (GetInput.a.StrafeLeft()) {
 			if (turboFinished > PauseScript.a.relativeTime) {
-				if (Vector3.Project(rbody.velocity, (cameraObject.transform.right * -1f)).magnitude < playerSpeed * 2f)
+				if (Vector3.Project(rbody.linearVelocity, (cameraObject.transform.right * -1f)).magnitude < playerSpeed * 2f)
 				rbody.AddForce(cameraObject.transform.right * walkAcceleration * 1.3f * 2f * Time.deltaTime * -1f,ForceMode.Acceleration); // double speed with turbo on
 			} else {
-				if (Vector3.Project(rbody.velocity, cameraObject.transform.right * -1f).magnitude < playerSpeed) 
+				if (Vector3.Project(rbody.linearVelocity, cameraObject.transform.right * -1f).magnitude < playerSpeed) 
 				rbody.AddForce(cameraObject.transform.right * walkAcceleration * 1.3f * Time.deltaTime * -1f,ForceMode.Acceleration);
 			}
 			inputtingMovement = true;
@@ -1475,23 +1475,23 @@ public class PlayerMovement : MonoBehaviour {
 
 		if (GetInput.a.StrafeRight()) {
 			if (turboFinished > PauseScript.a.relativeTime) {
-				if (Vector3.Project(rbody.velocity, cameraObject.transform.right).magnitude < playerSpeed * 2f)
+				if (Vector3.Project(rbody.linearVelocity, cameraObject.transform.right).magnitude < playerSpeed * 2f)
 				rbody.AddForce(cameraObject.transform.right * walkAcceleration * 1.3f * 2f * Time.deltaTime,ForceMode.Acceleration); // double speed with turbo on
 			} else {
-				if (Vector3.Project(rbody.velocity, cameraObject.transform.right).magnitude < playerSpeed) 
+				if (Vector3.Project(rbody.linearVelocity, cameraObject.transform.right).magnitude < playerSpeed) 
 				rbody.AddForce(cameraObject.transform.right * walkAcceleration * 1.3f * Time.deltaTime,ForceMode.Acceleration);
 			}
 			inputtingMovement = true;
 		}
 
 		if (Const.a.difficultyCyber > 1) {
-			if (rbody.velocity.magnitude < walkAcceleration * 0.05f) {
+			if (rbody.linearVelocity.magnitude < walkAcceleration * 0.05f) {
 				tempVec = MouseCursor.a.GetCursorScreenPointForRay();
 				tempVec = MouseLookScript.a.playerCamera.ScreenPointToRay(tempVec).direction;
 				rbody.AddForce(tempVec * walkAcceleration*0.05f * Time.deltaTime); // turbo doesn't affect detrimental forces :)
 			}
 		} else {
-			if (!inputtingMovement && !inCyberTube) rbody.velocity = Const.a.vectorZero;
+			if (!inputtingMovement && !inCyberTube) rbody.linearVelocity = Const.a.vectorZero;
 		}
 	}
 
@@ -1504,7 +1504,7 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	Vector2 GetClampedHorizontalMovement() {
-		horizontalMovement = new Vector2(rbody.velocity.x, rbody.velocity.z);
+		horizontalMovement = new Vector2(rbody.linearVelocity.x, rbody.linearVelocity.z);
 		if (horizontalMovement.magnitude > playerSpeed) {
 			horizontalMovement = horizontalMovement.normalized;
 			horizontalMovement *= playerSpeed; // Cap velocity to current max.
@@ -1515,8 +1515,8 @@ public class PlayerMovement : MonoBehaviour {
 	float GetClampedVerticalMovement() {
 		if (grounded && !isSprinting) return 0f; // Prevent inadvertent view
 												 // bob from floating.
-		if (rbody.velocity.y >= maxVerticalSpeed) return maxVerticalSpeed;
-		return rbody.velocity.y;
+		if (rbody.linearVelocity.y >= maxVerticalSpeed) return maxVerticalSpeed;
+		return rbody.linearVelocity.y;
 	}
 
 	void FatigueApply() {
@@ -1730,27 +1730,27 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	public void RigidbodySetVelocity(Rigidbody t, float s) {
-		tempVecRbody = t.velocity;
+		tempVecRbody = t.linearVelocity;
 		tempVecRbody = tempVecRbody.normalized * s;
-		t.velocity = tempVecRbody;
+		t.linearVelocity = tempVecRbody;
 	}
 
 	public void RigidbodySetVelocityX(Rigidbody t, float s) {
-		tempVecRbody = t.velocity;
+		tempVecRbody = t.linearVelocity;
 		tempVecRbody.x = s;
-		t.velocity = tempVecRbody;
+		t.linearVelocity = tempVecRbody;
 	}
 	
 	public void RigidbodySetVelocityY(Rigidbody t, float s) {
-		tempVecRbody = t.velocity;
+		tempVecRbody = t.linearVelocity;
 		tempVecRbody.y  = s;
-		t.velocity = tempVecRbody;
+		t.linearVelocity = tempVecRbody;
 	}
 	
 	public void RigidbodySetVelocityZ(Rigidbody t, float s) {
-		tempVecRbody = t.velocity;
+		tempVecRbody = t.linearVelocity;
 		tempVecRbody.z  = s;
-		t.velocity = tempVecRbody;
+		t.linearVelocity = tempVecRbody;
 	}
 
 	// Reset grounded to false when player is mid-air

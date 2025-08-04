@@ -662,8 +662,8 @@ public class AIController : MonoBehaviour {
 						}
 					}
 
-					tempVec.y = rbody.velocity.y; // Carry across gravity.
-					rbody.velocity = tempVec;
+					tempVec.y = rbody.linearVelocity.y; // Carry across gravity.
+					rbody.linearVelocity = tempVec;
 				}
 			}
 			return; // Still moving to same target destination.
@@ -748,7 +748,7 @@ public class AIController : MonoBehaviour {
 		if (index == 1 || (index >= 3 && index <= 9)
 			|| (index >= 11 && index <= 13) || index == 17 || index == 23) {
 
-			rbody.velocity *= 0.15f; // Stop scoot to shoot.
+			rbody.linearVelocity *= 0.15f; // Stop scoot to shoot.
 		}
 	}
 
@@ -815,8 +815,8 @@ public class AIController : MonoBehaviour {
 		if (actAsTurret) return;
 
 		tempVec = sightPoint.transform.forward * Const.a.runSpeedForNPC[index];
-		if (rbody.useGravity) tempVec.y = rbody.velocity.y; // Keep gravity.
-		rbody.velocity = tempVec;
+		if (rbody.useGravity) tempVec.y = rbody.linearVelocity.y; // Keep gravity.
+		rbody.linearVelocity = tempVec;
 	}
 	
 	Vector3 GetAStarPoint() {
@@ -986,7 +986,7 @@ public class AIController : MonoBehaviour {
 		if (sqrDist <= (stopDistance * stopDistance)) return; // At stop point.
 		if (!WithinAngleToTarget()) return;
 
-		rbody.velocity = (eyeTr.forward * Const.a.runSpeedForNPC[index]);
+		rbody.linearVelocity = (eyeTr.forward * Const.a.runSpeedForNPC[index]);
     }
 
 	// Commonized function to remove previous boilerplate code from all 3
@@ -1338,10 +1338,10 @@ public class AIController : MonoBehaviour {
 
 		// Add in the enemy's velocity to the projectile (in case they are
 		// riding on a moving platform or something - wait I don't have those!)
-		if (!IsCyberNPC()) shove += rbody.velocity;
+		if (!IsCyberNPC()) shove += rbody.linearVelocity;
 
 		// Ensure no velocity to start with.
-		beachball.GetComponent<Rigidbody>().velocity = Const.a.vectorZero;
+		beachball.GetComponent<Rigidbody>().linearVelocity = Const.a.vectorZero;
 		beachball.GetComponent<Rigidbody>().AddForce(shove, ForceMode.Impulse);
 	}
 
@@ -1519,7 +1519,7 @@ public class AIController : MonoBehaviour {
 		}
 
 		if (index == 9 || index == 20) {
-			rbody.velocity = new Vector3(0f,rbody.velocity.z,0f);
+			rbody.linearVelocity = new Vector3(0f,rbody.linearVelocity.z,0f);
 		}
 
 		dyingSetup = true;

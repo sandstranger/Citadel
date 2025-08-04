@@ -139,7 +139,7 @@ public class AIAnimationController : MonoBehaviour {
 
 	void Walk () {
 		if (anim.speed != 1f) anim.speed = 1f;
-		if (aic.rbody.velocity.sqrMagnitude >
+		if (aic.rbody.linearVelocity.sqrMagnitude >
 			(minWalkSpeedToAnimate * minWalkSpeedToAnimate)) {
 			if (aic.actAsTurret) {
 				anim.Play("Idle");

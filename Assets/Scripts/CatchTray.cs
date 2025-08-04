@@ -13,7 +13,7 @@ public class CatchTray : MonoBehaviour {
 				  + " fell out of level at "
 				  + col.gameObject.transform.position.ToString());
 		Rigidbody rbody = col.gameObject.GetComponent<Rigidbody>();
-		rbody.velocity = Vector3.zero;
+		rbody.linearVelocity = Vector3.zero;
 		float xpos = col.gameObject.transform.position.x;
 		float ypos = col.gameObject.transform.position.z;
 		col.gameObject.transform.position = ObjectContainmentSystem.FindNearestFloor(xpos,ypos,col.gameObject.transform.position.y);

@@ -22,7 +22,7 @@ public class PauseRigidbody : MonoBehaviour {
 	}
 
 	void SetPreviousValues() {
-		previousVelocity = rbody.velocity;
+		previousVelocity = rbody.linearVelocity;
 		if (previousSet) return;
 		
 		previousUseGravity = rbody.useGravity;
@@ -63,6 +63,6 @@ public class PauseRigidbody : MonoBehaviour {
 			rbody.collisionDetectionMode = previouscolDetMode;
 		}
 		
-		rbody.velocity = previousVelocity;
+		rbody.linearVelocity = previousVelocity;
 	}
 }
