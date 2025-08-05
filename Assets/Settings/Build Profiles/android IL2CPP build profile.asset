@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 15003, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: android build profile
+  m_Name: android IL2CPP build profile
   m_EditorClassIdentifier: 
   m_AssetVersion: 1
   m_BuildTarget: 13
@@ -94,8 +94,8 @@ MonoBehaviour:
     - line: '|   disableDepthAndStencilBuffers: 0'
     - line: '|   androidStartInFullscreen: 1'
     - line: '|   androidRenderOutsideSafeArea: 1'
-    - line: '|   androidUseSwappy: 0'
-    - line: '|   androidBlitType: 0'
+    - line: '|   androidUseSwappy: 1'
+    - line: '|   androidBlitType: 1'
     - line: '|   androidResizeableActivity: 0'
     - line: '|   androidDefaultWindowWidth: 1920'
     - line: '|   androidDefaultWindowHeight: 1080'
@@ -177,8 +177,8 @@ MonoBehaviour:
     - line: '|   isWsaHolographicRemotingEnabled: 0'
     - line: '|   enableFrameTimingStats: 0'
     - line: '|   enableOpenGLProfilerGPURecorders: 0'
-    - line: '|   allowHDRDisplaySupport: 1'
-    - line: '|   useHDRDisplay: 1'
+    - line: '|   allowHDRDisplaySupport: 0'
+    - line: '|   useHDRDisplay: 0'
     - line: '|   hdrBitDepth: 0'
     - line: '|   m_ColorGamuts: 00000000'
     - line: '|   targetPixelDensity: 30'
@@ -201,7 +201,7 @@ MonoBehaviour:
     - line: '|   overrideDefaultApplicationIdentifier: 1'
     - line: '|   AndroidBundleVersionCode: 1'
     - line: '|   AndroidMinSdkVersion: 23'
-    - line: '|   AndroidTargetSdkVersion: 35'
+    - line: '|   AndroidTargetSdkVersion: 36'
     - line: '|   AndroidPreferredInstallLocation: 0'
     - line: '|   aotOptions: '
     - line: '|   stripEngineCode: 1'
@@ -290,7 +290,7 @@ MonoBehaviour:
     - line: '|   useCustomGradlePropertiesTemplate: 0'
     - line: '|   useCustomGradleSettingsTemplate: 0'
     - line: '|   useCustomProguardFile: 0'
-    - line: '|   AndroidTargetArchitectures: 1'
+    - line: '|   AndroidTargetArchitectures: 11'
     - line: '|   AndroidSplashScreenScale: 0'
     - line: '|   androidSplashScreen: {instanceID: 0}'
     - line: '|   AndroidKeystoreName: ''{inproject}: '''
@@ -599,7 +599,10 @@ MonoBehaviour:
     - line: '|   - serializedVersion: 2'
     - line: '|     m_BuildTarget: Android'
     - line: '|     m_EncodingQuality: 0'
-    - line: '|   m_BuildTargetGroupHDRCubemapEncodingQuality: []'
+    - line: '|   m_BuildTargetGroupHDRCubemapEncodingQuality:'
+    - line: '|   - serializedVersion: 2'
+    - line: '|     m_BuildTarget: Android'
+    - line: '|     m_EncodingQuality: 0'
     - line: '|   m_BuildTargetGroupLightmapSettings:'
     - line: '|   - m_BuildTarget: Standalone'
     - line: '|     m_TextureStreamingEnabled: 0'
@@ -902,7 +905,7 @@ MonoBehaviour:
     - line: '|   platformArchitecture:'
     - line: '|     iPhone: 1'
     - line: '|   scriptingBackend:'
-    - line: '|     Android: 0'
+    - line: '|     Android: 1'
     - line: '|     Standalone: 0'
     - line: '|     WP8: 2'
     - line: '|     WebGL: 1'
