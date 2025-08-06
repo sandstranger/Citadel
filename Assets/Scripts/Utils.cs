@@ -319,6 +319,9 @@ public class Utils {
     
     // Determines the appropriate path based on platform and writability
     public static string GetAppropriateDataPath() {
+#if UNITY_ANDROID
+	    return Application.persistentDataPath;
+#endif	    
         if (Application.platform == RuntimePlatform.OSXEditor ||
             Application.platform == RuntimePlatform.OSXPlayer ||
             Application.platform == RuntimePlatform.Android) {
@@ -1791,7 +1794,7 @@ public class Utils {
         string logFilePath = GetLogFilePath(prev);
         string logname = "/Player.log";
         if (prev) logname = "/Player-prev.log";
-        string destinationPath = Application.streamingAssetsPath + logname;
+        string destinationPath = Application.persistentDataPath + logname;
 
         if (File.Exists(logFilePath)) {
             // Delete the existing destination log file if it already exists
