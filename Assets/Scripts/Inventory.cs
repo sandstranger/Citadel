@@ -1106,10 +1106,6 @@ public class Inventory : MonoBehaviour {
 			switch (logIndex) {
 				case 119:
 					vmailbetajet.SetActive(true);
-					fileName = "betajet.webm";
-					Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-					urlPath = Utils.SafePathCombine(basePath,fileName);
-					vmailbetajetVideo.url = urlPath;
 					vmailbetajetVideo.Play();
 					if (!MainMenuHandler.a.dataFound) vmailbetajetVideo.SetDirectAudioMute(0,true);
 					else vmailbetajetVideo.SetDirectAudioMute(0,false);
@@ -1117,10 +1113,6 @@ public class Inventory : MonoBehaviour {
 					break;
 				case 116:
 					vmailbridgesep.SetActive(true);
-					fileName = "bridgesep.webm";
-					Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-					urlPath = Utils.SafePathCombine(basePath,fileName);
-					vmailbridgesepVideo.url = urlPath;
 					vmailbridgesepVideo.Play();
 					if (!MainMenuHandler.a.dataFound) vmailbridgesepVideo.SetDirectAudioMute(0,true);
 					else vmailbridgesepVideo.SetDirectAudioMute(0,false);
@@ -1128,10 +1120,6 @@ public class Inventory : MonoBehaviour {
 					break;
 				case 117:
 					vmailcitadestruct.SetActive(true);
-					fileName = "citadestruct.webm";
-					Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-					urlPath = Utils.SafePathCombine(basePath,fileName);
-					vmailcitadestructVideo.url = urlPath;
 					vmailcitadestructVideo.Play();
 					if (!MainMenuHandler.a.dataFound) vmailcitadestructVideo.SetDirectAudioMute(0,true);
 					else vmailcitadestructVideo.SetDirectAudioMute(0,false);
@@ -1139,10 +1127,6 @@ public class Inventory : MonoBehaviour {
 					break;
 				case 110:
 					vmailgenstatus.SetActive(true);
-					fileName = "genstatus.webm";
-					Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-					urlPath = Utils.SafePathCombine(basePath,fileName);
-					vmailgenstatusVideo.url = urlPath;
 					vmailgenstatusVideo.Play();
 					if (!MainMenuHandler.a.dataFound) vmailgenstatusVideo.SetDirectAudioMute(0,true);
 					else vmailgenstatusVideo.SetDirectAudioMute(0,false);
@@ -1150,10 +1134,6 @@ public class Inventory : MonoBehaviour {
 					break;
 				case 114:
 					vmaillaserdest.SetActive(true);
-					fileName = "laserdest.webm";
-					Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-					urlPath = Utils.SafePathCombine(basePath,fileName);
-					vmaillaserdestVideo.url = urlPath;
 					vmaillaserdestVideo.Play();
 					if (!MainMenuHandler.a.dataFound) vmaillaserdestVideo.SetDirectAudioMute(0,true);
 					else vmaillaserdestVideo.SetDirectAudioMute(0,false);
@@ -1161,10 +1141,6 @@ public class Inventory : MonoBehaviour {
 					break;
 				case 120:
 					vmailshieldsup.SetActive(true);
-					fileName = "shieldsup.webm";
-					Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-					urlPath = Utils.SafePathCombine(basePath,fileName);
-					vmailshieldsupVideo.url = urlPath;
 					vmailshieldsupVideo.Play();
 					if (!MainMenuHandler.a.dataFound) vmailshieldsupVideo.SetDirectAudioMute(0,true);
 					else vmailshieldsupVideo.SetDirectAudioMute(0,false);

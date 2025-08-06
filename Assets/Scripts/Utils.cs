@@ -333,19 +333,21 @@ public class Utils {
         return Application.persistentDataPath;
     }
 
-	public static StreamReader ReadStreamingAsset(string fName) {
-        StreamReader dataReader = null;
-        if (Application.platform == RuntimePlatform.Android) {
-	        InitializeBetterStreamingassets();
-	        var bytes = BetterStreamingAssets.FileExists(fName) ? BetterStreamingAssets.ReadAllBytes(fName) : Array.Empty<byte>();
-            if (bytes.Length > 0) {
-                MemoryStream memStr = new MemoryStream(bytes);
-                dataReader = new StreamReader(memStr, Encoding.ASCII);
-            } else {
-                UnityEngine.Debug.LogError($"Failed to read {fName} on Android");
-                return null; // No recovery needed for Android
-            }
-        } else {
+    public static StreamReader ReadStreamingAsset(string fName)
+    {
+#if UNITY_ANDROID
+	    string basePath = Utils.GetAppropriateDataPath();
+	    var finalPathToFile = Path.Combine(basePath, fName);
+	    ConfirmExistsMakeIfNot(basePath, fName);
+	    if (!File.Exists(finalPathToFile))
+	    {
+		    return null;
+	    }
+
+	    var bytes = File.ReadAllBytes(finalPathToFile);
+	    return bytes.Length > 0 ? new StreamReader(new MemoryStream(bytes), Encoding.ASCII) : null;
+#else
+	        StreamReader dataReader = null;
 	        string basePath = Application.streamingAssetsPath;
 	        string fPath = SafePathCombine(basePath, fName);
 	        // Windows/Linux/MacOS: Try streamingAssetsPath first
@@ -366,8 +368,8 @@ public class Utils {
                 }
             }
         }
-
         return dataReader;
+#endif
     }
 
 	// From the Unity Documentation on Resources.Load:

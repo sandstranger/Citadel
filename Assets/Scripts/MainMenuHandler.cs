@@ -860,11 +860,6 @@ public class MainMenuHandler : MonoBehaviour {
 	public void PlayDeathVideo() {
 		DeathVideoContainer.SetActive(true);
 		DeathVideo.SetActive(true);
-		string basePath = Utils.GetAppropriateDataPath();
-		string fileName = "death.webm";
-		Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-		string urlPath = Utils.SafePathCombine(basePath,fileName);
-		deathPlayer.url = urlPath;
 		deathPlayer.Play();
 		deathPlayer.SetDirectAudioMute(0,true);
 		deathVideoText1.text = Const.a.stringTable[628];
@@ -882,11 +877,6 @@ public class MainMenuHandler : MonoBehaviour {
 		Const.a.WriteDatForIntroPlayed(false);
 		IntroVideoContainer.SetActive(true);
 		IntroVideo.SetActive(true);
-		string basePath = Utils.GetAppropriateDataPath();
-		string fileName = "intro.webm";
-		Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-		string urlPath = Utils.SafePathCombine(basePath,fileName);
-		introPlayer.url = urlPath;
 		introPlayer.Play();
 		if (!dataFound) introPlayer.SetDirectAudioMute(0,true);
 		else introPlayer.SetDirectAudioMute(0,false);
