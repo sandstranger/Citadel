@@ -103,14 +103,14 @@ public static class SaveLoad {
         }
     }
     
-    public static GameObject LoadPrefab(ref string[] entries, int lineNum, int curlevel) {
+    public static GameObject LoadPrefab(ref string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null, GameObject lightsParent = null) {
         if (!(entries[0].Contains("constIndex"))) { // [sic], need to fix light file to start with constIndex:7777
-            return LoadLight(entries,lineNum,curlevel);
+            return LoadLight(entries,lineNum,curlevel, lightsParent);
         }
 
         int constIndex = Utils.GetIntFromString(entries[0],"constIndex");
         if (ConsoleEmulator.ConstIndexIsGeometry(constIndex)) {
-            return LoadGeometry(entries,lineNum,curlevel);
+            return LoadGeometry(entries,lineNum,curlevel, levelGeometryParent);
         } else if (ConsoleEmulator.ConstIndexIsDynamicObject(constIndex)
                    || ConsoleEmulator.ConstIndexIsDoor(constIndex)
                    || ConsoleEmulator.ConstIndexIsStaticObjectSaveable(constIndex)
@@ -615,7 +615,7 @@ public static class SaveLoad {
         return s1.ToString();
     }
 
-    private static GameObject LoadGeometry(string[] entries, int lineNum, int curlevel) {
+    private static GameObject LoadGeometry(string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null) {
         if (entries.Length <= 1) { 
             Debug.Log("Can't load geometry from line " + lineNum.ToString()
                       + ", line had only one or no entries[]");
@@ -632,6 +632,11 @@ public static class SaveLoad {
         GameObject chunk = ConsoleEmulator.SpawnDynamicObject(constdex,curlevel,false,null,0);
         if (chunk == null) return null;
 
+        if (levelGeometryParent != null)
+        {
+            chunk.transform.SetParent(levelGeometryParent.transform);
+        }
+        
         chunk.name = entries[index]; index++;
 //         if (chunk.name == "chunk_cyberpanel (3918)") UnityEngine.Debug.Log("Loading chunk_cyberpanel (3918)");
         index = Utils.LoadTransform(chunk.transform,ref entries,index);
@@ -928,13 +933,13 @@ public static class SaveLoad {
     }
 
     public static int numLightsWithShadows = 0;
-    private static GameObject LoadLight(string[] entries, int lineNum, int curlevel) {
+    private static GameObject LoadLight(string[] entries, int lineNum, int curlevel, GameObject lightsParent = null) {
         if (entries.Length <= 1) { Debug.Log("Couldn't load light on line number: " + lineNum.ToString()); return null; }
 
         int index = 0;
 		float readFloatx, readFloaty, readFloatz, readFloatw;
         GameObject go = new GameObject("PointLight" + curlevel.ToString() + "." + lineNum.ToString());
-        go.transform.parent = LevelManager.a.GetRequestedLightsStaticImmutableContainer(curlevel).transform;
+        go.transform.parent = lightsParent!=null ? lightsParent.transform : LevelManager.a.GetRequestedLightsStaticImmutableContainer(curlevel).transform;
         Light lit = go.AddComponent<Light>();
         index = Utils.LoadTransform(go.transform,ref entries,index);
         lit.intensity = Utils.GetFloatFromString(entries[index],"intensity"); index++;
