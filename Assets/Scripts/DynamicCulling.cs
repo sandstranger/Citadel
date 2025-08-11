@@ -116,9 +116,13 @@ public class DynamicCulling : MonoBehaviour {
 
     void Awake() {
         a = this;
-        a.Cull_Init();
         a.pixels = new Color32[WORLDX * WORLDX];
         a.worldCellsOpen = new bool[WORLDX,WORLDX];
+    }
+
+    private void Start()
+    {
+        Cull_Init();
     }
 
     float GetVertexColorForChunk(int constdex) {

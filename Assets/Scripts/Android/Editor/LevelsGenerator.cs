@@ -106,6 +106,8 @@ namespace Android.Tools
 			
                 for (int i=0;i<chunkLights.Count;i++) {
                     lit = chunkLights[i];
+                    lit.enabled = true;
+                    lit.lightmapBakeType = LightmapBakeType.Mixed;
                     lit.gameObject.name = "ChunkLight_" + lit.gameObject.name;
                     lit.transform.SetParent(lightsParent.transform,true);
 // 				UnityEngine.Debug.Log("Moved light off of " + lit.gameObject.name);
@@ -136,6 +138,9 @@ namespace Android.Tools
 				
                     string[] entries = readline.Split(splitter);
                     var light = SaveLoad.LoadPrefab(ref entries,lineNum,curlevel, null, lightParent);
+                    var lightComponent = light.GetComponent<Light>();
+                    lightComponent.enabled = true;
+                    lightComponent.lightmapBakeType = LightmapBakeType.Mixed;
                     light.transform.SetParent(lightParent.transform, false);
                     lineNum++;
                 } while (!sf.EndOfStream);

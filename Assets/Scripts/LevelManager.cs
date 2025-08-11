@@ -51,7 +51,8 @@ public class LevelManager : MonoBehaviour {
 	private int getValreadInt;
 	private float getValreadFloat;
 	private static StringBuilder s1 = new StringBuilder();
-
+	private GameObject _dummyGameObject;
+	
 	// Singleton instance
 	public static LevelManager a;
 
@@ -60,6 +61,7 @@ public class LevelManager : MonoBehaviour {
 	}
 	
 	void Awake () {
+		_dummyGameObject = new("dummy_gameobject");
 		SetA();
 		if (currentLevel < 0) {
 			if (Const.a == null) return;
@@ -350,11 +352,15 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	public GameObject GetCurrentGeometryContainer() { // Does not return null
+#if UNITY_ANDROID
+		return _dummyGameObject;
+#else		
 		if (!LevNumInBounds(currentLevel)) {
 			return levelScripts[1].geometryContainer;
 		}
 
         return levelScripts[currentLevel].geometryContainer;
+#endif
 	}
 
 	public GameObject GetCurrentLightsStaticImmutableContainer() {
@@ -366,19 +372,27 @@ public class LevelManager : MonoBehaviour {
 	}
 	
 	public GameObject GetCurrentStaticImmutableContainer() { // Does not return null
+#if UNITY_ANDROID
+		return _dummyGameObject;
+#else		
 		if (!LevNumInBounds(currentLevel)) {
 			return levelScripts[1].staticObjectsImmutable;
 		}
 
 		return levelScripts[currentLevel].staticObjectsImmutable;
+#endif
 	}
 
 	public GameObject GetCurrentStaticSaveableContainer() { // Does not return null
+#if UNITY_ANDROID
+		return _dummyGameObject;
+#else		
 		if (!LevNumInBounds(currentLevel)) {
 			return levelScripts[1].staticObjectsSaveable;
 		}
 
 		return levelScripts[currentLevel].staticObjectsSaveable;
+#endif
 	}
 
 	public GameObject GetCurrentDoorsContainer() { // Does not return null
