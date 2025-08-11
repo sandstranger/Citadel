@@ -1,7 +1,9 @@
 {
     "name": "AndroidEditorTools",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "Citadel"
+    ],
     "includePlatforms": [
         "Editor"
     ],
