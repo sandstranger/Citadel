@@ -6,9 +6,46 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/CitadelScene.unity
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: Assets/Scenes/MasterScene.unity
-    guid: 00000000000000000000000000000000
+    path: Assets/Scenes/1-MedicalLevelScene.unity
+    guid: 6b94d5a87f148324391fb61651f53a5a
+  - enabled: 1
+    path: Assets/Scenes/0-ReactorLevelScene.unity
+    guid: c9761ddffb52b164d94f7df49339380f
+  - enabled: 1
+    path: Assets/Scenes/2-ScienceLevelScene.unity
+    guid: aeb85ee3b0182f448b66b5a15105f7b2
+  - enabled: 1
+    path: Assets/Scenes/3-MaintenanceLevelScene.unity
+    guid: 8e3163167267d6a46bfb6adcf455e1e9
+  - enabled: 1
+    path: Assets/Scenes/4-StorageLevelScene.unity
+    guid: 20c25d38ccb7eb944911f2018291ca01
+  - enabled: 1
+    path: Assets/Scenes/5-FlightDeckLevelScene.unity
+    guid: dd9a81373f9ac4a4eacb6af1067401ba
+  - enabled: 1
+    path: Assets/Scenes/6-ExecutiveLevelScene.unity
+    guid: 62e90666ece67904e98df6da253027b7
+  - enabled: 1
+    path: Assets/Scenes/7-EngineeringLevelScene.unity
+    guid: abadebf93ecf01d44886f3def55a66e1
+  - enabled: 1
+    path: Assets/Scenes/8-SecurityLevelScene.unity
+    guid: 440beb94ea0624640a02e9c95d32ca28
+  - enabled: 1
+    path: Assets/Scenes/9-BridgeLevelScene.unity
+    guid: dc3184c5317ee45489871b06463239e0
+  - enabled: 1
+    path: Assets/Scenes/10-AlphaGroveLevelScene.unity
+    guid: 8757d3d57495a7644a3aca1ee3156986
+  - enabled: 1
+    path: Assets/Scenes/11-BetaGroveLevelScene.unity
+    guid: 6d6e41b207222834fbdbb55a0a4edcc5
+  - enabled: 1
+    path: Assets/Scenes/12-DeltaGroveLevelScene.unity
+    guid: f369606cbb7e8cd4dadf577f13761326
+  - enabled: 1
+    path: Assets/Scenes/13-CyberspaceLevelScene.unity
+    guid: d336c0bea0dc59045ba67b106bf26a59
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
