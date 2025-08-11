@@ -222,8 +222,8 @@ public class LevelManager : MonoBehaviour {
 		if (!LevNumIsNonCyber(levnum)) return; // In a test or editor space.
 		if (!levelDataLoaded[levnum]) return; // Already cleared.
 
-		UnloadLevelLights(levnum);
-		UnloadLevelGeometry(levnum);
+	//	UnloadLevelLights(levnum);
+	//	UnloadLevelGeometry(levnum);
  		UnloadLevelDynamicObjects(levnum,true);
 		levelDataLoaded[levnum] = false;
 		SaveLoad.numLightsWithShadows = 0;
@@ -238,8 +238,8 @@ public class LevelManager : MonoBehaviour {
 		if (levelDataLoaded[levnum]) return; // Already loaded.
 
 // 		Debug.Log("Loading level data for " + levnum.ToString());
-		LoadLevelLights(levnum);
-		LoadLevelGeometry(levnum);
+	//	LoadLevelLights(levnum);
+	//	LoadLevelGeometry(levnum);
 		LoadLevelDynamicObjects(levnum);
 		Music.a.LoadLevelMusic(levnum);
 		levelDataLoaded[levnum] = true;
@@ -531,6 +531,7 @@ public class LevelManager : MonoBehaviour {
 	}
 	
 	public void UnloadLevelGeometry(int curlevel) {
+		return;
 		if (curlevel > (geometryContainers.Length - 1)) return;
 		if (curlevel < 0) return;
 
@@ -544,6 +545,7 @@ public class LevelManager : MonoBehaviour {
 	}
 	
 	public void LoadLevelGeometry(int curlevel) {
+		return;
 		if (curlevel > (geometryContainers.Length - 1)) return;
 		if (curlevel < 0) return;
 		
@@ -599,6 +601,7 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	public void UnloadLevelLights(int curlevel) {
+		return;
 		if (curlevel > 12) return;
 		if (curlevel > (lightContainers.Length - 1)) return;
 		if (curlevel < 0) return;
@@ -630,6 +633,7 @@ public class LevelManager : MonoBehaviour {
 	}
 
 	public void LoadLevelLights(int curlevel) {
+		return;
 		if (curlevel > 12) return;
 		if (curlevel > (lightContainers.Length - 1)) return;
 		if (curlevel < 0) return;
