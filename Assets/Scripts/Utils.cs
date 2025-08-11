@@ -370,7 +370,6 @@ public class Utils {
                     return null;
                 }
             }
-        }
         return dataReader;
 #endif
     }
