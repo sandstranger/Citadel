@@ -424,6 +424,8 @@ public class LevelManager : MonoBehaviour {
 			return levelScripts[1].dynamicObjectsContainer; // Default to Medical level
 		}
 		
+		Debug.Log(index);
+		
         return levelScripts[index].dynamicObjectsContainer;
 	}
 
@@ -452,7 +454,7 @@ public class LevelManager : MonoBehaviour {
 
 		for (int i=0; i < 14; i++) {
 			if (isNPC && par == npcContainers[i]) return i;
-			else if (par == levelScripts[i].dynamicObjectsContainer) return i;
+			else if (levelScripts[i]!=null && par == levelScripts[i].dynamicObjectsContainer) return i;
 		}
 
 		return -1;

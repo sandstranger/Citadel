@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
 // GLOBAL SCRIPT EXECUTION ORDER (set in Unity Project Settings, here for ref)
 // UnityEngine.EventSystems.EventSystems.EventSystem -1000
@@ -35,6 +36,8 @@ using UnityEngine.Networking;
 // TextLocalization 1300
 
 public class Const : MonoBehaviour {
+	public static bool NewGameStarted { get; private set; }
+	
 	public float shadowThreshold = 0.03f;
 	//Item constants
 	public QuestBits questData;
@@ -740,14 +743,9 @@ public class Const : MonoBehaviour {
 		int currentline = 0;
 		string dr;
 		string fileName = "ng.dat";
-		if (Application.platform == RuntimePlatform.Android) {
-		    a.introNotPlayed = false;
-			return;
-		} else {
-			string basePath = Utils.GetAppropriateDataPath();
-			Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-			dr = Utils.SafePathCombine(basePath,fileName);
-		}
+		string basePath = Utils.GetAppropriateDataPath();
+		Utils.ConfirmExistsMakeIfNot(basePath, fileName);
+		dr = Utils.SafePathCombine(basePath, fileName);
 
 		if (!File.Exists(dr)) {
 			UnityEngine.Debug.Log(fileName + " not found nor recreated");
@@ -968,43 +966,21 @@ public class Const : MonoBehaviour {
         string basePath = Application.streamingAssetsPath;
 		Utils.ConfirmExistsMakeIfNot(basePath,"textures/" + imgPath);
 		string path = Utils.SafePathCombine(basePath,"textures/" + imgPath);
+		
 		Texture2D tex = new Texture2D(64, 64); // Default to world grid size for cases where DynamicCulling needs to index as [64,64].
 		try {
-			bool isAndroidOrMacOS = (Application.platform == RuntimePlatform.Android
-								 || Application.platform == RuntimePlatform.OSXEditor
-								 || Application.platform == RuntimePlatform.OSXPlayer);
-			
-			if (isAndroidOrMacOS) {
-				if (Application.platform == RuntimePlatform.Android) {
-					// Android: Use UnityWebRequest to read from streamingAssetsPath
-					UnityWebRequest request = UnityWebRequest.Get(path);
-					var operation = request.SendWebRequest();
-
-					// Synchronous wait (consider async for better performance)
-					while (!operation.isDone) { }
-					if (request.result == UnityWebRequest.Result.Success) {
-						byte[] bytes = request.downloadHandler.data;
-						tex.LoadImage(bytes);
-					} else {
-						UnityEngine.Debug.LogError($"Failed to read {path} on Android: {request.error}");
-						goto CreateBlackTexture;
-					}
-				} else {
-					tex = Resources.Load<Texture2D>("StreamingAssetsRecovery/textures/" + imgPath);
-					if (tex != null) return tex;
-					else goto CreateBlackTexture;
-				}
-			} else {
-				if (File.Exists(path)) {
-					byte[] bytes = File.ReadAllBytes(path);
-					tex.LoadImage(bytes);
-					return tex;
-				}
+#if UNITY_EDITOR_OSX
+			tex = Resources.Load<Texture2D>("StreamingAssetsRecovery/textures/" + imgPath);
+			if (tex != null) return tex;
+#else
+			if (File.Exists(path)) {
+				byte[] bytes = File.ReadAllBytes(path);
+				tex.LoadImage(bytes);
+				return tex;
 			}
-			goto CreateBlackTexture;
+#endif			
 		} catch (Exception e) {
 			UnityEngine.Debug.Log($"BUG: Failed to load texture at {path}: {e.Message}");
-			goto CreateBlackTexture;
 		}
 
 CreateBlackTexture:
@@ -1307,8 +1283,6 @@ CreateBlackTexture:
 	// plenty fast enough.
 	public void StartSave(int index, string savename) {
 		if (PlayerHealth.a.hm.health < 1.0f) return; // Can't save while dead!
-        if (Application.platform == RuntimePlatform.Android) return;
-	    
 		StartCoroutine(SaveRoutine(index,savename));
 	}
 
@@ -1395,6 +1369,7 @@ CreateBlackTexture:
 		string basePath = Utils.GetAppropriateDataPath();
 		string sPath;
 		sPath = Utils.SafePathCombine(basePath,sName);
+		Debug.Log(sPath);
 		StreamWriter sw = new StreamWriter(sPath,false,Encoding.ASCII);
 		if (sw != null) {
 			using (sw) {
@@ -1575,7 +1550,6 @@ CreateBlackTexture:
 	//    c. Load to static saveable objects.
 	//    d. Iterate over dynamic object containers instantiating from save.
 	public void Load(int saveFileIndex, bool actual) {
-	    if (Application.platform == RuntimePlatform.Android) return;
 		ShowLoading();
 		GameObject freshGame = GameObject.Find("GameNotYetStarted");
 		if (freshGame != null) Utils.SafeDestroy(freshGame);

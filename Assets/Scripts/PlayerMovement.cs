@@ -971,7 +971,8 @@ public class PlayerMovement : MonoBehaviour {
 											   //   Up < 0 Inverted
 		);
 
-		Vector2 leftTouchstick = GetInput.a.leftTS.Coordinate();
+		
+		Vector2 leftTouchstick = Vector2.zero;
 		relForward += leftThumbstick.y + leftTouchstick.y;
 		relSideways += leftThumbstick.x + leftTouchstick.x;
 

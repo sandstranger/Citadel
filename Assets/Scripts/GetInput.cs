@@ -5,14 +5,6 @@ using UnityEngine.UI;
 
 // Master input handling functions from configuration
 public class GetInput : MonoBehaviour {
-	public MobileInputController leftTS;
-	public MobileInputController rightTS;
-	public UIButtonMask spaceButton;
-	public UIButtonMask swimUpButton;
-	public UIButtonMask swimDownButton;
-	public UIButtonMask lmbButton;
-	public UIButtonMask consoleButton;
-	public GameObject touchablesContainer;
 	public static GetInput a;
 	[HideInInspector] public bool isCapsLockOn;
 	private bool lastjoy3 = false;
@@ -23,11 +15,6 @@ public class GetInput : MonoBehaviour {
 	void Awake() {
 		a = this;
 		isCapsLockOn = false;
-		if (Application.platform != RuntimePlatform.Android) {
-			touchablesContainer.SetActive(false);
-		} else {
-			touchablesContainer.SetActive(true);
-		}
 	}
 
 // 	void Update() {
@@ -94,27 +81,20 @@ public class GetInput : MonoBehaviour {
 	public bool Backpedal(){ return GetKey(2); }
 	public bool StrafeRight() { return GetKey(3); }
 	public bool Jump() {
-		if (spaceButton.held) return true; // Touch
 		if (Input.GetKey(KeyCode.JoystickButton0)) return true; // Controller
 		return GetKey(4); // Mouse or Keyboard
 	}
 
 	public bool JumpDown() {
-		if (spaceButton.justHeld) return true; // Touch
 		if (Input.GetKeyDown(KeyCode.JoystickButton0)) return true; // Cntrller
 		return GetKeyDown(4); // Mouse or Keyboard
 	}
 
 	public bool Crouch() {
-		// Touch
-		if (swimDownButton.justHeld) return true;
 		if (Input.GetKeyDown(KeyCode.JoystickButton1)) return true;
 		return GetKeyDown(5);
 	}
 	public bool Prone()	{
-		// Touch
-		if (swimDownButton.justHeld) return true;
-		
 		// Controller
 		if (!lastjoy3
 			&& (Input.GetAxisRaw("JoyAxis3") > 0)
@@ -295,7 +275,6 @@ public class GetInput : MonoBehaviour {
 	}
 
 	public bool Attack() {
-	    if (lmbButton.held) return true;
 	    
 		if (Const.a.InputCodeSettings[24] == 153) return MouseWheelUp();
 		if (Const.a.InputCodeSettings[24] == 154) return MouseWheelDn();
@@ -303,7 +282,6 @@ public class GetInput : MonoBehaviour {
 		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[24]])) {
 			return true;
 		} else {
-			if (lmbButton.held) return true;
 			return false;
 		}
 	}
@@ -349,8 +327,7 @@ public class GetInput : MonoBehaviour {
 		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[40]])) {
 			return true;
 		}
-
-		if (swimUpButton.held) return true;
+		
 		return false;
 	}
 
@@ -360,8 +337,7 @@ public class GetInput : MonoBehaviour {
 		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[41]])) {
 			return true;
 		}
-
-		if (swimDownButton.held) return true;
+		
 		return false;
 	}
 
@@ -373,8 +349,7 @@ public class GetInput : MonoBehaviour {
 			|| Input.GetKeyDown(KeyCode.Caret)) {
 			return true;
 		}
-
-		if (consoleButton.justHeld) return true;
+		
 		return false;
 	} // UPDATE should replace the 94 check here with a system to handle Shift+6 binding to set directly?
 

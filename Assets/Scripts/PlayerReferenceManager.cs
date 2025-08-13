@@ -25,6 +25,16 @@ public class PlayerReferenceManager : MonoBehaviour {
 	public static PlayerReferenceManager a;
 
 	void Awake() {
+		if (a == null)
+		{
+			DontDestroyOnLoad(this.gameObject);
+		}
+
+		if (a != null && a == this)
+		{
+			Debug.Log("CALLED");
+		}
+		
 		a = this;
 		a.playerCurrentLevel = LevelManager.a.currentLevel;
 	}

@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine.Rendering;
 using UnityEngine;
 using System.Runtime.CompilerServices;
+using UnityEngine.UI;
 
 public class DynamicCulling : MonoBehaviour {
     [HideInInspector] public const int WORLDX = 64;

@@ -215,7 +215,6 @@ public class MouseLookScript : MonoBehaviour {
 		} 
 		KeyboardTurn();
 		KeyboardLookUpDn();
-		TouchLook();
 		if (inCyberSpace) { // Barrel roll!
 			if (GetInput.a.LeanLeft()) {
 				playerCapsuleTransform.RotateAround(
@@ -454,7 +453,8 @@ public class MouseLookScript : MonoBehaviour {
 	}
 	
 	void TouchLook() {
-	    Vector2 rightTouchstick = GetInput.a.rightTS.Coordinate();
+		return;
+	    Vector2 rightTouchstick = Vector2.zero;
 	    if (rightTouchstick.x < 0f) {
 			yRotation -= keyboardTurnSpeed * rightTouchstick.x;
 			playerCapsuleTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
@@ -512,8 +512,6 @@ public class MouseLookScript : MonoBehaviour {
 				playerCapsuleTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
 			}
 		}
-		
-		Vector2 rightTouchstick = GetInput.a.rightTS.Coordinate();
 	}
 
 	void KeyboardLookUpDn() {
