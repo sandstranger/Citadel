@@ -5,8 +5,9 @@ using UnityEngine.Networking;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
+using Citadel.Game;
 
-public class MouseLookScript : MonoBehaviour {
+public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
     // External references
 	public GameObject player;
 	public GameObject canvasContainer;
@@ -98,13 +99,13 @@ public class MouseLookScript : MonoBehaviour {
 	private float bobTarget;
 	private float headBobXVel;
 	private float headBobYVel;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new StringBuilder(500 * 1024);
     
 	public static MouseLookScript a;
 
-	void Awake() {
+	public void Initialize() {
 		a = this;
-		a.playerCamera = GetComponent<Camera>(); // Needed elsewhere, do early.
+		playerCamera = GetComponent<Camera>(); // Needed elsewhere, do early.
 	}
 
     void Start (){
@@ -191,8 +192,8 @@ public class MouseLookScript : MonoBehaviour {
 		if(GetInput.a.ToggleMode()) ToggleInventoryMode();
 
 		if (Const.a.questData.SelfDestructActivated
-			&& LevelManager.a.currentLevel != 13   // Not Cyberspace
-			&& LevelManager.a.currentLevel != 9) { // Not the bridge, separated
+			&& LevelManager.currentLevel != 13   // Not Cyberspace
+			&& LevelManager.currentLevel != 9) { // Not the bridge, separated
 
 			if (randomShakeFinished < PauseScript.a.relativeTime) {
 				randomShakeFinished = PauseScript.a.relativeTime
@@ -379,7 +380,7 @@ public class MouseLookScript : MonoBehaviour {
 		cyberspaceReturnPoint = PlayerMovement.a.transform.position;
 		cyberspaceReturnCameraLocalRotation = transform.localRotation.eulerAngles;
 		cyberspaceReturnPlayerCapsuleLocalRotation = playerCapsuleTransform.localRotation.eulerAngles;
-		cyberspaceReturnLevel = LevelManager.a.currentLevel;
+		cyberspaceReturnLevel = LevelManager.currentLevel;
 		MFDManager.a.EnterCyberspace();
 		LevelManager.a.LoadLevel(13,cyberspaceRecallPoint);
 		PlayerMovement.a.inCyberSpace = true;

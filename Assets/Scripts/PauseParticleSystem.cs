@@ -13,7 +13,10 @@ public class PauseParticleSystem : MonoBehaviour {
 	}
 
 	void Initialize() {
-		psys = GetComponent<ParticleSystem>();
+		if (psys == null)
+		{
+			psys = GetComponent<ParticleSystem>();
+		}
 		if (!Const.a.psys.Contains(this)) Const.a.psys.Add(this);
 	}
 

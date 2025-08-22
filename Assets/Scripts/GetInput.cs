@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Citadel.Game;
 using UnityEngine;
 using UnityEngine.UI;
 
 // Master input handling functions from configuration
-public class GetInput : MonoBehaviour {
+public class GetInput : MonoBehaviour, ISingletonInitializer {
 	public static GetInput a;
 	[HideInInspector] public bool isCapsLockOn;
 	private bool lastjoy3 = false;
@@ -12,7 +13,7 @@ public class GetInput : MonoBehaviour {
 	private Vector2 LTSCenter;
 	public float LTSRadius;
 
-	void Awake() {
+	public void Initialize() {
 		a = this;
 		isCapsLockOn = false;
 	}

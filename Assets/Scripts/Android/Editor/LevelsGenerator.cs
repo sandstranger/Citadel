@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Android.Tools
+namespace Citadel.Android.Tools
 {
     internal static class LevelsGenerator
     {

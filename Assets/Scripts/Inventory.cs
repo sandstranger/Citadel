@@ -2,12 +2,13 @@ using System.Collections;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using Citadel.Game;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 
-public class Inventory : MonoBehaviour {
+public class Inventory : MonoBehaviour, ISingletonInitializer {
 	// Access Cards
 	public AccessCardType[] accessCardsOwned; // save
 	private AccessCardType doorAccessTypeAcquired;
@@ -213,7 +214,7 @@ public class Inventory : MonoBehaviour {
 		return 0; // Using zero in case I pass this straight into the ever dangerous [ ]
 	}
 
-	void Awake() {
+	public void Initialize() {
 		a = this;
 
 		// Access Cards
@@ -907,10 +908,12 @@ public class Inventory : MonoBehaviour {
 
 	// Called by main menu since as this uses OnGUI it draws on top.
 	public void HideBioMonitor() {
-		if (hardwareButtonManager == null) return;
-		if (hardwareButtonManager.bioMonitorContainer == null) return;
-		if (MFDManager.a.FPS.activeInHierarchy) return;
-		
+		if (hardwareButtonManager == null || hardwareButtonManager.bioMonitorContainer == null || 
+		    MFDManager.a == null)
+		{
+			return;
+		}
+
 		hardwareButtonManager.bioMonitorContainer.SetActive(false);
 	}
 

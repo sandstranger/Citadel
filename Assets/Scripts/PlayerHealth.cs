@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Citadel.Game;
 
-public class PlayerHealth : MonoBehaviour {
+public class PlayerHealth : MonoBehaviour, ISingletonInitializer {
 	// External references, required
 	public GameObject radiationEffect;
 	public GameObject shieldEffect;
@@ -34,11 +35,11 @@ public class PlayerHealth : MonoBehaviour {
 	[HideInInspector] public float noiseFinished;
 	[HideInInspector] public int deaths = 0;
 	[HideInInspector] public int ressurections = 0;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(100 * 1024);
 	
 	public static PlayerHealth a;
 
-	void Awake() {
+	public void Initialize() {
 		a = this;
 	}
 
@@ -152,7 +153,7 @@ public class PlayerHealth : MonoBehaviour {
 			MouseLookScript.a.DropHeldItem();
 			MouseLookScript.a.ForceInventoryMode();
 		}	
-		int lindex = LevelManager.a.currentLevel != -1 ? LevelManager.a.currentLevel : 0;
+		int lindex = LevelManager.currentLevel != -1 ? LevelManager.currentLevel : 0;
 		hm.ClearOverlays();
 		if (LevelManager.a.ressurectionActive[lindex])
 			PlayerRessurect(); // Ressurection
@@ -182,12 +183,6 @@ public class PlayerHealth : MonoBehaviour {
 			AudioListener.pause = false;
 		}
 
-		GameObject newGameIndicator = GameObject.Find("NewGameIndicator");
-		GameObject loadGameIndicator = GameObject.Find("LoadGameIndicator");
-		GameObject freshGame = GameObject.Find("GameNotYetStarted");
-		if (newGameIndicator != null) Utils.SafeDestroy(newGameIndicator);
-		if (loadGameIndicator != null) Utils.SafeDestroy(loadGameIndicator);
-		if (freshGame != null) Utils.SafeDestroy(freshGame);
 		PauseScript.a.mainMenu.SetActive(true);
 		MainMenuHandler.a.InitialDisplay.SetActive(false);
 		MainMenuHandler.a.returnToPause = false;

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
 public class PooledItemDestroy : MonoBehaviour {
@@ -9,6 +10,14 @@ public class PooledItemDestroy : MonoBehaviour {
 
 	void OnEnable () {
 		timerFinished = PauseScript.a.relativeTime + itemLifeTime;
+	}
+
+	private void OnDisable()
+	{
+		if (onlyOnce)
+		{
+			doneYet = true;
+		}
 	}
 
 	void Update() {

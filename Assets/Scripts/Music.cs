@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using System;
+using Citadel.Game;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Music : MonoBehaviour {
+public class Music : MonoBehaviour, ISingletonInitializer {
 	public AudioSource SFXMain;
 	public AudioSource SFXMain2;
 	public bool twoPlaying;
@@ -44,9 +45,8 @@ public class Music : MonoBehaviour {
 
 	public static Music a;
 
-	void Awake() {
+	public void Initialize() {
 		a = this;
-		
 		clipFinished = Time.time;
 		clipOverlayFinished = Time.time;
 		tempClip = null;
@@ -663,19 +663,19 @@ public class Music : MonoBehaviour {
 
 		if (inCombat && !inZone && combatImpulseFinished < PauseScript.a.relativeTime) {
 			inCombat = false;
-			PlayTrack(LevelManager.a.currentLevel,TrackType.Combat, MusicType.Override);
+			PlayTrack(LevelManager.currentLevel,TrackType.Combat, MusicType.Override);
 			combatImpulseFinished = PauseScript.a.relativeTime + 20f;
 			return;
 		}
 
 		if (inZone) {
 			if (distortion) {
-				PlayTrack(LevelManager.a.currentLevel,TrackType.Distortion, MusicType.Override);
+				PlayTrack(LevelManager.currentLevel,TrackType.Distortion, MusicType.Override);
 				return;
 			}
 			
 			if (elevator) {
-				PlayTrack(LevelManager.a.currentLevel,TrackType.Elevator, MusicType.Override);
+				PlayTrack(LevelManager.currentLevel,TrackType.Elevator, MusicType.Override);
 				return;
 			}
 		}
@@ -685,14 +685,14 @@ public class Music : MonoBehaviour {
 				float remaining = curr.clip.length - curr.time;
 				if (remaining <= audBuffer) { // 50ms buffer before end
 					twoPlaying = !twoPlaying;
-					PlayTrack(LevelManager.a.currentLevel,TrackType.Walking, MusicType.Walking);
+					PlayTrack(LevelManager.currentLevel,TrackType.Walking, MusicType.Walking);
 				}
 			} else {
-				PlayTrack(LevelManager.a.currentLevel,TrackType.Walking, MusicType.Walking);
+				PlayTrack(LevelManager.currentLevel,TrackType.Walking, MusicType.Walking);
 			}
 		} else {
 			twoPlaying = false;
-			PlayTrack(LevelManager.a.currentLevel,TrackType.Walking, MusicType.Walking);
+			PlayTrack(LevelManager.currentLevel,TrackType.Walking, MusicType.Walking);
 		}
     }
     

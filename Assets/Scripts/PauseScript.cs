@@ -1,12 +1,15 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using System.IO;
+using Citadel.Game;
+using Citadel.SceneManagement;
 
-public class PauseScript : MonoBehaviour {
+public class PauseScript : MonoBehaviour, ISingletonInitializer {
 	public GameObject pauseText;
 	public GameObject[] disableUIOnPause;
 	public GameObject saltTheFries;
@@ -16,29 +19,35 @@ public class PauseScript : MonoBehaviour {
 	public GameObject hardSaveDialog;
 
 	[HideInInspector] public bool paused = false;
-	[HideInInspector] public bool previousInvMode = false;
+	[HideInInspector] public bool previousInvMode = true;
 	[HideInInspector] public bool onSaveDialog = false;
 	public float relativeTime;
 	public float absoluteTime;
-	[HideInInspector] public List<AmbientRegistration> ambientRegistry;
+	private readonly List<AmbientRegistration> _ambientRegistry = new();
 	private bool menuActive = true; // Store the state of the main menu
 	                                // gameobject active state so that we don't
 									// have to do a gameobject engine call more
 									// than once on every Update all over the
 									// code.
 
-	public static PauseScript a;
+	public static PauseScript a { get; private set; }
 
-	public void SetA() {
-		if (a == null) a = this;		
+	public void Initialize()
+	{
+		a = this;
+		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
+	}
+
+	private void OnDestroy()
+	{
+		ScenesLoader.OnStartLoadScene -= OnStartLoadScene;
+	}
+
+	private void OnStartLoadScene(Scene scene)
+	{
+		_ambientRegistry.Clear();
 	}
 	
-	void Awake() {
-		SetA();
-		a.ambientRegistry = new List<AmbientRegistration>();
-		a.previousInvMode = true;
-	}
-
 	// The whole point right here:
 	public bool Paused() { return paused || Const.a.loading; }
 	public bool MenuActive() { return menuActive; }
@@ -79,35 +88,35 @@ public class PauseScript : MonoBehaviour {
 		int hitCount = 0;
 		float newVolume = 1.0f;
 		RaycastHit[] results = new RaycastHit[6];
-		for (int i=0;i<ambientRegistry.Count;i++) {
-			if (ambientRegistry[i] == null) continue;
+		for (int i=0;i<_ambientRegistry.Count;i++) {
+			if (_ambientRegistry[i] == null) continue;
 
 			hitCount = Physics.RaycastNonAlloc(
 						MouseLookScript.a.transform.position,
-						ambientRegistry[i].transform.position
+						_ambientRegistry[i].transform.position
 						- MouseLookScript.a.transform.position,
 						results,32f,Const.a.layerMaskPlayerFrob,
 						QueryTriggerInteraction.UseGlobal);
 
-			ambientRegistry[i].SFX.volume =
-				ambientRegistry[i].normalVolume;
+			_ambientRegistry[i].SFX.volume =
+				_ambientRegistry[i].normalVolume;
 
 			if (hitCount > 0) {
 				if (hitCount > 5) {
-					newVolume = ambientRegistry[i].normalVolume * 0.40f;
+					newVolume = _ambientRegistry[i].normalVolume * 0.40f;
 				} else if (hitCount == 5) {
-					newVolume = ambientRegistry[i].normalVolume * 0.50f;
+					newVolume = _ambientRegistry[i].normalVolume * 0.50f;
 				} else if (hitCount == 4) {
-					newVolume = ambientRegistry[i].normalVolume * 0.60f;
+					newVolume = _ambientRegistry[i].normalVolume * 0.60f;
 				} else if (hitCount == 3) {
-					newVolume = ambientRegistry[i].normalVolume * 0.70f;
+					newVolume = _ambientRegistry[i].normalVolume * 0.70f;
 				} else if (hitCount == 2) {
-					newVolume = ambientRegistry[i].normalVolume * 0.80f;
+					newVolume = _ambientRegistry[i].normalVolume * 0.80f;
 				} else {
-					newVolume = ambientRegistry[i].normalVolume * 0.90f;
+					newVolume = _ambientRegistry[i].normalVolume * 0.90f;
 				}
 
-				ambientRegistry[i].SFX.volume = newVolume;
+				_ambientRegistry[i].SFX.volume = newVolume;
 			}
 		}
 
@@ -234,14 +243,14 @@ public class PauseScript : MonoBehaviour {
 	}
 
 	public void PauseAmbients() {
-		for (int u=0;u<ambientRegistry.Count;u++) {
-			if (ambientRegistry[u].SFX != null) ambientRegistry[u].SFX.Pause();
+		for (int u=0;u<_ambientRegistry.Count;u++) {
+			if (_ambientRegistry[u].SFX != null) _ambientRegistry[u].SFX.Pause();
 		}
 	}
 
 	public void UnpauseAmbients() {
-		for (int u=0;u<ambientRegistry.Count;u++) {
-			if (ambientRegistry[u].SFX != null) ambientRegistry[u].SFX.UnPause();
+		for (int u=0;u<_ambientRegistry.Count;u++) {
+			if (_ambientRegistry[u].SFX != null) _ambientRegistry[u].SFX.UnPause();
 		}
 	}
 
@@ -333,12 +342,6 @@ public class PauseScript : MonoBehaviour {
 		saveDialog.SetActive(false); // turn off dialog
 		mainMenu.SetActive(true);
 		MainMenuHandler.a.InitialDisplay.SetActive(false);
-		GameObject newGameIndicator = GameObject.Find("NewGameIndicator");
-		GameObject loadGameIndicator = GameObject.Find("LoadGameIndicator");
-		GameObject freshGame = GameObject.Find("GameNotYetStarted");
-		if (newGameIndicator != null) Utils.SafeDestroy(newGameIndicator);
-		if (loadGameIndicator != null) Utils.SafeDestroy(loadGameIndicator);
-		if (freshGame != null) Utils.SafeDestroy(freshGame);
 		MainMenuHandler.a.GoToSaveGameSubmenu(true);
 	}
 
@@ -346,12 +349,6 @@ public class PauseScript : MonoBehaviour {
 		DisablePauseUI();
 		saveDialog.SetActive(false); // turn off dialog
 		mainMenu.SetActive(true);
-		GameObject newGameIndicator = GameObject.Find("NewGameIndicator");
-		GameObject loadGameIndicator = GameObject.Find("LoadGameIndicator");
-		GameObject freshGame = GameObject.Find("GameNotYetStarted");
-		if (newGameIndicator != null) Utils.SafeDestroy(newGameIndicator);
-		if (loadGameIndicator != null) Utils.SafeDestroy(loadGameIndicator);
-		if (freshGame != null) Utils.SafeDestroy(freshGame);
 		MainMenuHandler.a.GoToFrontPage();
 	}
 
@@ -414,7 +411,7 @@ public class PauseScript : MonoBehaviour {
 
 	// No need to clear, these are all unsaved and static.
 	public void AddAmbientToRegistry(AmbientRegistration ar) {
-		ambientRegistry.Add(ar);
+		_ambientRegistry.Add(ar);
 	}
 }
 

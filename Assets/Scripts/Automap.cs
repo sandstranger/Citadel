@@ -2,8 +2,9 @@
 using UnityEngine.UI;
 using System.Text;
 using System.Collections;
+using Citadel.Game;
 
-public class Automap : MonoBehaviour {
+public class Automap : MonoBehaviour, ISingletonInitializer {
 	public Camera automapCamera;
 	public GameObject automapCanvasGO;
 	public GameObject automapContainerLH;
@@ -100,10 +101,10 @@ public class Automap : MonoBehaviour {
 
 	public static Automap a;
 
-	public void Awake() {
+	public void Initialize() {
 		a = this;
-		a.initialized = false;
-		a.inSideView = false;
+		initialized = false;
+		inSideView = false;
 	}
 
 	void Start() {
@@ -163,7 +164,7 @@ public class Automap : MonoBehaviour {
 		initialized = true;
 
 		if (LevelManager.a != null)
-			SetAutomapExploredReference(LevelManager.a.currentLevel);
+			SetAutomapExploredReference(LevelManager.currentLevel);
 		else
 			SetAutomapExploredReference(1);
 	}
@@ -173,8 +174,8 @@ public class Automap : MonoBehaviour {
 		if (!initialized) Start();
 
 		if (inSideView) {
-			Utils.AssignImageOverride(automapSideLHImage,automapsSideImages[LevelManager.a.currentLevel]);
-			Utils.AssignImageOverride(automapSideRHImage,automapsSideImages[LevelManager.a.currentLevel]);
+			Utils.AssignImageOverride(automapSideLHImage,automapsSideImages[LevelManager.currentLevel]);
+			Utils.AssignImageOverride(automapSideRHImage,automapsSideImages[LevelManager.currentLevel]);
 			return;
 		} 
 		
@@ -202,9 +203,9 @@ public class Automap : MonoBehaviour {
 
 // 		if (automapUpdateFinished < PauseScript.a.relativeTime) {
 			Utils.EnableImage(automapBaseImage);
-			if (LevelManager.a.currentLevel >= 0) {
+			if (LevelManager.currentLevel >= 0) {
 				Utils.AssignImageOverride(automapBaseImage,
-					automapsBaseImages[LevelManager.a.currentLevel]);
+					automapsBaseImages[LevelManager.currentLevel]);
 			}
 
 			float mapWidth = (Const.mapWorldMaxW - Const.mapWorldMaxE);
@@ -275,7 +276,7 @@ public class Automap : MonoBehaviour {
 
 				// Display hazards
 				for (int j=0;j<13;j++) {
-					if (j != LevelManager.a.currentLevel) {
+					if (j != LevelManager.currentLevel) {
 						Utils.DisableImage(automapsHazardOverlays[j]);
 						Utils.Deactivate(automapsHazardOverlays[j].gameObject);
 					} else {
@@ -311,7 +312,7 @@ public class Automap : MonoBehaviour {
 							&& tempVec2b.y < radiusSquared
 							&& (tempVec2b.x + tempVec2b.y) < radiusSquared) {
 							automapExplored[i] = true;
-							SetAutomapTileExplored(LevelManager.a.currentLevel,i);
+							SetAutomapTileExplored(LevelManager.currentLevel,i);
 							Utils.DisableImage(automapFoWTiles[i]);
 							Utils.Deactivate(automapFoWTiles[i].gameObject);
 						}
@@ -328,7 +329,7 @@ public class Automap : MonoBehaviour {
 	public void ActivateAutomapUI() {
 		Utils.EnableCamera(automapCamera);
 		Utils.Activate(automapCanvasGO);
-		ActivateLevelOverlayContainer(LevelManager.a.currentLevel);
+		ActivateLevelOverlayContainer(LevelManager.currentLevel);
 	}
 
 	public void DeactivateAutomapUI() {
@@ -487,8 +488,8 @@ public class Automap : MonoBehaviour {
 		automapNormalPlayerIconGORH.SetActive(false);
 		automapSideLH.SetActive(true);
 		automapSideRH.SetActive(true);
-		Utils.AssignImageOverride(automapSideLHImage,automapsSideImages[LevelManager.a.currentLevel]);
-		Utils.AssignImageOverride(automapSideRHImage,automapsSideImages[LevelManager.a.currentLevel]);
+		Utils.AssignImageOverride(automapSideLHImage,automapsSideImages[LevelManager.currentLevel]);
+		Utils.AssignImageOverride(automapSideRHImage,automapsSideImages[LevelManager.currentLevel]);
 	}
 
 	public void AutomapGoTop() {
@@ -620,7 +621,7 @@ public class Automap : MonoBehaviour {
 		for (j=0;j<4096;j++) { amp.automapExploredG1[j] = Utils.GetBoolFromString(entries[index],"automapExploredG1[" + j.ToString() + "]"); index++; }
 		for (j=0;j<4096;j++) { amp.automapExploredG2[j] = Utils.GetBoolFromString(entries[index],"automapExploredG2[" + j.ToString() + "]"); index++; }
 		for (j=0;j<4096;j++) { amp.automapExploredG4[j] = Utils.GetBoolFromString(entries[index],"automapExploredG4[" + j.ToString() + "]"); index++; }
-		if (LevelManager.a != null) amp.SetAutomapExploredReference(LevelManager.a.currentLevel);
+		if (LevelManager.a != null) amp.SetAutomapExploredReference(LevelManager.currentLevel);
 		else amp.SetAutomapExploredReference(1);
 
 		amp.currentAutomapZoomLevel = Utils.GetIntFromString(entries[index],"currentAutomapZoomLevel"); index++;

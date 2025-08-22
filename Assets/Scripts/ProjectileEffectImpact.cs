@@ -66,7 +66,7 @@ public class ProjectileEffectImpact : MonoBehaviour {
 				    dd.impactVelocity = dd.impactVelocity / 3f;
 				}
 				
-				if (LevelManager.a.currentLevel != 13 && !host.CompareTag("NPC")) {
+				if (LevelManager.currentLevel != 13 && !host.CompareTag("NPC")) {
 					Utils.ApplyImpactForce(other.gameObject,dd.impactVelocity,
 										   dd.attacknormal,dd.hit.point);
 				}

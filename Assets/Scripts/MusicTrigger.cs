@@ -15,7 +15,7 @@ public class MusicTrigger : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		if (tickFinished < PauseScript.a.relativeTime) {
 			if (other.gameObject.CompareTag("Player")) {
-				Music.a.PlayTrack(LevelManager.a.currentLevel,trackType,musicType);
+				Music.a.PlayTrack(LevelManager.currentLevel,trackType,musicType);
 				Music.a.NotifyZone(trackType);
 			}
 			tickFinished = PauseScript.a.relativeTime + tick;

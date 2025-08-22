@@ -49,9 +49,9 @@ public class SpawnManager : MonoBehaviour {
 		if (PauseScript.a.MenuActive()) return;
 		if (!active) return;
 
-		if (LevelManager.a.npcsm[LevelManager.a.currentLevel] == null) return;
+		if (LevelManager.a.npcsm[LevelManager.currentLevel] == null) return;
 
-		NPCSubManager subM = LevelManager.a.npcsm[LevelManager.a.currentLevel];
+		NPCSubManager subM = LevelManager.a.npcsm[LevelManager.currentLevel];
 		int numNPCs = subM.childrenNPCsAICs.Length;		
 		if (numNPCs > 300) return;
 
@@ -90,7 +90,7 @@ public class SpawnManager : MonoBehaviour {
 		if (spot.x == 0 && spot.y == 0 && spot.z == 0) return;
 
 		GameObject instGO = ConsoleEmulator.SpawnDynamicObject(
-			index,LevelManager.a.currentLevel,false,null,-1
+			index,LevelManager.currentLevel,false,null,-1
 		);
 
 		if (instGO == null) {

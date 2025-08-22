@@ -5,13 +5,17 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Citadel.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class LevelManager : MonoBehaviour {
-	public int currentLevel;
+public class LevelManager : MonoBehaviour
+{
+	public const int MaxLevelsCount = 14;
+	public const int NewGameLevelIndex = 1;
+
 	public GameObject[] levels;
 	public int[] levelSecurity;
 	public int[] levelCameraCount;
@@ -44,7 +48,6 @@ public class LevelManager : MonoBehaviour {
 	public Mesh sphereMesh;
 	public SkyRotate skyRotate;
 	public Material pipe_maint2_3_coolant;
-	[HideInInspector] public List<string>[] DynamicObjectsSavestrings = new List<string>[14];
 	
 	private bool getValparsed;
 	private bool[] levelDataLoaded;
@@ -52,17 +55,20 @@ public class LevelManager : MonoBehaviour {
 	private float getValreadFloat;
 	private static StringBuilder s1 = new StringBuilder();
 	private GameObject _dummyGameObject;
-	
+
+	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
+	public static readonly List<string>[] DynamicObjectsSavestrings = new List<string>[14];
+	public static int currentLevel = NewGameLevelIndex;
 	// Singleton instance
 	public static LevelManager a;
-
-	public void SetA() {
-		if (a == null) a = this;
-	}
 	
 	void Awake () {
 		_dummyGameObject = new("dummy_gameobject");
-		SetA();
+		if (a == null)
+		{
+			LoadDynamicObjectsSavestrings();
+		}
+		a = this;
 		if (currentLevel < 0) {
 			if (Const.a == null) return;
 			if (Const.a.player1CapsuleMainCameragGO == null) return;
@@ -81,46 +87,44 @@ public class LevelManager : MonoBehaviour {
 		SetSkyVisible(1);
 		if (ressurectionBayDoor.Length != 8) Debug.Log("BUG: LevelManager ressurectionBayDoor array length not equal to 8.");
 		Time.timeScale = Const.defaultTimeScale;
-		levelDataLoaded = new bool[14];
-		for (int i=0;i<14;i++) levelDataLoaded[i] = false;
-		ResetSaveStrings();
-		LoadDynamicObjectsSavestrings(true);
-		LoadLevelData(currentLevel);
+		levelDataLoaded = new bool[MaxLevelsCount];
+		for (int i=0;i<MaxLevelsCount;i++) levelDataLoaded[i] = false;
+//		LoadLevelData(currentLevel);
 	}
 
+	public bool LevelExists(int levelID)
+	{
+		return levelScripts[levelID] != null;
+	}
+	
 	public static bool LevNumInBounds(int levnum) {
-		return (levnum >=0 && levnum < 14); // 14 levels
+		return (levnum >=0 && levnum < MaxLevelsCount); // 14 levels
 	}
 
 	public static bool LevNumIsNonCyber(int levnum) {
 		return (levnum >=0 && levnum < 13); // 13 non-cyber levels
 	}
 
-	public void ResetSaveStrings() {
-		if (DynamicObjectsSavestrings != null) {
-			int strcount = DynamicObjectsSavestrings.Length;
-			if (strcount > 0) {
-				for (int i=strcount - 1;i>=0;i--) {
-					if (DynamicObjectsSavestrings[i] != null) {
-						DynamicObjectsSavestrings[i].Clear();
-					}
+	public static void ResetSaveStrings() {
+		int strcount = DynamicObjectsSavestrings.Length;
+		if (strcount > 0) {
+			for (int i=strcount - 1;i>=0;i--) {
+				if (DynamicObjectsSavestrings[i] != null) {
+					DynamicObjectsSavestrings[i].Clear();
 				}
-				
-				DynamicObjectsSavestrings = null;
+				else
+				{
+					DynamicObjectsSavestrings[i] = new List<string>();
+				}
 			}
 		}
-		DynamicObjectsSavestrings = new List<string>[14];
-		for (int i=0;i<14;i++) {
-			DynamicObjectsSavestrings[i] = new List<string>();
-			DynamicObjectsSavestrings[i].Clear();
-		}		
 	}
 	
 	// Used in a couple places, bit slow to return list but it's only part of
 	// loads and transitions between levels.
-	public List<string> ReadDynamicObjectFileList(int lev) {
+	private static List<string> ReadDynamicObjectFileList(int lev) {
 		List<string> readFileList = new List<string>();
-		if (lev > (levelScripts.Length - 1)) return readFileList;
+		if (lev > (MaxLevelsCount - 1)) return readFileList;
 		if (!LevNumInBounds(lev)) return readFileList;
 
 		string dynName = "CitadelScene_dynamics_level"+lev.ToString()+".txt";
@@ -140,8 +144,8 @@ public class LevelManager : MonoBehaviour {
 		
 		return readFileList;
 	}
-	
-	public void LoadDynamicObjectsSavestrings(bool skipCurrent) {
+
+	private static void LoadDynamicObjectsSavestrings() {
 		ResetSaveStrings();		
 		for (int i=0;i<14;i++) {			
 			List<string> readFileList = ReadDynamicObjectFileList(i);
@@ -246,11 +250,31 @@ public class LevelManager : MonoBehaviour {
 		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + SaveLoad.numLightsWithShadows.ToString());
 	}
 
-	public void LoadLevel(int levnum, Vector3 targetPosition) {
+	public static void ChangeGameScene(int levnum, Vector3? targetPosition = null, bool changeSceneForced = false)
+	{
+		if (!LevNumInBounds(levnum))
+		{
+			Debug.LogWarning("levnum out of bounds"); 
+			return;
+		}
+
+		if (currentLevel == levnum && !changeSceneForced)
+		{
+			Const.sprint(Const.a.stringTable[9]);
+			return;
+		}
+
+		TargetPosition = targetPosition ?? Vector3.zero;
+		currentLevel = levnum;
+		ObjectContainmentSystem.ClearLists();
+		ScenesLoader.LoadLevel(levnum);
+	}
+	
+	public void LoadLevel(int levnum, Vector3 targetPosition, bool loadLevelForced = false) {
 		if (!LevNumInBounds(levnum)) { Debug.LogWarning("levnum out of bounds"); return; }
 
 		// NOTE: Check this first since the button for the current level has a null destination.  This is fine and expected.
-		if (currentLevel == levnum) { Const.sprint(Const.a.stringTable[9]); return; } //Already there
+		if (currentLevel == levnum && !loadLevelForced) { Const.sprint(Const.a.stringTable[9]); return; } //Already there
 
 		MFDManager.a.TurnOffElevatorPad();
 // 		Debug.Log("Cleared GUI Over Button state from clicking on elevator button in MFD side pane");
@@ -283,7 +307,6 @@ public class LevelManager : MonoBehaviour {
 		System.GC.Collect();
 		System.GC.WaitForPendingFinalizers();
 		levels[levnum].SetActive(true); // enable new level
-		PlayerReferenceManager.a.playerCurrentLevel = levnum;
 		if (currentLevel == 2 && AutoSplitterData.missionSplitID == 0) {
 			AutoSplitterData.missionSplitID++; // 1 - Medical split - we are now on level 2
 			Debug.Log("AutoSplitterData missionSplitID incremented: " + AutoSplitterData.missionSplitID.ToString());
@@ -423,8 +446,6 @@ public class LevelManager : MonoBehaviour {
 		if (!LevNumInBounds(currentLevel)) {
 			return levelScripts[1].dynamicObjectsContainer; // Default to Medical level
 		}
-		
-		Debug.Log(index);
 		
         return levelScripts[index].dynamicObjectsContainer;
 	}
@@ -777,7 +798,7 @@ public class LevelManager : MonoBehaviour {
 		int i=0;
 		LevelManager lvm = go.GetComponent<LevelManager>();
 		s1.Clear();
-		s1.Append(Utils.UintToString(LevelManager.a.currentLevel,"currentLevel"));
+		s1.Append(Utils.UintToString(LevelManager.currentLevel,"currentLevel"));
 		s1.Append(Utils.splitChar);
 		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(LevelManager.a.levelSecurity[i],"levelSecurity["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
 		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(LevelManager.a.levelCameraDestroyedCount[i],"levelCameraDestroyedCount["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
@@ -821,7 +842,5 @@ public class LevelManager : MonoBehaviour {
 		rtxEmissive = null;
 		sphereMesh = null;
 		pipe_maint2_3_coolant = null;
-		DynamicObjectsSavestrings = null;
-		if (a == this) a = null;
 	}
 }

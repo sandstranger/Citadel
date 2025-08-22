@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using Citadel.Game;
+using Citadel.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -35,9 +37,9 @@ using Debug = UnityEngine.Debug;
 // UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion 1200
 // TextLocalization 1300
 
-public class Const : MonoBehaviour {
-	public static bool NewGameStarted { get; private set; }
-	
+public class Const : MonoBehaviour
+{
+	private const int StringBuilderSize = 500 * 1024;
 	public float shadowThreshold = 0.03f;
 	//Item constants
 	public QuestBits questData;
@@ -255,7 +257,7 @@ public class Const : MonoBehaviour {
     public string[] stringTable;
 	[HideInInspector] public bool stringTableLoaded = false;
 	[HideInInspector] public bool loading = false;
-	public HashSet<TextLocalization> TextLocalizationRegister;
+	public readonly HashSet<TextLocalization> TextLocalizationRegister = new();
 	public float[] reloadTime;
 
 	public Material[] screenCodes;
@@ -308,7 +310,6 @@ public class Const : MonoBehaviour {
 	[HideInInspector] public bool gameFinished = false; // Global constants
 	[HideInInspector] public float justSavedTimeStamp;
 	[HideInInspector] public float savedReminderTime = 7f; // human short-term memory length
-	[HideInInspector] public bool startingNewGame = false;
 	[HideInInspector] public bool introNotPlayed = false;
 	[HideInInspector] public const float doubleClickTime = 0.500f;
 	[HideInInspector] public const float frobDistance = 4.9f;
@@ -376,7 +377,9 @@ public class Const : MonoBehaviour {
 	private int lastTargetRegistrySize = 0;
 
 	public static RaycastHit hitNull;	
-
+	public static bool StartingNewGame { get; private set; } = false;
+	private static int? _saveFileIndex;
+	
 	// Private CONSTANTS
 	[HideInInspector] public int TARGET_FPS = 240;
 	private StringBuilder s1;
@@ -384,21 +387,41 @@ public class Const : MonoBehaviour {
 
 	//Instance container variable
 	public static Const a;
-	
-	public void SetA() {
-		if (a == null) a = this;
-	}
 
-	public void Awake() {
+	private void Awake()
+	{
+		if (a == null)
+		{
+			a = this;
+			DontDestroyOnLoad(this);
+		}
+		else if (StartingNewGame)
+		{
+			DestroyImmediate(a.gameObject);
+			a = this;
+			DontDestroyOnLoad(this);
+		}
+		else
+		{
+			DestroyImmediate(this.gameObject);
+			return;
+		}
+
+		foreach (var initializer in this.GetComponentsInChildren<ISingletonInitializer>())
+		{
+			initializer.Initialize();
+		}
+		
+		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
+		
 #if UNITY_EDITOR || !UNITY_ANDROID
 		TARGET_FPS = 144;
-#endif
 		Application.targetFrameRate = TARGET_FPS;
-		SetA(); // Create a new instance so that it can be accessed globally.
-				// MOST IMPORTANT PART!!
-
+#endif
+	
 		// Cache values needed by awake prior to the .a instances of others.
 		PlayerReferenceManager prm = a.player1.GetComponent<PlayerReferenceManager>();
+		prm.Initialize();
 		a.player1Capsule = prm.playerCapsule;
 		a.player1CapsuleMainCameragGO = prm.playerCapsuleMainCamera;
 		a.player1TargettingPos = a.player1CapsuleMainCameragGO.transform;
@@ -407,7 +430,6 @@ public class Const : MonoBehaviour {
 		a.LoadTextForLanguage(0); // Initialize with US English (index 0)
 		// Force Initialize all TextLocalization so language loaded from config
 		// is set properly.
-		a.TextLocalizationRegister = new HashSet<TextLocalization>();
 		TextLocalization texloc = null;
 		List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
 		int i,k, found;
@@ -441,8 +463,8 @@ public class Const : MonoBehaviour {
 		allParents.Clear();
 		allParents = null;
 
-		a.s1 = new StringBuilder();
-		a.s2 = new StringBuilder();
+		a.s1 = new StringBuilder(StringBuilderSize);
+		a.s2 = new StringBuilder(StringBuilderSize);
 		if (a.mainMenuInit != null) {
 			if (!a.mainMenuInit.activeSelf) a.mainMenuInit.SetActive(true);
 		}
@@ -564,33 +586,6 @@ public class Const : MonoBehaviour {
 // 		if (mainFont2 != null) { // Ensure text is crisp and readable.
 			mainFont2.material.mainTexture.filterMode = FilterMode.Point;
 // 		}
-
-		ResetPauseLists();
-		GameObject newGameIndicator = GameObject.Find("NewGameIndicator");
-		GameObject loadGameIndicator = GameObject.Find("LoadGameIndicator");
-		if (loadGameIndicator != null) {
-			// OK OK ok ok, so we aren't actually using this now and are just wiping out
-			// dynamic object containers and relying on loading all static object data to
-			// all static objects with manually generated indices now instead of Unity's
-			// guid since the guid IS DIFFERENT when you reload the scene because the guids
-			// are recreated as both scenes need loaded at once due to Unity's horrible no
-			// good uncontrollable way of doing scene reloads (which could be round-about
-			// worked around by having an empty dummy scene but poses other problems with
-			// DontDestroyOnLoad stuff.  Regardless the guids are wiped and thus breaks the
-			// old method of correlating saved objects in savefile to objects in the scene.
-			//
-			// Hopefully I've successfully marked and do save every static object to restore
-			// it to its former glory as-is when saved.  Hopefully.
-			MainMenuHandler.a.IntroVideo.SetActive(false);
-			MainMenuHandler.a.IntroVideoContainer.SetActive(false);
-			PauseScript.a.mainMenu.SetActive(false);
-			SceneTransitionHandler sth = loadGameIndicator.GetComponent<SceneTransitionHandler>();
-			sth.Load();
-		} else if (newGameIndicator != null) { 
-			UnityEngine.Debug.Log("newGameIndicator.name: " + newGameIndicator.name);
-			Utils.SafeDestroy(newGameIndicator);
-			GoIntoGame();				  // Start of the game!!
-		}
 	}
 	
 	public void ResetPauseLists() {
@@ -669,6 +664,25 @@ public class Const : MonoBehaviour {
 		}
 	}
 
+	private void OnSceneLoaded(Scene scene)
+	{
+		ResetPauseLists();
+		
+		if (StartingNewGame)
+		{
+			StartingNewGame = false;
+			GoIntoGame();
+		}
+		else if (_saveFileIndex.HasValue)
+		{
+			StartCoroutine(LoadRoutine(_saveFileIndex.Value,false));
+		}
+		else
+		{
+			LevelManager.a.LoadLevel(LevelManager.currentLevel, LevelManager.TargetPosition, loadLevelForced: true);
+		}
+	}
+	
 	private void LoadDamageTablesData () {
 		string readline; // variable to hold each string read in from the file
 		int currentline = 0;
@@ -706,7 +720,7 @@ public class Const : MonoBehaviour {
 		string readline; // variable to hold each string read in from the file
 		int pagenum = 0;
 		creditsLength = 1;
-		StringBuilder page = new StringBuilder();
+		StringBuilder page = new StringBuilder(StringBuilderSize);
 		StreamReader dataReader = Utils.ReadStreamingAsset("credits.txt");
 		using (dataReader) {
 			do {
@@ -1358,9 +1372,9 @@ CreateBlackTexture:
 		}
 		
 		for (i=0;i<14;i++) {
-			int dyncount = LevelManager.a.DynamicObjectsSavestrings[i].Count;
+			int dyncount = LevelManager.DynamicObjectsSavestrings[i].Count;
 			for (j=0;j<dyncount;j++) {
-				saveData.Add(LevelManager.a.DynamicObjectsSavestrings[i][j]);
+				saveData.Add(LevelManager.DynamicObjectsSavestrings[i][j]);
 			}
 		}
 
@@ -1408,28 +1422,10 @@ CreateBlackTexture:
 	// 7. Go into the game.  Player now has normal control.
 	public void NewGame() {
 		//UnityEngine.Debug.Log("Starting new game!");
-		WriteDatForIntroPlayed(false); // 2. Prevent intro from playing on subsequent sessions; only play intro video once ever after install (require menu option later).
-		GameObject freshGame = GameObject.Find("GameNotYetStarted"); // 3.
-		if (freshGame == null) { // 4b.
-			GameObject newGameIndicator = new GameObject(); // 4b.1.
-			newGameIndicator.name = "NewGameIndicator";
-			SceneTransitionHandler sth =
-			  newGameIndicator.AddComponent<SceneTransitionHandler>();
-			sth.saveGameIndex = -1;
-			sth.diffCombatCarryover = Const.a.difficultyCombat;
-			sth.diffCyberCarryover = Const.a.difficultyCyber;
-			sth.diffPuzzleCarryover = Const.a.difficultyPuzzle;
-			sth.diffMissionCarryover = Const.a.difficultyMission;
-			Cursor.lockState = CursorLockMode.None;
-			DontDestroyOnLoad(newGameIndicator); // 4b.2.
-			loadingScreen.SetActive(true);
-			ReloadScene(sth); // 4b.3.
-		} else { // 4a.
-			//UnityEngine.Debug.Log("freshGame.name: " + freshGame.name);
-			ClearActiveAutomapOverlays();
-			Utils.SafeDestroy(freshGame); // 4a.1. Destroy GameNotYetStarted. Game is started now.
-			GoIntoGame(); // 4a.2. Ok now it's actually started.
-		}
+		WriteDatForIntroPlayed(false);
+		StartingNewGame = true;
+		loadingScreen.SetActive(true);
+		LevelManager.ChangeGameScene(LevelManager.NewGameLevelIndex, changeSceneForced: true);
 	}
 
 	// Going into the game removes the helper GameObjects for these reasons:
@@ -1439,38 +1435,7 @@ CreateBlackTexture:
 	// - NewGameIndicator,  Game is no longer a new game, because it's started.
 	// - LoadGameIndicator, Game should have been loaded prior to entry.
 	public void GoIntoGame(Stopwatch loadTimer) {
-		GameObject freshGame = GameObject.Find("GameNotYetStarted");
-		if (freshGame != null) Utils.SafeDestroy(freshGame);
-		GameObject saveIndicator = GameObject.Find("NewGameIndicator");
-		if (saveIndicator != null) {
-			SceneTransitionHandler sth = saveIndicator.GetComponent<SceneTransitionHandler>();
-			UnityEngine.Debug.Log("Acquiring sth data");
-			if (sth != null) {
-				if (sth.setActiveAtNext) {
-					Const.a.difficultyCombat = sth.diffCombatCarryover;
-					Const.a.difficultyMission = sth.diffMissionCarryover;
-					Const.a.difficultyPuzzle = sth.diffPuzzleCarryover;
-					Const.a.difficultyCyber = sth.diffCyberCarryover;
-				}
-			}
-			Utils.SafeDestroy(saveIndicator);
-		}
-		
-		GameObject loadIndicator = GameObject.Find("LoadGameIndicator");
-		if (loadIndicator != null) {
-			SceneTransitionHandler sth = loadIndicator.GetComponent<SceneTransitionHandler>();
-			UnityEngine.Debug.Log("Acquiring sth data");
-			if (sth != null) {
-				if (sth.setActiveAtNext) {
-					Const.a.difficultyCombat = sth.diffCombatCarryover;
-					Const.a.difficultyMission = sth.diffMissionCarryover;
-					Const.a.difficultyPuzzle = sth.diffPuzzleCarryover;
-					Const.a.difficultyCyber = sth.diffCyberCarryover;
-				}
-			}
-			Utils.SafeDestroy(loadIndicator);
-		}
-		
+		LevelManager.a.LoadLevelData(LevelManager.currentLevel);
 		Cursor.visible = true;
 		Utils.Deactivate(loadingScreen);
 		Utils.Deactivate(MainMenuHandler.a.IntroVideo);
@@ -1495,6 +1460,7 @@ CreateBlackTexture:
 			sprint(stringTable[197] + " (" + loadTimer.Elapsed.ToString() + ")"); // Loading...Done!
 		}
 		
+		DynamicCulling.a.Cull_Init();
 		DynamicCulling.a.Cull(false);
 	}
 
@@ -1524,17 +1490,6 @@ CreateBlackTexture:
 		AutoSplitterData.isLoading = true;
 	}
 
-	public void ReloadScene(SceneTransitionHandler sth) {
-		int index = SceneManager.GetActiveScene().buildIndex; // CitadelScene
-		ObjectContainmentSystem.ClearLists();
-        SceneManager.CreateScene("LoadScene");
-		Scene loadScene = SceneManager.GetSceneByName("LoadScene");
-        SceneManager.SetActiveScene(loadScene);
-		AsyncOperation aso = SceneManager.UnloadSceneAsync(index,
-							  UnloadSceneOptions.UnloadAllEmbeddedSceneObjects);
-		sth.Reload(index, ref aso);
-	}
-
 	// Load the Game
 	// ========================================================================
 	// Sequence is as follows
@@ -1550,13 +1505,23 @@ CreateBlackTexture:
 	//    c. Load to static saveable objects.
 	//    d. Iterate over dynamic object containers instantiating from save.
 	public void Load(int saveFileIndex, bool actual) {
+		_saveFileIndex = null;
 		ShowLoading();
-		GameObject freshGame = GameObject.Find("GameNotYetStarted");
-		if (freshGame != null) Utils.SafeDestroy(freshGame);
-		startingNewGame = false;
+		StartingNewGame = false;
 		introNotPlayed = false;
+		_saveFileIndex = saveFileIndex;
 		WriteDatForIntroPlayed(introNotPlayed); // reset
-		StartCoroutine(Const.a.LoadRoutine(saveFileIndex,false));
+
+		var levelIndexFromSave = ReadLevelIndexFromSave(saveFileIndex);
+
+		if (levelIndexFromSave != LevelManager.currentLevel)
+		{
+			LevelManager.ChangeGameScene(levelIndexFromSave);
+		}
+		else
+		{
+			StartCoroutine(LoadRoutine(_saveFileIndex.Value,false));
+		}
 	}
 
 	// LOAD 2. Called from Load menu or Quick Load.
@@ -1587,8 +1552,14 @@ CreateBlackTexture:
 			healthObjectsRegistration[i] = null;
 		}
 		
-		LevelManager.a.ResetSaveStrings();
-		for (i=0;i<14;i++) {
+		LevelManager.ResetSaveStrings();
+		for (i=0;i<LevelManager.MaxLevelsCount;i++) {
+
+			if (LevelManager.a.levelScripts[i] == null)
+			{
+				continue;
+			}
+			
 			LevelManager.a.UnloadLevelDynamicObjects(i,false); // Delete them all!
 			LevelManager.a.UnloadLevelNPCs(i); // Delete them all!
 			loadPercentText.text = "Preparing level " + i.ToString();
@@ -1598,23 +1569,12 @@ CreateBlackTexture:
 		loadPercentText.text = "Open Save File         ";
 		yield return null; // Update progress text.
 
-		List<string> readFileList = new List<string>();
 		int index = 0; // Caching since it will be iterated over in a loop.
-		string[] entries = new string[2048]; // Holds pipe | delimited strings
+		string[] entries = Array.Empty<string>();
 											 // on individual lines.
-		string lName = "sav" + saveFileIndex.ToString() + ".txt";
-		StreamReader sr = Utils.ReadStreamingAsset(lName);
 		List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
-		if (sr != null) {
-			// Read the file into a list, line by line
-			using (sr) {
-				do {
-					readline = sr.ReadLine();
-					if (readline != null) readFileList.Add(readline);
-				} while (!sr.EndOfStream);
-				sr.Close();
-			}
-
+		var readFileList = ReadSave(saveFileIndex);
+		if (readFileList.Count > 0) {
 			loadPercentText.text = "Load Quest Data...     ";
 			yield return null; // to update the sprint
 			int numSaveFileLines = readFileList.Count;
@@ -1809,22 +1769,23 @@ CreateBlackTexture:
 					// Already did LevelManager.a.LoadLevel above, and since its
 					// savestrings lists were empty, safe to spawn dynamics now.
 					savID = Utils.GetIntFromString(entries[2],"SaveID");
-					if (ConsoleEmulator.ConstIndexIsNPC(constdex)) {
+					bool isNpc = ConsoleEmulator.ConstIndexIsNPC(constdex);
+					if (isNpc && LevelManager.a.LevelExists(levID)) {
 						contnr = LevelManager.a.GetRequestedLevelNPCContainer(levID);
 						instGO = ConsoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
 						SaveObject.Load(instGO,ref entries,i,prefID); // Load NPC.
-					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex)) {
+					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex) && !isNpc) {
 						// For DynamicObjects, if current level, go ahead and Instantiate new Prefabs, else add string to LevelManager's list for other levels.
-						if (levID == LevelManager.a.currentLevel) {
+						if (levID == LevelManager.currentLevel) {
 							contnr = LevelManager.a.GetRequestedLevelDynamicContainer(levID);
 							instGO = ConsoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
 							PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
 							SaveObject.Load(instGO,ref entries,i,prefID); // Load NPC.
 						} else {
-							if (levID < LevelManager.a.DynamicObjectsSavestrings.Length && levID >= 0) { // levID < 14
+							if (levID < LevelManager.DynamicObjectsSavestrings.Length && levID >= 0) { // levID < 14
 								if (i < (readFileList.Count - 1) && readFileList.Count > 0 && i >= 0) {
-									LevelManager.a.DynamicObjectsSavestrings[levID].Add(readFileList[i]);
+									LevelManager.DynamicObjectsSavestrings[levID].Add(readFileList[i]);
 								}
 							}
 						}
@@ -1849,12 +1810,12 @@ CreateBlackTexture:
 			
 			// OK we read in all the dynamic objects above into the savestrings
 			// list, now actaully instantiate them.
-			LevelManager.a.LoadLevelDynamicObjects(LevelManager.a.currentLevel);
+			LevelManager.a.LoadLevelDynamicObjects(LevelManager.currentLevel);
 			loadUpdateTimer.Stop();
 
 			// LOAD 8.  Repopulate registries as needed that were on Awake.
 			for (i = 0; i < LevelManager.a.npcsm.Length; i++ ) {
-				LevelManager.a.npcsm[i].RepopulateChildList();
+				LevelManager.a.npcsm[i]?.RepopulateChildList();
 			}
 			
 			if (Inventory.a.hasHardware[1]) {
@@ -1994,8 +1955,21 @@ CreateBlackTexture:
 		}
 	}
 
+	private int ReadLevelIndexFromSave(int saveFileIndex)
+	{
+		var saveData = ReadSave(saveFileIndex);
+		return saveData.Count > 0 ? Utils.GetIntFromString(saveData[2].Split(Utils.splitCharChar)[0], "currentLevel") : LevelManager.NewGameLevelIndex;
+	}
+
+	private IReadOnlyList<string> ReadSave(int saveFileIndex)
+	{
+		string lName = "sav" + saveFileIndex.ToString() + ".txt";
+		var pathToSave = Path.Combine(Path.Combine(Utils.GetAppropriateDataPath(), lName));
+		return File.Exists(pathToSave) ? File.ReadAllLines(pathToSave) : Array.Empty<string>();
+	}
+	
 	private void LockCPUScreenCode() {
-		switch (LevelManager.a.currentLevel) {
+		switch (LevelManager.currentLevel) {
 			case 1:
 				if (Const.a.questData.lev1SecCodeLocked) return;
 
@@ -2287,6 +2261,7 @@ CreateBlackTexture:
 	
 	void OnDestroy() {
 		if (a == this) a = null;
+		ScenesLoader.OnSceneLoaded -= OnSceneLoaded;
 		questData = null;
 		useableItemsFrobIcons = null;
 		useableItemsIcons = null;
@@ -2322,7 +2297,6 @@ CreateBlackTexture:
 		TargetRegister = null;
 		TargetnameRegister = null;
 		stringTable = null;
-		TextLocalizationRegister = null;
 		reloadTime = null;
 		screenCodes = null;
 		logImages = null;

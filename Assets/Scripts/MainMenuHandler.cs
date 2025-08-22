@@ -5,9 +5,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 using System.IO;
 using System.Collections;
+using Citadel.Game;
 using SimpleFileBrowser;
 
-public class MainMenuHandler : MonoBehaviour {
+public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	public GameObject Button1;
 	public GameObject Button2;
 	public GameObject Button3;
@@ -125,7 +126,8 @@ public class MainMenuHandler : MonoBehaviour {
 	private const float deathvidLength = 16.8f;
 	private float vidStartTime;
 
-	void Awake() {
+	public void Initialize()
+	{
 		a = this;
 		BackGroundMusic.ignoreListenerPause = true; // Play when paused.
 		ResetPages();
@@ -136,7 +138,7 @@ public class MainMenuHandler : MonoBehaviour {
 		Config.SetVolume();
 		GoToFrontPage();
 		CheckAndPlayIntro();
-#else		
+#else
 		Config.SetVolume();
 		FileBrowser.SetFilters(false,new FileBrowser.Filter("SHOCK RES Files",
 															".RES",".res"));

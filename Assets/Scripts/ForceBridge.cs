@@ -151,7 +151,7 @@ public class ForceBridge : MonoBehaviour {
 	}
 	
 	private GameObject CreateSEGIEmitterCube() {
-		GameObject segiEmitter = new GameObject("ForceBridgeSEGIEmitter_"  + LevelManager.a.currentLevel.ToString() + "." + gameObject.name);
+		GameObject segiEmitter = new GameObject("ForceBridgeSEGIEmitter_"  + LevelManager.currentLevel.ToString() + "." + gameObject.name);
         segiEmitter.transform.parent = transform;
         segiEmitter.transform.localPosition = new Vector3(0f,0f,0f);
 		segiEmitter.transform.localScale = new Vector3(1f,1f,1f); // Parent scales it

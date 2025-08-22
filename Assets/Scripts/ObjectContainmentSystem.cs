@@ -4,45 +4,51 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public static class ObjectContainmentSystem {
-    public static List<GameObject> FloorChunks;
-    public static List<GameObject> ActiveFloorChunks;
+public static class ObjectContainmentSystem
+{
+    private static readonly List<GameObject> FloorChunks = new();
+    private static readonly List<GameObject> ActiveFloorChunks = new();
 
-    public static void FindAllFloorGOs() {
-        if (FloorChunks == null) FloorChunks = new List<GameObject>();
-        else FloorChunks.Clear();
-        
-		List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
-		for (int i=0;i<allParents.Count;i++) {
-			Component[] compArray = allParents[i].GetComponentsInChildren(typeof(MarkAsFloor),true);
-			for (int k=0;k<compArray.Length;k++) {
-				FloorChunks.Add(compArray[k].gameObject);
-			}
-		}
-		
-		allParents.Clear();
+    public static void FindAllFloorGOs()
+    {
+        FloorChunks.Clear();
+
+        List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
+        for (int i = 0; i < allParents.Count; i++)
+        {
+            Component[] compArray = allParents[i].GetComponentsInChildren(typeof(MarkAsFloor), true);
+            for (int k = 0; k < compArray.Length; k++)
+            {
+                FloorChunks.Add(compArray[k].gameObject);
+            }
+        }
+
+        allParents.Clear();
         allParents = null; // Done with it.
-	}
+    }
 
-    public static void UpdateActiveFlooring() {
-        if (ActiveFloorChunks == null) ActiveFloorChunks = new List<GameObject>();
-        if (FloorChunks == null) {
-            FloorChunks = new List<GameObject>();
+    public static void UpdateActiveFlooring()
+    {
+        if (FloorChunks.Count == 0)
+        {
             FindAllFloorGOs();
         }
-        
+
         ActiveFloorChunks.Clear();
-        for (int i=0; i<FloorChunks.Count;i++) {
+        for (int i = 0; i < FloorChunks.Count; i++)
+        {
             if (FloorChunks[i] == null) continue;
 
             if (FloorChunks[i].activeInHierarchy) ActiveFloorChunks.Add(FloorChunks[i]);
         }
     }
 
-    public static Vector3 FindNearestFloor(float x, float y, float heightFallback) {
+    public static Vector3 FindNearestFloor(float x, float y, float heightFallback)
+    {
         Vector3 checkpos;
         float distMin = 1000000f;
-        for (int i=0;i<ActiveFloorChunks.Count;i++) {
+        for (int i = 0; i < ActiveFloorChunks.Count; i++)
+        {
             checkpos = ActiveFloorChunks[i].transform.position;
             float deltax = x - checkpos.x;
             float deltay = y - checkpos.z; // Stupid Unity
@@ -52,7 +58,8 @@ public static class ObjectContainmentSystem {
         }
 
         // Go back and find the floor closest to us.  Could have blasted away via explosion.
-        for (int i=0;i<ActiveFloorChunks.Count;i++) {
+        for (int i = 0; i < ActiveFloorChunks.Count; i++)
+        {
             checkpos = ActiveFloorChunks[i].transform.position;
             float deltax = x - checkpos.x;
             float deltay = y - checkpos.z; // Stupid Unity
@@ -60,13 +67,12 @@ public static class ObjectContainmentSystem {
             if (deltay - distMin < 1.28f) return checkpos;
         }
 
-        return new Vector3(x,heightFallback,y);
+        return new Vector3(x, heightFallback, y);
     }
-    
-    public static void ClearLists() {
+
+    public static void ClearLists()
+    {
         FloorChunks.Clear();
-        FloorChunks = null;
         ActiveFloorChunks.Clear();
-        ActiveFloorChunks = null;
     }
 }

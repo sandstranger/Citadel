@@ -12,7 +12,7 @@ public class SaveObject : MonoBehaviour {
 	public bool instantiated = false; // Should oject be instantiated on load?
 	public static string currentObjectInfo;
 	
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(200 * 1024);
 	[HideInInspector] public string saveableType;
 	[HideInInspector] public bool initialized = false;
 

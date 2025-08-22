@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Citadel.Game;
 using UnityEngine;
 
-public class PlayerReferenceManager : MonoBehaviour {
+public class PlayerReferenceManager : MonoBehaviour, ISingletonInitializer {
 	// External references, required
 	public GameObject playerCapsule;
 	public GameObject playerCapsuleHardwareLantern;
@@ -19,24 +20,34 @@ public class PlayerReferenceManager : MonoBehaviour {
 	public GameObject playerRadiationTreatmentFlash;
 	public GameObject playerMFDManager;
 
-	// Internal references
-	[HideInInspector] public int playerCurrentLevel;
-
 	public static PlayerReferenceManager a;
 
-	void Awake() {
+	public void Initialize()
+	{
 		if (a == null)
 		{
-			DontDestroyOnLoad(this.gameObject);
+			a = this;
+			DontDestroyOnLoad(this);
+		}
+		else if (Const.StartingNewGame)
+		{
+			DestroyImmediate(a.gameObject);
+			a = this;
+			DontDestroyOnLoad(this);
+		}
+		else
+		{
+			DestroyImmediate(this.gameObject);
+			return;
 		}
 
-		if (a != null && a == this)
+		foreach (var initializer in GetComponentsInChildren<ISingletonInitializer>())
 		{
-			Debug.Log("CALLED");
+			if (initializer is not PlayerReferenceManager)
+			{
+				initializer.Initialize();
+			}
 		}
-		
-		a = this;
-		a.playerCurrentLevel = LevelManager.a.currentLevel;
 	}
 
 	public static string SavePlayerData(GameObject plyr, PrefabIdentifier prefID) {

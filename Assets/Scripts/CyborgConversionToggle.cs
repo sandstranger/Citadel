@@ -11,7 +11,7 @@ public class CyborgConversionToggle : MonoBehaviour {
 
 	public void PlayVoxMessage() {
 		SFX.Stop();
-		int lindex = LevelManager.a.currentLevel != -1 ? LevelManager.a.currentLevel : 0;
+		int lindex = LevelManager.currentLevel != -1 ? LevelManager.currentLevel : 0;
 		if (LevelManager.a.ressurectionActive[lindex]) {
 			Utils.PlayOneShotSavable(SFX,Const.a.sounds[183]); // "vox_cybconvcancelled"
 			Const.sprint(Const.a.stringTable[591]); // "Cyborg conversion cancelled.  Healing normal."

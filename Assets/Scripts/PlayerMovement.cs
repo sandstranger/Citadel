@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Citadel.Game;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class PlayerMovement : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 	// External references, required
 	public GameObject cameraObject;
 	public Transform cheatG1Spawn;
@@ -169,11 +170,12 @@ public class PlayerMovement : MonoBehaviour {
 	private float bodyLerpGravityOffDelayFinished;
 	private ContactPoint[] contactsCache;
 	private static Vector3 feetOffset = new Vector3(0f,-0.48f,0f);
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(200 * 1024);
 	
 	public static PlayerMovement a;
 
-	void Awake() {
+	public void Initialize() 
+	{
 		a = this;
 	}
 
@@ -1144,6 +1146,8 @@ public class PlayerMovement : MonoBehaviour {
 		if ((!gravliftState && GetInput.a.Jump())
 			|| gravliftState && GetInput.a.JumpDown()) {
 
+			Debug.Log("CALLED JUMP");
+			
 			if (!justJumped) {
 				if (grounded || gravliftState || Inventory.a.JumpJetsActive()) {
 					jumpTime = jumpImpulseTime;

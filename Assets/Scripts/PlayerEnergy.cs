@@ -33,10 +33,10 @@ public class PlayerEnergy : MonoBehaviour {
     
     void TargetIdentifierSenseTargets() {
 		// Automatically lock onto nearby targets.
-		if (LevelManager.a.npcsm[LevelManager.a.currentLevel] == null) return;
+		if (LevelManager.a.npcsm[LevelManager.currentLevel] == null) return;
 		
 		// Very specific variable names are good right ;)
-		int lev = LevelManager.a.currentLevel;
+		int lev = LevelManager.currentLevel;
 		int numNPCs = LevelManager.a.npcsm[lev].childrenNPCsAICs.Length;
 		if (numNPCs <= 0) return;
 		

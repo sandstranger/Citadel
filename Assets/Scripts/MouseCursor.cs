@@ -5,8 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System;
+using Citadel.Game;
 
-public class MouseCursor : MonoBehaviour {
+public class MouseCursor : MonoBehaviour, ISingletonInitializer {
     public GameObject playerCamera;
 	public GameObject uiCamera;
 	private Camera uiCameraCam;
@@ -64,21 +65,22 @@ public class MouseCursor : MonoBehaviour {
 	
 	public static MouseCursor a;
 
-	void Awake() {
+	public void Initialize() {
 		a = this;
 		a.uiCameraCam = uiCamera.GetComponent<Camera>();
 		cursorSize = Screen.width * cursorScreenPercentage;
-		a.drawTexture = new Rect((Screen.width*halfFactor) - offsetX, (Screen.height * halfFactor) - cursorSize, cursorSize, cursorSize);
+		a.drawTexture = new Rect((Screen.width * halfFactor) - offsetX, (Screen.height * halfFactor) - cursorSize,
+			cursorSize, cursorSize);
 		deltaX = deltaY = 0;
 		lastMousePos = cursorPosition = Input.mousePosition;
 		pev = new PointerEventData(EventSystem.current);
 		graphicCastResults = new List<RaycastResult>();
 		canvasRectTransform = canvas.gameObject.GetComponent<RectTransform>();
 		if (canvasRectTransform == null) Debug.LogError("Can't access RectTransform on canvas!");
-		
+
 		cursorCanvasRectTransform = cursorCanvas.gameObject.GetComponent<RectTransform>();
 		if (cursorCanvasRectTransform == null) Debug.LogError("Can't access RectTransform on cursorCanvas!");
-		
+
 		cursorRectTransform = cursorUIImage.GetComponent<RectTransform>();
 		if (cursorRectTransform == null) Debug.LogError("Can't access RectTransform on Cursor!");
 	}

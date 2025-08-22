@@ -5,71 +5,75 @@ using UnityEngine;
 using UnityEngine.PostProcessing;
 
 // Handles configuration parsing for user settings.
-public class Config {
-	public static void LoadConfig() {
+public static class Config {
+	public static void LoadConfig()
+	{
 		// The currently used config is always Config.ini.
 		string basePath = Utils.GetAppropriateDataPath();
-		Utils.ConfirmExistsMakeIfNot(basePath,"Config.ini");
+		Utils.ConfirmExistsMakeIfNot(basePath, "Config.ini");
 
 #if UNITY_EDITOR
 		Const.a.GraphicsResWidth = Screen.width;
 		Const.a.GraphicsResHeight = Screen.height;
-#elif !UNITY_ANDROID		
+#elif !UNITY_ANDROID
 		Const.a.GraphicsResWidth = AssignConfigInt("Graphics","ResolutionWidth");
 		Const.a.GraphicsResHeight = AssignConfigInt("Graphics","ResolutionHeight");
 #endif
 
-#if UNITY_ANDROID		
+#if UNITY_ANDROID
 		Const.a.GraphicsFullscreen = true;
 #else
 		Const.a.GraphicsFullscreen = AssignConfigBool("Graphics","Fullscreen");
-#endif		
-		Const.a.GraphicsSSAO = AssignConfigBool("Graphics","SSAO");
-		Const.a.GraphicsBloom = AssignConfigBool("Graphics","Bloom");
-		Const.a.GraphicsSEGI = AssignConfigBool("Graphics","SEGI");
-		Const.a.GraphicsFOV = AssignConfigInt("Graphics","FOV");
-		Const.a.GraphicsAAMode = AssignConfigInt("Graphics","AA");
+#endif
+		Const.a.GraphicsSSAO = AssignConfigBool("Graphics", "SSAO");
+		Const.a.GraphicsBloom = AssignConfigBool("Graphics", "Bloom");
+		Const.a.GraphicsSEGI = AssignConfigBool("Graphics", "SEGI");
+		Const.a.GraphicsFOV = AssignConfigInt("Graphics", "FOV");
+		Const.a.GraphicsAAMode = AssignConfigInt("Graphics", "AA");
 		Const.a.GraphicsShadowMode = AssignConfigInt("Graphics", "Shadows");
 		Const.a.GraphicsSSRMode = AssignConfigInt("Graphics", "SSR");
-		Const.a.GraphicsGamma = AssignConfigInt("Graphics","Gamma");
-		Const.a.GraphicsModelDetail = AssignConfigInt("Graphics","ModelDetail");
-		Const.a.GraphicsVSync = AssignConfigBool("Graphics","VSync");
+		Const.a.GraphicsGamma = AssignConfigInt("Graphics", "Gamma");
+		Const.a.GraphicsModelDetail = AssignConfigInt("Graphics", "ModelDetail");
+		Const.a.GraphicsVSync = AssignConfigBool("Graphics", "VSync");
 
 		// Audio Configurations
-		Const.a.AudioSpeakerMode = AssignConfigInt("Audio","SpeakerMode");
-		Const.a.AudioReverb = AssignConfigBool("Audio","Reverb");
-		Const.a.AudioVolumeMaster = AssignConfigInt("Audio","VolumeMaster");
-		Const.a.AudioVolumeMusic = AssignConfigInt("Audio","VolumeMusic");
-		Const.a.AudioVolumeMessage = AssignConfigInt("Audio","VolumeMessage");
-		Const.a.AudioVolumeEffects = AssignConfigInt("Audio","VolumeEffects");
-		Const.a.AudioLanguage = AssignConfigInt("Audio","Language");  // defaults to 0 = english
-		Const.a.DynamicMusic = AssignConfigBool("Audio","DynamicMusic");
-		Const.a.Footsteps = AssignConfigBool("Audio","Footsteps");
-		Const.a.HeadBob = AssignConfigBool("Input","HeadBob");
+		Const.a.AudioSpeakerMode = AssignConfigInt("Audio", "SpeakerMode");
+		Const.a.AudioReverb = AssignConfigBool("Audio", "Reverb");
+		Const.a.AudioVolumeMaster = AssignConfigInt("Audio", "VolumeMaster");
+		Const.a.AudioVolumeMusic = AssignConfigInt("Audio", "VolumeMusic");
+		Const.a.AudioVolumeMessage = AssignConfigInt("Audio", "VolumeMessage");
+		Const.a.AudioVolumeEffects = AssignConfigInt("Audio", "VolumeEffects");
+		Const.a.AudioLanguage = AssignConfigInt("Audio", "Language"); // defaults to 0 = english
+		Const.a.DynamicMusic = AssignConfigBool("Audio", "DynamicMusic");
+		Const.a.Footsteps = AssignConfigBool("Audio", "Footsteps");
+		Const.a.HeadBob = AssignConfigBool("Input", "HeadBob");
 
-		Const.a.MouseSensitivity = ((AssignConfigInt("Input","MouseSensitivity")/100f) * 2f) + 0.01f;
+		Const.a.MouseSensitivity = ((AssignConfigInt("Input", "MouseSensitivity") / 100f) * 2f) + 0.01f;
 
 		string inputCapture;
 		// Input Configurations
-		for (int i=0;i<40;i++) {
-			inputCapture = INIWorker.IniReadValue("Input",Const.a.InputCodes[i]);
-			for (int j=0;j<159;j++) {
+		for (int i = 0; i < 40; i++)
+		{
+			inputCapture = INIWorker.IniReadValue("Input", Const.a.InputCodes[i]);
+			for (int j = 0; j < 159; j++)
+			{
 				if (Const.a.InputValues[j] == inputCapture) Const.a.InputCodeSettings[i] = j;
 			}
 		}
-		Const.a.InputInvertLook = AssignConfigBool("Input","InvertLook");
-		Const.a.InputInvertCyberspaceLook = AssignConfigBool("Input","InvertCyberspaceLook");
-		Const.a.InputInvertInventoryCycling = AssignConfigBool("Input","InvertInventoryCycling");
-		Const.a.InputQuickItemPickup = AssignConfigBool("Input","QuickItemPickup");
-		Const.a.InputQuickReloadWeapons = AssignConfigBool("Input","QuickReloadWeapons");
-		Const.a.NoShootMode = AssignConfigBool("Input","NoShootMode");
+
+		Const.a.InputInvertLook = AssignConfigBool("Input", "InvertLook");
+		Const.a.InputInvertCyberspaceLook = AssignConfigBool("Input", "InvertCyberspaceLook");
+		Const.a.InputInvertInventoryCycling = AssignConfigBool("Input", "InvertInventoryCycling");
+		Const.a.InputQuickItemPickup = AssignConfigBool("Input", "QuickItemPickup");
+		Const.a.InputQuickReloadWeapons = AssignConfigBool("Input", "QuickReloadWeapons");
+		Const.a.NoShootMode = AssignConfigBool("Input", "NoShootMode");
 		SetVolume();
 		Const.sprint("Setting screen resolution to "
-				     + Const.a.GraphicsResWidth.ToString()
-				     + ", " + Const.a.GraphicsResHeight.ToString()
-				     + ", Fullscreen: "
-				     + Const.a.GraphicsFullscreen.ToString());
-		Screen.SetResolution(Const.a.GraphicsResWidth,Const.a.GraphicsResHeight,true);
+		             + Const.a.GraphicsResWidth.ToString()
+		             + ", " + Const.a.GraphicsResHeight.ToString()
+		             + ", Fullscreen: "
+		             + Const.a.GraphicsFullscreen.ToString());
+		Screen.SetResolution(Const.a.GraphicsResWidth, Const.a.GraphicsResHeight, true);
 		Screen.fullScreen = Const.a.GraphicsFullscreen;
 		SetShadows();
 		SetModelDetail();
@@ -84,7 +88,7 @@ public class Config {
 		SetLanguage();
 		SetAudioMode();
 	}
-
+	
 	public static void WriteConfig() {
 		INIWorker.IniWriteValue("Graphics","ResolutionWidth",Const.a.GraphicsResWidth.ToString());
 		INIWorker.IniWriteValue("Graphics","ResolutionHeight",Const.a.GraphicsResHeight.ToString());

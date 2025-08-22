@@ -1,8 +1,11 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Text;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Citadel.Game;
 
 // Handles the HUD UI.
 public class MFDManager : MonoBehaviour  {
@@ -236,12 +239,12 @@ public class MFDManager : MonoBehaviour  {
 	private int beepCount = 0;
 	private bool audPaused = false;
 	
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(100 * 1024);
 
 	// Singleton instance
 	public static MFDManager a;
 
-	public void Start () {
+	private void Start() {
 		a = this;
 		a.logFinished = PauseScript.a.relativeTime;
 		a.logActive = false;
@@ -253,7 +256,7 @@ public class MFDManager : MonoBehaviour  {
 		a.deltaTime = Time.time;
 		a.count = 0;
 		a.tickFinished = a.centerTabsTickFinished = Time.time + tickSecs
-						 + UnityEngine.Random.value;
+		                                                      + UnityEngine.Random.value;
 		a.formatToDisplayMS = "{0:0.0}";
 		a.formatToDisplayFPS = "{0:0.0}";
 		a.versionText.text = Const.a.versionString; // CITADEL PROJECT VERSION
@@ -277,6 +280,11 @@ public class MFDManager : MonoBehaviour  {
 			audioLogContainerRH.GetComponent<LogDataTabContainerManager>();
 		a.ResetItemTab();
 		a.minigameCamera.SetActive(false);
+	}
+
+	private void OnDestroy()
+	{
+		a = null;
 	}
 
 	void WeaponCycleUp() {

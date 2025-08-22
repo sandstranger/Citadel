@@ -4,23 +4,25 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Text;
+using Citadel.Game;
 
 // Prevents shooting through the UI when using the UI on the HUD.
 // Handles data about what is under the cursor for different button
 // interactions such as right clicking as parsed by MouseLookScript.
-public class GUIState : MonoBehaviour {
+public class GUIState : MonoBehaviour, ISingletonInitializer {
 	[SerializeField] public bool isBlocking = false;
 	public static GUIState a;
 	public ButtonType overButtonType = ButtonType.None;
 	public bool overButton;
 	[HideInInspector] public GameObject currentButton;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(100 * 1024);
 
-	void Awake() {
+	public void Initialize()
+	{
 		a = this;
-		a.ClearOverButton();
+		ClearOverButton();
 	}
-
+	
 	public void PtrHandler(bool block, bool overState, ButtonType overType,
 						   GameObject button) {
 		isBlocking = block;
@@ -45,11 +47,12 @@ public class GUIState : MonoBehaviour {
 			return "0|0";
 		}
 
-		s1.Clear();
 		s1.Append(Utils.UintToString(Utils.ButtonTypeToInt(guis.overButtonType),"overButtonType"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(guis.overButton,"overButton"));
-		return s1.ToString();
+		var result = s1.ToString();
+		s1.Clear();
+		return result;
 	}
 
 	public static int Load(GameObject go, ref string[] entries, int index) {

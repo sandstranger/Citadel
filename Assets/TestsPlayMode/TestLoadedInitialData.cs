@@ -283,8 +283,8 @@ namespace Tests {
             string[] entries;
             string dynaname;
             for (int lev=0;lev<14;lev++) {
-                for (i=0;i<LevelManager.a.DynamicObjectsSavestrings[lev].Count;i++) {
-                    entries = LevelManager.a.DynamicObjectsSavestrings[lev][i].Split(splitter);
+                for (i=0;i<LevelManager.DynamicObjectsSavestrings[lev].Count;i++) {
+                    entries = LevelManager.DynamicObjectsSavestrings[lev][i].Split(splitter);
                     if (entries.Length <= 1) continue;
                     
                     for (k=0;k<entries.Length;k++) {

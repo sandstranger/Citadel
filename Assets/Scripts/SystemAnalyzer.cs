@@ -36,7 +36,7 @@ public class SystemAnalyzer : MonoBehaviour {
     // Start is called before the first frame update
     void Update() {
 		descSecurity.text = Const.a.stringTable[474];
-		security.text = LevelManager.a.levelSecurity[LevelManager.a.currentLevel] + Const.a.stringTable[307];
+		security.text = LevelManager.a.levelSecurity[LevelManager.currentLevel] + Const.a.stringTable[307];
 		descLaser.text = Const.a.stringTable[475];
 		laser.text = Const.a.questData.LaserDestroyed ? Const.a.stringTable[486] : Const.a.stringTable[485];
 		descLifepod.text = Const.a.stringTable[476];

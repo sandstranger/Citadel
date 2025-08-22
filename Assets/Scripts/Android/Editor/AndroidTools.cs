@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Android.Tools
+namespace Citadel.Android.Tools
 {
     internal static class AndroidTools
     {

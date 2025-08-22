@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
 public class ExplosionLife : MonoBehaviour {
@@ -9,26 +10,68 @@ public class ExplosionLife : MonoBehaviour {
 	public bool dontDestroy = false;
 	private Light lite;
 
-	void Awake () {
-		if (lightLife > 0f) StartCoroutine(LifeTime(GetComponent<Light>(), 0f, brightness, lightLife));
+	private WaitForSeconds _thinkDelayWaiter;
+	private WaitForSeconds _delayBeforeDestroyWaiter;
+	private Light _light;
+	private bool _wasDisabled = false;
+	
+	private void Awake ()
+	{
+		_light = GetComponent<Light>();
+		_thinkDelayWaiter = new WaitForSeconds(thinkInterval);
+		_delayBeforeDestroyWaiter = new WaitForSeconds(delayBeforeDestroy);
+	}
+
+	private void OnEnable()
+	{
+		if (lightLife > 0f)
+		{
+			StartCoroutine(LifeTime( 0f, brightness, lightLife));
+		}
+
+		_wasDisabled = false;
 		StartCoroutine(DelayedDestroy());
 	}
 
-	IEnumerator LifeTime (Light l, float fadeStart, float fadeEnd, float fadeTime) {
+	private void OnDisable()
+	{
+		StopAllCoroutines();
+		if (!_wasDisabled)
+		{
+			DestroyExplosionLife();
+		}
+	}
+
+	private IEnumerator LifeTime (float fadeStart, float fadeEnd, float fadeTime) {
 		float t = 0.0f;
 		
 		while (t < fadeTime) {
 			t += Time.deltaTime;
-			
-			if (l != null) l.intensity = Mathf.Lerp(fadeStart, fadeEnd, t / fadeTime);
-			yield return new WaitForSeconds(thinkInterval);
+
+			if (_light != null)
+			{
+				_light.intensity = Mathf.Lerp(fadeStart, fadeEnd, t / fadeTime);
+			}
+			yield return _thinkDelayWaiter;
 		}
-		if (l != null) l.intensity = 0f;
+
+		if (_light != null)
+		{
+			_light.intensity = 0f;
+		}
 	}
 
-	IEnumerator DelayedDestroy () {
-		yield return new WaitForSeconds (delayBeforeDestroy);
-		if (dontDestroy) {
+	private IEnumerator DelayedDestroy ()
+	{
+		yield return _delayBeforeDestroyWaiter;
+		DestroyExplosionLife();
+	}
+
+	private void DestroyExplosionLife()
+	{
+		if (dontDestroy)
+		{
+			_wasDisabled = true;
 			gameObject.SetActive(false);
 		} else {
 			Utils.SafeDestroy(this.gameObject);

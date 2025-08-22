@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Citadel.Game;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MissionTimer : MonoBehaviour {
+public class MissionTimer : MonoBehaviour, ISingletonInitializer {
 	public Text text;
 	public Text timerTypeText;
 	public string currentMission;
@@ -18,9 +20,15 @@ public class MissionTimer : MonoBehaviour {
 
 	public static MissionTimer a;
 
-	void Awake() {
+	public async void Initialize() {
 		a = this;
 		a.t = 6000f;
+
+		while (PauseScript.a == null || Const.a == null)
+		{
+			await Task.Yield();
+		}
+		
 		a.timerFinished = PauseScript.a.relativeTime + 1f;
 		a.currentMission = Const.a.stringTable[504];
 		a.currentMissionIndex = 0;

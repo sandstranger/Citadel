@@ -391,7 +391,7 @@ public static class ConsoleEmulator {
 		} else if (ts.Contains("summon_obj")) {
 			int val = Utils.GetIntFromStringAudLogText(ts.Split(' ').Last()); // That's a slow line to compute!
 			if (val < 438 && val >= 0) {
-				SpawnDynamicObject(val,LevelManager.a.currentLevel,true,-1);
+				SpawnDynamicObject(val,LevelManager.currentLevel,true,-1);
 			}
         } else if (ts.Contains("undo")) {
 			if (lastSpawnedGO != null && Const.a.editMode) Utils.SafeDestroy(lastSpawnedGO);
@@ -1458,11 +1458,11 @@ Generic Materials (Const.a.genericMaterials[])
 	}
 
 	public static GameObject SpawnDynamicObject(int val, int saveID) {
-		return SpawnDynamicObject(val,LevelManager.a.currentLevel,false,null,
+		return SpawnDynamicObject(val,LevelManager.currentLevel,false,null,
 								  saveID);
 	}
 	
 	public static GameObject SpawnDynamicObject(int val) {
-		return SpawnDynamicObject(val,LevelManager.a.currentLevel,false,null,-1);
+		return SpawnDynamicObject(val,LevelManager.currentLevel,false,null,-1);
 	}
 }
