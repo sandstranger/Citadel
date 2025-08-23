@@ -1,10 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class CyberAccess : MonoBehaviour {
 	public string target;
 	public string argvalue;
+
+	[Inject] private Const _consts;
+	[Inject] private MouseLookScript _mouseLookScript;
 
 	// Entry Positions:
 	// ======================
@@ -19,8 +23,8 @@ public class CyberAccess : MonoBehaviour {
 	
     public void Use (UseData ud) {
 		ud.argvalue = argvalue;
-		Const.a.UseTargets(gameObject,ud,target);
-		Const.sprint(Const.a.stringTable[441]); // Entering Cyberspace!
+		_consts.UseTargets(gameObject,ud,target);
+		_consts.sprint(_consts.stringTable[441]); // Entering Cyberspace!
 		Vector3 entryPosition = new Vector3( 195.42000f, -13.44000f,  33.28000f);
 		switch(LevelManager.currentLevel) {
 			case 0: entryPosition = new Vector3( 210.68340f,   2.81200f, -24.37800f); break;
@@ -40,6 +44,6 @@ public class CyberAccess : MonoBehaviour {
 			case 8: entryPosition = new Vector3( 244.73500f,  41.99257f, -19.69500f); break;
 			case 9: entryPosition = new Vector3( 185.16100f,  84.50200f, -46.04246f); break;
 		}
-		MouseLookScript.a.EnterCyberspace(entryPosition);
+		_mouseLookScript.EnterCyberspace(entryPosition);
 	}
 }

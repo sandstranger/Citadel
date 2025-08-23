@@ -3,14 +3,17 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 
 public class LogMoreButton : MonoBehaviour {
 	public GameObject logTextOutput;
 	public GameObject multiMediaTab;
 	private string remainder = System.String.Empty;
 
+	[Inject] private MFDManager _mfdManager;
+	
 	void LogMoreButtonClick() {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		remainder = logTextOutput.GetComponent<Text>().text;
 		if (remainder.Length>568) {
 			// MORE BUTTON
@@ -18,12 +21,12 @@ public class LogMoreButton : MonoBehaviour {
 			logTextOutput.GetComponent<Text>().text = remainder;
 		} else {
 			// CLOSE BUTTON
-			MFDManager.a.ResetMultiMediaTabs();
-			MFDManager.a.ClearDataTab(true);
-			MFDManager.a.ClearDataTab(false);
-			MFDManager.a.leftTC.ReturnToLastTab();
-			MFDManager.a.rightTC.ReturnToLastTab();
-			MFDManager.a.CenterTabButtonClickSilent(0,true);
+			_mfdManager.ResetMultiMediaTabs();
+			_mfdManager.ClearDataTab(true);
+			_mfdManager.ClearDataTab(false);
+			_mfdManager.leftTC.ReturnToLastTab();
+			_mfdManager.rightTC.ReturnToLastTab();
+			_mfdManager.CenterTabButtonClickSilent(0,true);
 			GetComponent<UIButtonMask>().PtrExit(); // Force mouse cursor out of UI.
 		}
 	}

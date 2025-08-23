@@ -9,10 +9,12 @@ using System.Runtime.Serialization;
 using System.Text;
 using Citadel.Game;
 using Citadel.SceneManagement;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
 using Debug = UnityEngine.Debug;
 
 // GLOBAL SCRIPT EXECUTION ORDER (set in Unity Project Settings, here for ref)
@@ -37,7 +39,7 @@ using Debug = UnityEngine.Debug;
 // UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion 1200
 // TextLocalization 1300
 
-public class Const : MonoBehaviour
+public class Const : SingletonHelper<Const>
 {
 	private const int StringBuilderSize = 500 * 1024;
 	public float shadowThreshold = 0.03f;
@@ -164,8 +166,7 @@ public class Const : MonoBehaviour
 	// System constants
 	[HideInInspector] public string[] creditsText;
 	[HideInInspector] public HealthManager[] healthObjectsRegistration; // List of objects with health, used for fast application of damage in explosions
-	public GameObject player1;
-
+	
 	// Layer masks
 	[HideInInspector] public int layerMaskPlayerFrob;
 	[HideInInspector] public int layerMaskPlayerTargetIDFrob;
@@ -345,9 +346,9 @@ public class Const : MonoBehaviour
 	[HideInInspector] public PlayerMovement player1PlayerMovementScript;
 	[HideInInspector] public PlayerHealth player1PlayerHealthScript;
 	[HideInInspector] public GameObject player1CapsuleMainCameragGO;
-	[HideInInspector] public List<PauseRigidbody> prb;
-	[HideInInspector] public List<PauseParticleSystem> psys;
-	[HideInInspector] public List<PauseAnimation> panimsList;
+	[HideInInspector] public readonly List<PauseRigidbody> prb = new();
+	[HideInInspector] public readonly List<PauseParticleSystem> psys = new();
+	[HideInInspector] public readonly List<PauseAnimation> panimsList = new();
 	[HideInInspector] public float playerCameraOffsetY = 0.84f; //Vertical camera offset from player 0,0,0 position (mid-body)
 	[HideInInspector] public Color ssYellowText = new Color(0.8902f, 0.8745f, 0f); // Yellow, e.g. for current inventory text
 	[HideInInspector] public Color ssDarkYellowText = new Color(0.8902f * 0.7f, 0.8745f * 0.7f, 0f); // Dark Yellow, e.g. for changing items transition
@@ -410,33 +411,28 @@ public class Const : MonoBehaviour
 	private StringBuilder s1;
 	private StringBuilder s2;
 
-	//Instance container variable
-	public static Const a;
+	public DynamicCulling DynamicCulling => _dynamicCulling;
+	public MouseLookScript MouseLookScript => _mouseLookScript;
+	public MFDManager MfdManager => _mfdManager;
+	public GameObject Player => _playerReference.gameObject;
+	[Inject] 
+	private PlayerReferenceManager _playerReference;
+	[Inject] 
+	private LevelManager _levelManager;
+	[Inject] private ConsoleEmulator _consoleEmulator;
+	[Inject] private Config _config;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Automap _automap;
+	[Inject] private Inventory _inventory;
+	[Inject] private MainMenuHandler _mainMenuHandler;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
+	[Inject] private DynamicCulling _dynamicCulling;
+	[Inject] private QuestLogNotesManager _questLogNotesManager;
 
 	private void Awake()
 	{
-		if (a == null)
-		{
-			a = this;
-			DontDestroyOnLoad(this);
-		}
-		else if (StartingNewGame)
-		{
-			DestroyImmediate(a.gameObject);
-			a = this;
-			DontDestroyOnLoad(this);
-		}
-		else
-		{
-			DestroyImmediate(this.gameObject);
-			return;
-		}
-
-		foreach (var initializer in this.GetComponentsInChildren<ISingletonInitializer>())
-		{
-			initializer.Initialize();
-		}
-		
 		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
 		
 #if UNITY_EDITOR || !UNITY_ANDROID
@@ -444,15 +440,12 @@ public class Const : MonoBehaviour
 		Application.targetFrameRate = TARGET_FPS;
 #endif
 	
-		// Cache values needed by awake prior to the .a instances of others.
-		PlayerReferenceManager prm = a.player1.GetComponent<PlayerReferenceManager>();
-		prm.Initialize();
-		a.player1Capsule = prm.playerCapsule;
-		a.player1CapsuleMainCameragGO = prm.playerCapsuleMainCamera;
-		a.player1TargettingPos = a.player1CapsuleMainCameragGO.transform;
-		a.player1PlayerMovementScript = a.player1Capsule.GetComponent<PlayerMovement>();
-		a.CheckIfNewGame();
-		a.LoadTextForLanguage(0); // Initialize with US English (index 0)
+		player1Capsule = _playerReference.playerCapsule;
+		player1CapsuleMainCameragGO = _playerReference.playerCapsuleMainCamera;
+		player1TargettingPos = player1CapsuleMainCameragGO.transform;
+		player1PlayerMovementScript = player1Capsule.GetComponent<PlayerMovement>();
+		CheckIfNewGame();
+		LoadTextForLanguage(0); // Initialize with US English (index 0)
 		// Force Initialize all TextLocalization so language loaded from config
 		// is set properly.
 		TextLocalization texloc = null;
@@ -470,16 +463,16 @@ public class Const : MonoBehaviour
 			}
 		}
 		
-		a.lastTargetRegistrySize = 0;
-		a.TargetRegister = new List<GameObject>();
-		a.TargetnameRegister = new List<string>();
+		lastTargetRegistrySize = 0;
+		TargetRegister = new List<GameObject>();
+		TargetnameRegister = new List<string>();
 		for (i=0;i<allParents.Count;i++) {
 			found = 0;
 			Component[] compArray = allParents[i].GetComponentsInChildren(typeof(TargetIO),true); // find all TargetIO components, including inactive (hence the true here at the end)
 			for (k=0;k<compArray.Length;k++) {
 				TargetIO tio = compArray[k].gameObject.GetComponent<TargetIO>();
 				if (tio != null) {
-					tio.RemoteStart(a.gameObject,"Awake()"); // Reregister
+					tio.RemoteStart(gameObject,"Awake()"); // Reregister
 					found++;
 				}
 			}
@@ -488,21 +481,21 @@ public class Const : MonoBehaviour
 		allParents.Clear();
 		allParents = null;
 
-		a.s1 = new StringBuilder(StringBuilderSize);
-		a.s2 = new StringBuilder(StringBuilderSize);
-		if (a.mainMenuInit != null) {
-			if (!a.mainMenuInit.activeSelf) a.mainMenuInit.SetActive(true);
+		s1 = new StringBuilder(StringBuilderSize);
+		s2 = new StringBuilder(StringBuilderSize);
+		if (mainMenuInit != null) {
+			if (!mainMenuInit.activeSelf) mainMenuInit.SetActive(true);
 		}
 
-		a.justSavedTimeStamp = Time.time - a.savedReminderTime;
-		a.quaternionIdentity = Quaternion.identity;
-		a.vectorZero = Vector3.zero;
-		a.vectorOne = Vector3.one;
-		a.LoadAudioLogMetaData();
-		a.LoadDamageTablesData();
-		a.LoadEnemyTablesData(); // Doing earlier, needed by AIController Start
-		a.LoadTextures();
-		a.versionString = "v0.99.93"; // Global CITADEL PROJECT VERSION
+		justSavedTimeStamp = Time.time - savedReminderTime;
+		quaternionIdentity = Quaternion.identity;
+		vectorZero = Vector3.zero;
+		vectorOne = Vector3.one;
+		LoadAudioLogMetaData();
+		LoadDamageTablesData();
+		LoadEnemyTablesData(); // Doing earlier, needed by AIController Start
+		LoadTextures();
+		versionString = "v0.99.93"; // Global CITADEL PROJECT VERSION
 		UnityEngine.Debug.Log("Citadel " + versionString
 							  + ": " + System.Environment.NewLine
 							  + "Start of C# Game Code, Welcome back Hacker!");
@@ -552,7 +545,7 @@ public class Const : MonoBehaviour
     }
 
 	void Start() {
-		Config.LoadConfig();
+		_config.LoadConfig();
 		layerMaskNPCSight = LayerMask.GetMask("Default","Geometry",
 											  "Door","InterDebris",
 											  "PhysObjects","Player","Player2",
@@ -603,7 +596,7 @@ public class Const : MonoBehaviour
 
 		LoadCreditsData();
 		StartCoroutine(InitializeEventSystem());
-		questData = new QuestBits ();
+		questData = new QuestBits (_levelManager,this);
 // 		if (mainFont1 != null) { // Ensure text is crisp and readable.
 			mainFont1.material.mainTexture.filterMode = FilterMode.Point;
 // 		}
@@ -643,7 +636,7 @@ public class Const : MonoBehaviour
 		string readline; // variable to hold each string read in from the file
 		char logSplitChar = ',';
 		string tF = null;
-		switch(Const.a.AudioLanguage) {
+		switch(AudioLanguage) {
             case 0: tF = "logs_text_english.txt"; break;
 			case 1: tF = "logs_text_espanol.txt"; break; // UPKEEP: Other languages
 			case 2: tF = "logs_text_deutsch.txt"; break; // German
@@ -705,7 +698,7 @@ public class Const : MonoBehaviour
 		}
 		else if (LevelManager.LoadLevelAfterSceneChanges)
 		{
-			LevelManager.a.LoadLevel(LevelManager.currentLevel, LevelManager.TargetPosition, loadLevelForced: true);
+			_levelManager.LoadLevel(LevelManager.currentLevel, LevelManager.TargetPosition, loadLevelForced: true);
 		}
 	}
 	
@@ -796,7 +789,7 @@ public class Const : MonoBehaviour
 		using (dataReader) {
 			do {
 				readline = dataReader.ReadLine(); // Read the next line
-				if (currentline == 1) a.introNotPlayed = readline.Equals("1");
+				if (currentline == 1) introNotPlayed = readline.Equals("1");
 				currentline++;
 			} while (!dataReader.EndOfStream);
 
@@ -818,7 +811,7 @@ public class Const : MonoBehaviour
 			}
 		}
 
-		a.introNotPlayed = setIntroNotPlayed;
+		introNotPlayed = setIntroNotPlayed;
 	}
 
 	private void LoadEnemyTablesData() {
@@ -1083,41 +1076,41 @@ CreateBlackTexture:
 							 new Vector2(0.5f,0.5f));
 	}
 
-	public static string GetTargetID(int npcIndex) {
+	public string GetTargetID(int npcIndex) {
 		if (npcIndex > 29) return "BUG: npcIndex too large for GetTargetID!";
 
-		Const.a.npcCount[npcIndex]++;
-		return Const.a.nameForNPC[npcIndex] + Const.a.npcCount[npcIndex].ToString();
+		npcCount[npcIndex]++;
+		return nameForNPC[npcIndex] + npcCount[npcIndex].ToString();
 	}
 
-	public static string GetCyberTargetID(int cyberNPCIndex) {
+	public string GetCyberTargetID(int cyberNPCIndex) {
 		switch(cyberNPCIndex) {
-			case 0: return Const.a.stringTable[499];
-			case 1: return Const.a.stringTable[500];
-			case 2: return Const.a.stringTable[501];
-			case 3: return Const.a.stringTable[502];
+			case 0: return stringTable[499];
+			case 1: return stringTable[500];
+			case 2: return stringTable[501];
+			case 3: return stringTable[502];
 		}
-		return Const.a.stringTable[503];
+		return stringTable[503];
 	}
 
 	// StatusBar Print
-	public static void sprint(string input, GameObject player) {
+	public void sprint(string input, GameObject player) {
 		#if UNITY_EDITOR
 			// Don't spam unneeded info here.
 		#else
 			UnityEngine.Debug.Log(input);
 		#endif
-		a.statusBar.SendText(input);
+		statusBar.SendText(input);
 	}
 	
-	public static void sprint(int lingdex) {
+	public void sprint(int lingdex) {
 		if (lingdex < 0) return;
-		if (lingdex > Const.a.stringTable.Length) return;
+		if (lingdex > stringTable.Length) return;
 		
-		sprint(Const.a.stringTable[lingdex],null);
+		sprint(stringTable[lingdex],null);
 	}
 
-	public static void sprint(string input) { Const.sprint(input,null); }
+	public void sprint(string input) { sprint(input,null); }
 
 	public GameObject GetObjectFromPool(PoolType pool) {
 		if (pool == PoolType.None) return null; // Do nothing, no pool requested.
@@ -1126,12 +1119,12 @@ CreateBlackTexture:
 		string poolName = " ";
 
 		switch (pool) {
-		case PoolType.SparksSmall:           return (MonoBehaviour.Instantiate(sparksSmall,Vector3.zero,Const.a.quaternionIdentity) as GameObject);
-		case PoolType.CameraExplosions:      return (MonoBehaviour.Instantiate(cameraExplosion,Vector3.zero,Const.a.quaternionIdentity) as GameObject);
-		case PoolType.BloodSpurtSmall:       return (MonoBehaviour.Instantiate(bloodSpurtSmall,Vector3.zero,Const.a.quaternionIdentity) as GameObject);
-		case PoolType.BloodSpurtSmallYellow: return (MonoBehaviour.Instantiate(bloodSpurtSmallYellow,Vector3.zero,Const.a.quaternionIdentity) as GameObject);
-		case PoolType.BloodSpurtSmallGreen:  return (MonoBehaviour.Instantiate(bloodSpurtSmallGreen,Vector3.zero,Const.a.quaternionIdentity) as GameObject);
-		case PoolType.SparksSmallBlue:       return (MonoBehaviour.Instantiate(sparksSmallBlue,Vector3.zero,Const.a.quaternionIdentity) as GameObject);
+		case PoolType.SparksSmall:           return InstantiatePrefab(sparksSmall);
+		case PoolType.CameraExplosions:      return InstantiatePrefab(cameraExplosion);
+		case PoolType.BloodSpurtSmall:       return InstantiatePrefab(bloodSpurtSmall);
+		case PoolType.BloodSpurtSmallYellow: return InstantiatePrefab(bloodSpurtSmallYellow);
+		case PoolType.BloodSpurtSmallGreen:  return InstantiatePrefab(bloodSpurtSmallGreen);
+		case PoolType.SparksSmallBlue:       return InstantiatePrefab(sparksSmallBlue);
 		case PoolType.HopperImpact: 
 			poolContainer = Pool_HopperImpact;
 			poolName = "HopperImpact ";
@@ -1258,6 +1251,11 @@ CreateBlackTexture:
 		}
 
 		return null;
+
+		GameObject InstantiatePrefab(GameObject prefab)
+		{
+			return GameBindings.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity);
+		}
 	}
 
 	void ClearAutomapOverlay(GameObject over) {
@@ -1309,7 +1307,7 @@ CreateBlackTexture:
 	// top speed, no pausing momentarily to draw any progress bar since it is
 	// plenty fast enough.
 	public void StartSave(int index, string savename) {
-		if (PlayerHealth.a.hm.health < 1.0f) return; // Can't save while dead!
+		if (_playerHealth.hm.health < 1.0f) return; // Can't save while dead!
 		StartCoroutine(SaveRoutine(index,savename));
 	}
 
@@ -1341,9 +1339,9 @@ CreateBlackTexture:
 		
 		// Credit Stats and Times
 		s1.Clear();
-		s1.Append(Utils.FloatToString(PauseScript.a.relativeTime,"GameTime"));
+		s1.Append(Utils.FloatToString(_pauseScript.relativeTime,"GameTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.FloatToString(PauseScript.a.absoluteTime,"TotalPlayTime"));
+		s1.Append(Utils.FloatToString(_pauseScript.absoluteTime,"TotalPlayTime"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(kills,"kills"));
 		s1.Append(Utils.splitChar);
@@ -1361,11 +1359,11 @@ CreateBlackTexture:
 		saveData.Add(s1.ToString());
 
 		s1.Clear();
-		s1.Append(LevelManager.Save(LevelManager.a.gameObject));
+		s1.Append(_levelManager.Save());
 		s1.Append(Utils.splitChar);
 		s1.Append(questData.Save());
 		s1.Append(Utils.splitChar);
-		s1.Append(QuestLogNotesManager.a.Save());
+		s1.Append(_questLogNotesManager.Save());
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.UintToString(difficultyCombat,"difficultyCombat"));
 		s1.Append(Utils.splitChar);
@@ -1381,7 +1379,7 @@ CreateBlackTexture:
 		// Save all the objects data
 		for (i=0;i<saveableGameObjects.Count;i++) {
 			// Take this object's data and add it to the array.
-			saveData.Add(SaveObject.Save(saveableGameObjects[i])); // <<< THIS IS IT <<<
+			saveData.Add(SaveObject.Save(_levelManager,saveableGameObjects[i])); // <<< THIS IS IT <<<
 		}
 		
 		foreach (var dynamicObjectsSaveList in LevelManager.DynamicObjectsSavestrings)
@@ -1414,7 +1412,7 @@ CreateBlackTexture:
 		// Make "Done!" appear at the end of the line after "Saving..." is finished, concept from Halo's "Checkpoint...Done!"
 		saveTimer.Stop();
 		sprint(stringTable[195] + " (" + saveTimer.Elapsed.ToString() + ")");
-		if (saveFileIndex < 7) Const.a.justSavedTimeStamp = Time.time + Const.a.savedReminderTime; // using normal run time, don't ask again to save for next 7 seconds
+		if (saveFileIndex < 7) justSavedTimeStamp = Time.time + savedReminderTime; // using normal run time, don't ask again to save for next 7 seconds
 	}
 
 	// Start a New Game
@@ -1431,7 +1429,7 @@ CreateBlackTexture:
 	//   2. Flag it as DontDestroyOnLoad so it is preserved across scenes.
 	//   3. Unload current scene.
 	//   4. SceneTransitionHandler on DontDestroyOnLoad GameObject loads scene.
-	// 5. Const.a.Start() checks for NewGameIndicator existence.
+	// 5. _consts.Start() checks for NewGameIndicator existence.
 	// 6a. If present, simply turn off main menu.
 	// 6b. Else same as if game was started from scratch.
 	// 7. Go into the game.  Player now has normal control.
@@ -1440,7 +1438,7 @@ CreateBlackTexture:
 		WriteDatForIntroPlayed(false);
 		StartingNewGame = true;
 		loadingScreen.SetActive(true);
-		LevelManager.a.ChangeGameScene(LevelManager.NewGameLevelIndex, changeSceneForced: true);
+		_levelManager.ChangeGameScene(LevelManager.NewGameLevelIndex, changeSceneForced: true);
 	}
 
 	// Going into the game removes the helper GameObjects for these reasons:
@@ -1450,24 +1448,24 @@ CreateBlackTexture:
 	// - NewGameIndicator,  Game is no longer a new game, because it's started.
 	// - LoadGameIndicator, Game should have been loaded prior to entry.
 	public void GoIntoGame(Stopwatch loadTimer) {
-		LevelManager.a.LoadLevelData(LevelManager.currentLevel);
+		_levelManager.LoadLevelData(LevelManager.currentLevel);
 		Cursor.visible = true;
 		Utils.Deactivate(loadingScreen);
-		Utils.Deactivate(MainMenuHandler.a.IntroVideo);
-		Utils.Deactivate(MainMenuHandler.a.IntroVideoContainer);
-		Automap.a.ActivateAutomapUI();
-		Automap.a.DeactivateAutomapUI();
-		Utils.Deactivate(PauseScript.a.mainMenu);
-		PauseScript.a.PauseDisable();
-		if (PlayerHealth.a != null) {
-			if (PlayerHealth.a.hm != null) PlayerHealth.a.hm.ClearOverlays();
+		Utils.Deactivate(_mainMenuHandler.IntroVideo);
+		Utils.Deactivate(_mainMenuHandler.IntroVideoContainer);
+		_automap.ActivateAutomapUI();
+		_automap.DeactivateAutomapUI();
+		Utils.Deactivate(_pauseScript.mainMenu);
+		_pauseScript.PauseDisable();
+		if (_playerHealth != null) {
+			if (_playerHealth.hm != null) _playerHealth.hm.ClearOverlays();
 		}
 
-		if (Const.a.NoShootMode) MouseLookScript.a.ForceInventoryMode();
+		if (NoShootMode) _mouseLookScript.ForceInventoryMode();
 		Utils.Activate(player1Capsule);
 		Utils.Activate(player1CapsuleMainCameragGO.transform.parent.gameObject);
 		Utils.Activate(player1CapsuleMainCameragGO);
-		Utils.EnableCamera(MouseLookScript.a.playerCamera);
+		Utils.EnableCamera(_mouseLookScript.playerCamera);
 		WriteDatForIntroPlayed(false);
 		if (loadTimer == null) {
 			sprint(stringTable[197]);
@@ -1475,8 +1473,8 @@ CreateBlackTexture:
 			sprint(stringTable[197] + " (" + loadTimer.Elapsed.ToString() + ")"); // Loading...Done!
 		}
 		
-		DynamicCulling.a.Cull_Init();
-		DynamicCulling.a.Cull(false);
+		_dynamicCulling.Cull_Init();
+		_dynamicCulling.Cull(false);
 	}
 
 	public void GoIntoGame() {
@@ -1484,23 +1482,23 @@ CreateBlackTexture:
 	}
 
 	public void ShowLoading() {
-		Utils.DisableCamera(MouseLookScript.a.playerCamera); // Hide changes.
-		PauseScript.a.mainMenu.SetActive(false); // Ensure that main menu is 
+		Utils.DisableCamera(_mouseLookScript.playerCamera); // Hide changes.
+		_pauseScript.mainMenu.SetActive(false); // Ensure that main menu is 
 												 // off if came from Load page.
- 		PauseScript.a.PauseEnable(); // Enable pause to make sure that nothing 
+ 		_pauseScript.PauseEnable(); // Enable pause to make sure that nothing 
 									 // goes on during couroutine as it happens
 									 // over multiple frames.
-		PauseScript.a.DisablePauseUI(); // Enable loading texts and unlock cursor.
+		_pauseScript.DisablePauseUI(); // Enable loading texts and unlock cursor.
 		sprint(stringTable[196]); // Loading...
-		if (PlayerHealth.a != null) PlayerHealth.a.hm.ClearOverlays();
+		if (_playerHealth != null) _playerHealth.hm.ClearOverlays();
 		Cursor.lockState = CursorLockMode.None;
 		Cursor.visible = true;
 		loadPercentText.text = "(1) --.--";
 
 		// Clear the HUD
-		MFDManager.a.TabReset(true);
-		MFDManager.a.TabReset(false);
-		MFDManager.a.DisableAllCenterTabs();
+		_mfdManager.TabReset(true);
+		_mfdManager.TabReset(false);
+		_mfdManager.DisableAllCenterTabs();
 		loadingScreen.SetActive(true);
 		AutoSplitterData.isLoading = true;
 	}
@@ -1537,7 +1535,7 @@ CreateBlackTexture:
 
 		if (levelIndexFromSave != LevelManager.currentLevel)
 		{
-			LevelManager.a.ChangeGameScene(levelIndexFromSave);
+			_levelManager.ChangeGameScene(levelIndexFromSave);
 		}
 		else
 		{
@@ -1546,7 +1544,7 @@ CreateBlackTexture:
 	}
 
 	// LOAD 2. Called from Load menu or Quick Load.
-	// LOAD 6. Called from Const.a.Start().
+	// LOAD 6. Called from _consts.Start().
 	public IEnumerator LoadRoutine(int saveFileIndex, bool actual) {
 		Stopwatch loadTimer = new Stopwatch();
 		Stopwatch loadUpdateTimer = new Stopwatch(); // For loading % indicator.
@@ -1575,16 +1573,17 @@ CreateBlackTexture:
 		
 		LevelManager.ResetSaveStrings();
 		LevelManager.StaticObjectsSaveStrings.ResetSaveStrings();
+		var readFileList = ReadSave(saveFileIndex);
 		
 		for (i=0;i<LevelManager.MaxLevelsCount;i++) {
 
-			if (LevelManager.a.levelScripts[i] == null)
+			if (!_levelManager.LevelExists(i))
 			{
 				continue;
 			}
 			
-			LevelManager.a.UnloadLevelDynamicObjects(i,false); // Delete them all!
-			LevelManager.a.UnloadLevelNPCs(i); // Delete them all!
+			_levelManager.UnloadLevelDynamicObjects(i,false); // Delete them all!
+			_levelManager.UnloadLevelNPCs(i); // Delete them all!
 			loadPercentText.text = "Preparing level " + i.ToString();
 			yield return new WaitForSeconds(0.1f); // Update progress text.
 		}
@@ -1596,8 +1595,7 @@ CreateBlackTexture:
 		string[] entries = Array.Empty<string>();
 											 // on individual lines.
 		List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
-		allParents.Add(player1);
-		var readFileList = ReadSave(saveFileIndex);
+		allParents.Add(Player);
 		if (readFileList.Count > 0) {
 			loadPercentText.text = "Load Quest Data...     ";
 			yield return null; // to update the sprint
@@ -1612,8 +1610,8 @@ CreateBlackTexture:
 			
 			// The global time from which everything checks it's
 			// somethingerotherFinished timer states.
-			PauseScript.a.relativeTime = Utils.GetFloatFromString(entries[index],"GameTime"); index++;
-			PauseScript.a.absoluteTime = Utils.GetFloatFromString(entries[index],"TotalPlayTime"); index++;
+			_pauseScript.relativeTime = Utils.GetFloatFromString(entries[index],"GameTime"); index++;
+			_pauseScript.absoluteTime = Utils.GetFloatFromString(entries[index],"TotalPlayTime"); index++;
 			kills = Utils.GetIntFromString(entries[index],"kills"); index++;
 			cyberkills = Utils.GetIntFromString(entries[index],"cyberkills"); index++;
 			shotsFired = Utils.GetIntFromString(entries[index],"shotsFired"); index++;
@@ -1625,9 +1623,9 @@ CreateBlackTexture:
 
 			// Read in global states, difficulties, and quest mission bits.
 			entries = readFileList[2].Split(Utils.splitCharChar);
-			index = LevelManager.Load(LevelManager.a.gameObject,ref entries,index);
+			index = _levelManager.Load(ref entries,index);
 			index = questData.Load(ref entries,index);
-			index = QuestLogNotesManager.a.Load(ref entries,index);
+			index = _questLogNotesManager.Load(ref entries,index);
 			difficultyCombat = Utils.GetIntFromString(entries[index],"difficultyCombat"); index++;
 			difficultyMission = Utils.GetIntFromString(entries[index],"difficultyMission"); index++;
 			difficultyPuzzle = Utils.GetIntFromString(entries[index],"difficultyPuzzle"); index++;
@@ -1726,7 +1724,7 @@ CreateBlackTexture:
 						
 						entries = readFileList[i].Split(Utils.splitCharChar);
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
-						SaveObject.Load(currentGameObjectInScene,ref entries,i,prefID);
+						SaveObject.Load(this,_levelManager,currentGameObjectInScene,ref entries,i,prefID);
 						wasLoaded = true;
 						alreadyCheckedThisSaveableGameObjectInScene[j] = true; // Huge time saver right here!
 						break;
@@ -1805,12 +1803,12 @@ CreateBlackTexture:
 					levID = Utils.GetIntFromString(entries[19],"levelID");
 					if (!ConsoleEmulator.ConstIndexInBounds(constdex)) continue;
 
-					// Already did LevelManager.a.LoadLevel above, and since its
+					// Already did _levelManager.LoadLevel above, and since its
 					// savestrings lists were empty, safe to spawn dynamics now.
 					savID = Utils.GetIntFromString(entries[2],"SaveID");
 					bool isNpc = ConsoleEmulator.ConstIndexIsNPC(constdex);
 					bool isDynamicObject = ConsoleEmulator.ConstIndexIsDynamicObject(constdex);
-					bool levelExists = LevelManager.a.LevelExists(levID);
+					bool levelExists = _levelManager.LevelExists(levID);
 					bool saveObjectToStaticStrings = !isDynamicObject && !levelExists && i < (readFileList.Count - 1);
 
 					if (saveObjectToStaticStrings)
@@ -1818,17 +1816,17 @@ CreateBlackTexture:
 						LevelManager.StaticObjectsSaveStrings[levID].Add(readFileList[i]);
 					}
 					else if (isNpc && levelExists) {
-						contnr = LevelManager.a.GetRequestedLevelNPCContainer(levID);
-						instGO = ConsoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
+						contnr = _levelManager.GetRequestedLevelNPCContainer(levID);
+						instGO = _consoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-						SaveObject.Load(instGO,ref entries,i,prefID); // Load NPC.
+						SaveObject.Load(this,_levelManager,instGO,ref entries,i,prefID); // Load NPC.
 					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex) && !isNpc) {
 						// For DynamicObjects, if current level, go ahead and Instantiate new Prefabs, else add string to LevelManager's list for other levels.
 						if (levID == LevelManager.currentLevel) {
-							contnr = LevelManager.a.GetRequestedLevelDynamicContainer(levID);
-							instGO = ConsoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
+							contnr = _levelManager.GetRequestedLevelDynamicContainer(levID);
+							instGO = _consoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
 							PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-							SaveObject.Load(instGO,ref entries,i,prefID); // Load NPC.
+							SaveObject.Load(this,_levelManager,instGO,ref entries,i,prefID); // Load NPC.
 						} else {
 							if (levID < LevelManager.DynamicObjectsSavestrings.Count && levID >= 0) { // levID < 14
 								if (i < (readFileList.Count - 1) && readFileList.Count > 0 && i >= 0) {
@@ -1857,15 +1855,15 @@ CreateBlackTexture:
 			
 			// OK we read in all the dynamic objects above into the savestrings
 			// list, now actaully instantiate them.
-			LevelManager.a.LoadLevelDynamicObjects(LevelManager.currentLevel);
+			_levelManager.LoadLevelDynamicObjects(LevelManager.currentLevel);
 			loadUpdateTimer.Stop();
 
 			// LOAD 8.  Repopulate registries as needed that were on Awake.
-			for (i = 0; i < LevelManager.a.npcsm.Length; i++ ) {
-				LevelManager.a.npcsm[i]?.RepopulateChildList();
+			for (i = 0; i < _levelManager.npcsm.Length; i++ ) {
+				_levelManager.npcsm[i]?.RepopulateChildList();
 			}
 			
-			if (Inventory.a.hasHardware[1]) {
+			if (_inventory.hasHardware[1]) {
 				// Go through all HealthManagers in the game and initialize the
 				// linked overlays now for Automap.  Done after instantiation.
 				List<GameObject> hmGOs = new List<GameObject>();
@@ -1912,8 +1910,8 @@ CreateBlackTexture:
 		ResetPauseLists();
 		loadPercentText.text = "Re-init cull systems...";
 		yield return null;
-		DynamicCulling.a.Cull_Init();
-		DynamicCulling.a.CullCore();
+		_dynamicCulling.Cull_Init();
+		_dynamicCulling.CullCore();
 		loadPercentText.text = "Cleaning Up...";
 		yield return null;
 
@@ -1938,9 +1936,9 @@ CreateBlackTexture:
 			aic = healthObjectsRegistration[i].GetComponent<AIController>();
 			if (aic == null) continue;
 			if (aic.SFX == null) continue;
-			if (aic.index < Const.a.sfxSightSoundForNPC.Length && aic.index >= 0) {
-				if (Const.a.sfxSightSoundForNPC[aic.index] < Const.a.sounds.Length && Const.a.sfxSightSoundForNPC[aic.index] >= 0) {
-					if (aic.SFX.clip == Const.a.sounds[Const.a.sfxSightSoundForNPC[aic.index]]) {
+			if (aic.index < sfxSightSoundForNPC.Length && aic.index >= 0) {
+				if (sfxSightSoundForNPC[aic.index] < sounds.Length && sfxSightSoundForNPC[aic.index] >= 0) {
+					if (aic.SFX.clip == sounds[sfxSightSoundForNPC[aic.index]]) {
 						aic.SFX.volume = aic.normalVolume;
 						continue;
 					}
@@ -1948,10 +1946,10 @@ CreateBlackTexture:
 			}
 
 			hitCount = Physics.RaycastNonAlloc(
-						MouseLookScript.a.transform.position,
+						_mouseLookScript.transform.position,
 						aic.transform.position
-						  - MouseLookScript.a.transform.position,
-						results,32f,Const.a.layerMaskPlayerFrob,
+						  - _mouseLookScript.transform.position,
+						results,32f,layerMaskPlayerFrob,
 						QueryTriggerInteraction.UseGlobal);
 
 			aic.SFX.volume = aic.normalVolume;
@@ -2018,40 +2016,40 @@ CreateBlackTexture:
 	private void LockCPUScreenCode() {
 		switch (LevelManager.currentLevel) {
 			case 1:
-				if (Const.a.questData.lev1SecCodeLocked) return;
+				if (questData.lev1SecCodeLocked) return;
 
-				Const.a.questData.lev1SecCodeLocked = true;
-				Const.a.questData.lev1SecCode = UnityEngine.Random.Range(0,10);
+				questData.lev1SecCodeLocked = true;
+				questData.lev1SecCode = UnityEngine.Random.Range(0,10);
 			break;
 			case 2:
-				if (Const.a.questData.lev2SecCodeLocked) return;
+				if (questData.lev2SecCodeLocked) return;
 
-				Const.a.questData.lev2SecCodeLocked = true;
-				Const.a.questData.lev2SecCode = UnityEngine.Random.Range(0,10);
+				questData.lev2SecCodeLocked = true;
+				questData.lev2SecCode = UnityEngine.Random.Range(0,10);
 				break;
 			case 3:
-				if (Const.a.questData.lev3SecCodeLocked) return;
+				if (questData.lev3SecCodeLocked) return;
 
-				Const.a.questData.lev3SecCodeLocked = true;
-				Const.a.questData.lev3SecCode = UnityEngine.Random.Range(0,10);
+				questData.lev3SecCodeLocked = true;
+				questData.lev3SecCode = UnityEngine.Random.Range(0,10);
 				break;
 			case 4:
-				if (Const.a.questData.lev4SecCodeLocked) return;
+				if (questData.lev4SecCodeLocked) return;
 
-				Const.a.questData.lev4SecCodeLocked = true;
-				Const.a.questData.lev4SecCode = UnityEngine.Random.Range(0,10);
+				questData.lev4SecCodeLocked = true;
+				questData.lev4SecCode = UnityEngine.Random.Range(0,10);
 				break;
 			case 5:
-				if (Const.a.questData.lev5SecCodeLocked) return;
+				if (questData.lev5SecCodeLocked) return;
 
-				Const.a.questData.lev5SecCodeLocked = true;
-				Const.a.questData.lev5SecCode = UnityEngine.Random.Range(0,10);
+				questData.lev5SecCodeLocked = true;
+				questData.lev5SecCode = UnityEngine.Random.Range(0,10);
 				break;
 			case 6:
-				if (Const.a.questData.lev6SecCodeLocked) return;
+				if (questData.lev6SecCodeLocked) return;
 
-				Const.a.questData.lev6SecCodeLocked = true;
-				Const.a.questData.lev6SecCode = UnityEngine.Random.Range(0,10);
+				questData.lev6SecCodeLocked = true;
+				questData.lev6SecCode = UnityEngine.Random.Range(0,10);
 				break;
 		}
 	}
@@ -2189,11 +2187,11 @@ CreateBlackTexture:
 
 		if (effectIsWorldwide) {
 			// The whole station is a shakin' and a movin'!
-			MouseLookScript.a.ScreenShake(force,1f);
+			_mouseLookScript.ScreenShake(force,1f);
 		} else {
 			// check if player is close enough and shake em' up!
 			if (Vector3.Distance(transform.position,player1Capsule.transform.position) < distance) {
-				MouseLookScript.a.ScreenShake(force,1f);
+				_mouseLookScript.ScreenShake(force,1f);
 			}
 		}
 	}
@@ -2213,7 +2211,7 @@ CreateBlackTexture:
         float victories = (float)(kills + cyberkills);
         float secs = 0f;
         
-        secs = Mathf.Floor(PauseScript.a.relativeTime / 3600f);
+        secs = Mathf.Floor(_pauseScript.relativeTime / 3600f);
         if (!isFinal) { // Report score if no deaths.
             score = victories * 10000f;
             score -= Mathf.Min(score * 0.666f,secs * 100f);
@@ -2224,7 +2222,7 @@ CreateBlackTexture:
         
         // Death is 10 anti-kills, but you always keep at least a third of your
         // kills.
-        float deathPenalty = PlayerHealth.a.ressurections * 10f;
+        float deathPenalty = _playerHealth.ressurections * 10f;
         score = victories - Mathf.Min(deathPenalty,victories * 0.666f);
         score *= 10000f;
         score -= Mathf.Min(score * 0.666f,secs * 100f);
@@ -2246,7 +2244,7 @@ CreateBlackTexture:
 	    s1.Append("\n");
 	    
 	    string hours, minutes, secs;
-	    float t = PauseScript.a.relativeTime;
+	    float t = _pauseScript.relativeTime;
 		float tb = (Mathf.Floor(t/3600f));
         hours = tb.ToString("0");
         t = t - (tb * 3600f);
@@ -2259,7 +2257,7 @@ CreateBlackTexture:
 	              
 	    s1.Append("\n");
 	    
-	    t = PauseScript.a.absoluteTime;
+	    t = _pauseScript.absoluteTime;
 		tb = (Mathf.Floor(t/3600f));
         hours = tb.ToString("0");
         t = t - (tb * 3600f);
@@ -2277,9 +2275,9 @@ CreateBlackTexture:
 	    
 	    s1.Append("Score Subtotal: " + GetScore(false).ToString("0"));
 	    s1.Append("\n");
-	    s1.Append("Deaths: " + PlayerHealth.a.deaths.ToString());
+	    s1.Append("Deaths: " + _playerHealth.deaths.ToString());
 	    s1.Append("\n");
-	    s1.Append("Ressurections: " + PlayerHealth.a.ressurections.ToString());
+	    s1.Append("Ressurections: " + _playerHealth.ressurections.ToString());
 	    s1.Append("\n");
 	    s1.Append("Combat: " + difficultyCombat.ToString()
 	              + " | Puzzle: " + difficultyPuzzle.ToString()
@@ -2307,7 +2305,6 @@ CreateBlackTexture:
 	}
 	
 	void OnDestroy() {
-		if (a == this) a = null;
 		ScenesLoader.OnSceneLoaded -= OnSceneLoaded;
 		questData = null;
 		useableItemsFrobIcons = null;
@@ -2330,7 +2327,6 @@ CreateBlackTexture:
 		typeForNPC = null;
 		creditsText = null;
 		healthObjectsRegistration = null;
-		player1 = null;
 		loadingScreen = null;
 		mainMenuInit = null;
 		statusBar = null;
@@ -2372,9 +2368,6 @@ CreateBlackTexture:
 		player1PlayerMovementScript = null;
 		player1PlayerHealthScript = null;
 		player1CapsuleMainCameragGO = null;
-		prb = null;
-		psys = null;
-		panimsList = null;
 		s1 = null;
 		s2 = null;
 	}

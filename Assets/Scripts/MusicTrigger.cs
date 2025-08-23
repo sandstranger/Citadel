@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class MusicTrigger : MonoBehaviour {
@@ -8,23 +9,26 @@ public class MusicTrigger : MonoBehaviour {
 	public TrackType trackType;
 	public MusicType musicType;
 
+	[Inject] private Music _music;
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake() {
-		tickFinished = PauseScript.a.relativeTime + 2f;
+		tickFinished = _pauseScript.relativeTime + 2f;
 	}
 
 	void OnTriggerEnter(Collider other) {
-		if (tickFinished < PauseScript.a.relativeTime) {
+		if (tickFinished < _pauseScript.relativeTime) {
 			if (other.gameObject.CompareTag("Player")) {
-				Music.a.PlayTrack(LevelManager.currentLevel,trackType,musicType);
-				Music.a.NotifyZone(trackType);
+				_music.PlayTrack(LevelManager.currentLevel,trackType,musicType);
+				_music.NotifyZone(trackType);
 			}
-			tickFinished = PauseScript.a.relativeTime + tick;
+			tickFinished = _pauseScript.relativeTime + tick;
 		}
 	}
 
 	void OnTriggerExit(Collider other) {
 		if (other.gameObject.CompareTag("Player")) {
-			Music.a.Stop(); // return to normal upon leaving the trigger
+			_music.Stop(); // return to normal upon leaving the trigger
 		}
 	}
 }

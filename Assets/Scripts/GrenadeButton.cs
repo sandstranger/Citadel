@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
+using Zenject;
 
 public class GrenadeButton : MonoBehaviour {
 	public int GrenButtonIndex;
@@ -10,6 +11,12 @@ public class GrenadeButton : MonoBehaviour {
 	private int itemLookup;
 	private EventTrigger evenT;
 	private bool pointerEntered;
+
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GUIState _guiState;
+	[Inject] private Inventory _inventory;
+	[Inject] private MouseLookScript _mouseLookScript;
 
 	void Awake() {
 		pointerEntered = false;
@@ -43,34 +50,34 @@ public class GrenadeButton : MonoBehaviour {
 	public void PtrEnter () {
 		if (pointerEntered) return;
 
-		GUIState.a.PtrHandler(true,true,ButtonType.Grenade,gameObject);
-		MouseLookScript.a.currentButton = gameObject;
+		_guiState.PtrHandler(true,true,ButtonType.Grenade,gameObject);
+		_mouseLookScript.currentButton = gameObject;
 		pointerEntered = true;
 	}
 
 	public void PtrExit () {
 		if (!pointerEntered) return;
 
-		GUIState.a.ClearOverButton();
+		_guiState.ClearOverButton();
 		pointerEntered = false;
     }
 
 	void DoubleClick() {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 
 		// Put grenade in the player's hand (cursor)
-		MouseLookScript.a.UseGrenade(useableItemIndex);
+		_mouseLookScript.UseGrenade(useableItemIndex);
 	}
 
 	public void GrenadeInvClick () {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		GrenadeInvSelect();
 	}
 
 	public void GrenadeInvSelect() {
-		MFDManager.a.SendInfoToItemTab(useableItemIndex);
-		Inventory.a.grenadeCurrent = GrenButtonIndex; // Set current
-		Utils.PlayUIOneShotSavable(80); //changeweapon
+		_mfdManager.SendInfoToItemTab(useableItemIndex);
+		_inventory.grenadeCurrent = GrenButtonIndex; // Set current
+		Utils.PlayUIOneShotSavable(_consts,80); //changeweapon
 	}
 
 	void Start() {

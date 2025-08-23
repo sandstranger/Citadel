@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class ForceBridge : MonoBehaviour {
@@ -22,7 +23,10 @@ public class ForceBridge : MonoBehaviour {
 	private const float tickTime = 0.05f;
 	private bool initialized = false;
 	[HideInInspector] public GameObject segiEmitter;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
+
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
 
 	public void Start() {
 		#if UNITY_EDITOR
@@ -30,8 +34,8 @@ public class ForceBridge : MonoBehaviour {
 		#endif
 		
 		if (!initialized) {
-			if (PauseScript.a == null) tickFinished = tickTime + Random.value;
-			else tickFinished = PauseScript.a.relativeTime + tickTime + Random.value;
+			if (_pauseScript == null) tickFinished = tickTime + Random.value;
+			else tickFinished = _pauseScript.relativeTime + tickTime + Random.value;
 			
 			lerping = true;
 		}
@@ -59,20 +63,20 @@ public class ForceBridge : MonoBehaviour {
 
 	public void SetColorMaterial() {
 		switch (fieldColor) {
-			case ForceFieldColor.Red:      mr.material = Const.a.genericMaterials[5];  break;
-			case ForceFieldColor.Green:    mr.material = Const.a.genericMaterials[9];  break;
-			case ForceFieldColor.Blue:     mr.material = Const.a.genericMaterials[8];  break;
-			case ForceFieldColor.Purple:   mr.material = Const.a.genericMaterials[12]; break;
-			case ForceFieldColor.RedFaint: mr.material = Const.a.genericMaterials[6];  break;
+			case ForceFieldColor.Red:      mr.material = _consts.genericMaterials[5];  break;
+			case ForceFieldColor.Green:    mr.material = _consts.genericMaterials[9];  break;
+			case ForceFieldColor.Blue:     mr.material = _consts.genericMaterials[8];  break;
+			case ForceFieldColor.Purple:   mr.material = _consts.genericMaterials[12]; break;
+			case ForceFieldColor.RedFaint: mr.material = _consts.genericMaterials[6];  break;
 		}
 	}
 
 	void FixedUpdate() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
-		if (tickFinished >= PauseScript.a.relativeTime) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
+		if (tickFinished >= _pauseScript.relativeTime) return;
 
-		tickFinished = PauseScript.a.relativeTime + tickTime;
+		tickFinished = _pauseScript.relativeTime + tickTime;
 		if (activated) {
 			Utils.Activate(segiEmitter);
 			if (lerping) {
@@ -118,7 +122,7 @@ public class ForceBridge : MonoBehaviour {
 	public void Activate(bool isSilent) {
 		if (activated) return; // already there
 
-		if (!isSilent) Utils.PlayOneShotSavable(SFX,Const.a.sounds[102]);
+		if (!isSilent) Utils.PlayOneShotSavable(SFX,_consts.sounds[102]);
 		Utils.EnableMeshRenderer(mr);
 		Utils.EnableBoxCollider(bCol);
 		Utils.Activate(segiEmitter);
@@ -136,7 +140,7 @@ public class ForceBridge : MonoBehaviour {
 	public void Deactivate(bool isSilent) {
 		if (!activated) return; // already there
 
-		if (!isSilent) Utils.PlayOneShotSavable(SFX,Const.a.sounds[102]);
+		if (!isSilent) Utils.PlayOneShotSavable(SFX,_consts.sounds[102]);
 		if (segiEmitter != null) segiEmitter.SetActive(false);
 		activated = false;
 		lerping = true;
@@ -156,15 +160,15 @@ public class ForceBridge : MonoBehaviour {
         segiEmitter.transform.localPosition = new Vector3(0f,0f,0f);
 		segiEmitter.transform.localScale = new Vector3(1f,1f,1f); // Parent scales it
         MeshFilter mf = segiEmitter.AddComponent<MeshFilter>();
-        mf.sharedMesh = Const.a.cubeMesh;
+        mf.sharedMesh = _consts.cubeMesh;
         MeshRenderer mR = segiEmitter.AddComponent<MeshRenderer>();
-        mR.material = Const.a.segiEmitterMaterial1;
+        mR.material = _consts.segiEmitterMaterial1;
 		switch (fieldColor) {
-			case ForceFieldColor.Red:      mR.sharedMaterial = Const.a.segiEmitterMaterialRed;  break;
-			case ForceFieldColor.Green:    mR.sharedMaterial = Const.a.segiEmitterMaterialGreen;  break;
-			case ForceFieldColor.Blue:     mR.sharedMaterial = Const.a.segiEmitterMaterialBlue;  break;
-			case ForceFieldColor.Purple:   mR.sharedMaterial = Const.a.segiEmitterMaterialPurple; break;
-			case ForceFieldColor.RedFaint: mR.sharedMaterial = Const.a.segiEmitterMaterialRedFaint;  break;
+			case ForceFieldColor.Red:      mR.sharedMaterial = _consts.segiEmitterMaterialRed;  break;
+			case ForceFieldColor.Green:    mR.sharedMaterial = _consts.segiEmitterMaterialGreen;  break;
+			case ForceFieldColor.Blue:     mR.sharedMaterial = _consts.segiEmitterMaterialBlue;  break;
+			case ForceFieldColor.Purple:   mR.sharedMaterial = _consts.segiEmitterMaterialPurple; break;
+			case ForceFieldColor.RedFaint: mR.sharedMaterial = _consts.segiEmitterMaterialRedFaint;  break;
 		}
 
         segiEmitter.layer = 2; // IgnoreRaycast
@@ -199,7 +203,7 @@ public class ForceBridge : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(fb.lerping,"lerping"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(fb.tickFinished,"tickFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(fb._pauseScript,fb.tickFinished,"tickFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(fb.x,"x"));
 		s1.Append(Utils.splitChar);
@@ -251,7 +255,7 @@ public class ForceBridge : MonoBehaviour {
 		
 		index++;
 		fb.lerping = Utils.GetBoolFromString(entries[index],"lerping"); index++;
-		fb.tickFinished = Utils.LoadRelativeTimeDifferential(entries[index],"tickFinished"); index++;
+		fb.tickFinished = Utils.LoadRelativeTimeDifferential(fb._pauseScript,entries[index],"tickFinished"); index++;
 		fb.x = Utils.GetBoolFromString(entries[index],"x"); index++;
 		fb.y = Utils.GetBoolFromString(entries[index],"y"); index++;
 		fb.z = Utils.GetBoolFromString(entries[index],"z"); index++;

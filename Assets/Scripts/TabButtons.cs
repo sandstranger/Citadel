@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Zenject;
 
 public class TabButtons : MonoBehaviour {
 	// Externally assigned, required
@@ -17,6 +18,8 @@ public class TabButtons : MonoBehaviour {
 	public int curTab = 0;
 	public int lastTab = 0;
 
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;	
 	void Start() {
 		TurnAllTabsOff();
 		ItemTabButton.image.overrideSprite = MFDSprite;
@@ -46,35 +49,35 @@ public class TabButtons : MonoBehaviour {
 		SetCurrentAsLast();
 		switch (tabNum) {
 			case 0: // Weapon
-				MFDManager.a.lastWeaponSideRH = isRH;
+				_mfdManager.lastWeaponSideRH = isRH;
 				break;
 			case 1: // Item
-				MFDManager.a.lastItemSideRH = isRH;
+				_mfdManager.lastItemSideRH = isRH;
 				break;
 			case 2: // Automap
-				MFDManager.a.lastAutomapSideRH = isRH;
+				_mfdManager.lastAutomapSideRH = isRH;
 				break;
 			case 3: // Target
-				MFDManager.a.lastTargetSideRH = isRH;
+				_mfdManager.lastTargetSideRH = isRH;
 				break;
 			case 4: // Data
-				if (MFDManager.a.tetheredSearchable != null) {
-					if (isRH) MFDManager.a.lastSearchSideRH = true;
-					else MFDManager.a.lastSearchSideRH = false;
+				if (_mfdManager.tetheredSearchable != null) {
+					if (isRH) _mfdManager.lastSearchSideRH = true;
+					else _mfdManager.lastSearchSideRH = false;
 				}
-				MFDManager.a.lastDataSideRH = isRH;
+				_mfdManager.lastDataSideRH = isRH;
 				break;
 		}
 	}
 
 	public void TabButtonClick(int tabNum) { // For click events.
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		TabButtonAction(tabNum);
 		SetMFDLasts(tabNum);
 	}
 
 	public void TabButtonAction(int tabNum) { // For keyboard events.
-		Utils.PlayUIOneShotSavable(97);
+		Utils.PlayUIOneShotSavable(_consts,97);
 		TabButtonClickSilent(tabNum,false);
 		SetMFDLasts(tabNum);
 	}

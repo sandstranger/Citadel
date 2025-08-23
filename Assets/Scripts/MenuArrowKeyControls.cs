@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,8 @@ public class MenuArrowKeyControls : MonoBehaviour {
 	private bool axisUp = false;
 	private bool axisDn = false;
 
+	[Inject] private PlayerMovement _playerMovement;
+
 	void Awake () {
 		currentIndex = 0;
 	}
@@ -19,7 +22,7 @@ public class MenuArrowKeyControls : MonoBehaviour {
 	}
 
 	void  Update() {
-		if (PlayerMovement.a.consoleActivated) return;
+		if (_playerMovement.consoleActivated) return;
 
 		if (Input.GetKeyUp(KeyCode.Return)
 			|| Input.GetKeyUp(KeyCode.KeypadEnter)

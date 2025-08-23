@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class NPC_Hopper_Death : MonoBehaviour {
@@ -18,12 +19,14 @@ public class NPC_Hopper_Death : MonoBehaviour {
 	private float tickFinished;
 	private SkinnedMeshRenderer smr;
 
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake() {
 		smr = GetComponent<SkinnedMeshRenderer>();
 		redTint = 0f;
 		rimPower = 255f;
-		tick2Finished = PauseScript.a.relativeTime + blendRimColorTickSecs;
-		tickFinished = PauseScript.a.relativeTime + blendShapeTickSecs;
+		tick2Finished = _pauseScript.relativeTime + blendRimColorTickSecs;
+		tickFinished = _pauseScript.relativeTime + blendShapeTickSecs;
 		blendStep1 = -1;
 		blendStep2 = 0;
 		blendAmountPerTick = 18f;
@@ -32,16 +35,16 @@ public class NPC_Hopper_Death : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
-			if (tick2Finished < PauseScript.a.relativeTime) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
+			if (tick2Finished < _pauseScript.relativeTime) {
 				rimPower = smr.material.GetColor("_RimColor").r;
 				rimPower -= rimPowerShiftPerTick;
 				if (rimPower < 0) rimPower = 0;
 				smr.material.SetColor("_RimColor",new Color(rimPower,0,(rimPower*0.75f),0));
-				tick2Finished = PauseScript.a.relativeTime + blendRimColorTickSecs;
+				tick2Finished = _pauseScript.relativeTime + blendRimColorTickSecs;
 			}
 
-			if (tickFinished < PauseScript.a.relativeTime && blendStep2 < 6) {
+			if (tickFinished < _pauseScript.relativeTime && blendStep2 < 6) {
 				blendAmount1 -= blendAmountPerTick;
 				blendAmount2 += blendAmountPerTick;
 				if (blendStep2 >= 3) {
@@ -73,7 +76,7 @@ public class NPC_Hopper_Death : MonoBehaviour {
 				if (redTint < 0) redTint = 0; //floor
 				if (redTint > 10) redTint = 10; // ceil
 				smr.material.SetColor("_HSVAAdjust",new Color(redTint,0,0,0));
-				tickFinished = PauseScript.a.relativeTime + blendShapeTickSecs;
+				tickFinished = _pauseScript.relativeTime + blendShapeTickSecs;
 			}
 		}
 	}

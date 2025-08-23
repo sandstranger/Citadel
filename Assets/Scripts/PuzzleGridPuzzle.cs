@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class PuzzleGridPuzzle : MonoBehaviour {
@@ -30,7 +31,10 @@ public class PuzzleGridPuzzle : MonoBehaviour {
 	[HideInInspector] public bool fired = false; // save
 	private Animator anim;
 	private bool alreadyOpen = false;
-	private static StringBuilder s1 = new StringBuilder();
+	[Inject] private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	private static readonly StringBuilder s1 = new(200 * 500);
 
 	void Awake() {
 		puzzleSolved = false;
@@ -51,22 +55,22 @@ public class PuzzleGridPuzzle : MonoBehaviour {
 
 	public void Use (UseData ud) {
 		if (dead) {
-			Const.sprint(messageOnBrokenLingdex);
+			_consts.sprint(messageOnBrokenLingdex);
 			return;
 		}
 
-		if (LevelManager.a.GetCurrentLevelSecurity() > securityThreshhold) {
-			MFDManager.a.BlockedBySecurity(transform.position);
+		if (_levelManager.GetCurrentLevelSecurity() > securityThreshhold) {
+			_mfdManager.BlockedBySecurity(transform.position);
 			return;
 		}
 
-		if (LevelManager.a.superoverride || Const.a.difficultyMission == 0) {
+		if (_levelManager.superoverride || _consts.difficultyMission == 0) {
 			// SHODAN can go anywhere!  Full security override!
 			locked = false;
 		}
 
 		if (locked) {
-			Const.sprint(messageOnLockedLingdex);
+			_consts.sprint(messageOnLockedLingdex);
 			return;
 		}
 
@@ -80,14 +84,14 @@ public class PuzzleGridPuzzle : MonoBehaviour {
 					  + "without parameters!");
 		}
 
-		Const.sprint(Const.a.stringTable[190],ud.owner); // Puzzle accessed
+		_consts.sprint(_consts.stringTable[190],ud.owner); // Puzzle accessed
 		inUse = true;
 		if (animate && anim != null && !alreadyOpen) {
 			anim.Play("Open");
 			alreadyOpen = true;
 		}
 
-		MFDManager.a.SendGridPuzzleToDataTab(grid,cellType,gridType,
+		_mfdManager.SendGridPuzzleToDataTab(grid,cellType,gridType,
 											 sourceIndex,outputIndex,width,
 											 height,theme,target,ud,
 											 transform.position,this);
@@ -95,7 +99,7 @@ public class PuzzleGridPuzzle : MonoBehaviour {
 
 	public void UseTargets (GameObject owner) {
 		if (onlyFireOnce && fired) {
-			Const.sprint(alreadyFiredMessageLingdex);
+			_consts.sprint(alreadyFiredMessageLingdex);
 			return;
 		}
 
@@ -103,8 +107,8 @@ public class PuzzleGridPuzzle : MonoBehaviour {
 		UseData ud = new UseData();
 		ud.owner = owner;
 		ud.argvalue = argvalue;
-		Const.a.UseTargets(gameObject,ud,target);
-		Const.sprint(successMessageLingdex);
+		_consts.UseTargets(gameObject,ud,target);
+		_consts.sprint(successMessageLingdex);
 	}
 
 	public static string Save(GameObject go) {

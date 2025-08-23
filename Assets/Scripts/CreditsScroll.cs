@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -21,26 +22,29 @@ public class CreditsScroll : MonoBehaviour {
 	private const float vidLength = 37.2f;
 	private float vidStartTime;
 
-    void OnEnable() {
+	[Inject] private Const _consts;
+	[Inject] private MainMenuHandler _mainMenuHandler;
+
+	void OnEnable() {
 		bottom = false;
 		pagenum = 0;
-		creditsText.text = Const.a.creditsText[pagenum];
+		creditsText.text = _consts.creditsText[pagenum];
 		Utils.Activate(exitVideo);
 		Utils.Activate(endVideoTextGO1);
 		outroPlayer.Play();
-		if (!MainMenuHandler.a.dataFound) outroPlayer.SetDirectAudioMute(0,true);
+		if (!_mainMenuHandler.dataFound) outroPlayer.SetDirectAudioMute(0,true);
 		else outroPlayer.SetDirectAudioMute(0,false);
 
-		endVideoText1.text = Const.a.stringTable[610];
-		endVideoText2.text = Const.a.stringTable[611];
-		endVideoText3.text = Const.a.stringTable[612];
+		endVideoText1.text = _consts.stringTable[610];
+		endVideoText2.text = _consts.stringTable[611];
+		endVideoText3.text = _consts.stringTable[612];
 		Utils.Deactivate(endVideoTextGO2);
 		Utils.Deactivate(endVideoTextGO3);
 		vidFinished = Time.time + vidLength;
 		vidStartTime = Time.time;
-		if (Const.a.gameFinished) {
+		if (_consts.gameFinished) {
 			// Get player stats for finishing the game!
-			Const.a.creditsText[1] = Const.a.CreditsStats();
+			_consts.creditsText[1] = _consts.CreditsStats();
 		}
     }
 
@@ -81,7 +85,7 @@ public class CreditsScroll : MonoBehaviour {
 				return;
 			}
 			
-			MainMenuHandler.a.GoBack();
+			_mainMenuHandler.GoBack();
 		}
 
 		if (Input.GetMouseButtonUp(0)) {
@@ -89,17 +93,17 @@ public class CreditsScroll : MonoBehaviour {
 
 			if (!bottom) {
 				pagenum++;
-				if (!Const.a.gameFinished) {
+				if (!_consts.gameFinished) {
 					if (pagenum == 1) pagenum++; // Skip stats when playing
 					                             // from main menu.
 				}
-				if (pagenum >= Const.a.creditsLength) {
+				if (pagenum >= _consts.creditsLength) {
 					bottom = true;
 				} else {
-					creditsText.text = Const.a.creditsText[pagenum];
+					creditsText.text = _consts.creditsText[pagenum];
 				}
 			} else {
-				MainMenuHandler.a.GoBack();
+				_mainMenuHandler.GoBack();
 			}
 		}
 
@@ -108,7 +112,7 @@ public class CreditsScroll : MonoBehaviour {
 
 			pagenum--;
 			if (pagenum <0) pagenum = 0;
-			creditsText.text = Const.a.creditsText[pagenum];
+			creditsText.text = _consts.creditsText[pagenum];
 		}
 	}
 }

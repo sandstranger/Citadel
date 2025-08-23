@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class UseableObjectUse : MonoBehaviour {
 	public int useableItemIndex;
@@ -8,11 +9,14 @@ public class UseableObjectUse : MonoBehaviour {
 	public int ammo = 0;
 	public int ammo2 = 0;
 	public bool heldObjectLoadedAlternate = false;
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100);
+
+	[Inject] private Const _consts;
+	[Inject] private MouseLookScript _mouseLookScript;
 
 	void Awake() {
 		// 33% chance of not spawning logic probes on Puzzle difficulty of 3
-		if (Const.a.difficultyPuzzle == 3) {
+		if (_consts.difficultyPuzzle == 3) {
 			if (useableItemIndex == 54) {
 				if (UnityEngine.Random.Range(0,1f) < 0.33f) {
 					Utils.SafeDestroy(gameObject);
@@ -21,39 +25,39 @@ public class UseableObjectUse : MonoBehaviour {
 		}
 
 		// Remove access cards on Mission difficulty 1 or 0
-		if (Const.a.difficultyMission <= 1) {
+		if (_consts.difficultyMission <= 1) {
 			if (useableItemIndex >= 81 && useableItemIndex <= 91) {
 				Utils.SafeDestroy(gameObject);
 			}
 		}
 
 		// Remove audiologs on Mission difficulty 0
-		if (Const.a.difficultyMission == 0) {
+		if (_consts.difficultyMission == 0) {
 			if (useableItemIndex == 6) Utils.SafeDestroy(gameObject);
 		}
 	}
 
 	// Was GameObject owner as arguments, now UseData to hold more info.
 	public void Use (UseData ud) {
-	    if (MouseLookScript.a.holdingObject) {
-	        MouseLookScript.a.DropHeldItem();
+	    if (_mouseLookScript.holdingObject) {
+	        _mouseLookScript.DropHeldItem();
 	        return;
 	    }
 	    
 		if (useableItemIndex < 0) Debug.Log("BUG: Useable index less than 0!");
-		MouseLookScript.a.holdingObject = true;
-		MouseLookScript.a.heldObjectIndex = useableItemIndex;
-		MouseLookScript.a.heldObjectCustomIndex = customIndex;
-		MouseLookScript.a.heldObjectAmmo = ammo;
-		MouseLookScript.a.heldObjectAmmo2 = ammo2;
-		MouseLookScript.a.heldObjectLoadedAlternate = heldObjectLoadedAlternate;
-		if (Const.a.InputQuickItemPickup) {
-			MouseLookScript.a.AddItemToInventory(useableItemIndex,customIndex);
-			MouseLookScript.a.ResetHeldItem();
+		_mouseLookScript.holdingObject = true;
+		_mouseLookScript.heldObjectIndex = useableItemIndex;
+		_mouseLookScript.heldObjectCustomIndex = customIndex;
+		_mouseLookScript.heldObjectAmmo = ammo;
+		_mouseLookScript.heldObjectAmmo2 = ammo2;
+		_mouseLookScript.heldObjectLoadedAlternate = heldObjectLoadedAlternate;
+		if (_consts.InputQuickItemPickup) {
+			_mouseLookScript.AddItemToInventory(useableItemIndex,customIndex);
+			_mouseLookScript.ResetHeldItem();
 		} else {
-			MouseLookScript.a.ForceInventoryMode();  // Inventory mode is turned on when picking something up
-			Const.sprint(Const.a.stringTable[useableItemIndex + 326] // <item>
-						 + Const.a.stringTable[319]); // picked up.
+			_mouseLookScript.ForceInventoryMode();  // Inventory mode is turned on when picking something up
+			_consts.sprint(_consts.stringTable[useableItemIndex + 326] // <item>
+						 + _consts.stringTable[319]); // picked up.
 		}
 		
 		Destroy(gameObject);

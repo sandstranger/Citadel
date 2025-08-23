@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Zenject;
 
 public class ImageSequenceTextureArrayUI : MonoBehaviour {
 	private Object[] objects;
@@ -15,6 +16,8 @@ public class ImageSequenceTextureArrayUI : MonoBehaviour {
 	public bool playOnMenu = false; // False for Vmail
 	public bool deactivateAtEnd = false;
 	
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake() {
 		goImage = this.GetComponent<Image>();
 	}
@@ -39,8 +42,8 @@ public class ImageSequenceTextureArrayUI : MonoBehaviour {
 	}
 	
 	void Update() {
-		if (!PauseScript.a.Paused() || playOnMenu) {
-			if (!PauseScript.a.MenuActive() || playOnMenu) {
+		if (!_pauseScript.Paused() || playOnMenu) {
+			if (!_pauseScript.MenuActive() || playOnMenu) {
 				if (deactivateAtEnd && playDone) gameObject.SetActive(false);
 				if (stopAtEnd && playDone) return;
 
@@ -61,7 +64,7 @@ public class ImageSequenceTextureArrayUI : MonoBehaviour {
 	IEnumerator PlayLoop(float delay) {
 		yield return new WaitForSeconds(delay); // Wait for the time defined at the delay parameter.
 TryAgain:
-		if (PauseScript.a.Paused() && !playOnMenu) {
+		if (_pauseScript.Paused() && !playOnMenu) {
 			yield return null;
 			goto TryAgain;
 		}

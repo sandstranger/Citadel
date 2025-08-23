@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class Trigger : MonoBehaviour {
@@ -14,7 +15,11 @@ public class Trigger : MonoBehaviour {
 	[HideInInspector] public float delayFireFinished;
 	[HideInInspector] public float delayResetFinished;
 	[HideInInspector] public bool allDone = false;
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100);
+
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerMovement _playerMovement;
 
     IEnumerator DelayedTarget(GameObject activator) {
         yield return new WaitForSeconds(delay);
@@ -25,7 +30,7 @@ public class Trigger : MonoBehaviour {
 		UseData ud = new UseData();
 		ud.owner = activator;
 		ud.argvalue = argvalue;
-		Const.a.UseTargets(gameObject,ud,target);
+		_consts.UseTargets(gameObject,ud,target);
 	}
 
 	void TriggerTripped (Collider col, bool initialEntry) {
@@ -81,6 +86,7 @@ public class Trigger : MonoBehaviour {
 
 	public static string Save(GameObject go) {
 		Trigger trig = go.GetComponent<Trigger>();
+		var pauseScript = trig._pauseScript;
 		s1.Clear();
 		s1.Append(Utils.BoolToString(trig.allDone,"allDone"));
 		s1.Append(Utils.splitChar);
@@ -90,9 +96,9 @@ public class Trigger : MonoBehaviour {
 		else s1.Append("hadRecentActivator:0");
 
 		s1.Append(Utils.splitChar);		
-		s1.Append(Utils.SaveRelativeTimeDifferential(trig.delayFireFinished,"delayFireFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,trig.delayFireFinished,"delayFireFinished"));
 		s1.Append(Utils.splitChar);		
-		s1.Append(Utils.SaveRelativeTimeDifferential(trig.delayResetFinished,"delayResetFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,trig.delayResetFinished,"delayResetFinished"));
 		s1.Append(Utils.splitChar);		
 		s1.Append(Utils.FloatToString(trig.delay,"delay"));
 		s1.Append(Utils.splitChar);		
@@ -108,12 +114,13 @@ public class Trigger : MonoBehaviour {
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		Trigger trig = go.GetComponent<Trigger>();
+		var pauseScript = trig._pauseScript;
 		trig.allDone = Utils.GetBoolFromString(entries[index],"allDone"); index++;
 		trig.numPlayers = Utils.GetIntFromString(entries[index],"numPlayers"); index++;
 		bool hadRecentActivator = Utils.GetBoolFromString(entries[index],"hadRecentActivator"); index++;
-		if (hadRecentActivator) trig.recentMostActivator = PlayerMovement.a.gameObject;
-		trig.delayFireFinished = Utils.LoadRelativeTimeDifferential(entries[index],"delayFireFinished"); index++;
-		trig.delayResetFinished = Utils.LoadRelativeTimeDifferential(entries[index],"delayResetFinished"); index++;
+		if (hadRecentActivator) trig.recentMostActivator = trig._playerMovement.gameObject;
+		trig.delayFireFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"delayFireFinished"); index++;
+		trig.delayResetFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"delayResetFinished"); index++;
 		trig.delay = Utils.GetFloatFromString(entries[index],"delay"); index++;
 		trig.onlyOnce = Utils.GetBoolFromString(entries[index],"onlyOnce"); index++;
 		trig.ignoreSecondaryTriggers = Utils.GetBoolFromString(entries[index],"ignoreSecondaryTriggers"); index++;

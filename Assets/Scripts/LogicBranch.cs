@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 // Allows for consistently switching back and forth between two targets
 public class LogicBranch : MonoBehaviour {
@@ -18,8 +19,10 @@ public class LogicBranch : MonoBehaviour {
 	[HideInInspector] public bool onSecond = false; // save
 	public bool autoFlipOnTarget = true;
 	
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100);
 
+	[Inject] private Const _consts;
+	
 	void Awake() {
 		if (startOnSecond) {
 			currenttarget = target2;
@@ -73,7 +76,7 @@ public class LogicBranch : MonoBehaviour {
 			}
 		}
 
-		Const.a.UseTargets(null,ud,currenttarget);
+		_consts.UseTargets(null,ud,currenttarget);
 		if (autoFlipOnTarget) FlipTrackSwitch();
 	}
 

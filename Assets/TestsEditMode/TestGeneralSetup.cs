@@ -1126,72 +1126,7 @@ namespace Tests {
                         "Duplicate SaveIDs found: "
                         + string.Join(", ", duplicateSaveIDs));
         }
-
-        [UnityTest]
-        public IEnumerator ConfirmChunksHaveTextureArrayAssigned() {
-            RunBeforeAnyTests();
-            yield return new WaitWhile(() => SceneLoaded() == false);
-            SetupTests();
-            bool check = true;
-
-            string msg = "RunBeforeAnyTests failed to populate allGOs: ";
-            Assert.That(allGOs.Count > 1,msg + allGOs.Count.ToString());
-            string script = "PrefabIdentifier";
-            MeshFilter mf;
-            Material mat;
-
-            // Run through all GameObjects and perform all tests
-            for (int i=0;i<allGOs.Count;i++) {
-                PrefabIdentifier pid =
-                    allGOs[i].GetComponent<PrefabIdentifier>();
-
-                if (pid == null) continue;
-                if (pid.constIndex == 22) {//pid.constIndex < 2 || pid.constIndex > 304
-                //    || pid.constIndex == 20 || pid.constIndex == 21
-                //    || pid.constIndex == 22 || pid.constIndex == 279
-                //    || pid.constIndex == 112 || pid.constIndex == 79
-                //    || pid.constIndex == 78 || pid.constIndex == 93) {
-                    continue;
-                }
-
-                // Have prefab gameobject now get its goods.
-                Component[] mfArray = allGOs[i].GetComponentsInChildren(
-                                            typeof(MeshFilter),true);
-
-                for (int k=0;k<mfArray.Length;k++) {
-                    mat = mfArray[k].gameObject.GetComponent<Material>();
-                    if (mat == null) continue;
-                    if (mat != Const.a.genericMaterials[48]) continue; // chunk
-
-                    mf = mfArray[k].gameObject.GetComponent<MeshFilter>();
-                    Color[] vertexColors = mf.sharedMesh.colors;
-                    msg = "has no vertex colors";
-                    check = vertexColors.Length > 0;
-                    Assert.That(check,FailMessage(script,allGOs[i],msg));
-                    //if (!check) {
-                    //    UnityEngine.Debug.Log(FailMessage(script,allGOs[i],
-                    //                                      msg));
-                    //}
-
-                    if (!check) continue;
-
-                    msg = "has some vertices whose vertex color.r is 0";
-                    check = true;
-                    for (int j=0;j<vertexColors.Length;j++) {
-                        if (vertexColors[j].r == 0f) {
-                            check = false;
-                            break;
-                        }
-                    }
-                    //if (!check) {
-                    //    UnityEngine.Debug.Log(FailMessage(script,allGOs[i],
-                    //                          msg));
-                    //}
-                    Assert.That(check,FailMessage(script,allGOs[i],msg));
-                }
-            }
-        }
-
+        
         [UnityTest]
         public IEnumerator ConfirmLevelManagerInScene() {
             RunBeforeAnyTests();

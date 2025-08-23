@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 // Used to change gravity lift from red to green.
@@ -7,15 +8,17 @@ public class MaterialChanger : MonoBehaviour {
 	[HideInInspector] public bool alreadyDone = false;
 	public int levelIndex = 0;
 
+	[Inject] private Const _consts;
+	
 	IEnumerator SetMaterialFromCode(int index){
         yield return new WaitForSeconds(0.2f); // give Const a time to populate it's questdata
 		switch (index) {
-			case 1: GetComponent<MeshRenderer> ().material = (Const.a.screenCodes[Const.a.questData.lev1SecCode]); break;
-			case 2: GetComponent<MeshRenderer> ().material = (Const.a.screenCodes[Const.a.questData.lev2SecCode]); break;
-			case 3: GetComponent<MeshRenderer> ().material = (Const.a.screenCodes[Const.a.questData.lev3SecCode]); break;
-			case 4: GetComponent<MeshRenderer> ().material = (Const.a.screenCodes[Const.a.questData.lev4SecCode]); break;
-			case 5: GetComponent<MeshRenderer> ().material = (Const.a.screenCodes[Const.a.questData.lev5SecCode]); break;
-			case 6: GetComponent<MeshRenderer> ().material = (Const.a.screenCodes[Const.a.questData.lev6SecCode]); break;
+			case 1: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev1SecCode]); break;
+			case 2: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev2SecCode]); break;
+			case 3: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev3SecCode]); break;
+			case 4: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev4SecCode]); break;
+			case 5: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev5SecCode]); break;
+			case 6: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev6SecCode]); break;
 		}
 		alreadyDone = true;
 	}

@@ -4,10 +4,11 @@ using System.IO;
 using System.Diagnostics;
 using System;
 using Citadel.Game;
+using Zenject;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class Music : MonoBehaviour, ISingletonInitializer {
+public class Music : MonoBehaviour {
 	public AudioSource SFXMain;
 	public AudioSource SFXMain2;
 	public bool twoPlaying;
@@ -43,10 +44,11 @@ public class Music : MonoBehaviour, ISingletonInitializer {
 	private string musicRPath;
 	private string musicRLoopedPath;
 
-	public static Music a;
+	[Inject] private Const _consts;
+	[Inject] private MainMenuHandler _mainMenuHandler;
+	[Inject] private PauseScript _pauseScript;
 
-	public void Initialize() {
-		a = this;
+	private void Awake() {
 		clipFinished = Time.time;
 		clipOverlayFinished = Time.time;
 		tempClip = null;
@@ -183,14 +185,14 @@ public class Music : MonoBehaviour, ISingletonInitializer {
 	}
 
 	private void PlayMenuMusic() {
-		MainMenuHandler.a.BackGroundMusic.clip = titleMusic;
-		if (MainMenuHandler.a.gameObject.activeSelf
-			&& !MainMenuHandler.a.inCutscene
-			&& MainMenuHandler.a.dataFound) {
+		_mainMenuHandler.BackGroundMusic.clip = titleMusic;
+		if (_mainMenuHandler.gameObject.activeSelf
+			&& !_mainMenuHandler.inCutscene
+			&& _mainMenuHandler.dataFound) {
 
-			MainMenuHandler.a.BackGroundMusic.Play();
-			if (MainMenuHandler.a.BackGroundMusic.clip == titleMusic
-				&& MainMenuHandler.a.BackGroundMusic.isPlaying) {
+			_mainMenuHandler.BackGroundMusic.Play();
+			if (_mainMenuHandler.BackGroundMusic.clip == titleMusic
+				&& _mainMenuHandler.BackGroundMusic.isPlaying) {
 				
 				UnityEngine.Debug.Log("Back ground music started");
 			}
@@ -410,7 +412,7 @@ public class Music : MonoBehaviour, ISingletonInitializer {
 	public void PlayTrack(int levnum, TrackType ttype, MusicType mtype) {
 		// Looped Music (Dynamic Music off)
 		// --------------------------------------------------------------------
-		if (!Const.a.DynamicMusic) {
+		if (!_consts.DynamicMusic) {
 			if (mtype == MusicType.Overlay) return; // No overlays in looped.
 			if (mtype == MusicType.Override && (ttype == TrackType.MutantNear
 				|| ttype == TrackType.Cybertube || ttype == TrackType.RobotNear
@@ -422,7 +424,7 @@ public class Music : MonoBehaviour, ISingletonInitializer {
 			}
 
 			float vol = 0.2f;
-			if (Const.a != null) vol = Const.a.AudioVolumeMusic;
+			if (_consts != null) vol = _consts.AudioVolumeMusic;
 			if (mtype == MusicType.Walking || mtype == MusicType.Combat || mtype == MusicType.None) {
 				tempClip = levelMusicLooped;
 			} else if (mtype == MusicType.Override) {
@@ -633,10 +635,10 @@ public class Music : MonoBehaviour, ISingletonInitializer {
     void Update() {
 		// Check if main menu is active and disable playing background music
 		if (mainMenu.activeSelf == true
-			|| Const.a.loadingScreen.activeSelf == true
-			|| !MainMenuHandler.a.dataFound) {
+			|| _consts.loadingScreen.activeSelf == true
+			|| !_mainMenuHandler.dataFound) {
 
-			if (!paused || !MainMenuHandler.a.dataFound) {
+			if (!paused || !_mainMenuHandler.dataFound) {
 				paused = true;
 				if (SFXMain != null) SFXMain.Pause();
 				if (SFXMain2 != null) SFXMain2.Pause();
@@ -648,8 +650,8 @@ public class Music : MonoBehaviour, ISingletonInitializer {
 
 		if (paused) {
 			paused = false;
-			if (SFXMain != null && (!twoPlaying || !Const.a.DynamicMusic)) SFXMain.UnPause();
-			if (SFXMain2 != null && twoPlaying && Const.a.DynamicMusic) SFXMain2.UnPause();
+			if (SFXMain != null && (!twoPlaying || !_consts.DynamicMusic)) SFXMain.UnPause();
+			if (SFXMain2 != null && twoPlaying && _consts.DynamicMusic) SFXMain2.UnPause();
 			if (SFXOverlay != null) SFXOverlay.UnPause();
 		}
 
@@ -661,10 +663,10 @@ public class Music : MonoBehaviour, ISingletonInitializer {
             if (remaining > audBuffer) return;
         }
 
-		if (inCombat && !inZone && combatImpulseFinished < PauseScript.a.relativeTime) {
+		if (inCombat && !inZone && combatImpulseFinished < _pauseScript.relativeTime) {
 			inCombat = false;
 			PlayTrack(LevelManager.currentLevel,TrackType.Combat, MusicType.Override);
-			combatImpulseFinished = PauseScript.a.relativeTime + 20f;
+			combatImpulseFinished = _pauseScript.relativeTime + 20f;
 			return;
 		}
 
@@ -680,7 +682,7 @@ public class Music : MonoBehaviour, ISingletonInitializer {
 			}
 		}
 		
-		if (Const.a.DynamicMusic) {
+		if (_consts.DynamicMusic) {
 			if (curr.clip != null && curr.isPlaying) {
 				float remaining = curr.clip.length - curr.time;
 				if (remaining <= audBuffer) { // 50ms buffer before end
@@ -708,6 +710,5 @@ public class Music : MonoBehaviour, ISingletonInitializer {
 		tempClip = null;
 		curC = null;
 		curOverlayC = null;
-		if (a == this) a = null;
 	}
 }

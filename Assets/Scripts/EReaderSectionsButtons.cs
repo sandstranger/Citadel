@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class EReaderSectionsButtons : MonoBehaviour {
@@ -8,30 +9,34 @@ public class EReaderSectionsButtons : MonoBehaviour {
 	public EReaderSectionsButtonHighlight ersbh2;
 	public EReaderSectionsButtonHighlight ersbh3;
 
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Inventory _inventory;
+	
 	void OnEnable() {
-		if (Const.a.difficultyMission == 0) ersbh3.gameObject.SetActive(false);
+		if (_consts.difficultyMission == 0) ersbh3.gameObject.SetActive(false);
 		else ersbh3.gameObject.SetActive(true);
 
 		HighlightOthers();
 	}
 
 	public void HighlightOthers() {
-		Inventory.a.CheckForUnreadLogs();
-		if (Inventory.a.hasNewEmail) ersbh0.HighlightButton();
-		if (Inventory.a.hasNewLogs) ersbh1.HighlightButton();
-		if (Inventory.a.hasNewData) ersbh2.HighlightButton();
-		if (Inventory.a.hasNewNotes) ersbh3.HighlightButton();
+		_inventory.CheckForUnreadLogs();
+		if (_inventory.hasNewEmail) ersbh0.HighlightButton();
+		if (_inventory.hasNewLogs) ersbh1.HighlightButton();
+		if (_inventory.hasNewData) ersbh2.HighlightButton();
+		if (_inventory.hasNewNotes) ersbh3.HighlightButton();
 	}
 
 	public void OnClick(int index) {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 
 		SetEReaderSectionsButtonsHighlights(index);
 		switch (index) {
-			case 0: MFDManager.a.OpenEmailTableContents(); break;
-			case 1: MFDManager.a.OpenLogTableContents(); break;
-			case 2: MFDManager.a.OpenDataTableContents(); break;
-			case 3: MFDManager.a.OpenNotesTableContents(); break;
+			case 0: _mfdManager.OpenEmailTableContents(); break;
+			case 1: _mfdManager.OpenLogTableContents(); break;
+			case 2: _mfdManager.OpenDataTableContents(); break;
+			case 3: _mfdManager.OpenNotesTableContents(); break;
 		}
 	}
 

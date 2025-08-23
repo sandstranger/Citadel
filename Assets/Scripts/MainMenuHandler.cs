@@ -6,9 +6,10 @@ using UnityEngine.Video;
 using System.IO;
 using System.Collections;
 using Citadel.Game;
+using Zenject;
 using SimpleFileBrowser;
 
-public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
+public class MainMenuHandler : MonoBehaviour {
 	public GameObject Button1;
 	public GameObject Button2;
 	public GameObject Button3;
@@ -46,7 +47,6 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	public bool inCutscene = false;
 	public GameObject PresetConfirmDialog;
 	public Text presetQuestionText;
-	public static MainMenuHandler a;
 	public ConfigKeybindButton[] keybindButtons;
 	public ConfigToggles ctInvertUpDnLook;
 	public ConfigToggles ctInvertUpDnCyberLook;
@@ -126,16 +126,26 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	private const float deathvidLength = 16.8f;
 	private float vidStartTime;
 
-	public void Initialize()
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Inventory _inventory;
+	[Inject] private MissionTimer _missionTimer;
+	[Inject] private MouseCursor _mouseCursor;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private Music _music;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private DynamicCulling _dynamicCulling;
+
+	private void Awake()
 	{
-		a = this;
 		BackGroundMusic.ignoreListenerPause = true; // Play when paused.
 		ResetPages();
 		dataFound = false;
 		inCutscene = false;
 #if UNITY_ANDROID
 		dataFound = true;
-		Config.SetVolume();
+		_config.SetVolume();
 		GoToFrontPage();
 		CheckAndPlayIntro();
 #else
@@ -149,41 +159,41 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 
 	// Improve menu performance.
 	void DisableCameraDuringMenu() {
-		if (MouseLookScript.a == null) return;
+		if (_mouseLookScript == null) return;
 
-		MouseLookScript.a.playerCamera.enabled = false; 
+		_mouseLookScript.playerCamera.enabled = false; 
 	}
 
 	void ReEnableCamera() {
-		if (MouseLookScript.a == null) return;
+		if (_mouseLookScript == null) return;
 
-		MouseLookScript.a.playerCamera.enabled = true;
+		_mouseLookScript.playerCamera.enabled = true;
 		//UnityEngine.Debug.Log("Camera reenabled");
 	}
 
 	void OnEnable() {
-		if (Inventory.a != null) Inventory.a.HideBioMonitor();
+		if (_inventory != null) _inventory.HideBioMonitor();
 		DisableCameraDuringMenu();
 		if (IntroVideoContainer.activeSelf) {
 			vidFinished = Time.time + vidLength;
 			vidStartTime = Time.time;
 
 			// Setup text.
-			introVideoText1.text = Const.a.stringTable[613];
-			introVideoText2.text = Const.a.stringTable[614];
-			introVideoText3.text = Const.a.stringTable[615];
-			introVideoText4.text = Const.a.stringTable[616];
-			introVideoText5.text = Const.a.stringTable[617];
-			introVideoText6.text = Const.a.stringTable[618];
-			introVideoText7.text = Const.a.stringTable[619];
-			introVideoText8.text = Const.a.stringTable[620];
-			introVideoText9.text = Const.a.stringTable[621];
-			introVideoText10.text = Const.a.stringTable[622];
-			introVideoText11.text = Const.a.stringTable[623];
-			introVideoText12.text = Const.a.stringTable[624];
-			introVideoText13.text = Const.a.stringTable[625];
-			introVideoText14.text = Const.a.stringTable[626];
-			introVideoText15.text = Const.a.stringTable[627];
+			introVideoText1.text = _consts.stringTable[613];
+			introVideoText2.text = _consts.stringTable[614];
+			introVideoText3.text = _consts.stringTable[615];
+			introVideoText4.text = _consts.stringTable[616];
+			introVideoText5.text = _consts.stringTable[617];
+			introVideoText6.text = _consts.stringTable[618];
+			introVideoText7.text = _consts.stringTable[619];
+			introVideoText8.text = _consts.stringTable[620];
+			introVideoText9.text = _consts.stringTable[621];
+			introVideoText10.text = _consts.stringTable[622];
+			introVideoText11.text = _consts.stringTable[623];
+			introVideoText12.text = _consts.stringTable[624];
+			introVideoText13.text = _consts.stringTable[625];
+			introVideoText14.text = _consts.stringTable[626];
+			introVideoText15.text = _consts.stringTable[627];
 			Utils.Activate(introVideoTextGO1);
 			Utils.Deactivate(introVideoTextGO2);
 			Utils.Deactivate(introVideoTextGO3);
@@ -203,7 +213,7 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	}
 
 	void OnDisable() {
-		if (Inventory.a != null) Inventory.a.UnHideBioMonitor();
+		if (_inventory != null) _inventory.UnHideBioMonitor();
 		ReEnableCamera();
 	}
 	
@@ -220,7 +230,7 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 			IntroVideo.SetActive(false);
 			ClearVideoRT();
 			IntroVideoContainer.SetActive(false);
-			BackGroundMusic.clip = Music.a.titleMusic;
+			BackGroundMusic.clip = _music.titleMusic;
 			if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
 		} else {
 			System.IO.File.Create(indn);
@@ -236,7 +246,7 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 			// Go right on into the game, all good here.
 			InitialDisplay.SetActive(false);
 			dataFound = true;
-			Config.SetVolume();
+			_config.SetVolume();
 			GoToFrontPage();
 			CheckAndPlayIntro();
 		} else {
@@ -261,7 +271,7 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		DeathVideo.SetActive(false);
 		DeathVideoContainer.SetActive(false);
 		ClearVideoRT();
-		BackGroundMusic.clip = Music.a.titleMusic;
+		BackGroundMusic.clip = _music.titleMusic;
 		if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
 	}
 
@@ -270,8 +280,8 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		IntroVideo.SetActive(false);
 		ClearVideoRT();
 		IntroVideoContainer.SetActive(false);
-		Const.a.WriteDatForIntroPlayed(false);
-		BackGroundMusic.clip = Music.a.titleMusic;
+		_consts.WriteDatForIntroPlayed(false);
+		BackGroundMusic.clip = _music.titleMusic;
 		if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
 	}
 
@@ -468,14 +478,14 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 				Utils.Deactivate(deathVideoTextGO1);
 				Utils.Deactivate(deathVideoTextGO2);
 				ClearVideoRT();
-				BackGroundMusic.clip = Music.a.titleMusic;
+				BackGroundMusic.clip = _music.titleMusic;
 				if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
 			}
 		} else {
 			if (!BackGroundMusic.isPlaying
 				&& !saltTheFries.activeInHierarchy
 				&& gameObject.activeSelf) {
-				BackGroundMusic.clip = Music.a.titleMusic;
+				BackGroundMusic.clip = _music.titleMusic;
 				if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
 			}
 		}
@@ -484,8 +494,8 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		if ((   (Input.GetKey(KeyCode.LeftAlt) && Input.GetKeyDown(KeyCode.P))
 			 || (Input.GetKeyDown(KeyCode.LeftAlt) && Input.GetKey(KeyCode.P)))
 			&& !CouldNotFindDialogue.activeInHierarchy) {
-			if (string.IsNullOrWhiteSpace(Const.a.playerName)) {
-				Const.a.playerName = "Qmaster";
+			if (string.IsNullOrWhiteSpace(_consts.playerName)) {
+				_consts.playerName = "Qmaster";
 			}
 
 			StartGame(true);
@@ -520,28 +530,28 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void StartGame (bool isNew) {
-		Const.a.difficultyCombat = combat.difficultySetting;
-		Const.a.difficultyMission = mission.difficultySetting;
-		Const.a.difficultyPuzzle = puzzle.difficultySetting;
-		Const.a.difficultyCyber = cyber.difficultySetting;
-		if (Const.a.difficultyMission < 3) {
-			MissionTimer.a.text.text = System.String.Empty;
-			MissionTimer.a.timerTypeText.text = System.String.Empty;
-			MFDManager.a.overallMissionTimerT.SetActive(false);
-			MFDManager.a.overallMissionTimer.SetActive(false);
+		_consts.difficultyCombat = combat.difficultySetting;
+		_consts.difficultyMission = mission.difficultySetting;
+		_consts.difficultyPuzzle = puzzle.difficultySetting;
+		_consts.difficultyCyber = cyber.difficultySetting;
+		if (_consts.difficultyMission < 3) {
+			_missionTimer.text.text = System.String.Empty;
+			_missionTimer.timerTypeText.text = System.String.Empty;
+			_mfdManager.overallMissionTimerT.SetActive(false);
+			_mfdManager.overallMissionTimer.SetActive(false);
 		} else {
-			MFDManager.a.overallMissionTimerT.SetActive(true);
-			MFDManager.a.overallMissionTimer.SetActive(true);
+			_mfdManager.overallMissionTimerT.SetActive(true);
+			_mfdManager.overallMissionTimer.SetActive(true);
 		}
 		
 		if (isNew) {
 			string pname = newgamePage.GetComponentInChildren<InputField>(true).text;
 			if (string.IsNullOrWhiteSpace(pname)) pname = "Hacker";
-			Const.a.playerName = pname;
-			Const.a.NewGame();
+			_consts.playerName = pname;
+			_consts.NewGame();
 		}
 
-		MouseCursor.a.mainCamera.enabled = true;
+		_mouseCursor.mainCamera.enabled = true;
 		this.gameObject.SetActive(false);
 	}
 
@@ -622,17 +632,17 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 
 	void UpdateConfigTabTextColor() {
 		if (GraphicsTab.activeInHierarchy) {
-			GraphicsTabButtonText.color = Const.a.ssYellowText;
-			InputTabButtonText.color = Const.a.ssGreenText;
-			AudioTabButtonText.color = Const.a.ssGreenText;
+			GraphicsTabButtonText.color = _consts.ssYellowText;
+			InputTabButtonText.color = _consts.ssGreenText;
+			AudioTabButtonText.color = _consts.ssGreenText;
 		} else if (InputTab.activeInHierarchy) {
-			GraphicsTabButtonText.color = Const.a.ssGreenText;
-			InputTabButtonText.color = Const.a.ssYellowText;
-			AudioTabButtonText.color = Const.a.ssGreenText;
+			GraphicsTabButtonText.color = _consts.ssGreenText;
+			InputTabButtonText.color = _consts.ssYellowText;
+			AudioTabButtonText.color = _consts.ssGreenText;
 		} else if (AudioTab.activeInHierarchy) {
-			GraphicsTabButtonText.color = Const.a.ssGreenText;
-			InputTabButtonText.color = Const.a.ssGreenText;
-			AudioTabButtonText.color = Const.a.ssYellowText;
+			GraphicsTabButtonText.color = _consts.ssGreenText;
+			InputTabButtonText.color = _consts.ssGreenText;
+			AudioTabButtonText.color = _consts.ssYellowText;
 		}
 	}
 
@@ -644,18 +654,18 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 // 		configCamera.targetTexture.Release();
 // 		configCamera.targetTexture.width = Screen.width;
 // 		configCamera.targetTexture.height = Screen.height;
-		configCamera.fieldOfView = Const.a.player1CapsuleMainCameragGO.GetComponent<Camera>().fieldOfView;
+		configCamera.fieldOfView = _consts.player1CapsuleMainCameragGO.GetComponent<Camera>().fieldOfView;
 		Grayscale gsc = configCamera.gameObject.GetComponent<Grayscale>();
-		Grayscale gscMain = Const.a.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<Grayscale>();
+		Grayscale gscMain = _consts.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<Grayscale>();
 		if (gsc != null && gscMain != null) gsc.enabled = gscMain.enabled;
 		
 		UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion sao = configCamera.gameObject.GetComponent<UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion>();
-		if (sao != null) sao.enabled = Const.a.GraphicsSSAO;
+		if (sao != null) sao.enabled = _consts.GraphicsSSAO;
 		SEGI sega = configCamera.gameObject.GetComponent<SEGI>();
-		DynamicCulling.a.CullCore();
-		if (sega != null) sega.enabled = Const.a.GraphicsSEGI;
+		_dynamicCulling.CullCore();
+		if (sega != null) sega.enabled = _consts.GraphicsSEGI;
 		configCamera.Render();
-// 		if (Const.a.GraphicsSEGI) {
+// 		if (_consts.GraphicsSEGI) {
 // 			yield return null;
 // 			configCamera.Render();
 // 		}
@@ -736,18 +746,18 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void SaveGame(int index,string savename) {
-		Const.a.StartSave(index,savename);
-		Const.sprint(Const.a.stringTable[28] + index.ToString() + "!",Const.a.player1);
-		PauseScript.a.EnablePauseUI();
-		MouseCursor.a.mainCamera.enabled = true;
+		_consts.StartSave(index,savename);
+		_consts.sprint(_consts.stringTable[28] + index.ToString() + "!",_consts.Player);
+		_pauseScript.EnablePauseUI();
+		_mouseCursor.mainCamera.enabled = true;
 		this.gameObject.SetActive(false);
 	}
 
 	public void LoadGame(int index) {
 		if (loadButtonText[index].text == "- unused -"
 			|| loadButtonText[index].text == "- unused quicksave -") {
-			Const.sprint(Const.a.stringTable[1022]); // "No data to load."
-		} else Const.a.Load(index,false);
+			_consts.sprint(_consts.stringTable[1022]); // "No data to load."
+		} else _consts.Load(index,false);
 	}
 
 	public void GoBack () {
@@ -762,7 +772,7 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		}
 
 		if (returnToPause) {
-			PauseScript.a.ExitSaveDialog();
+			_pauseScript.ExitSaveDialog();
 			ResetPages();
 			returnToPause = false;
 			this.gameObject.SetActive(false);
@@ -783,7 +793,7 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		// Go Back to singlepayer page
 		if (currentPage == Pages.np || currentPage == Pages.lp || currentPage == Pages.cd) {
 			if (currentPage == Pages.cd) {
-				BackGroundMusic.clip = Music.a.titleMusic;
+				BackGroundMusic.clip = _music.titleMusic;
 				if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
 			}
 			GoToSingleplayerSubmenu();
@@ -836,7 +846,7 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		if (dataFound) {
 			SuccessBanner.SetActive(true);
 			CouldNotFindDialogue.SetActive(false);
-			Config.SetVolume();
+			_config.SetVolume();
 			yield return new WaitForSeconds(0.5f);
 
 			GoToFrontPage();
@@ -854,7 +864,7 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	public void CloseDataFileNotification() {
 		// Close data file notification without finding sound files CITALOG.RES and CITBARK.RES from data path
 		CouldNotFindDialogue.SetActive(false);
-		Config.SetVolume(); // probably not needed here, but just in case
+		_config.SetVolume(); // probably not needed here, but just in case
 		GoToFrontPage();
 		CheckAndPlayIntro();
 	}
@@ -864,19 +874,19 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		DeathVideo.SetActive(true);
 		deathPlayer.Play();
 		deathPlayer.SetDirectAudioMute(0,true);
-		deathVideoText1.text = Const.a.stringTable[628];
-		deathVideoText2.text = Const.a.stringTable[629];
+		deathVideoText1.text = _consts.stringTable[628];
+		deathVideoText2.text = _consts.stringTable[629];
 		Utils.Activate(deathVideoTextGO1);
 		Utils.Deactivate(deathVideoTextGO2);
 		gameObject.SetActive(true);
-		BackGroundMusic.clip = Music.a.levelMusicDeath;
+		BackGroundMusic.clip = _music.levelMusicDeath;
 		if (dataFound) BackGroundMusic.Play();
 		vidFinished = Time.time + deathvidLength;
 		vidStartTime = Time.time;
 	}
 
 	public void PlayIntro() {
-		Const.a.WriteDatForIntroPlayed(false);
+		_consts.WriteDatForIntroPlayed(false);
 		IntroVideoContainer.SetActive(true);
 		IntroVideo.SetActive(true);
 		introPlayer.Play();
@@ -889,21 +899,21 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		vidStartTime = Time.time;
 
 		// Setup text.
-		introVideoText1.text = Const.a.stringTable[613];
-		introVideoText2.text = Const.a.stringTable[614];
-		introVideoText3.text = Const.a.stringTable[615];
-		introVideoText4.text = Const.a.stringTable[616];
-		introVideoText5.text = Const.a.stringTable[617];
-		introVideoText6.text = Const.a.stringTable[618];
-		introVideoText7.text = Const.a.stringTable[619];
-		introVideoText8.text = Const.a.stringTable[620];
-		introVideoText9.text = Const.a.stringTable[621];
-		introVideoText10.text = Const.a.stringTable[622];
-		introVideoText11.text = Const.a.stringTable[623];
-		introVideoText12.text = Const.a.stringTable[624];
-		introVideoText13.text = Const.a.stringTable[625];
-		introVideoText14.text = Const.a.stringTable[626];
-		introVideoText15.text = Const.a.stringTable[627];
+		introVideoText1.text = _consts.stringTable[613];
+		introVideoText2.text = _consts.stringTable[614];
+		introVideoText3.text = _consts.stringTable[615];
+		introVideoText4.text = _consts.stringTable[616];
+		introVideoText5.text = _consts.stringTable[617];
+		introVideoText6.text = _consts.stringTable[618];
+		introVideoText7.text = _consts.stringTable[619];
+		introVideoText8.text = _consts.stringTable[620];
+		introVideoText9.text = _consts.stringTable[621];
+		introVideoText10.text = _consts.stringTable[622];
+		introVideoText11.text = _consts.stringTable[623];
+		introVideoText12.text = _consts.stringTable[624];
+		introVideoText13.text = _consts.stringTable[625];
+		introVideoText14.text = _consts.stringTable[626];
+		introVideoText15.text = _consts.stringTable[627];
 		Utils.Activate(introVideoTextGO1);
 		Utils.Deactivate(introVideoTextGO2);
 		Utils.Deactivate(introVideoTextGO3);
@@ -925,10 +935,10 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		ResetPages();
 		creditsPage.SetActive(true);
 		currentPage = Pages.cd;
-		if (Const.a.DynamicMusic) {
-			BackGroundMusic.clip = Music.a.creditsMusic;
+		if (_consts.DynamicMusic) {
+			BackGroundMusic.clip = _music.creditsMusic;
 		} else {
-			BackGroundMusic.clip = Music.a.levelMusicLooped;
+			BackGroundMusic.clip = _music.levelMusicLooped;
 		}
 
 		if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
@@ -937,8 +947,8 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	public void SetConfigPreset(int index) {
 		presetQuestionValue = index;
 
-		if (presetQuestionValue == 1)  presetQuestionText.text = Const.a.stringTable[924]; // CHANGE ALL KEYS TO LEGACY PRESET?
-		else presetQuestionText.text = Const.a.stringTable[923]; // RESET ALL KEYS TO DEFAULT?
+		if (presetQuestionValue == 1)  presetQuestionText.text = _consts.stringTable[924]; // CHANGE ALL KEYS TO LEGACY PRESET?
+		else presetQuestionText.text = _consts.stringTable[923]; // RESET ALL KEYS TO DEFAULT?
 
 		PresetConfirmDialog.SetActive(true);
 	}
@@ -951,98 +961,98 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 	public void ApplyPreset() {
 		switch (presetQuestionValue) {
 			case 0: // Default
-				Const.a.InputCodeSettings[0] = 22; // Forward = w
-				Const.a.InputCodeSettings[1] = 0; // Strafe Left = a
-				Const.a.InputCodeSettings[2] = 18; // Backpedal = s
-				Const.a.InputCodeSettings[3] = 3; // Strafe Right = d
-				Const.a.InputCodeSettings[4] = 87; // Jump = space
-				Const.a.InputCodeSettings[5] = 2; // Crouch = c
-				Const.a.InputCodeSettings[6] = 23; // Prone = x
-				Const.a.InputCodeSettings[7] = 16; // Lean Left = q
-				Const.a.InputCodeSettings[8] = 4; // Lean Right = e
-				Const.a.InputCodeSettings[9] = 46; // Sprint = left shift
-				Const.a.InputCodeSettings[10] = 139; // Toggle Sprint = capslock
-				Const.a.InputCodeSettings[11] = 38; // Turn Left = left
-				Const.a.InputCodeSettings[12] = 39; // Turn Right = right
-				Const.a.InputCodeSettings[13] = 36; // Look Up = up
-				Const.a.InputCodeSettings[14] = 37; // Look Down = down
-				Const.a.InputCodeSettings[15] = 20; // Recent Log = u
-				Const.a.InputCodeSettings[16] = 26; // Biomonitor = 1
-				Const.a.InputCodeSettings[17] = 27; // Sensaround = 2
-				Const.a.InputCodeSettings[18] = 28; // Lantern = 3
-				Const.a.InputCodeSettings[19] = 29; // Shield = 4
-				Const.a.InputCodeSettings[20] = 30; // Infrared = 5
-				Const.a.InputCodeSettings[21] = 31; // Email = 6
-				Const.a.InputCodeSettings[22] = 32; // Booster = 7
-				Const.a.InputCodeSettings[23] = 33; // Jumpjets = 8
-				Const.a.InputCodeSettings[24] = 53; // Attack = mouse 0
-				Const.a.InputCodeSettings[25] = 54; // Use = mouse 1
-				Const.a.InputCodeSettings[26] = 86; // Menu/Back = escape
-				Const.a.InputCodeSettings[27] = 84; // Toggle Mode = tab
-				Const.a.InputCodeSettings[28] = 17; // Reload = r
-				Const.a.InputCodeSettings[29] = 153; // Weapon + = mwheel up
-				Const.a.InputCodeSettings[30] = 154; // Weapon - = mwheel dn
-				Const.a.InputCodeSettings[31] = 6; // Grenade = g
-				Const.a.InputCodeSettings[32] = 19; // Grenade + = t
-				Const.a.InputCodeSettings[33] = 1; // Grenade - = b
-				Const.a.InputCodeSettings[34] = 21; // Ammo Type = v
-				Const.a.InputCodeSettings[35] = 109; // Unused
-				Const.a.InputCodeSettings[36] = 9; // Patch Use = j
-				Const.a.InputCodeSettings[37] = 8; // Patch + = i
-				Const.a.InputCodeSettings[38] = 133; // Patch - = ,
-				Const.a.InputCodeSettings[39] = 12; // Full Map = m
-				Const.a.NoShootMode = false;
-				Const.a.InputQuickReloadWeapons = true;
-				Const.a.InputQuickItemPickup = false;
+				_consts.InputCodeSettings[0] = 22; // Forward = w
+				_consts.InputCodeSettings[1] = 0; // Strafe Left = a
+				_consts.InputCodeSettings[2] = 18; // Backpedal = s
+				_consts.InputCodeSettings[3] = 3; // Strafe Right = d
+				_consts.InputCodeSettings[4] = 87; // Jump = space
+				_consts.InputCodeSettings[5] = 2; // Crouch = c
+				_consts.InputCodeSettings[6] = 23; // Prone = x
+				_consts.InputCodeSettings[7] = 16; // Lean Left = q
+				_consts.InputCodeSettings[8] = 4; // Lean Right = e
+				_consts.InputCodeSettings[9] = 46; // Sprint = left shift
+				_consts.InputCodeSettings[10] = 139; // Toggle Sprint = capslock
+				_consts.InputCodeSettings[11] = 38; // Turn Left = left
+				_consts.InputCodeSettings[12] = 39; // Turn Right = right
+				_consts.InputCodeSettings[13] = 36; // Look Up = up
+				_consts.InputCodeSettings[14] = 37; // Look Down = down
+				_consts.InputCodeSettings[15] = 20; // Recent Log = u
+				_consts.InputCodeSettings[16] = 26; // Biomonitor = 1
+				_consts.InputCodeSettings[17] = 27; // Sensaround = 2
+				_consts.InputCodeSettings[18] = 28; // Lantern = 3
+				_consts.InputCodeSettings[19] = 29; // Shield = 4
+				_consts.InputCodeSettings[20] = 30; // Infrared = 5
+				_consts.InputCodeSettings[21] = 31; // Email = 6
+				_consts.InputCodeSettings[22] = 32; // Booster = 7
+				_consts.InputCodeSettings[23] = 33; // Jumpjets = 8
+				_consts.InputCodeSettings[24] = 53; // Attack = mouse 0
+				_consts.InputCodeSettings[25] = 54; // Use = mouse 1
+				_consts.InputCodeSettings[26] = 86; // Menu/Back = escape
+				_consts.InputCodeSettings[27] = 84; // Toggle Mode = tab
+				_consts.InputCodeSettings[28] = 17; // Reload = r
+				_consts.InputCodeSettings[29] = 153; // Weapon + = mwheel up
+				_consts.InputCodeSettings[30] = 154; // Weapon - = mwheel dn
+				_consts.InputCodeSettings[31] = 6; // Grenade = g
+				_consts.InputCodeSettings[32] = 19; // Grenade + = t
+				_consts.InputCodeSettings[33] = 1; // Grenade - = b
+				_consts.InputCodeSettings[34] = 21; // Ammo Type = v
+				_consts.InputCodeSettings[35] = 109; // Unused
+				_consts.InputCodeSettings[36] = 9; // Patch Use = j
+				_consts.InputCodeSettings[37] = 8; // Patch + = i
+				_consts.InputCodeSettings[38] = 133; // Patch - = ,
+				_consts.InputCodeSettings[39] = 12; // Full Map = m
+				_consts.NoShootMode = false;
+				_consts.InputQuickReloadWeapons = true;
+				_consts.InputQuickItemPickup = false;
 				break;
 			case 1: // Legacy SS1
-				Const.a.InputCodeSettings[0] = 18; // Forward = s
-				Const.a.InputCodeSettings[1] = 25; // Strafe Left = z
-				Const.a.InputCodeSettings[2] = 23; // Backpedal = x
-				Const.a.InputCodeSettings[3] = 2; // Strafe Right = c
-				Const.a.InputCodeSettings[4] = 87; // Jump = space
-				Const.a.InputCodeSettings[5] = 6; // Crouch = g
-				Const.a.InputCodeSettings[6] = 1; // Prone = b
-				Const.a.InputCodeSettings[7] = 16; // Lean Left = q
-				Const.a.InputCodeSettings[8] = 4; // Lean Right = e
-				Const.a.InputCodeSettings[9] = 46; // Sprint = left shift
-				Const.a.InputCodeSettings[10] = 139; // Toggle Sprint = capslock
-				Const.a.InputCodeSettings[11] = 0; // Turn Left = a
-				Const.a.InputCodeSettings[12] = 3; // Turn Right = d
-				Const.a.InputCodeSettings[13] = 17; // Look Up = r
-				Const.a.InputCodeSettings[14] = 21; // Look Down = v
-				Const.a.InputCodeSettings[15] = 20; // Recent Log = p
-				Const.a.InputCodeSettings[16] = 26; // Biomonitor = 1
-				Const.a.InputCodeSettings[17] = 28; // Sensaround = 3
-				Const.a.InputCodeSettings[18] = 29; // Lantern = 4
-				Const.a.InputCodeSettings[19] = 30; // Shield = 5
-				Const.a.InputCodeSettings[20] = 31; // Infrared = 6
-				Const.a.InputCodeSettings[21] = 33; // Email = 8
-				Const.a.InputCodeSettings[22] = 34; // Booster = 9
-				Const.a.InputCodeSettings[23] = 35; // Jumpjets = 0
-				Const.a.InputCodeSettings[24] = 54; // Use = mouse 1
-				Const.a.InputCodeSettings[25] = 53; // Attack = mouse 0
-				Const.a.InputCodeSettings[26] = 86; // Menu/Back = escape
-				Const.a.InputCodeSettings[27] = 84; // Toggle Mode = tab
-				Const.a.InputCodeSettings[28] = 19; // Reload = t
-				Const.a.InputCodeSettings[29] = 153; // Weapon + = mwheel up
-				Const.a.InputCodeSettings[30] = 154; // Weapon - = mwheel dn
-				Const.a.InputCodeSettings[31] = 7; // Grenade = h
-				Const.a.InputCodeSettings[32] = 24; // Grenade + = y
-				Const.a.InputCodeSettings[33] = 13; // Grenade - = n
-				Const.a.InputCodeSettings[34] = 10; // Ammo Type = k
-				Const.a.InputCodeSettings[35] = 109; // Unused
-				Const.a.InputCodeSettings[36] = 9; // Patch Use = j
-				Const.a.InputCodeSettings[37] = 8; // Patch + = i
-				Const.a.InputCodeSettings[38] = 133; // Patch - = ,
-				Const.a.InputCodeSettings[39] = 12; // Full Map = m
-				Const.a.NoShootMode = true;
-				Const.a.InputQuickReloadWeapons = false;
-				Const.a.InputQuickItemPickup = false;
+				_consts.InputCodeSettings[0] = 18; // Forward = s
+				_consts.InputCodeSettings[1] = 25; // Strafe Left = z
+				_consts.InputCodeSettings[2] = 23; // Backpedal = x
+				_consts.InputCodeSettings[3] = 2; // Strafe Right = c
+				_consts.InputCodeSettings[4] = 87; // Jump = space
+				_consts.InputCodeSettings[5] = 6; // Crouch = g
+				_consts.InputCodeSettings[6] = 1; // Prone = b
+				_consts.InputCodeSettings[7] = 16; // Lean Left = q
+				_consts.InputCodeSettings[8] = 4; // Lean Right = e
+				_consts.InputCodeSettings[9] = 46; // Sprint = left shift
+				_consts.InputCodeSettings[10] = 139; // Toggle Sprint = capslock
+				_consts.InputCodeSettings[11] = 0; // Turn Left = a
+				_consts.InputCodeSettings[12] = 3; // Turn Right = d
+				_consts.InputCodeSettings[13] = 17; // Look Up = r
+				_consts.InputCodeSettings[14] = 21; // Look Down = v
+				_consts.InputCodeSettings[15] = 20; // Recent Log = p
+				_consts.InputCodeSettings[16] = 26; // Biomonitor = 1
+				_consts.InputCodeSettings[17] = 28; // Sensaround = 3
+				_consts.InputCodeSettings[18] = 29; // Lantern = 4
+				_consts.InputCodeSettings[19] = 30; // Shield = 5
+				_consts.InputCodeSettings[20] = 31; // Infrared = 6
+				_consts.InputCodeSettings[21] = 33; // Email = 8
+				_consts.InputCodeSettings[22] = 34; // Booster = 9
+				_consts.InputCodeSettings[23] = 35; // Jumpjets = 0
+				_consts.InputCodeSettings[24] = 54; // Use = mouse 1
+				_consts.InputCodeSettings[25] = 53; // Attack = mouse 0
+				_consts.InputCodeSettings[26] = 86; // Menu/Back = escape
+				_consts.InputCodeSettings[27] = 84; // Toggle Mode = tab
+				_consts.InputCodeSettings[28] = 19; // Reload = t
+				_consts.InputCodeSettings[29] = 153; // Weapon + = mwheel up
+				_consts.InputCodeSettings[30] = 154; // Weapon - = mwheel dn
+				_consts.InputCodeSettings[31] = 7; // Grenade = h
+				_consts.InputCodeSettings[32] = 24; // Grenade + = y
+				_consts.InputCodeSettings[33] = 13; // Grenade - = n
+				_consts.InputCodeSettings[34] = 10; // Ammo Type = k
+				_consts.InputCodeSettings[35] = 109; // Unused
+				_consts.InputCodeSettings[36] = 9; // Patch Use = j
+				_consts.InputCodeSettings[37] = 8; // Patch + = i
+				_consts.InputCodeSettings[38] = 133; // Patch - = ,
+				_consts.InputCodeSettings[39] = 12; // Full Map = m
+				_consts.NoShootMode = true;
+				_consts.InputQuickReloadWeapons = false;
+				_consts.InputQuickItemPickup = false;
 				break;
 		}
 		presetQuestionValue = -1;	
-		Config.WriteConfig(); // Save config.  Always set to autosave.
+		_config.WriteConfig(); // Save config.  Always set to autosave.
 		for (int i=0;i<keybindButtons.Length;i++) {
 			keybindButtons[i].UpdateText();
 		}
@@ -1062,14 +1072,14 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 
 	IEnumerator quitFunction () { // Handle exiting from menu option
 		BackGroundMusic.Stop();
-		Const.a.WriteDatForIntroPlayed(false);
+		_consts.WriteDatForIntroPlayed(false);
 		saltTheFries.SetActive(true);
 		yield return new WaitForSeconds(0.75f);
 		#if UNITY_EDITOR
 			UnityEditor.EditorApplication.isPlaying = false;
 		#endif
 			
-		Config.SaveConfigToPlayerPrefs();
+		_config.SaveConfigToPlayerPrefs();
 		Application.Quit();
 	}
 	
@@ -1077,8 +1087,8 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		#if UNITY_EDITOR
 			UnityEditor.EditorApplication.isPlaying = false;
 		#endif
-		Const.a.WriteDatForIntroPlayed(false);
-		Config.SaveConfigToPlayerPrefs();
+		_consts.WriteDatForIntroPlayed(false);
+		_config.SaveConfigToPlayerPrefs();
 		Utils.CopyLogFiles(false);
 	}
 	
@@ -1181,6 +1191,5 @@ public class MainMenuHandler : MonoBehaviour, ISingletonInitializer {
 		ssrApply = null;
 		audModeApply = null;
 		mdlDetApply = null;
-		if (a == this) a = null;
 	}
 }

@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ConfigurationMenuAAApply : MonoBehaviour {
 	private Dropdown aaPicker;
 
-	void Start() { // Wait for Const.a. to initialize.
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+	
+	void Start() { // Wait for _consts. to initialize.
 		Initialize();
 	}
 
@@ -15,19 +19,18 @@ public class ConfigurationMenuAAApply : MonoBehaviour {
 	}
 	
 	public void SetOptionsText() {
-		if (Const.a == null) return;
-		if (!Const.a.stringTableLoaded) return;
+		if (!_consts.stringTableLoaded) return;
 		if (aaPicker == null) return;
 
 		List<string> aaList = new List<string>();
 		for (int i=0;i<6;i++) {
 			switch(i) {
-				case 0: aaList.Add(Const.a.stringTable[779]); break;
-				case 1: aaList.Add(Const.a.stringTable[780]); break;
-				case 2: aaList.Add(Const.a.stringTable[781]); break;
-				case 3: aaList.Add(Const.a.stringTable[782]); break;
-				case 4: aaList.Add(Const.a.stringTable[783]); break;
-				case 5: aaList.Add(Const.a.stringTable[784]); break;
+				case 0: aaList.Add(_consts.stringTable[779]); break;
+				case 1: aaList.Add(_consts.stringTable[780]); break;
+				case 2: aaList.Add(_consts.stringTable[781]); break;
+				case 3: aaList.Add(_consts.stringTable[782]); break;
+				case 4: aaList.Add(_consts.stringTable[783]); break;
+				case 5: aaList.Add(_consts.stringTable[784]); break;
 			}
 		}
 		aaPicker.ClearOptions();
@@ -42,18 +45,18 @@ public class ConfigurationMenuAAApply : MonoBehaviour {
 		}
 		
 		SetOptionsText();
-		if (aaPicker.value != Const.a.GraphicsAAMode) {
-			aaPicker.value = Const.a.GraphicsAAMode;
+		if (aaPicker.value != _consts.GraphicsAAMode) {
+			aaPicker.value = _consts.GraphicsAAMode;
 		}
 	}
 
 	public void OnDropdownSelect () {
 		if (aaPicker != null)
-			Const.a.GraphicsAAMode = aaPicker.value;
+			_consts.GraphicsAAMode = aaPicker.value;
 		else
-			Const.a.GraphicsAAMode = 1; // Default to FXAA Extreme Performance
+			_consts.GraphicsAAMode = 1; // Default to FXAA Extreme Performance
 
-		Config.WriteConfig();
-		Config.SetAA();
+		_config.WriteConfig();
+		_config.SetAA();
 	}
 }

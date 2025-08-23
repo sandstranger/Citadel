@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ConfigurationMenuAudioModeApply : MonoBehaviour {
 	private Dropdown picker;
 
-	void Start() { // Wait for Const.a. to initialize.
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+
+	void Start() { // Wait for _consts. to initialize.
 		Initialize();
 	}
 
@@ -15,20 +19,20 @@ public class ConfigurationMenuAudioModeApply : MonoBehaviour {
 	}
 	
 	public void SetOptionsText() {
-		if (Const.a == null) return;
-		if (!Const.a.stringTableLoaded) return;
+		if (_consts == null) return;
+		if (!_consts.stringTableLoaded) return;
 		if (picker == null) return;
 
 		List<string> ssrList = new List<string>();
 		for (int i=0;i<7;i++) {
 			switch(i) {
-				case 0: ssrList.Add(Const.a.stringTable[795]); break;
-				case 1: ssrList.Add(Const.a.stringTable[796]); break;
-				case 2: ssrList.Add(Const.a.stringTable[797]); break;
-				case 3: ssrList.Add(Const.a.stringTable[798]); break;
-				case 4: ssrList.Add(Const.a.stringTable[799]); break;
-				case 5: ssrList.Add(Const.a.stringTable[800]); break;
-				case 6: ssrList.Add(Const.a.stringTable[801]); break;
+				case 0: ssrList.Add(_consts.stringTable[795]); break;
+				case 1: ssrList.Add(_consts.stringTable[796]); break;
+				case 2: ssrList.Add(_consts.stringTable[797]); break;
+				case 3: ssrList.Add(_consts.stringTable[798]); break;
+				case 4: ssrList.Add(_consts.stringTable[799]); break;
+				case 5: ssrList.Add(_consts.stringTable[800]); break;
+				case 6: ssrList.Add(_consts.stringTable[801]); break;
 			}
 		}
 		picker.ClearOptions();
@@ -43,16 +47,16 @@ public class ConfigurationMenuAudioModeApply : MonoBehaviour {
 		}
 
 		SetOptionsText();
-		if (picker.value != Const.a.AudioSpeakerMode) {
-			picker.value = Const.a.AudioSpeakerMode;
+		if (picker.value != _consts.AudioSpeakerMode) {
+			picker.value = _consts.AudioSpeakerMode;
 		}
 	}
 
 	public void OnDropdownSelect () {
-		if (picker != null) Const.a.AudioSpeakerMode = picker.value;
-		else Const.a.AudioSpeakerMode = 1; // Default to Stereo
+		if (picker != null) _consts.AudioSpeakerMode = picker.value;
+		else _consts.AudioSpeakerMode = 1; // Default to Stereo
 
-		Config.WriteConfig();
-		Config.SetAudioMode();
+		_config.WriteConfig();
+		_config.SetAudioMode();
 	}
 }

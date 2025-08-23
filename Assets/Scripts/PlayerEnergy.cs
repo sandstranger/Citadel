@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class PlayerEnergy : MonoBehaviour {
 	// External references
@@ -16,32 +17,34 @@ public class PlayerEnergy : MonoBehaviour {
 	[HideInInspector] public float maxenergy = 255f;
 	[HideInInspector] public int drainJPM = 0;
 	private string jpm = " J/min";
-	private static StringBuilder s1 = new StringBuilder();
+	
+	private static StringBuilder s1 = new StringBuilder(100 * 1024);
 
-	public static PlayerEnergy a;
+	[Inject] private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private Inventory _inventory;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private WeaponFire _weaponFire;
+	[Inject] private WeaponCurrent _weaponCurrent;
 
-	public void Awake() {
-		a = this;
-	}
-
-    public void Start() {
+	public void Start() {
 		tempF = 0;
 		drainJPM = 0;
 		energy = 54f; //max is 255 
-		tickFinished = PauseScript.a.relativeTime + tick + Random.value; // random offset seed to prevent ticks lining up and causing frame hiccups
+		tickFinished = _pauseScript.relativeTime + tick + Random.value; // random offset seed to prevent ticks lining up and causing frame hiccups
     }
     
     void TargetIdentifierSenseTargets() {
 		// Automatically lock onto nearby targets.
-		if (LevelManager.a.npcsm[LevelManager.currentLevel] == null) return;
+		if (_levelManager.npcsm[LevelManager.currentLevel] == null) return;
 		
 		// Very specific variable names are good right ;)
 		int lev = LevelManager.currentLevel;
-		int numNPCs = LevelManager.a.npcsm[lev].childrenNPCsAICs.Length;
+		int numNPCs = _levelManager.npcsm[lev].childrenNPCsAICs.Length;
 		if (numNPCs <= 0) return;
 		
 		for (int i=0;i<numNPCs;i++) {
-			AIController aic = LevelManager.a.npcsm[lev].childrenNPCsAICs[i];
+			AIController aic = _levelManager.npcsm[lev].childrenNPCsAICs[i];
 			if (aic == null) continue;
 			if (aic.healthManager == null) continue;
             if (!aic.gameObject.activeInHierarchy) continue;
@@ -51,17 +54,17 @@ public class PlayerEnergy : MonoBehaviour {
 			// if NPC is in range....
 			float far = Vector3.Distance(aic.transform.position,
 			                             transform.position);
-			if (far > TargetID.GetTargetIDSensingRange(false)) continue;
+			if (far > TargetID.GetTargetIDSensingRange(_inventory,false)) continue;
 			
-			WeaponFire.a.CreateTargetIDInstance(-1f,aic.healthManager,-1f);
+			_weaponFire.CreateTargetIDInstance(-1f,aic.healthManager,-1f);
 		}
     }
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			tempF = 1f;
 			bool activeEnergyDrainers = false;
-			if (tickFinished < PauseScript.a.relativeTime) {
+			if (tickFinished < _pauseScript.relativeTime) {
 				drainJPM = 0;
 				// 0 System Analyzer doesn't take energy
 
@@ -70,8 +73,8 @@ public class PlayerEnergy : MonoBehaviour {
 				// 2 = Datareader doesn't take energy
 
 				// 3 Drain sensaround
-				if (Inventory.a.hardwareIsActive[3]) {
-					switch (Inventory.a.hardwareVersion[3]) {
+				if (_inventory.hardwareIsActive[3]) {
+					switch (_inventory.hardwareVersion[3]) {
 						case 0: tempF = 0.01535f; drainJPM += 9; break; // takes about 300s to drain full energy
 						case 1: tempF = 0.03413f; drainJPM += 20; break; // takes about 300s to drain full energy
 						case 2: tempF = 0.02559f; drainJPM += 15; break; // takes about 240s to drain full energy
@@ -81,13 +84,13 @@ public class PlayerEnergy : MonoBehaviour {
 				}
 
 				// 4 = Target Identifier doesn't take energy
-				if (Inventory.a.hasHardware[4]) {
+				if (_inventory.hasHardware[4]) {
 				    TargetIdentifierSenseTargets();
 				}
 
 				// 5 = Energy Shield - handled by HealthManager
-				if (Inventory.a.hardwareIsActive[5]) {
-					switch (Inventory.a.hardwareVersionSetting[5]) {
+				if (_inventory.hardwareIsActive[5]) {
+					switch (_inventory.hardwareVersionSetting[5]) {
 						case 0: tempF = 0.04096f; drainJPM += 24; break;
 						case 1: tempF = 0.10239f; drainJPM += 60; break;
 						case 2: tempF = 0.17919f; drainJPM += 105; break;
@@ -98,8 +101,8 @@ public class PlayerEnergy : MonoBehaviour {
 				}
 
 				// 6 = Biomonitor
-				if (Inventory.a.hardwareIsActive[6]) {
-					switch (Inventory.a.hardwareVersionSetting[6]) {
+				if (_inventory.hardwareIsActive[6]) {
+					switch (_inventory.hardwareVersionSetting[6]) {
 						case 0: tempF = 0.001706f; drainJPM += 1;  activeEnergyDrainers = true; break;
 						case 1: tempF = 0; break; // doesn't take energy
 					}
@@ -107,8 +110,8 @@ public class PlayerEnergy : MonoBehaviour {
 				}
 
 				// 7 = Head Mounted Lantern
-				if (Inventory.a.hardwareIsActive[7]) {
-					switch (Inventory.a.hardwareVersionSetting[7]) {
+				if (_inventory.hardwareIsActive[7]) {
+					switch (_inventory.hardwareVersionSetting[7]) {
 						case 0: tempF = 0.02559f; drainJPM += 15; break;// takes about 180s to drain full energy
 						case 1: tempF = 0.04266f; drainJPM += 25; break; // takes about 120s to drain full energy
 						case 2: tempF = 0.05119f; drainJPM += 30; break; // takes about 90s to drain full energy
@@ -120,8 +123,8 @@ public class PlayerEnergy : MonoBehaviour {
 				// 8 Envirosuit - handled by HealthManager for radiation checks
 
 				// 9 = Turbo Motion Booster - done in PlayerMovement since we only use energy on boost, no drain with skates
-				if (Inventory.a.hardwareIsActive[9]) {
-					switch (Inventory.a.hardwareVersionSetting[9]) {
+				if (_inventory.hardwareIsActive[9]) {
+					switch (_inventory.hardwareVersionSetting[9]) {
 						case 0: tempF = 0f; break;
 						case 1: tempF = 0.02f; drainJPM += 16; break; // takes about 120s to drain full energy
 						case 2: tempF = 0.015f; drainJPM += 12; break; // takes about 90s to drain full energy
@@ -133,12 +136,12 @@ public class PlayerEnergy : MonoBehaviour {
 				// 10 Jump Jet Boots - done in PlayerMovement since we only drain while jumping
 
 				// 11 Drain nightsight
-				if (Inventory.a.hardwareIsActive [11]) {
+				if (_inventory.hardwareIsActive [11]) {
 					tempF = 0.08533f; drainJPM += 50; // takes about 120s to drain full energy
 					activeEnergyDrainers = true;
 					TakeEnergy(tempF);
 				}
-				tickFinished = PauseScript.a.relativeTime + tick;
+				tickFinished = _pauseScript.relativeTime + tick;
 			}
 
 			// Turn everything off when we are out of energy
@@ -158,25 +161,25 @@ public class PlayerEnergy : MonoBehaviour {
 	}
 
 	void DeactivateHardwareOnEnergyDepleted() {
-		Inventory.a.hardwareIsActive[3] = false;
-		Inventory.a.hardwareButtonManager.SensaroundOff(); //sensaround
-		if (Inventory.a.hardwareIsActive [6] && Inventory.a.hardwareVersionSetting[6] == 0) Inventory.a.hardwareButtonManager.BioOff(); // biomonitor, but only on v1, v2 doesn't use power
-		if (Inventory.a.hardwareIsActive [5]) Inventory.a.hardwareButtonManager.ShieldOffWithEffects(); // shield
-		if (Inventory.a.hardwareIsActive [7]) Inventory.a.hardwareButtonManager.LanternOff(); // lantern
-		if (Inventory.a.hardwareIsActive [9]) Inventory.a.hardwareButtonManager.BoosterOff(); // turbo motion booster
-		if (Inventory.a.hardwareIsActive [11]) Inventory.a.hardwareButtonManager.InfraredOff(); // infrared
+		_inventory.hardwareIsActive[3] = false;
+		_inventory.hardwareButtonManager.SensaroundOff(); //sensaround
+		if (_inventory.hardwareIsActive [6] && _inventory.hardwareVersionSetting[6] == 0) _inventory.hardwareButtonManager.BioOff(); // biomonitor, but only on v1, v2 doesn't use power
+		if (_inventory.hardwareIsActive [5]) _inventory.hardwareButtonManager.ShieldOffWithEffects(); // shield
+		if (_inventory.hardwareIsActive [7]) _inventory.hardwareButtonManager.LanternOff(); // lantern
+		if (_inventory.hardwareIsActive [9]) _inventory.hardwareButtonManager.BoosterOff(); // turbo motion booster
+		if (_inventory.hardwareIsActive [11]) _inventory.hardwareButtonManager.InfraredOff(); // infrared
 	}
 
     public void TakeEnergy(float take) {
 		float was = energy;
 		if (energy == 0) return;
-		if (WeaponCurrent.a.redbull) return; // No energy drain!
+		if (_weaponCurrent.redbull) return; // No energy drain!
 
 		energy -= take;
 		if (energy <= 0f) {
 			energy = 0f;
-			Utils.PlayUIOneShotSavable(84); // energy_gone
-			Const.sprint(314); //Power supply exhausted.
+			Utils.PlayUIOneShotSavable(_consts,84); // energy_gone
+			_consts.sprint(314); //Power supply exhausted.
 			DeactivateHardwareOnEnergyDepleted();
 		}
 	}
@@ -185,10 +188,10 @@ public class PlayerEnergy : MonoBehaviour {
 		energy += give;
 		if (energy > maxenergy) energy = maxenergy;
         if (type == EnergyType.Battery) {
-            Utils.PlayUIOneShotSavable(79); // batteryuse
+            Utils.PlayUIOneShotSavable(_consts,79); // batteryuse
         }
         if (type == EnergyType.ChargeStation) {
-            Utils.PlayUIOneShotSavable(100); // chargingstation
+            Utils.PlayUIOneShotSavable(_consts,100); // chargingstation
         }
     }
 
@@ -197,14 +200,14 @@ public class PlayerEnergy : MonoBehaviour {
 		s1.Clear();
 		s1.Append(Utils.FloatToString(pe.energy,"energy"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pe.tickFinished,"tickFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pe._pauseScript,pe.tickFinished,"tickFinished"));
 		return s1.ToString();
 	}
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		PlayerEnergy pe = go.GetComponent<PlayerEnergy>();
 		pe.energy = Utils.GetFloatFromString(entries[index],"energy"); index++;
-		pe.tickFinished = Utils.LoadRelativeTimeDifferential(entries[index],"tickFinished"); index++;
+		pe.tickFinished = Utils.LoadRelativeTimeDifferential(pe._pauseScript,entries[index],"tickFinished"); index++;
 		return index;
 	}
 }

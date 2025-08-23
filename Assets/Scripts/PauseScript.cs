@@ -8,8 +8,9 @@ using System.Linq;
 using System.IO;
 using Citadel.Game;
 using Citadel.SceneManagement;
+using Zenject;
 
-public class PauseScript : MonoBehaviour, ISingletonInitializer {
+public class PauseScript : MonoBehaviour {
 	public GameObject pauseText;
 	public GameObject[] disableUIOnPause;
 	public GameObject saltTheFries;
@@ -24,17 +25,22 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 	public float relativeTime;
 	public float absoluteTime;
 	private readonly List<AmbientRegistration> _ambientRegistry = new();
+	[Inject] private ConsoleEmulator _consoleEmulator;
+	[Inject] private Const _consts;
+	[Inject] private GetInput _getInput;
+	[Inject] private Inventory _inventory;
+	[Inject] private MainMenuHandler _mainMenuHandler;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PlayerMovement _playerMovement;
+
 	private bool menuActive = true; // Store the state of the main menu
 	                                // gameobject active state so that we don't
 									// have to do a gameobject engine call more
 									// than once on every Update all over the
 									// code.
 
-	public static PauseScript a { get; private set; }
-
-	public void Initialize()
+	private void Awake()
 	{
-		a = this;
 		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
 	}
 
@@ -49,7 +55,7 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 	}
 	
 	// The whole point right here:
-	public bool Paused() { return paused || Const.a.loading; }
+	public bool Paused() { return paused || _consts.loading; }
 	public bool MenuActive() { return menuActive; }
 
 	void Update() {
@@ -58,8 +64,8 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 
 		menuActive = mainMenu.activeSelf;
 		if (!menuActive) {
-			if (!MouseLookScript.a.playerCamera.enabled) MouseLookScript.a.playerCamera.enabled = true;
-			if (GetInput.a.Menu()) {
+			if (!_mouseLookScript.playerCamera.enabled) _mouseLookScript.playerCamera.enabled = true;
+			if (_getInput.Menu()) {
 				if (onSaveDialog)
 					ExitSaveDialog();
 				else
@@ -80,7 +86,7 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void ConsoleEntryEnterDelegate() {
-		ConsoleEmulator.ConsoleEntryEnter();
+		_consoleEmulator.ConsoleEntryEnter();
 	}
 
 	public void RaycastAudioOcclusion() {
@@ -92,10 +98,10 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 			if (_ambientRegistry[i] == null) continue;
 
 			hitCount = Physics.RaycastNonAlloc(
-						MouseLookScript.a.transform.position,
+						_mouseLookScript.transform.position,
 						_ambientRegistry[i].transform.position
-						- MouseLookScript.a.transform.position,
-						results,32f,Const.a.layerMaskPlayerFrob,
+						- _mouseLookScript.transform.position,
+						results,32f,_consts.layerMaskPlayerFrob,
 						QueryTriggerInteraction.UseGlobal);
 
 			_ambientRegistry[i].SFX.volume =
@@ -120,7 +126,7 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 			}
 		}
 
-		Const.a.NPCAudioOcclusion();
+		_consts.NPCAudioOcclusion();
 	}
 
 /*
@@ -139,8 +145,8 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
         for (int i=0;i < ObjectContainmentSystem.ActiveFloorChunks.Count;i++) {
 			go = ObjectContainmentSystem.ActiveFloorChunks[i];
 			flrPos = go.transform.position;
-			for (int k=0;k<Const.a.prb.Count;k++) {
-				pb = Const.a.prb[k];
+			for (int k=0;k<_consts.prb.Count;k++) {
+				pb = _consts.prb[k];
 				if (!pm.gameObject.activeInHierarchy) continue;
 
 				objPos = pb.gameObject.transform.position;
@@ -195,17 +201,17 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 	public void PauseEnable() {
 		AudioListener.pause = true;
 		PauseSystems();
-		previousInvMode = MouseLookScript.a.inventoryMode;
-		if (MouseLookScript.a.inventoryMode == false) {
-			MouseLookScript.a.ToggleInventoryMode();
+		previousInvMode = _mouseLookScript.inventoryMode;
+		if (_mouseLookScript.inventoryMode == false) {
+			_mouseLookScript.ToggleInventoryMode();
 		}
 		
-		if (Inventory.a.vmailbetajet.activeInHierarchy) Inventory.a.vmailbetajetVideo.Pause();
-		if (Inventory.a.vmailbridgesep.activeInHierarchy) Inventory.a.vmailbridgesepVideo.Pause();
-		if (Inventory.a.vmailcitadestruct.activeInHierarchy) Inventory.a.vmailcitadestructVideo.Pause();
-		if (Inventory.a.vmailgenstatus.activeInHierarchy) Inventory.a.vmailgenstatusVideo.Pause();
-		if (Inventory.a.vmaillaserdest.activeInHierarchy) Inventory.a.vmaillaserdestVideo.Pause();
-		if (Inventory.a.vmailshieldsup.activeInHierarchy) Inventory.a.vmailshieldsupVideo.Pause();
+		if (_inventory.vmailbetajet.activeInHierarchy) _inventory.vmailbetajetVideo.Pause();
+		if (_inventory.vmailbridgesep.activeInHierarchy) _inventory.vmailbridgesepVideo.Pause();
+		if (_inventory.vmailcitadestruct.activeInHierarchy) _inventory.vmailcitadestructVideo.Pause();
+		if (_inventory.vmailgenstatus.activeInHierarchy) _inventory.vmailgenstatusVideo.Pause();
+		if (_inventory.vmaillaserdest.activeInHierarchy) _inventory.vmaillaserdestVideo.Pause();
+		if (_inventory.vmailshieldsup.activeInHierarchy) _inventory.vmailshieldsupVideo.Pause();
 		EnablePauseUI();
 		pauseText.SetActive(true);
 	}
@@ -213,17 +219,17 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 	public void PauseDisable() {
 		AudioListener.pause = false;
 		UnpauseSystems();
-		if (previousInvMode != MouseLookScript.a.inventoryMode) {
-			MouseLookScript.a.ToggleInventoryMode();
-			MouseLookScript.a.SetCameraCullDistances();
+		if (previousInvMode != _mouseLookScript.inventoryMode) {
+			_mouseLookScript.ToggleInventoryMode();
+			_mouseLookScript.SetCameraCullDistances();
 		}
 		DisablePauseUI();
-		if (Inventory.a.vmailbetajet.activeInHierarchy) Inventory.a.vmailbetajetVideo.Play();
-		if (Inventory.a.vmailbridgesep.activeInHierarchy) Inventory.a.vmailbridgesepVideo.Play();
-		if (Inventory.a.vmailcitadestruct.activeInHierarchy) Inventory.a.vmailcitadestructVideo.Play();
-		if (Inventory.a.vmailgenstatus.activeInHierarchy) Inventory.a.vmailgenstatusVideo.Play();
-		if (Inventory.a.vmaillaserdest.activeInHierarchy) Inventory.a.vmaillaserdestVideo.Play();
-		if (Inventory.a.vmailshieldsup.activeInHierarchy) Inventory.a.vmailshieldsupVideo.Play();
+		if (_inventory.vmailbetajet.activeInHierarchy) _inventory.vmailbetajetVideo.Play();
+		if (_inventory.vmailbridgesep.activeInHierarchy) _inventory.vmailbridgesepVideo.Play();
+		if (_inventory.vmailcitadestruct.activeInHierarchy) _inventory.vmailcitadestructVideo.Play();
+		if (_inventory.vmailgenstatus.activeInHierarchy) _inventory.vmailgenstatusVideo.Play();
+		if (_inventory.vmaillaserdest.activeInHierarchy) _inventory.vmaillaserdestVideo.Play();
+		if (_inventory.vmailshieldsup.activeInHierarchy) _inventory.vmailshieldsupVideo.Play();
 		pauseText.SetActive(false);
 	}
 
@@ -233,10 +239,10 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 			disableUIOnPause[i].SetActive(false);
 		}
 
-		for (int k=0;k<Const.a.prb.Count;k++) Const.a.prb[k].Pause();
-		for (int k=0;k<Const.a.psys.Count;k++) Const.a.psys[k].Pause();
-		for (int k=0;k<Const.a.panimsList.Count;k++) {
-			Const.a.panimsList[k].Pause();
+		for (int k=0;k<_consts.prb.Count;k++) _consts.prb[k].Pause();
+		for (int k=0;k<_consts.psys.Count;k++) _consts.psys[k].Pause();
+		for (int k=0;k<_consts.panimsList.Count;k++) {
+			_consts.panimsList[k].Pause();
 		}
 
 		PauseAmbients();
@@ -260,39 +266,39 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 			disableUIOnPause[i].SetActive(true);
 		}
 
-		for (int k=0;k<Const.a.prb.Count;k++) {
-			if (Const.a.prb[k] == null) continue;
+		for (int k=0;k<_consts.prb.Count;k++) {
+			if (_consts.prb[k] == null) continue;
 			
-			Const.a.prb[k].UnPause();
+			_consts.prb[k].UnPause();
 		}
 		
-		for (int k=0;k<Const.a.psys.Count;k++) {
-			if (Const.a.psys[k] == null) continue;
+		for (int k=0;k<_consts.psys.Count;k++) {
+			if (_consts.psys[k] == null) continue;
 			
-			Const.a.psys[k].UnPause();
+			_consts.psys[k].UnPause();
 		}
 		
-		for (int k=0;k<Const.a.panimsList.Count;k++) {
-			if (Const.a.panimsList[k] == null) continue;
+		for (int k=0;k<_consts.panimsList.Count;k++) {
+			if (_consts.panimsList[k] == null) continue;
 			
-			Const.a.panimsList[k].UnPause();
+			_consts.panimsList[k].UnPause();
 		}
 
 		UnpauseAmbients();
-		PlayerMovement.a.ConsoleDisable();
+		_playerMovement.ConsoleDisable();
 	}
 
 	public void OpenSaveDialog() {
 		if (onSaveDialog) return;
 
-		if (PlayerMovement.a.inCyberSpace) {
-			Const.sprint(Const.a.stringTable[602]); // Cannot save in cyberspace
+		if (_playerMovement.inCyberSpace) {
+			_consts.sprint(_consts.stringTable[602]); // Cannot save in cyberspace
 			OpenSaveDialogHard();
 			return;
 		}
 
 		DisablePauseUI();
-		if (Const.a.justSavedTimeStamp < Time.time) {
+		if (_consts.justSavedTimeStamp < Time.time) {
 			onSaveDialog = true;
 			saveDialog.SetActive(true);
 		}
@@ -302,7 +308,7 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 		if (onSaveDialog) return;
 
 		DisablePauseUI();
-		if (Const.a.justSavedTimeStamp < Time.time) {
+		if (_consts.justSavedTimeStamp < Time.time) {
 			onSaveDialog = true;
 			hardSaveDialog.SetActive(true);
 		}
@@ -316,8 +322,8 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void SavePause() {
-		if (PlayerMovement.a.inCyberSpace) {
-			Const.sprint(Const.a.stringTable[602]); // Cannot save in cyberspace
+		if (_playerMovement.inCyberSpace) {
+			_consts.sprint(_consts.stringTable[602]); // Cannot save in cyberspace
 			return;
 		}
 		if (onSaveDialog) return;
@@ -325,7 +331,7 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 		DisablePauseUI();
 		saveDialog.SetActive(false); // turn off dialog
 		mainMenu.SetActive(true);
-		MainMenuHandler.a.GoToSaveGameSubmenu(true);
+		_mainMenuHandler.GoToSaveGameSubmenu(true);
 	}
 
 	public void LoadPause() {
@@ -334,27 +340,27 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 		DisablePauseUI();
 		saveDialog.SetActive(false); // turn off dialog
 		mainMenu.SetActive(true);
-		MainMenuHandler.a.GoToLoadGameSubmenu(true);
+		_mainMenuHandler.GoToLoadGameSubmenu(true);
 	}
 
 	public void SavePauseQuit() {
 		DisablePauseUI();
 		saveDialog.SetActive(false); // turn off dialog
 		mainMenu.SetActive(true);
-		MainMenuHandler.a.InitialDisplay.SetActive(false);
-		MainMenuHandler.a.GoToSaveGameSubmenu(true);
+		_mainMenuHandler.InitialDisplay.SetActive(false);
+		_mainMenuHandler.GoToSaveGameSubmenu(true);
 	}
 
 	public void NoSavePauseQuit() {
 		DisablePauseUI();
 		saveDialog.SetActive(false); // turn off dialog
 		mainMenu.SetActive(true);
-		MainMenuHandler.a.GoToFrontPage();
+		_mainMenuHandler.GoToFrontPage();
 	}
 
 	public void PauseQuitHard() {
 		mainMenu.SetActive(true);
-		MainMenuHandler.a.Quit();
+		_mainMenuHandler.Quit();
 	}
 
 	public void EnablePauseUI() {
@@ -365,7 +371,7 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 
 			if (smbh != null) {
 				smbh.DeHighlight(); // Prevent persisted states.
-				if (i == 3 && PlayerMovement.a.inCyberSpace) { // Save button
+				if (i == 3 && _playerMovement.inCyberSpace) { // Save button
 					smbh.enabled = false;
 				} else {
 					smbh.enabled = true;
@@ -385,13 +391,13 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 
 		DisablePauseUI();
 		mainMenu.SetActive(true);
-		MainMenuHandler.a.GoToOptionsSubmenu(true);
+		_mainMenuHandler.GoToOptionsSubmenu(true);
 	}
 
 
 	public void TakeScreenshot() {
 		string sname = System.DateTime.UtcNow.ToString("ddMMMyyyy_HH_mm_ss")
-					   + "_" + Const.a.versionString + ".png";
+					   + "_" + _consts.versionString + ".png";
 		string spath = Utils.SafePathCombine(Application.streamingAssetsPath,
 											 "Screenshots");
 
@@ -405,7 +411,7 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 	// Let screenshot save without putting text in it.
 	public IEnumerator ScreenshotSprint(string sname) {
 		yield return new WaitForSeconds(0.1f);
-		Const.sprint(Const.a.stringTable[1024] + sname); // "Wrote screenshot "
+		_consts.sprint(_consts.stringTable[1024] + sname); // "Wrote screenshot "
 
 	}
 

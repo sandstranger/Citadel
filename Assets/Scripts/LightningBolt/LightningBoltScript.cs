@@ -7,6 +7,7 @@
 
 using UnityEngine;
 using System.Collections.Generic;
+using Zenject;
 
 namespace DigitalRuby.LightningBolt
 {
@@ -94,6 +95,8 @@ namespace DigitalRuby.LightningBolt
         private int animationOffsetIndex;
         private int animationPingPongDirection = 1;
 
+        [Inject] private PauseScript _pauseScript;
+        
         private void GetPerpendicularVector(ref Vector3 directionNormalized, out Vector3 side) {
             if (directionNormalized == Vector3.zero) {
                 side = Vector3.right;
@@ -240,11 +243,11 @@ namespace DigitalRuby.LightningBolt
         }
 
         private void Update() {
-            if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) return;
+            if (_pauseScript.Paused() || _pauseScript.MenuActive()) return;
 
-            if (timer < PauseScript.a.relativeTime) {
+            if (timer < _pauseScript.relativeTime) {
                 if (ManualMode) {
-                    timer = PauseScript.a.relativeTime + Duration;
+                    timer = _pauseScript.relativeTime + Duration;
                     lineRenderer.positionCount = 0;
                 } else {
                     Trigger();
@@ -257,7 +260,7 @@ namespace DigitalRuby.LightningBolt
         /// </summary>
         public void Trigger() {
             Vector3 start, end;
-            timer = PauseScript.a.relativeTime + Duration + Mathf.Max(Duration, timer);
+            timer = _pauseScript.relativeTime + Duration + Mathf.Max(Duration, timer);
             if (StartObject == null) {
                 start = StartPosition;
             } else {

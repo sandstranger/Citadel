@@ -29,6 +29,13 @@ public class DamageData {
 	public float impactVelocity;
 	public bool isOtherNPC;
 
+	private readonly Const _consts;
+
+	public DamageData(Const consts)
+	{
+		_consts = consts;
+	}
+
 	public void ResetDamageData (DamageData damageData) {
 		damageData.owner = null;
 		damageData.ownersCamera = null;
@@ -50,11 +57,11 @@ public class DamageData {
 		damageData.other = null;
 		damageData.indexNPC = -1;
 		damageData.hit = new RaycastHit();
-		damageData.attacknormal = Const.a.vectorZero;
+		damageData.attacknormal = _consts.vectorZero;
 		damageData.impactVelocity = 0f;
 	}
 
-	public static DamageData SetNPCData (int NPCindex, int attackNum,
+	public static DamageData SetNPCData (Const consts,int NPCindex, int attackNum,
 											   GameObject ownedBy) {
 		if (NPCindex < 0 || NPCindex > 28) {
 			NPCindex = 0;
@@ -65,18 +72,18 @@ public class DamageData {
 		}
 
 		if (attackNum < 1 || attackNum > 3) attackNum = 1;
-		DamageData dd = new DamageData(); 
+		DamageData dd = new DamageData(consts); 
 		// Attacker (self [a]) data
 		dd.owner = ownedBy;
 		switch (attackNum) {
 		case 1:
-			dd.damage = Const.a.damageForNPC[NPCindex];
+			dd.damage = consts.damageForNPC[NPCindex];
 			break;
 		case 2:
-			dd.damage = Const.a.damageForNPC2[NPCindex];
+			dd.damage = consts.damageForNPC2[NPCindex];
 			break;
 		case 3:
-			dd.damage = Const.a.damageForNPC3[NPCindex];
+			dd.damage = consts.damageForNPC3[NPCindex];
 			break;
 		default:
 			Debug.Log("BUG: NPC attackIndex not 0,1, or 2!  Damage set to 1.");

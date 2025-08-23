@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ConfigurationMenuModelDetailApply : MonoBehaviour {
 	private Dropdown picker;
 
-	void Start() { // Wait for Const.a. to initialize.
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+
+	void Start() { // Wait for _consts. to initialize.
 		Initialize();
 	}
 
@@ -15,15 +19,15 @@ public class ConfigurationMenuModelDetailApply : MonoBehaviour {
 	}
 	
 	public void SetOptionsText() {
-		if (Const.a == null) return;
-		if (!Const.a.stringTableLoaded) return;
+		if (_consts == null) return;
+		if (!_consts.stringTableLoaded) return;
 		if (picker == null) return;
 
 		List<string> shadList = new List<string>();
 		for (int i=0;i<3;i++) {
 			switch(i) {
-				case 0: shadList.Add(Const.a.stringTable[914]); break; // No Detail
-				case 1: shadList.Add(Const.a.stringTable[915]); break; // High Detail
+				case 0: shadList.Add(_consts.stringTable[914]); break; // No Detail
+				case 1: shadList.Add(_consts.stringTable[915]); break; // High Detail
 			}
 		}
 		picker.ClearOptions();
@@ -35,18 +39,18 @@ public class ConfigurationMenuModelDetailApply : MonoBehaviour {
 		if (picker == null) Debug.Log("BUG: ConfigurationMenuModelDetailApply missing component for picker.");
 
 		SetOptionsText();
-		if (picker.value != Const.a.GraphicsModelDetail) {
-			picker.value = Const.a.GraphicsModelDetail;
+		if (picker.value != _consts.GraphicsModelDetail) {
+			picker.value = _consts.GraphicsModelDetail;
 		}
 	}
 
 	public void OnDropdownSelect () {
 		if (picker != null)
-			Const.a.GraphicsModelDetail = picker.value;
+			_consts.GraphicsModelDetail = picker.value;
 		else
-			Const.a.GraphicsModelDetail = 0; // Default to off, huge performance impact
+			_consts.GraphicsModelDetail = 0; // Default to off, huge performance impact
 
-		Config.WriteConfig();
-		Config.SetModelDetail();
+		_config.WriteConfig();
+		_config.SetModelDetail();
 	}
 }

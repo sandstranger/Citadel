@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
+using Zenject;
 
 public class GeneralInvButton : MonoBehaviour {
     public int GeneralInvButtonIndex;
@@ -10,6 +11,13 @@ public class GeneralInvButton : MonoBehaviour {
 	public GameObject activateButton;
 	private bool reduce = false;
 
+	[Inject] private PlayerEnergy _playerEnergy;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GUIState _guiState;
+	[Inject] private Inventory _inventory;
+	[Inject] private PlayerHealth _playerHealth;
+
     void Start() {
         GetComponent<Button>().onClick.AddListener(() => {
 			GeneralInvClick();
@@ -17,101 +25,101 @@ public class GeneralInvButton : MonoBehaviour {
     }
 
     void GeneralInvClick() {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		GeneralInvUse();
 	}
 
 	public void GeneralInvUse() {
-        Inventory.a.generalInvCurrent = GeneralInvButtonIndex; //Set current
+        _inventory.generalInvCurrent = GeneralInvButtonIndex; //Set current
 		useableItemIndex =
-			Inventory.a.generalInventoryIndexRef[GeneralInvButtonIndex];
+			_inventory.generalInventoryIndexRef[GeneralInvButtonIndex];
 
 		// Access Cards
 		if (GeneralInvButtonIndex == 0) {
-			MFDManager.a.SendInfoToItemTab(81);
-			if (MFDManager.a.lastItemSideRH) {
-				MFDManager.a.rightTC.SetCurrentAsLast();
+			_mfdManager.SendInfoToItemTab(81);
+			if (_mfdManager.lastItemSideRH) {
+				_mfdManager.rightTC.SetCurrentAsLast();
 			} else {
-				MFDManager.a.leftTC.SetCurrentAsLast();
+				_mfdManager.leftTC.SetCurrentAsLast();
 			}
 		} else {
-			MFDManager.a.SendInfoToItemTab(useableItemIndex,customIndex);
-			if (MFDManager.a.lastItemSideRH) {
-				MFDManager.a.rightTC.SetCurrentAsLast();
+			_mfdManager.SendInfoToItemTab(useableItemIndex,customIndex);
+			if (_mfdManager.lastItemSideRH) {
+				_mfdManager.rightTC.SetCurrentAsLast();
 			} else {
-				MFDManager.a.leftTC.SetCurrentAsLast();
+				_mfdManager.leftTC.SetCurrentAsLast();
 			}
 		}
     }
 
     public void DoubleClick() {
-        Inventory.a.generalInvCurrent = GeneralInvButtonIndex; //Set current
-		MFDManager.a.mouseClickHeldOverGUI = true;
+        _inventory.generalInvCurrent = GeneralInvButtonIndex; //Set current
+		_mfdManager.mouseClickHeldOverGUI = true;
 		GeneralInvApply();
 	}
 
 	void ApplyBattery() {
-		if (PlayerEnergy.a.energy >= 255f) {
-			Const.sprint(Const.a.stringTable[303]);
+		if (_playerEnergy.energy >= 255f) {
+			_consts.sprint(_consts.stringTable[303]);
 			reduce = false;
 		}
 
-		PlayerEnergy.a.GiveEnergy(83f,EnergyType.Battery);
+		_playerEnergy.GiveEnergy(83f,EnergyType.Battery);
 		reduce = true;
 	}
 
 	void ApplyIcadBattery() {
-		if (PlayerEnergy.a.energy >= 255f) {
-			Const.sprint(Const.a.stringTable[303]);
+		if (_playerEnergy.energy >= 255f) {
+			_consts.sprint(_consts.stringTable[303]);
 			reduce = false;
 			return;
 		}
 
-		PlayerEnergy.a.GiveEnergy(255f,EnergyType.Battery);
+		_playerEnergy.GiveEnergy(255f,EnergyType.Battery);
 		reduce = true;
 	}
 
 	void ApplyHealthkit() {
-		if (PlayerHealth.a.hm.health >= PlayerHealth.a.hm.maxhealth) {
-			Const.sprint(Const.a.stringTable[304]);
+		if (_playerHealth.hm.health >= _playerHealth.hm.maxhealth) {
+			_consts.sprint(_consts.stringTable[304]);
 			reduce = false;
 			return;
 		}
 
-		PlayerHealth.a.hm.health = PlayerHealth.a.hm.maxhealth;
-		MFDManager.a.DrawTicks(true);
+		_playerHealth.hm.health = _playerHealth.hm.maxhealth;
+		_mfdManager.DrawTicks(true);
 		reduce = true;
 	}
 
 	public void GeneralInvApply() {
 		// Access Cards button
 		if (GeneralInvButtonIndex == 0) {
-			MFDManager.a.SendInfoToItemTab(81);
-			MFDManager.a.OpenTab(1,true,TabMSG.None, useableItemIndex,
+			_mfdManager.SendInfoToItemTab(81);
+			_mfdManager.OpenTab(1,true,TabMSG.None, useableItemIndex,
 								 Handedness.LH);
 			return;
 		}
 
         reduce = false;
 		useableItemIndex =
-			Inventory.a.generalInventoryIndexRef[GeneralInvButtonIndex];
+			_inventory.generalInventoryIndexRef[GeneralInvButtonIndex];
 		switch (useableItemIndex) {
 			case 52: ApplyBattery(); break;
 			case 53: ApplyIcadBattery(); break;
 			case 55: ApplyHealthkit(); break;
 			default:
-				MFDManager.a.SendInfoToItemTab(useableItemIndex,customIndex);
-				MFDManager.a.OpenTab(1,true,TabMSG.None, useableItemIndex,
+				_mfdManager.SendInfoToItemTab(useableItemIndex,customIndex);
+				_mfdManager.OpenTab(1,true,TabMSG.None, useableItemIndex,
 									 Handedness.LH);
 
 				// Set current.
-				Inventory.a.generalInvCurrent = GeneralInvButtonIndex;
+				_inventory.generalInvCurrent = GeneralInvButtonIndex;
 				break;
 		}
 
 		if (reduce)  {
-			Inventory.a.generalInventoryIndexRef[GeneralInvButtonIndex] = -1;
-			GUIState.a.ClearOverButton();
+			_inventory.generalInventoryIndexRef[GeneralInvButtonIndex] = -1;
+			_guiState.ClearOverButton();
 		}
 	}
 }

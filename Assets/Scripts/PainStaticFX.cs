@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,13 +13,15 @@ public class PainStaticFX : MonoBehaviour {
 	private float effectFinished;
 	private Image img;
 
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake () {
 		img = GetComponent<Image>();
 		img.enabled = false;
 	}
 
 	public void Flash(int intensity) {
-		effectFinished = PauseScript.a.relativeTime + lifetime;
+		effectFinished = _pauseScript.relativeTime + lifetime;
 		img.overrideSprite = painLight;
 
 		switch(intensity) {
@@ -40,9 +43,9 @@ public class PainStaticFX : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			if (img.enabled == false) return; // only care if flash is on
-			if (effectFinished < PauseScript.a.relativeTime) Deactivate();
+			if (effectFinished < _pauseScript.relativeTime) Deactivate();
 		}
 	}
 

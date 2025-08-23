@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -82,6 +83,11 @@ public class PuzzleWire : MonoBehaviour {
 	public HUDColor[] wireColors;
 	public HUDColor[] rememberColors;
 
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake () {
 		selectedWire = -1;
 		blinkState = false;
@@ -131,14 +137,14 @@ public class PuzzleWire : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			if (Solved) return;
 
 			if (selectedWire != -1) {
-				if (blinkTimeFinished < PauseScript.a.relativeTime) {
+				if (blinkTimeFinished < _pauseScript.relativeTime) {
 					BlinkSelectedIndicator();
 					blinkState = !blinkState;
-					blinkTimeFinished = PauseScript.a.relativeTime + blinkTime;
+					blinkTimeFinished = _pauseScript.relativeTime + blinkTime;
 				}
 			} else {
 				DisableAllSelectedIndicators();
@@ -151,7 +157,7 @@ public class PuzzleWire : MonoBehaviour {
 						numberOfWires++;
 				}
 
-				if (Const.a.difficultyPuzzle == 3) {
+				if (_consts.difficultyPuzzle == 3) {
 					// Set all wire colors to the same on hard
 					wireColors[0] = rememberColors[0];
 					wireColors[1] = rememberColors[1];
@@ -192,7 +198,7 @@ public class PuzzleWire : MonoBehaviour {
 				}
 			} else {
 				DisableGeniusHints();
-				if (Const.a.difficultyPuzzle == 3) {
+				if (_consts.difficultyPuzzle == 3) {
 					// Set all wire colors to the same on hard
 					wireColors[0] = HUDColor.Yellow;
 					wireColors[1] = HUDColor.Yellow;
@@ -318,7 +324,7 @@ public class PuzzleWire : MonoBehaviour {
 		theme = sentTheme;
 		wireColors = sentHUDColors;
 		rememberColors = sentHUDColors;
-		if (Const.a.difficultyPuzzle == 3) {
+		if (_consts.difficultyPuzzle == 3) {
 			// Set all wire colors to the same on hard
 			wireColors[0] = HUDColor.Yellow;
 			wireColors[1] = HUDColor.Yellow;
@@ -336,20 +342,20 @@ public class PuzzleWire : MonoBehaviour {
 		EvaluatePuzzle();
 		ChangeAppearance();
 
-		if (udSent.mainIndex == 54 || Const.a.difficultyPuzzle == 0) {
+		if (udSent.mainIndex == 54 || _consts.difficultyPuzzle == 0) {
 			PuzzleSolved(true);
 		}
 	}
 
 	private Vector3 GetPositionOfLHNode(int index) {
-		tempVec = Const.a.vectorZero;
+		tempVec = _consts.vectorZero;
 		tempVec.x = 0;
 		tempVec.y = nodeYOffset * -1 * index;
 		return tempVec;
 	}
 
 	private Vector3 GetPositionOfRHNode(int index) {
-		tempVec = Const.a.vectorZero;
+		tempVec = _consts.vectorZero;
 		tempVec.x = nodeXOffset;
 		tempVec.y = nodeYOffset * -1 * index;
 		return tempVec;
@@ -394,7 +400,7 @@ public class PuzzleWire : MonoBehaviour {
 	}
 
 	public void ClickLHNode(int spot) {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		if (Solved) return;
 
 		if (selectedWireLH) {
@@ -410,7 +416,7 @@ public class PuzzleWire : MonoBehaviour {
 	}
 
 	public void ClickRHNode(int spot) {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		if (Solved) return;
 
 		if (!selectedWireLH) {
@@ -441,7 +447,7 @@ public class PuzzleWire : MonoBehaviour {
 		DisableAllSelectedIndicators();
 		selectedWireLH = true;
 		blinkState = true;
-		blinkTimeFinished = PauseScript.a.relativeTime + blinkTime;
+		blinkTimeFinished = _pauseScript.relativeTime + blinkTime;
 		BlinkSelectedIndicator();
 		ChangeAppearance();
 		//EvaluatePuzzle();
@@ -463,7 +469,7 @@ public class PuzzleWire : MonoBehaviour {
 		DisableAllSelectedIndicators();
 		selectedWireLH = false;
 		blinkState = true;
-		blinkTimeFinished = PauseScript.a.relativeTime + blinkTime;
+		blinkTimeFinished = _pauseScript.relativeTime + blinkTime;
 		BlinkSelectedIndicator();
 		ChangeAppearance();
 		//EvaluatePuzzle();
@@ -640,7 +646,7 @@ public class PuzzleWire : MonoBehaviour {
 		if (wire5RHPosition == wire5RHTarget && wireIsActive[4]) tempF += 0.19f;
 		if (wire6RHPosition == wire6RHTarget && wireIsActive[5]) tempF += 0.19f;
 		if (wire7RHPosition == wire7RHTarget && wireIsActive[6]) tempF += 0.19f;
-		if (Const.a.difficultyPuzzle == 1) tempF += 0.19f;
+		if (_consts.difficultyPuzzle == 1) tempF += 0.19f;
 		actualValue = tempF;
 		if (tempF > 0.92f || AllWiresCorrect()) PuzzleSolved(false);
 	}
@@ -660,11 +666,11 @@ public class PuzzleWire : MonoBehaviour {
 		actualValue = 1f;
 		slider.value = actualValue;
 		Solved = true;
-		Utils.PlayUIOneShotSavable(46);
+		Utils.PlayUIOneShotSavable(_consts,46);
 		puzzleWP.puzzleSolved = true;
 		puzzleWP.UseTargets(udSender.owner);
 		if (usedLogicProbe) {
-			MouseLookScript.a.ResetHeldItem();
+			_mouseLookScript.ResetHeldItem();
 		}
 	}
 }

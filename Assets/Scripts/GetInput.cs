@@ -1,23 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Citadel.Game;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
 // Master input handling functions from configuration
-public class GetInput : MonoBehaviour, ISingletonInitializer {
-	public static GetInput a;
-	[HideInInspector] public bool isCapsLockOn;
+public class GetInput : MonoBehaviour {
+	[HideInInspector] public bool isCapsLockOn = false;
 	private bool lastjoy3 = false;
 	private bool lastUse = false;
 	private Vector2 LTSCenter;
 	public float LTSRadius;
 
-	public void Initialize() {
-		a = this;
-		isCapsLockOn = false;
-	}
-
+	[Inject] private Const _consts;
+	
 // 	void Update() {
 	//	// Used for testing with a DualShock PlayStation 4 remote aka the DS4 for the PS4.
 	//	if (Input.GetKeyDown(KeyCode.JoystickButton0 )) Debug.Log("JoystickButton0 pressed"); // X (A)
@@ -57,12 +54,12 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool GetKeyRiseEdgeOrHeld(int codeSettingIndex, bool risingEdge) {
-		int setCode = Const.a.InputCodeSettings[codeSettingIndex];
+		int setCode = _consts.InputCodeSettings[codeSettingIndex];
 		if (MouseWheelBoundAndRolled(setCode)) return true;
 		if (risingEdge) {
-			if (Input.GetKeyDown(Const.a.InputValues[setCode])) return true;
+			if (Input.GetKeyDown(_consts.InputValues[setCode])) return true;
 		} else {
-			if (Input.GetKey(Const.a.InputValues[setCode])) return true;
+			if (Input.GetKey(_consts.InputValues[setCode])) return true;
 		}
 
 		return false;
@@ -105,9 +102,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 		}
 
 		lastjoy3 = false;
-		if (Const.a.InputCodeSettings[6] == 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[6] == 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[6]])) {
+		if (_consts.InputCodeSettings[6] == 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[6] == 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[6]])) {
 			return true;
 		}
 
@@ -121,9 +118,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 			return true;
 		}
 
-		if (Const.a.InputCodeSettings[7] == 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[7] == 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[7]])) {
+		if (_consts.InputCodeSettings[7] == 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[7] == 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[7]])) {
 			return true;
 		}
 		return false;
@@ -136,9 +133,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 			return true;
 		}
 
-		if (Const.a.InputCodeSettings[8] == 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[8] == 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[8]])) {
+		if (_consts.InputCodeSettings[8] == 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[8] == 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[8]])) {
 			return true;
 		}
 
@@ -147,9 +144,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 
 	public bool Sprint() {
 		if (Input.GetKey(KeyCode.JoystickButton9)) return true;
-		if (Const.a.InputCodeSettings[9] == 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[9] == 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[9]])) {
+		if (_consts.InputCodeSettings[9] == 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[9] == 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[9]])) {
 			return true;
 		}
 
@@ -157,9 +154,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool TurnLeft() {
-		if (Const.a.InputCodeSettings[11]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[11]== 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[11]])) {
+		if (_consts.InputCodeSettings[11]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[11]== 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[11]])) {
 			return true;
 		}
 
@@ -167,9 +164,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool TurnRight() {
-		if (Const.a.InputCodeSettings[12]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[12]== 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[12]])) {
+		if (_consts.InputCodeSettings[12]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[12]== 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[12]])) {
 			return true;
 		}
 
@@ -177,9 +174,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool LookUp() {
-		if (Const.a.InputCodeSettings[13]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[13]== 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[13]])) {
+		if (_consts.InputCodeSettings[13]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[13]== 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[13]])) {
 			return true;
 		}
 
@@ -187,9 +184,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool LookDown() {
-		if (Const.a.InputCodeSettings[14]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[14]== 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[14]])) {
+		if (_consts.InputCodeSettings[14]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[14]== 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[14]])) {
 			return true;
 		}
 
@@ -197,9 +194,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool RecentLog() {
-		if (Const.a.InputCodeSettings[15]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[15]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[15]])) {
+		if (_consts.InputCodeSettings[15]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[15]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[15]])) {
 			return true;
 		}
 
@@ -207,9 +204,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool Biomonitor() {
-		if (Const.a.InputCodeSettings[16]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[16]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[16]])) {
+		if (_consts.InputCodeSettings[16]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[16]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[16]])) {
 			return true;
 		}
 
@@ -217,9 +214,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool Sensaround() {
-		if (Const.a.InputCodeSettings[17]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[17]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[17]])) {
+		if (_consts.InputCodeSettings[17]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[17]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[17]])) {
 			return true;
 		}
 
@@ -228,9 +225,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 
 	public bool Lantern() {
 		if (Input.GetKeyDown(KeyCode.JoystickButton10)) return true;
-		if (Const.a.InputCodeSettings[18]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[18]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[18]])) {
+		if (_consts.InputCodeSettings[18]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[18]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[18]])) {
 			return true;
 		}
 
@@ -238,9 +235,9 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool Shield() {
-		if (Const.a.InputCodeSettings[19]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[19]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[19]])) {
+		if (_consts.InputCodeSettings[19]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[19]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[19]])) {
 			return true;
 		}
 
@@ -248,39 +245,39 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public bool Infrared() {
-		if (Const.a.InputCodeSettings[20]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[20]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[20]])) {
+		if (_consts.InputCodeSettings[20]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[20]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[20]])) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public bool Email() { if (Const.a.InputCodeSettings[21]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[21]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[21]]))return true;
+	public bool Email() { if (_consts.InputCodeSettings[21]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[21]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[21]]))return true;
 		return false;
 	}
 
-	public bool Booster() { if (Const.a.InputCodeSettings[22]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[22]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[22]]))return true;
+	public bool Booster() { if (_consts.InputCodeSettings[22]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[22]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[22]]))return true;
 		return false;
 	}
 
-	public bool Jumpjets() { if (Const.a.InputCodeSettings[23]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[23]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[23]]))return true;
+	public bool Jumpjets() { if (_consts.InputCodeSettings[23]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[23]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[23]]))return true;
 		return false;
 	}
 
 	public bool Attack() {
 	    
-		if (Const.a.InputCodeSettings[24] == 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[24] == 154) return MouseWheelDn();
+		if (_consts.InputCodeSettings[24] == 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[24] == 154) return MouseWheelDn();
 		if (Input.GetKey(KeyCode.JoystickButton5)) return true;
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[24]])) {
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[24]])) {
 			return true;
 		} else {
 			return false;
@@ -300,32 +297,32 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 		}
 
 		if (Input.GetKeyDown(KeyCode.JoystickButton4)) return true;
-		if (Const.a.InputCodeSettings[25]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[25]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[25]])) {
+		if (_consts.InputCodeSettings[25]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[25]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[25]])) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public bool Menu()			{ if (Input.GetKeyDown(KeyCode.JoystickButton7) || Input.GetKeyDown(KeyCode.JoystickButton8)) return true; if (Const.a.InputCodeSettings[26]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[26]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[26]])) return true; else return false; }
-	public bool ToggleMode()	{ if (Input.GetAxisRaw("JoyAxis7") < 0) return true; if (Const.a.InputCodeSettings[27]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[27]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[27]])) return true; else return false; }
-	public bool Reload()		{ if (Input.GetKeyDown(KeyCode.JoystickButton2)) return true; if (Const.a.InputCodeSettings[28]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[28]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[28]])) return true; else return false; }
-	public bool WeaponCycUp()	{ if (Input.GetKeyDown(KeyCode.JoystickButton3)) return true; if (Const.a.InputCodeSettings[29]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[29]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[29]])) return true; else return false; }
-	public bool WeaponCycDown() { if (Const.a.InputCodeSettings[30]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[30]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[30]])) return true; else return false; }
-	public bool Grenade()		{ if (Input.GetKeyDown(KeyCode.JoystickButton6)) return true; if (Const.a.InputCodeSettings[31]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[31]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[31]])) return true; else return false; }
-	public bool GrenadeCycUp()	{ if (Input.GetAxisRaw("JoyAxis7") > 0) return true; if (Const.a.InputCodeSettings[32]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[32]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[32]])) return true; else return false; }
-	public bool GrenadeCycDown(){ if (Const.a.InputCodeSettings[33]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[33]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[33]])) return true; else return false; }
-	public bool ChangeAmmoType(){ if (Const.a.InputCodeSettings[34]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[34]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[34]])) return true; else return false; }
-	public bool Patch()			{ if (Input.GetAxisRaw("JoyAxis8") < 0) return true; if (Const.a.InputCodeSettings[36]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[36]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[36]])) return true; else return false; }
-	public bool PatchCycUp()	{ if (Const.a.InputCodeSettings[37]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[37]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[37]])) return true; else return false; }
-	public bool PatchCycDown()	{ if (Const.a.InputCodeSettings[38]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[38]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[38]])) return true; else return false; }
-	public bool Map()			{ if (Input.GetAxisRaw("JoyAxis8") > 0) return true; if (Const.a.InputCodeSettings[39]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[39]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[39]])) return true; else return false; }
+	public bool Menu()			{ if (Input.GetKeyDown(KeyCode.JoystickButton7) || Input.GetKeyDown(KeyCode.JoystickButton8)) return true; if (_consts.InputCodeSettings[26]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[26]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[26]])) return true; else return false; }
+	public bool ToggleMode()	{ if (Input.GetAxisRaw("JoyAxis7") < 0) return true; if (_consts.InputCodeSettings[27]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[27]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[27]])) return true; else return false; }
+	public bool Reload()		{ if (Input.GetKeyDown(KeyCode.JoystickButton2)) return true; if (_consts.InputCodeSettings[28]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[28]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[28]])) return true; else return false; }
+	public bool WeaponCycUp()	{ if (Input.GetKeyDown(KeyCode.JoystickButton3)) return true; if (_consts.InputCodeSettings[29]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[29]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[29]])) return true; else return false; }
+	public bool WeaponCycDown() { if (_consts.InputCodeSettings[30]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[30]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[30]])) return true; else return false; }
+	public bool Grenade()		{ if (Input.GetKeyDown(KeyCode.JoystickButton6)) return true; if (_consts.InputCodeSettings[31]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[31]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[31]])) return true; else return false; }
+	public bool GrenadeCycUp()	{ if (Input.GetAxisRaw("JoyAxis7") > 0) return true; if (_consts.InputCodeSettings[32]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[32]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[32]])) return true; else return false; }
+	public bool GrenadeCycDown(){ if (_consts.InputCodeSettings[33]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[33]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[33]])) return true; else return false; }
+	public bool ChangeAmmoType(){ if (_consts.InputCodeSettings[34]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[34]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[34]])) return true; else return false; }
+	public bool Patch()			{ if (Input.GetAxisRaw("JoyAxis8") < 0) return true; if (_consts.InputCodeSettings[36]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[36]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[36]])) return true; else return false; }
+	public bool PatchCycUp()	{ if (_consts.InputCodeSettings[37]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[37]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[37]])) return true; else return false; }
+	public bool PatchCycDown()	{ if (_consts.InputCodeSettings[38]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[38]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[38]])) return true; else return false; }
+	public bool Map()			{ if (Input.GetAxisRaw("JoyAxis8") > 0) return true; if (_consts.InputCodeSettings[39]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[39]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[39]])) return true; else return false; }
     public bool SwimUp() {
-		if (Const.a.InputCodeSettings[40]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[40]== 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[40]])) {
+		if (_consts.InputCodeSettings[40]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[40]== 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[40]])) {
 			return true;
 		}
 		
@@ -333,20 +330,20 @@ public class GetInput : MonoBehaviour, ISingletonInitializer {
 	}
 
     public bool SwimDn() {
-		if (Const.a.InputCodeSettings[41]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[41]== 154) return MouseWheelDn();
-		if (Input.GetKey(Const.a.InputValues[Const.a.InputCodeSettings[41]])) {
+		if (_consts.InputCodeSettings[41]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[41]== 154) return MouseWheelDn();
+		if (Input.GetKey(_consts.InputValues[_consts.InputCodeSettings[41]])) {
 			return true;
 		}
 		
 		return false;
 	}
 
-    // public bool SwapAmmoType()	{ if (Const.a.InputCodeSettings[42]== 153) return MouseWheelUp(); if (Const.a.InputCodeSettings[42]== 154) return MouseWheelDn(); if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[42]])) return true; else return false; }
+    // public bool SwapAmmoType()	{ if (_consts.InputCodeSettings[42]== 153) return MouseWheelUp(); if (_consts.InputCodeSettings[42]== 154) return MouseWheelDn(); if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[42]])) return true; else return false; }
     public bool Console() {
-		if (Const.a.InputCodeSettings[43]== 153) return MouseWheelUp();
-		if (Const.a.InputCodeSettings[43]== 154) return MouseWheelDn();
-		if (Input.GetKeyDown(Const.a.InputValues[Const.a.InputCodeSettings[43]])
+		if (_consts.InputCodeSettings[43]== 153) return MouseWheelUp();
+		if (_consts.InputCodeSettings[43]== 154) return MouseWheelDn();
+		if (Input.GetKeyDown(_consts.InputValues[_consts.InputCodeSettings[43]])
 			|| Input.GetKeyDown(KeyCode.Caret)) {
 			return true;
 		}

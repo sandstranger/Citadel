@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class MaterialFlash : MonoBehaviour {
@@ -16,6 +17,9 @@ public class MaterialFlash : MonoBehaviour {
 	private bool changeDone = false;
 	private bool normal = true;
 
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
+	
 	void Start () {
 		meshR = GetComponent<MeshRenderer>();
 		if (normalMat == null) Debug.Log("BUG: MaterialFlash.cs has a null normal material!  Assign your materials!");
@@ -33,8 +37,8 @@ public class MaterialFlash : MonoBehaviour {
 	}
 
     void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
-			if (Const.a.questData.SelfDestructActivated) isFlashing = true;
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
+			if (_consts.questData.SelfDestructActivated) isFlashing = true;
 
 			if (isFlashing) {
 				if (flashFinished < Time.time) {

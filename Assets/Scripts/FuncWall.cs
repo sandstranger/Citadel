@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System;
+using Citadel.Game;
+using Zenject;
 using UnityEngine;
 
 public class FuncWall : MonoBehaviour {
@@ -23,7 +25,10 @@ public class FuncWall : MonoBehaviour {
 	private Vector3 tempVec;
 	private float dist;         // Only ever used right away, not saved.
 	private float distanceLeft; // Only ever used right away, not saved.
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100 * 500);
+
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
 
 	public void InitializeFromLoad() {
 		rbody = GetComponent<Rigidbody>();
@@ -77,7 +82,7 @@ public class FuncWall : MonoBehaviour {
 		}
 
 		if (SFXSource != null) {
-			SFXSource.clip = Const.a.sounds[76]; // doorwall_move
+			SFXSource.clip = _consts.sounds[76]; // doorwall_move
 			SFXSource.loop = true;
 			SFXSource.Play();
 		}
@@ -87,12 +92,12 @@ public class FuncWall : MonoBehaviour {
 
 	void MoveStart() {
 		currentState = FuncStates.MovingStart;
-		startTime = PauseScript.a.relativeTime + 10f;
+		startTime = _pauseScript.relativeTime + 10f;
 	}
 
 	void MoveTarget() {
 		currentState = FuncStates.MovingTarget;
-		startTime = PauseScript.a.relativeTime + 10f;
+		startTime = _pauseScript.relativeTime + 10f;
 	}
 
 	void MoveToPosition(Vector3 goalPosition, FuncStates newState) {
@@ -107,13 +112,13 @@ public class FuncWall : MonoBehaviour {
 		if (float.IsNaN(percentMoved)) percentMoved = 0f;
 		if (percentMoved > 1.0f) percentMoved = 1.0f;
 		if (percentMoved < 0f) percentMoved = 0f;
-		if (distanceLeft <= 0.04f || startTime < PauseScript.a.relativeTime) {
+		if (distanceLeft <= 0.04f || startTime < _pauseScript.relativeTime) {
 			currentState = newState;
 			if (SFXSource != null) {
 				SFXSource.Stop ();
 				SFXSource.loop = false;
 				if (!stopSoundPlayed) {
-					Utils.PlayOneShotSavable(SFXSource,Const.a.sounds[77]);
+					Utils.PlayOneShotSavable(SFXSource,_consts.sounds[77]);
 					stopSoundPlayed = true;
 				}
 			}
@@ -121,20 +126,20 @@ public class FuncWall : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.mainMenu.activeSelf) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.mainMenu.activeSelf) return;
 
 		switch (currentState) {
 			case FuncStates.Start:
 				transform.position = startPosition;
 				if (rbody.linearVelocity.sqrMagnitude > 0) {
-					rbody.linearVelocity = Const.a.vectorZero;
+					rbody.linearVelocity = _consts.vectorZero;
 				}
 				break;
 			case FuncStates.Target:
 				transform.position = targetPosition.transform.position;
 				if (rbody.linearVelocity.sqrMagnitude > 0) {
-					rbody.linearVelocity = Const.a.vectorZero;
+					rbody.linearVelocity = _consts.vectorZero;
 				}
 				break;
 			case FuncStates.MovingStart:
@@ -170,7 +175,7 @@ public class FuncWall : MonoBehaviour {
 		s1.Append(Utils.splitChar );
 		s1.Append(Utils.FloatToString(fw.percentMoved,"percentMoved"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(fw.startTime,"startTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(fw._pauseScript,fw.startTime,"startTime"));
 
 		// The mover_target transform and position was saved by SaveObject.Save
 		// prior to that function calling this function, so only save the
@@ -202,7 +207,7 @@ public class FuncWall : MonoBehaviour {
 	// ->->chunk_somechunk3   exist yet on a freshly instantiated prefab.
 	// ->->etc. etc.
 	// ->info_target         This is a relative offset position creator
-	public static int Load(GameObject go, ref string[] entries, int index) {
+	public static int Load(Const @const,GameObject go, ref string[] entries, int index) {
 		float readFloatx, readFloaty, readFloatz;
 		FuncWall fw = go.GetComponent<FuncWall>(); // Fairweather we are
 												   // having. Vague Quake
@@ -218,7 +223,7 @@ public class FuncWall : MonoBehaviour {
 		fw.speed = Utils.GetFloatFromString(entries[index],"speed"); index++;
 		fw.percentAjar = Utils.GetFloatFromString(entries[index],"percentAjar"); index++;
 		fw.percentMoved = Utils.GetFloatFromString(entries[index],"percentMoved"); index++;
-		fw.startTime = Utils.LoadRelativeTimeDifferential(entries[index],"startTime"); index++;
+		fw.startTime = Utils.LoadRelativeTimeDifferential(fw._pauseScript,entries[index],"startTime"); index++;
 		Transform parentTR = go.transform.parent.transform;
 		index = Utils.LoadTransform(parentTR,ref entries,index);
 		Transform info_target = go.transform.parent.transform.GetChild(1);
@@ -238,9 +243,9 @@ public class FuncWall : MonoBehaviour {
 			// Assumption here is that we are loading to a freshly instantiated
 			// func_wall prefab and that there are no children chunks on the
 			// mover_target GameObject yet.
-			GameObject childGO = Instantiate(Const.a.GetPrefab(chunkdex),
-						go.transform.localPosition, // 0's, transform is below
-						Const.a.quaternionIdentity) as GameObject;
+			GameObject childGO = GameBindings.InstantiatePrefab(@const.GetPrefab(chunkdex),
+				go.transform.localPosition, // 0's, transform is below
+				@const.quaternionIdentity);
 			childGO.transform.SetParent(go.transform); // Set parent prior
 													   // to loading transform.
 			#if UNITY_EDITOR

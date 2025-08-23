@@ -1,12 +1,15 @@
 using UnityEngine;
 using System.Collections;
+using Zenject;
 
 public class CyberDecoy : MonoBehaviour {
+	[Inject] private Const _consts;
+	
 	void OnEnable() {
-		Const.a.decoyActive = true;
+		_consts.decoyActive = true;
 	}
 
 	void OnDisable() {
-		Const.a.decoyActive = false;
+		_consts.decoyActive = false;
 	}
 }

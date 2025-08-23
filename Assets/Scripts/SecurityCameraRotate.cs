@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 // Rotates a security camera back and forth between two angle values, pausing
 // at each angle value for an instance-set amount of time.  This assumes that
@@ -20,8 +21,10 @@ public class SecurityCameraRotate : MonoBehaviour {
 	private float tickTime = 0.1f;
 	private static StringBuilder s1 = new StringBuilder();
 
+	[Inject] private PauseScript _pauseScript;
+
 	void Start () {
-		waitingFinished = PauseScript.a.relativeTime;
+		waitingFinished = _pauseScript.relativeTime;
 		rotatePositive = true;
 		if (this.enabled) active = true;
 		else active = false;
@@ -32,7 +35,7 @@ public class SecurityCameraRotate : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			if (mR != null) {
 				if (!mR.isVisible || !mR.enabled) return;
 			} else {
@@ -40,7 +43,7 @@ public class SecurityCameraRotate : MonoBehaviour {
 				return;
 			}
 
-			if (waitingFinished < PauseScript.a.relativeTime) {
+			if (waitingFinished < _pauseScript.relativeTime) {
 				if (rotatePositive) RotatePositive();
 				else                RotateNegative();
 			}
@@ -51,7 +54,7 @@ public class SecurityCameraRotate : MonoBehaviour {
 		if (((transform.rotation.eulerAngles.y + 1f) >= endYAngle)
 			&& ((transform.rotation.eulerAngles.y - 1f) <= endYAngle)) {
 			rotatePositive = false;
-			waitingFinished = PauseScript.a.relativeTime + waitTime;
+			waitingFinished = _pauseScript.relativeTime + waitTime;
 			return;
 		}
 		
@@ -63,7 +66,7 @@ public class SecurityCameraRotate : MonoBehaviour {
 		if (((transform.rotation.eulerAngles.y + 1f) >= startYAngle)
 			&& ((transform.rotation.eulerAngles.y - 1f) <= startYAngle)) {
 			rotatePositive = true;
-			waitingFinished = PauseScript.a.relativeTime + waitTime;
+			waitingFinished = _pauseScript.relativeTime + waitTime;
 			return;
 		}
 		
@@ -73,8 +76,9 @@ public class SecurityCameraRotate : MonoBehaviour {
 
 	public static string Save(GameObject go) {
 		SecurityCameraRotate scr = go.GetComponent<SecurityCameraRotate>();
+		var pauseScript = scr._pauseScript;
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(scr.waitingFinished,"waitingFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,scr.waitingFinished,"waitingFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(scr.enabled,"enabled"));
 		s1.Append(Utils.splitChar);
@@ -88,7 +92,8 @@ public class SecurityCameraRotate : MonoBehaviour {
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		SecurityCameraRotate scr = go.GetComponent<SecurityCameraRotate>();
-		scr.waitingFinished = Utils.LoadRelativeTimeDifferential(entries[index],"waitingFinished"); index++;
+		var pauseScript = scr._pauseScript;
+		scr.waitingFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"waitingFinished"); index++;
 		scr.enabled = Utils.GetBoolFromString(entries[index],"enabled"); index++;
 		scr.startYAngle = Utils.GetFloatFromString(entries[index],"startYAngle"); index++;
 		scr.endYAngle = Utils.GetFloatFromString(entries[index],"endYAngle"); index++;

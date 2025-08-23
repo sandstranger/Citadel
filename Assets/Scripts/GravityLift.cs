@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class GravityLift : MonoBehaviour {
 	public float strength = 12f;
@@ -12,7 +13,10 @@ public class GravityLift : MonoBehaviour {
 	public Vector3 topPoint;
 	public float initialBurstFinished;
 	private BoxCollider boxcol;
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(200 * 10);
+
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerMovement _playerMovement;
 
 	void Awake() {
 		boxcol = GetComponent<BoxCollider>();
@@ -22,14 +26,14 @@ public class GravityLift : MonoBehaviour {
 
 	void OnTriggerExit(Collider other) {
 		if (other.gameObject.GetComponent<PlayerMovement>() != null) {
-			PlayerMovement.a.gravliftState = false;
+			_playerMovement.gravliftState = false;
 		}
 	}
 
 	void OnForce(Collider other, bool initial) {
 		if (other.gameObject.layer == 12) { // Player
 			if (other.gameObject.GetComponent<PlayerMovement>() != null) {
-				PlayerMovement.a.gravliftState = true;
+				_playerMovement.gravliftState = true;
 			}
 		}
 
@@ -47,7 +51,7 @@ public class GravityLift : MonoBehaviour {
 								- otherRbody.linearVelocity.y);
 
 				if (initial
-					|| initialBurstFinished > PauseScript.a.relativeTime) {
+					|| initialBurstFinished > _pauseScript.relativeTime) {
 
 					yForce *= 2f;
 				}
@@ -61,13 +65,13 @@ public class GravityLift : MonoBehaviour {
 		// Apply weak force for inactive state - applies some force for gentle
 		// descent, never really off completely.
 		if (other.gameObject.GetComponent<PlayerMovement>() != null) {
-			PlayerMovement.a.gravliftState = true;
+			_playerMovement.gravliftState = true;
 		}
 
 		if (otherRbody.linearVelocity.y < offStrengthFactor) {
 			float yForce = ((offStrengthFactor)-otherRbody.linearVelocity.y);
 			if (initial
-				|| initialBurstFinished > PauseScript.a.relativeTime) {
+				|| initialBurstFinished > _pauseScript.relativeTime) {
 
 				yForce *= 2f;
 			}
@@ -80,7 +84,7 @@ public class GravityLift : MonoBehaviour {
 		otherRbody = other.gameObject.GetComponent<Rigidbody>();
 		if (otherRbody == null) return; // Not a physical object.
 
-		initialBurstFinished = PauseScript.a.relativeTime + 1.0f;
+		initialBurstFinished = _pauseScript.relativeTime + 1.0f;
 		if (active) OnForce(other,true);
 		else OffForce(other,true);
 	}
@@ -107,7 +111,7 @@ public class GravityLift : MonoBehaviour {
 		s1.Clear();
 		s1.Append(Utils.BoolToString(gl.active,"active")); // bool - is this gravlift on?
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(gl.initialBurstFinished,"initialBurstFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(gl._pauseScript,gl.initialBurstFinished,"initialBurstFinished"));
 		return s1.ToString();
 	}
 
@@ -129,7 +133,7 @@ public class GravityLift : MonoBehaviour {
 		}
 
 		gl.active = Utils.GetBoolFromString(entries[index],"active"); index++; // bool - is this gravlift on?
-		gl.initialBurstFinished = Utils.LoadRelativeTimeDifferential(entries[index],"initialBurstFinished"); index++;
+		gl.initialBurstFinished = Utils.LoadRelativeTimeDifferential(gl._pauseScript,entries[index],"initialBurstFinished"); index++;
 		return index;
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class PuzzleWirePuzzle : MonoBehaviour {
@@ -22,12 +23,16 @@ public class PuzzleWirePuzzle : MonoBehaviour {
 	public int messageOnLockedLingdex = 302;
 	public int messageOnBrokenLingdex = 189;
 	public bool puzzleSolved; // save
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new(100 * 500);
 	private Animator anim;
 	
 	public bool animate = true;
 	public bool inUse = false;
 
+	[Inject] private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	
 	void Awake() {
 		puzzleSolved = false;
 		if (animate) {
@@ -56,22 +61,22 @@ public class PuzzleWirePuzzle : MonoBehaviour {
 
 	public void Use (UseData ud) {
 		if (dead) {
-			Const.sprint(messageOnBrokenLingdex);
+			_consts.sprint(messageOnBrokenLingdex);
 			return;
 		}
 
-		if (LevelManager.a.GetCurrentLevelSecurity() > securityThreshhold) {
-			MFDManager.a.BlockedBySecurity(transform.position);
+		if (_levelManager.GetCurrentLevelSecurity() > securityThreshhold) {
+			_mfdManager.BlockedBySecurity(transform.position);
 			return;
 		}
 
-		if (LevelManager.a.superoverride || Const.a.difficultyMission == 0) {
+		if (_levelManager.superoverride || _consts.difficultyMission == 0) {
 			// SHODAN can go anywhere!  Full security override!
 			locked = false;
 		}
 
 		if (locked) {
-			Const.sprint(messageOnLockedLingdex);
+			_consts.sprint(messageOnLockedLingdex);
 			return;
 		}
 
@@ -85,9 +90,9 @@ public class PuzzleWirePuzzle : MonoBehaviour {
 					  + "without parameters!");
 		}
 
-		Const.sprint(190); //Puzzle accessed
+		_consts.sprint(190); //Puzzle accessed
 		inUse = true;
-		MFDManager.a.SendWirePuzzleToDataTab(wiresOn,rowsActive,
+		_mfdManager.SendWirePuzzleToDataTab(wiresOn,rowsActive,
 											 currentPositionsLeft,
 											 currentPositionsRight,
 											 solutionPositionsLeft,
@@ -100,8 +105,8 @@ public class PuzzleWirePuzzle : MonoBehaviour {
 		UseData ud = new UseData();
 		ud.owner = owner;
 		ud.argvalue = argvalue;
-		Const.a.UseTargets(gameObject,ud,target);
-		Const.sprint(successMessageLingdex);
+		_consts.UseTargets(gameObject,ud,target);
+		_consts.sprint(successMessageLingdex);
 	}
 
 	public static string Save(GameObject go) {

@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "SimpleFileBrowser.Runtime",
-        "BetterStreamingAssets"
+        "BetterStreamingAssets",
+        "Zenject"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ConfigurationMenuSSRApply : MonoBehaviour {
 	private Dropdown picker;
 
-	void Start() { // Wait for Const.a. to initialize.
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+	
+	void Start() { // Wait for _consts. to initialize.
 		Initialize();
 	}
 
@@ -15,16 +19,16 @@ public class ConfigurationMenuSSRApply : MonoBehaviour {
 	}
 	
 	public void SetOptionsText() {
-		if (Const.a == null) return;
-		if (!Const.a.stringTableLoaded) return;
+		if (_consts == null) return;
+		if (!_consts.stringTableLoaded) return;
 		if (picker == null) return;
 
 		List<string> ssrList = new List<string>();
 		for (int i=0;i<3;i++) {
 			switch(i) {
-				case 0: ssrList.Add(Const.a.stringTable[788]); break;
-				case 1: ssrList.Add(Const.a.stringTable[789]); break;
-				case 2: ssrList.Add(Const.a.stringTable[790]); break;
+				case 0: ssrList.Add(_consts.stringTable[788]); break;
+				case 1: ssrList.Add(_consts.stringTable[789]); break;
+				case 2: ssrList.Add(_consts.stringTable[790]); break;
 			}
 		}
 		picker.ClearOptions();
@@ -39,16 +43,16 @@ public class ConfigurationMenuSSRApply : MonoBehaviour {
 		}
 
 		SetOptionsText();
-		if (picker.value != Const.a.GraphicsSSRMode) {
-			picker.value = Const.a.GraphicsSSRMode;
+		if (picker.value != _consts.GraphicsSSRMode) {
+			picker.value = _consts.GraphicsSSRMode;
 		}
 	}
 
 	public void OnDropdownSelect () {
-		if (picker != null) Const.a.GraphicsSSRMode = picker.value;
-		else Const.a.GraphicsSSRMode = 0; // Default to off
+		if (picker != null) _consts.GraphicsSSRMode = picker.value;
+		else _consts.GraphicsSSRMode = 0; // Default to off
 
-		Config.WriteConfig();
-		Config.SetSSR();
+		_config.WriteConfig();
+		_config.SetSSR();
 	}
 }

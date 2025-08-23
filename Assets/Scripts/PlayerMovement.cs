@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Citadel.Game;
+using Zenject;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
+public class PlayerMovement : MonoBehaviour {
 	// External references, required
 	public GameObject cameraObject;
 	public Transform cheatG1Spawn;
@@ -171,22 +172,28 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 	private ContactPoint[] contactsCache;
 	private static Vector3 feetOffset = new Vector3(0f,-0.48f,0f);
 	private static readonly StringBuilder s1 = new(200 * 1024);
-	
-	public static PlayerMovement a;
 
-	public void Initialize() 
-	{
-		a = this;
-	}
+	[Inject] private LevelManager _levelManager;
+	[Inject] private BiomonitorGraphSystem _biomonitorGraphSystem;
+	[Inject] private PlayerEnergy _playerEnergy;
+	[Inject] private ConsoleEmulator _consoleEmulator;
+	[Inject] private Const _consts;
+	[Inject] private Automap _automap;
+	[Inject] private GetInput _getInput;
+	[Inject] private Inventory _inventory;
+	[Inject] private MouseCursor _mouseCursor;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
 
     void Start() {
 		currentCrouchRatio = def1;
 		bodyState = BodyState.Standing;
 		cyberDesetup = false;
 		oldBodyState = bodyState;
-		fatigueFinished = PauseScript.a.relativeTime;
-		fatigueFinished2 = PauseScript.a.relativeTime;
-		ladderSFXFinished = PauseScript.a.relativeTime;
+		fatigueFinished = _pauseScript.relativeTime;
+		fatigueFinished2 = _pauseScript.relativeTime;
+		ladderSFXFinished = _pauseScript.relativeTime;
 		rbody = GetComponent<Rigidbody>();
 		oldVelocity = rbody.linearVelocity;
 		capsuleCollider = GetComponent<CapsuleCollider>();
@@ -196,45 +203,44 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		staminupActive = false;
 		cyberCollider = GetComponent<SphereCollider>();
 		consoleActivated = false;
-		jumpLandSoundFinished = PauseScript.a.relativeTime;
+		jumpLandSoundFinished = _pauseScript.relativeTime;
 		justJumped = false;
-		jumpSFXFinished = PauseScript.a.relativeTime;
+		jumpSFXFinished = _pauseScript.relativeTime;
 		fatigueWarned = false;
-		jumpJetEnergySuckTickFinished = PauseScript.a.relativeTime;
-		ressurectingFinished = PauseScript.a.relativeTime;
+		jumpJetEnergySuckTickFinished = _pauseScript.relativeTime;
+		ressurectingFinished = _pauseScript.relativeTime;
 		tempInt = -1;
-		doubleJumpFinished = PauseScript.a.relativeTime;
+		doubleJumpFinished = _pauseScript.relativeTime;
 		doubleJumpTicks = 0;
-		turboFinished = PauseScript.a.relativeTime;
+		turboFinished = _pauseScript.relativeTime;
 		playerHome = transform.localPosition;
-		ConsoleEmulator.lastCommand = new string[7];
-		ConsoleEmulator.consoleMemdex = consoleMemdex = 0;
+		_consoleEmulator.consoleMemdex = consoleMemdex = 0;
 		FatigueCheat = false;
 		if (Application.platform == RuntimePlatform.Android) {
 		    fpsCounter.SetActive(true);
 		}
 
-		stepFinished = PauseScript.a.relativeTime;
-		rustleFinished = PauseScript.a.relativeTime;
+		stepFinished = _pauseScript.relativeTime;
+		rustleFinished = _pauseScript.relativeTime;
 		bodyLerpGravityOffDelayFinished = 0;
 		contactsCache = new ContactPoint[16];
     }
 
 	void Update() {
 		// Always allowed items, even when paused...
-		lastCommand0 = ConsoleEmulator.lastCommand[0];
-		lastCommand1 = ConsoleEmulator.lastCommand[1];
-		lastCommand2 = ConsoleEmulator.lastCommand[2];
-		lastCommand3 = ConsoleEmulator.lastCommand[3];
-		lastCommand4 = ConsoleEmulator.lastCommand[4];
-		lastCommand5 = ConsoleEmulator.lastCommand[5];
-		lastCommand6 = ConsoleEmulator.lastCommand[6];
-		consoleMemdex = ConsoleEmulator.consoleMemdex;
-		ConsoleEmulator.ConsoleUpdate();
+		lastCommand0 = _consoleEmulator.lastCommand[0];
+		lastCommand1 = _consoleEmulator.lastCommand[1];
+		lastCommand2 = _consoleEmulator.lastCommand[2];
+		lastCommand3 = _consoleEmulator.lastCommand[3];
+		lastCommand4 = _consoleEmulator.lastCommand[4];
+		lastCommand5 = _consoleEmulator.lastCommand[5];
+		lastCommand6 = _consoleEmulator.lastCommand[6];
+		consoleMemdex = _consoleEmulator.consoleMemdex;
+		_consoleEmulator.ConsoleUpdate();
 
 		// Bug Hunter feedback (puts it into their screenshots for me)
 		if (locationIndicator.activeInHierarchy) {
-			locationText.text = Const.a.stringTable[738] // "location: "
+			locationText.text = _consts.stringTable[738] // "location: "
 								+ (transform.position.x.ToString("00.00")
 								+ " " + transform.position.y.ToString("00.00")
 								+ " " + transform.position.z.ToString("00.00"));
@@ -242,14 +248,14 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 		// Prevent falling or movement while menu is up. Force it here in case
 		// PauseScript didn't catch it at startup.
-		if (PauseScript.a.mainMenu.activeSelf == true) {
+		if (_pauseScript.mainMenu.activeSelf == true) {
 			rbody.useGravity = false;
 			rbody.Sleep();
 			return;
 		}
 
-		if (PauseScript.a.Paused()
-			|| (ressurectingFinished >= PauseScript.a.relativeTime)) {
+		if (_pauseScript.Paused()
+			|| (ressurectingFinished >= _pauseScript.relativeTime)) {
 			return;
 		}
 		
@@ -275,8 +281,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		if (!inCyberSpace) {
 			CyberDestupOrNoclipMaintain();
 		} else {
-			PlayerHealth.a.makingNoise = true; // Cyber enemies more aware.
-			PlayerHealth.a.noiseFinished = PauseScript.a.relativeTime + 0.5f;
+			_playerHealth.makingNoise = true; // Cyber enemies more aware.
+			_playerHealth.noiseFinished = _pauseScript.relativeTime + 0.5f;
 		}
 
 		isSprinting = GetSprintInputState();
@@ -284,7 +290,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		Prone();
 		EndCrouchProneTransition();
 		FatigueApply(); // Here fatigue me out, except in cyberspace
-		Automap.a.UpdateAutomap(transform.localPosition); // Update the map.
+		_automap.UpdateAutomap(transform.localPosition); // Update the map.
 	}
 
 	void FixedUpdate() {
@@ -294,8 +300,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		Vector2 hz = new Vector2(rbody.linearVelocity.x, rbody.linearVelocity.z);
 		playerSpeedHorizontalActual = hz.magnitude;
 
-		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) return;
-		if (ressurectingFinished > PauseScript.a.relativeTime) return;
+		if (_pauseScript.Paused() || _pauseScript.MenuActive()) return;
+		if (ressurectingFinished > _pauseScript.relativeTime) return;
 		if (consoleActivated) return;
 
 		// Crouch/Prone by shrinking the capsule height.
@@ -358,7 +364,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		// Using value of 1.06 = (player capsule height / 2) + 0.06 = 1 + 0.06;
 		bool successfulRay = Physics.Raycast(transform.position, Vector3.down,
 											 out tempHit,1.1f,
-											 Const.a.layerMaskPlayerFeet);
+											 _consts.layerMaskPlayerFeet);
 
 		//Debug.Log("Feet ray 1 success: " + successfulRay.ToString());
 		// Success here means hit a useable something.
@@ -378,7 +384,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			return;
 		}
 
-		if (!Const.a.Footsteps) {
+		if (!_consts.Footsteps) {
 			SFXClothes.Stop();
 			SFXFootsteps.Stop();
 			return;
@@ -390,15 +396,15 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 		if ((Mathf.Abs(relForward) + Mathf.Abs(relSideways)) == 0) return;
 
-		if (rustleFinished < PauseScript.a.relativeTime) {
+		if (rustleFinished < _pauseScript.relativeTime) {
 			rustleFinished = isSprinting
-							 ? PauseScript.a.relativeTime
+							 ? _pauseScript.relativeTime
 							   + UnityEngine.Random.Range(0.4f,0.6f)
-							 : PauseScript.a.relativeTime
+							 : _pauseScript.relativeTime
 							   + UnityEngine.Random.Range(0.8f,1.2f);
 
 			AudioClip rustle =
-				Const.a.sounds[UnityEngine.Random.Range(459,465 + 1)];
+				_consts.sounds[UnityEngine.Random.Range(459,465 + 1)];
 
 			Utils.PlayOneShotSavable(SFXClothes,rustle,
 									 UnityEngine.Random.Range(0.3f,0.5f));
@@ -408,7 +414,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 		successfulRay = Physics.Raycast(transform.position, Vector3.down,
 										out tempHit,feetRayLength,
-										Const.a.layerMaskPlayerFeet);
+										_consts.layerMaskPlayerFeet);
 		
 		if (tempHit.collider == null) return;
 // 		Debug.DrawRay(transform.position,tempHit.point,Color.green,1f,true);
@@ -422,11 +428,11 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		if (prefID == null) return;
 
 		// Footsteps
-		if (stepFinished < PauseScript.a.relativeTime) {
+		if (stepFinished < _pauseScript.relativeTime) {
 			stepFinished = isSprinting
-						   ? PauseScript.a.relativeTime
+						   ? _pauseScript.relativeTime
 							 + UnityEngine.Random.Range(0.2f,0.3f)
-						   : PauseScript.a.relativeTime
+						   : _pauseScript.relativeTime
 							 + UnityEngine.Random.Range(0.35f,0.65f);
 
 			FootStepType fstep = GetFootstepTypeForPrefab(prefID.constIndex);
@@ -780,98 +786,98 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 	
 	public AudioClip JumpSound(FootStepType fstep) {
 		switch(fstep) {
-			case FootStepType.None: return Const.a.sounds[0];
+			case FootStepType.None: return _consts.sounds[0];
 			// + 1 because its exclusive, :eyeroll:
-			case FootStepType.Carpet:      return Const.a.sounds[UnityEngine.Random.Range(540,542 + 1)];
-			case FootStepType.Concrete:    return Const.a.sounds[UnityEngine.Random.Range(546,548 + 1)];
-			case FootStepType.GrittyCrete: return Const.a.sounds[UnityEngine.Random.Range(552,554 + 1)];
-			case FootStepType.Grass:       return Const.a.sounds[UnityEngine.Random.Range(558,560 + 1)];
-			case FootStepType.Gravel:      return Const.a.sounds[UnityEngine.Random.Range(564,566 + 1)];
-			case FootStepType.Rock:        return Const.a.sounds[UnityEngine.Random.Range(570,572 + 1)];
-			case FootStepType.Glass:       return Const.a.sounds[UnityEngine.Random.Range(576,578 + 1)];
-			case FootStepType.Marble:      return Const.a.sounds[UnityEngine.Random.Range(582,584 + 1)];
-			case FootStepType.Metal:       return Const.a.sounds[UnityEngine.Random.Range(588,590 + 1)];
-			case FootStepType.Grate:       return Const.a.sounds[UnityEngine.Random.Range(594,596 + 1)];
-			case FootStepType.Metal2:      return Const.a.sounds[UnityEngine.Random.Range(600,602 + 1)];
-			case FootStepType.Metpanel:    return Const.a.sounds[UnityEngine.Random.Range(606,608 + 1)];
-			case FootStepType.Panel:       return Const.a.sounds[UnityEngine.Random.Range(612,614 + 1)];
-			case FootStepType.Plaster:     return Const.a.sounds[UnityEngine.Random.Range(618,620 + 1)];
-			case FootStepType.Plastic:     return Const.a.sounds[UnityEngine.Random.Range(624,626 + 1)];
-			case FootStepType.Plastic2:    return Const.a.sounds[UnityEngine.Random.Range(630,632 + 1)];
-			case FootStepType.Rubber:      return Const.a.sounds[UnityEngine.Random.Range(636,638 + 1)];
-			case FootStepType.Sand:        return Const.a.sounds[UnityEngine.Random.Range(642,644 + 1)];
-			case FootStepType.Squish:      return Const.a.sounds[UnityEngine.Random.Range(648,650 + 1)];
-			case FootStepType.Vent:        return Const.a.sounds[UnityEngine.Random.Range(429,430 + 1)];
-			case FootStepType.Water:       return Const.a.sounds[UnityEngine.Random.Range(651,654 + 1)];
-			case FootStepType.Wood:        return Const.a.sounds[UnityEngine.Random.Range(661,663 + 1)];
-			case FootStepType.Wood2:       return Const.a.sounds[UnityEngine.Random.Range(667,669 + 1)];
+			case FootStepType.Carpet:      return _consts.sounds[UnityEngine.Random.Range(540,542 + 1)];
+			case FootStepType.Concrete:    return _consts.sounds[UnityEngine.Random.Range(546,548 + 1)];
+			case FootStepType.GrittyCrete: return _consts.sounds[UnityEngine.Random.Range(552,554 + 1)];
+			case FootStepType.Grass:       return _consts.sounds[UnityEngine.Random.Range(558,560 + 1)];
+			case FootStepType.Gravel:      return _consts.sounds[UnityEngine.Random.Range(564,566 + 1)];
+			case FootStepType.Rock:        return _consts.sounds[UnityEngine.Random.Range(570,572 + 1)];
+			case FootStepType.Glass:       return _consts.sounds[UnityEngine.Random.Range(576,578 + 1)];
+			case FootStepType.Marble:      return _consts.sounds[UnityEngine.Random.Range(582,584 + 1)];
+			case FootStepType.Metal:       return _consts.sounds[UnityEngine.Random.Range(588,590 + 1)];
+			case FootStepType.Grate:       return _consts.sounds[UnityEngine.Random.Range(594,596 + 1)];
+			case FootStepType.Metal2:      return _consts.sounds[UnityEngine.Random.Range(600,602 + 1)];
+			case FootStepType.Metpanel:    return _consts.sounds[UnityEngine.Random.Range(606,608 + 1)];
+			case FootStepType.Panel:       return _consts.sounds[UnityEngine.Random.Range(612,614 + 1)];
+			case FootStepType.Plaster:     return _consts.sounds[UnityEngine.Random.Range(618,620 + 1)];
+			case FootStepType.Plastic:     return _consts.sounds[UnityEngine.Random.Range(624,626 + 1)];
+			case FootStepType.Plastic2:    return _consts.sounds[UnityEngine.Random.Range(630,632 + 1)];
+			case FootStepType.Rubber:      return _consts.sounds[UnityEngine.Random.Range(636,638 + 1)];
+			case FootStepType.Sand:        return _consts.sounds[UnityEngine.Random.Range(642,644 + 1)];
+			case FootStepType.Squish:      return _consts.sounds[UnityEngine.Random.Range(648,650 + 1)];
+			case FootStepType.Vent:        return _consts.sounds[UnityEngine.Random.Range(429,430 + 1)];
+			case FootStepType.Water:       return _consts.sounds[UnityEngine.Random.Range(651,654 + 1)];
+			case FootStepType.Wood:        return _consts.sounds[UnityEngine.Random.Range(661,663 + 1)];
+			case FootStepType.Wood2:       return _consts.sounds[UnityEngine.Random.Range(667,669 + 1)];
 		}
 		
-		return Const.a.sounds[0]; // null wav fallback
+		return _consts.sounds[0]; // null wav fallback
 	}
 	
 	public AudioClip JumpLandSound(FootStepType fstep) {
 		switch(fstep) {
-			case FootStepType.None: return Const.a.sounds[0];
+			case FootStepType.None: return _consts.sounds[0];
 			// + 1 because its exclusive, :eyeroll:
-			case FootStepType.Carpet:      return Const.a.sounds[UnityEngine.Random.Range(537,539 + 1)];
-			case FootStepType.Concrete:    return Const.a.sounds[UnityEngine.Random.Range(543,545 + 1)];
-			case FootStepType.GrittyCrete: return Const.a.sounds[UnityEngine.Random.Range(549,551 + 1)];
-			case FootStepType.Grass:       return Const.a.sounds[UnityEngine.Random.Range(555,557 + 1)];
-			case FootStepType.Gravel:      return Const.a.sounds[UnityEngine.Random.Range(561,563 + 1)];
-			case FootStepType.Rock:        return Const.a.sounds[UnityEngine.Random.Range(567,569 + 1)];
-			case FootStepType.Glass:       return Const.a.sounds[UnityEngine.Random.Range(573,575 + 1)];
-			case FootStepType.Marble:      return Const.a.sounds[UnityEngine.Random.Range(579,581 + 1)];
-			case FootStepType.Metal:       return Const.a.sounds[UnityEngine.Random.Range(585,587 + 1)];
-			case FootStepType.Grate:       return Const.a.sounds[UnityEngine.Random.Range(591,593 + 1)];
-			case FootStepType.Metal2:      return Const.a.sounds[UnityEngine.Random.Range(597,599 + 1)];
-			case FootStepType.Metpanel:    return Const.a.sounds[UnityEngine.Random.Range(603,605 + 1)];
-			case FootStepType.Panel:       return Const.a.sounds[UnityEngine.Random.Range(609,611 + 1)];
-			case FootStepType.Plaster:     return Const.a.sounds[UnityEngine.Random.Range(615,617 + 1)];
-			case FootStepType.Plastic:     return Const.a.sounds[UnityEngine.Random.Range(621,623 + 1)];
-			case FootStepType.Plastic2:    return Const.a.sounds[UnityEngine.Random.Range(627,629 + 1)];
-			case FootStepType.Rubber:      return Const.a.sounds[UnityEngine.Random.Range(633,635 + 1)];
-			case FootStepType.Sand:        return Const.a.sounds[UnityEngine.Random.Range(639,641 + 1)];
-			case FootStepType.Squish:      return Const.a.sounds[UnityEngine.Random.Range(645,647 + 1)];
-			case FootStepType.Vent:        return Const.a.sounds[UnityEngine.Random.Range(428,437 + 1)];
-			case FootStepType.Water:       return Const.a.sounds[UnityEngine.Random.Range(655,657 + 1)];
-			case FootStepType.Wood:        return Const.a.sounds[UnityEngine.Random.Range(658,660 + 1)];
-			case FootStepType.Wood2:       return Const.a.sounds[UnityEngine.Random.Range(664,666 + 1)];
+			case FootStepType.Carpet:      return _consts.sounds[UnityEngine.Random.Range(537,539 + 1)];
+			case FootStepType.Concrete:    return _consts.sounds[UnityEngine.Random.Range(543,545 + 1)];
+			case FootStepType.GrittyCrete: return _consts.sounds[UnityEngine.Random.Range(549,551 + 1)];
+			case FootStepType.Grass:       return _consts.sounds[UnityEngine.Random.Range(555,557 + 1)];
+			case FootStepType.Gravel:      return _consts.sounds[UnityEngine.Random.Range(561,563 + 1)];
+			case FootStepType.Rock:        return _consts.sounds[UnityEngine.Random.Range(567,569 + 1)];
+			case FootStepType.Glass:       return _consts.sounds[UnityEngine.Random.Range(573,575 + 1)];
+			case FootStepType.Marble:      return _consts.sounds[UnityEngine.Random.Range(579,581 + 1)];
+			case FootStepType.Metal:       return _consts.sounds[UnityEngine.Random.Range(585,587 + 1)];
+			case FootStepType.Grate:       return _consts.sounds[UnityEngine.Random.Range(591,593 + 1)];
+			case FootStepType.Metal2:      return _consts.sounds[UnityEngine.Random.Range(597,599 + 1)];
+			case FootStepType.Metpanel:    return _consts.sounds[UnityEngine.Random.Range(603,605 + 1)];
+			case FootStepType.Panel:       return _consts.sounds[UnityEngine.Random.Range(609,611 + 1)];
+			case FootStepType.Plaster:     return _consts.sounds[UnityEngine.Random.Range(615,617 + 1)];
+			case FootStepType.Plastic:     return _consts.sounds[UnityEngine.Random.Range(621,623 + 1)];
+			case FootStepType.Plastic2:    return _consts.sounds[UnityEngine.Random.Range(627,629 + 1)];
+			case FootStepType.Rubber:      return _consts.sounds[UnityEngine.Random.Range(633,635 + 1)];
+			case FootStepType.Sand:        return _consts.sounds[UnityEngine.Random.Range(639,641 + 1)];
+			case FootStepType.Squish:      return _consts.sounds[UnityEngine.Random.Range(645,647 + 1)];
+			case FootStepType.Vent:        return _consts.sounds[UnityEngine.Random.Range(428,437 + 1)];
+			case FootStepType.Water:       return _consts.sounds[UnityEngine.Random.Range(655,657 + 1)];
+			case FootStepType.Wood:        return _consts.sounds[UnityEngine.Random.Range(658,660 + 1)];
+			case FootStepType.Wood2:       return _consts.sounds[UnityEngine.Random.Range(664,666 + 1)];
 		}
 		
-		return Const.a.sounds[0]; // null wav fallback
+		return _consts.sounds[0]; // null wav fallback
 	}
 
 	public AudioClip FootStepSound(FootStepType fstep) {
 		switch(fstep) {
-			case FootStepType.None: return Const.a.sounds[0];
+			case FootStepType.None: return _consts.sounds[0];
 			// + 1 because its exclusive, :eyeroll:
-			case FootStepType.Carpet:      return Const.a.sounds[UnityEngine.Random.Range(268,275 + 1)];
-			case FootStepType.Concrete:    return Const.a.sounds[UnityEngine.Random.Range(276,283 + 1)];
-			case FootStepType.GrittyCrete: return Const.a.sounds[UnityEngine.Random.Range(284,291 + 1)];
-			case FootStepType.Grass:       return Const.a.sounds[UnityEngine.Random.Range(292,299 + 1)];
-			case FootStepType.Gravel:      return Const.a.sounds[UnityEngine.Random.Range(300,307 + 1)];
-			case FootStepType.Rock:        return Const.a.sounds[UnityEngine.Random.Range(308,315 + 1)];
-			case FootStepType.Glass:       return Const.a.sounds[UnityEngine.Random.Range(316,323 + 1)];
-			case FootStepType.Marble:      return Const.a.sounds[UnityEngine.Random.Range(324,331 + 1)];
-			case FootStepType.Metal:       return Const.a.sounds[UnityEngine.Random.Range(332,339 + 1)];
-			case FootStepType.Grate:       return Const.a.sounds[UnityEngine.Random.Range(340,347 + 1)];
-			case FootStepType.Metal2:      return Const.a.sounds[UnityEngine.Random.Range(348,355 + 1)];
-			case FootStepType.Metpanel:    return Const.a.sounds[UnityEngine.Random.Range(356,363 + 1)];
-			case FootStepType.Panel:       return Const.a.sounds[UnityEngine.Random.Range(364,371 + 1)];
-			case FootStepType.Plaster:     return Const.a.sounds[UnityEngine.Random.Range(372,379 + 1)];
-			case FootStepType.Plastic:     return Const.a.sounds[UnityEngine.Random.Range(380,387 + 1)];
-			case FootStepType.Plastic2:    return Const.a.sounds[UnityEngine.Random.Range(388,395 + 1)];
-			case FootStepType.Rubber:      return Const.a.sounds[UnityEngine.Random.Range(396,403 + 1)];
-			case FootStepType.Sand:        return Const.a.sounds[UnityEngine.Random.Range(404,411 + 1)];
-			case FootStepType.Squish:      return Const.a.sounds[UnityEngine.Random.Range(412,427 + 1)];
-			case FootStepType.Vent:        return Const.a.sounds[UnityEngine.Random.Range(428,437 + 1)];
-			case FootStepType.Water:       return Const.a.sounds[UnityEngine.Random.Range(438,442 + 1)];
-			case FootStepType.Wood:        return Const.a.sounds[UnityEngine.Random.Range(443,450 + 1)];
-			case FootStepType.Wood2:       return Const.a.sounds[UnityEngine.Random.Range(451,458 + 1)];
+			case FootStepType.Carpet:      return _consts.sounds[UnityEngine.Random.Range(268,275 + 1)];
+			case FootStepType.Concrete:    return _consts.sounds[UnityEngine.Random.Range(276,283 + 1)];
+			case FootStepType.GrittyCrete: return _consts.sounds[UnityEngine.Random.Range(284,291 + 1)];
+			case FootStepType.Grass:       return _consts.sounds[UnityEngine.Random.Range(292,299 + 1)];
+			case FootStepType.Gravel:      return _consts.sounds[UnityEngine.Random.Range(300,307 + 1)];
+			case FootStepType.Rock:        return _consts.sounds[UnityEngine.Random.Range(308,315 + 1)];
+			case FootStepType.Glass:       return _consts.sounds[UnityEngine.Random.Range(316,323 + 1)];
+			case FootStepType.Marble:      return _consts.sounds[UnityEngine.Random.Range(324,331 + 1)];
+			case FootStepType.Metal:       return _consts.sounds[UnityEngine.Random.Range(332,339 + 1)];
+			case FootStepType.Grate:       return _consts.sounds[UnityEngine.Random.Range(340,347 + 1)];
+			case FootStepType.Metal2:      return _consts.sounds[UnityEngine.Random.Range(348,355 + 1)];
+			case FootStepType.Metpanel:    return _consts.sounds[UnityEngine.Random.Range(356,363 + 1)];
+			case FootStepType.Panel:       return _consts.sounds[UnityEngine.Random.Range(364,371 + 1)];
+			case FootStepType.Plaster:     return _consts.sounds[UnityEngine.Random.Range(372,379 + 1)];
+			case FootStepType.Plastic:     return _consts.sounds[UnityEngine.Random.Range(380,387 + 1)];
+			case FootStepType.Plastic2:    return _consts.sounds[UnityEngine.Random.Range(388,395 + 1)];
+			case FootStepType.Rubber:      return _consts.sounds[UnityEngine.Random.Range(396,403 + 1)];
+			case FootStepType.Sand:        return _consts.sounds[UnityEngine.Random.Range(404,411 + 1)];
+			case FootStepType.Squish:      return _consts.sounds[UnityEngine.Random.Range(412,427 + 1)];
+			case FootStepType.Vent:        return _consts.sounds[UnityEngine.Random.Range(428,437 + 1)];
+			case FootStepType.Water:       return _consts.sounds[UnityEngine.Random.Range(438,442 + 1)];
+			case FootStepType.Wood:        return _consts.sounds[UnityEngine.Random.Range(443,450 + 1)];
+			case FootStepType.Wood2:       return _consts.sounds[UnityEngine.Random.Range(451,458 + 1)];
 		}
 
-		return Const.a.sounds[0]; // null wav
+		return _consts.sounds[0]; // null wav
 	}
 
 	float GetBasePlayerSpeed() {
@@ -883,7 +889,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 		float retval = maxWalkSpeed;
 		bonus = 0f;
-		if (Inventory.a.BoosterActive()) bonus = boosterSpeedBoost;
+		if (_inventory.BoosterActive()) bonus = boosterSpeedBoost;
 		switch (bodyState) {
 			case BodyState.Standing: 		retval = maxWalkSpeed;   break;
 			case BodyState.Crouch: 			retval = maxCrouchSpeed; break;
@@ -894,8 +900,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			case BodyState.ProningUp: 		retval = maxProneSpeed;  break;
 		}
 
-		if ((isSprinting || Inventory.a.BoosterActive()) && running) {
-			if (fatigue > 80f && !Inventory.a.BoosterActive()) {
+		if ((isSprinting || _inventory.BoosterActive()) && running) {
+			if (fatigue > 80f && !_inventory.BoosterActive()) {
 				retval = maxSprintSpeedFatigued;
 			} else {
 				retval = maxSprintSpeed;
@@ -958,13 +964,13 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 	}
 
 	void SetRunningRelForwardsAndSidewaysFlags() {
-		relForward = GetInput.a.Backpedal() ? -1f : 0f;
-		if (GetInput.a.Forward()) {
+		relForward = _getInput.Backpedal() ? -1f : 0f;
+		if (_getInput.Forward()) {
 			relForward = 1f;
 		}
 
-		relSideways = GetInput.a.StrafeLeft() ? -1f : 0f;
-		if (GetInput.a.StrafeRight()) relSideways = 1f;
+		relSideways = _getInput.StrafeLeft() ? -1f : 0f;
+		if (_getInput.StrafeRight()) relSideways = 1f;
 
 		// Now check for thumbstick/joystick input
 		Vector2 leftThumbstick = new Vector2(
@@ -1020,8 +1026,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 	}
 
 	void ApplyGravity() {
-// 		if (gravFinished < PauseScript.a.relativeTime) {
-// 			gravFinished = PauseScript.a.relativeTime + 0.01f;
+// 		if (gravFinished < _pauseScript.relativeTime) {
+// 			gravFinished = _pauseScript.relativeTime + 0.01f;
 // 			rbody.AddRelativeForce(Vector3.down * 9.83f * 9.83f);
 // 		}
 	}
@@ -1032,8 +1038,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 				if (isSprinting) return;
 			} else {
 				if (isSprinting && running) {
-					if (GetInput.a.SwimUp()) return;
-					if (GetInput.a.SwimDn()) return;
+					if (_getInput.SwimUp()) return;
+					if (_getInput.SwimDn()) return;
 				}
 			}
 		}
@@ -1054,7 +1060,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 											  deceleration);
 			if (isSprinting && running) return;
 		} else {
-			if (Inventory.a.BoosterActive()) {
+			if (_inventory.BoosterActive()) {
 				deceleration = walkDeaccelerationBooster;
 			}
 
@@ -1082,7 +1088,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		if (inCyberSpace) return; // 6dof handled in MouseLookScript for this.
 		if (CheatNoclip) return;
 
-		if (GetInput.a.LeanRight()) {
+		if (_getInput.LeanRight()) {
 			float trigFrac = Input.GetAxisRaw("JoyAxis3"); // L2
 			float spd = leanSpeed;
 			if (trigFrac > 0) spd *= trigFrac;
@@ -1093,7 +1099,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 			leanShift = -1 * (leanMaxShift * (leanTarget/leanMaxAngle));
 		}
-		if (GetInput.a.LeanLeft()) {
+		if (_getInput.LeanLeft()) {
 			float trigFrac = Input.GetAxisRaw("JoyAxis6"); // R2
 			float spd = leanSpeed;
 			if (trigFrac > 0) spd *= trigFrac;
@@ -1118,10 +1124,10 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			return true;
 		} else {
 			if (bodyLerpGravityOffDelayFinished == 0) {
-				bodyLerpGravityOffDelayFinished = PauseScript.a.relativeTime + 0.25f;
+				bodyLerpGravityOffDelayFinished = _pauseScript.relativeTime + 0.25f;
 			}
 
-			if (bodyLerpGravityOffDelayFinished > PauseScript.a.relativeTime) {
+			if (bodyLerpGravityOffDelayFinished > _pauseScript.relativeTime) {
 				return true;
 			}
 		}
@@ -1136,39 +1142,39 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 	// Get input for Jump and set impulse time, removed
 	// "&& (ladderState == 0)" since I want to be able to jump off a ladder
 	void Jump() {
-		if (CheatNoclip && !Inventory.a.JumpJetsActive()) return;
+		if (CheatNoclip && !_inventory.JumpJetsActive()) return;
 
-		if (doubleJumpFinished < PauseScript.a.relativeTime) {
+		if (doubleJumpFinished < _pauseScript.relativeTime) {
 			doubleJumpTicks--;
 			if (doubleJumpTicks < 0) doubleJumpTicks = 0;
 		}
 
-		if ((!gravliftState && GetInput.a.Jump())
-			|| gravliftState && GetInput.a.JumpDown()) {
+		if ((!gravliftState && _getInput.Jump())
+			|| gravliftState && _getInput.JumpDown()) {
 
 			Debug.Log("CALLED JUMP");
 			
 			if (!justJumped) {
-				if (grounded || gravliftState || Inventory.a.JumpJetsActive()) {
+				if (grounded || gravliftState || _inventory.JumpJetsActive()) {
 					jumpTime = jumpImpulseTime;
-					doubleJumpFinished = PauseScript.a.relativeTime + Const.doubleClickTime;
+					doubleJumpFinished = _pauseScript.relativeTime + Const.doubleClickTime;
 					doubleJumpTicks++;
 					justJumped = true;
-					if (!Inventory.a.JumpJetsActive() && !Inventory.a.BoosterActive()) {
+					if (!_inventory.JumpJetsActive() && !_inventory.BoosterActive()) {
 						fatigue += jumpFatigue;
 					}
 				} else {
 					if (ladderState > 1) {
 						jumpTime = jumpImpulseTime;
 						justJumped = true;
-						if (!Inventory.a.JumpJetsActive() && !Inventory.a.BoosterActive()) {
+						if (!_inventory.JumpJetsActive() && !_inventory.BoosterActive()) {
 							fatigue += jumpFatigue;
 						}
 					}
 				}
 			}
 
-			if (Inventory.a.BoosterActive() && Inventory.a.BoosterSetToBoost()) {
+			if (_inventory.BoosterActive() && _inventory.BoosterSetToBoost()) {
 				if (justJumped && doubleJumpTicks == 2) {
 					// Booster thrust
 					rbody.AddForce(new Vector3(transform.forward.x * burstForce,
@@ -1176,19 +1182,16 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 											   transform.forward.z * burstForce),
 											   ForceMode.Impulse);
 					
-					PlayerHealth.a.makingNoise = true;
-					PlayerHealth.a.noiseFinished = PauseScript.a.relativeTime + 0.5f;
-					PlayerEnergy.a.TakeEnergy(22f);
-					if (BiomonitorGraphSystem.a != null) {
-						BiomonitorGraphSystem.a.EnergyPulse(22f);
-					}
-
+					_playerHealth.makingNoise = true;
+					_playerHealth.noiseFinished = _pauseScript.relativeTime + 0.5f;
+					_playerEnergy.TakeEnergy(22f);
+					_biomonitorGraphSystem.EnergyPulse(22f);
 					justJumped = false;
 					jumpTime = 0;
 					doubleJumpTicks = 0;
 
 					// Make sure we can't do it again right away.
-					doubleJumpFinished = PauseScript.a.relativeTime - 1f;
+					doubleJumpFinished = _pauseScript.relativeTime - 1f;
 				}
 			}
 		}
@@ -1203,29 +1206,27 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		while (jumpTimeMod > 0) { // Why is this a `while` instead of an `if`??
 							   // Because otherwise it don't work, duh!
 			jumpTimeMod -= Time.smoothDeltaTime;
-			if (fatigue > 80 && !Inventory.a.JumpJetsActive()) {
+			if (fatigue > 80 && !_inventory.JumpJetsActive()) {
 				jumpVelocityApply = jumpVelocityFatigued * rbody.mass;
 				jumpVel.y = jumpVelocityApply;
 			}
 
-			if (Inventory.a.JumpJetsActive()) {
+			if (_inventory.JumpJetsActive()) {
 				float energysuck = 25f;
 				jumpVelocityApply = jumpVelocityBoots * rbody.mass;
 				jumpVel.y = jumpVelocityApply;
-				switch (Inventory.a.hardwareVersionSetting[10]) {
+				switch (_inventory.hardwareVersionSetting[10]) {
 					case 0: energysuck = 11f; break;
 					case 1: energysuck = 26f; break;
 					case 2: energysuck = 22f; break;
 				}
 
-				if (PlayerEnergy.a.energy >= energysuck) {
+				if (_playerEnergy.energy >= energysuck) {
 					rbody.AddForce(jumpVel,ForceMode.Force);  // huhnh!
-					if (jumpJetEnergySuckTickFinished < PauseScript.a.relativeTime) {
-						jumpJetEnergySuckTickFinished = PauseScript.a.relativeTime + jumpJetEnergySuckTick;
-						PlayerEnergy.a.TakeEnergy(energysuck);
-						if (BiomonitorGraphSystem.a != null) {
-							BiomonitorGraphSystem.a.EnergyPulse(energysuck);
-						}
+					if (jumpJetEnergySuckTickFinished < _pauseScript.relativeTime) {
+						jumpJetEnergySuckTickFinished = _pauseScript.relativeTime + jumpJetEnergySuckTick;
+						_playerEnergy.TakeEnergy(energysuck);
+						_biomonitorGraphSystem.EnergyPulse(energysuck);
 					}
 				} else {
 					hwbJumpJets.JumpJetsOff();
@@ -1240,21 +1241,21 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			}
 		}
 
-		if (justJumped && !Inventory.a.JumpJetsActive()) {
+		if (justJumped && !_inventory.JumpJetsActive()) {
 			// Play jump sound
-			if (jumpSFXFinished < PauseScript.a.relativeTime) {
-				jumpSFXFinished = PauseScript.a.relativeTime + jumpSFXIntervalTime;
+			if (jumpSFXFinished < _pauseScript.relativeTime) {
+				jumpSFXFinished = _pauseScript.relativeTime + jumpSFXIntervalTime;
 				SFX.pitch = 1f;
 				float jumpSFXVolume = 1.0f;
 				if (fatigue > 80) jumpSFXVolume = 0.5f; // Quietly, we tired.
 				
-				PlayerHealth.a.makingNoise = true;
-				PlayerHealth.a.noiseFinished = PauseScript.a.relativeTime + 0.5f;
+				_playerHealth.makingNoise = true;
+				_playerHealth.noiseFinished = _pauseScript.relativeTime + 0.5f;
 				Physics.Raycast(transform.position, Vector3.down,
 								out tempHit,feetRayLength,
-								Const.a.layerMaskPlayerFeet);
+								_consts.layerMaskPlayerFeet);
 				
-				if (tempHit.collider == null) { Utils.PlayOneShotSavable(SFX,SFXJump,jumpSFXVolume); return; }
+				if (tempHit.collider == null) { Utils.PlayOneShotSavable(_consts,SFX,SFXJump,jumpSFXVolume); return; }
 				GameObject hitGO = tempHit.collider.transform.gameObject;
 				PrefabIdentifier prefID = hitGO.GetComponent<PrefabIdentifier>();
 				if (prefID == null) {
@@ -1262,11 +1263,11 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 						prefID = hitGO.transform.parent.gameObject.GetComponent<PrefabIdentifier>();
 					}
 				}
-				if (prefID == null) { Utils.PlayOneShotSavable(SFX,SFXJump,jumpSFXVolume); return; }
+				if (prefID == null) { Utils.PlayOneShotSavable(_consts,SFX,SFXJump,jumpSFXVolume); return; }
 				
 				FootStepType fstep = GetFootstepTypeForPrefab(prefID.constIndex);
 				AudioClip stcp = JumpSound(fstep);
-				Utils.PlayTempAudio(transform.position - feetOffset,stcp,jumpSFXVolume);
+				Utils.PlayTempAudio(_consts,transform.position - feetOffset,stcp,jumpSFXVolume);
 			}
 			justJumped = false;
 		}
@@ -1282,10 +1283,10 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		float sidForce = 0f;
 		float forForce = 0f;
 		float upForce = 0f;
-		if (grounded || Inventory.a.JumpJetsActive()) {
+		if (grounded || _inventory.JumpJetsActive()) {
 			// Ladder climb, allow while grounded
 			float bonus = 1f;
-			if (Inventory.a.JumpJetsActive()) bonus = 2f;
+			if (_inventory.JumpJetsActive()) bonus = 2f;
 
 			sidForce = relSideways * walkAcceleration * Time.deltaTime;
 			forForce = relForward * walkAcceleration * Time.deltaTime;
@@ -1296,12 +1297,12 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			rbody.AddRelativeForce(sidForce,upForce,forForce);
 		} else {
 			// Climbing off the ground
-			if (ladderSFXFinished < PauseScript.a.relativeTime
+			if (ladderSFXFinished < _pauseScript.relativeTime
 				&& rbody.linearVelocity.y > ladderSpeed * 0.5f) {
 
 				SFX.pitch = (UnityEngine.Random.Range(0.8f,1.2f));
-				Utils.PlayOneShotSavable(SFX,SFXLadder,0.2f);
-				ladderSFXFinished = PauseScript.a.relativeTime
+				Utils.PlayOneShotSavable(_consts,SFX,SFXLadder,0.2f);
+				ladderSFXFinished = _pauseScript.relativeTime
 									+ ladderSFXIntervalTime;
 			}
 
@@ -1316,7 +1317,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			rbody.AddRelativeForce(sidForce,upForce,forForce);
 		}
 
-		if (Inventory.a.BoosterActive() && Inventory.a.BoosterSetToSkates()) {
+		if (_inventory.BoosterActive() && _inventory.BoosterSetToSkates()) {
 			deceleration = walkDeaccelerationBooster;
 		} else {
 			deceleration = walkDeacceleration;
@@ -1352,11 +1353,11 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		movDir = movDir.normalized;
 		if (floorDot < 0.98f) {
 			if (Vector3.Dot(movDir,floorAng) < 0f) {
-				if (Inventory.a.BoosterActive()) forForce *= 2f;
+				if (_inventory.BoosterActive()) forForce *= 2f;
 			}
 		}
 
-		if (grounded || Inventory.a.JumpJetsActive()) {
+		if (grounded || _inventory.JumpJetsActive()) {
 			// Normal walking
 			runTime += Time.deltaTime;
 			if (relForward == 0 && relSideways == 0) runTime = 0;
@@ -1366,14 +1367,14 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			movDir.y = 0;
 			if (floorDot > 0.9f) rbody.linearVelocity = movDir;
 			movDir = movDir.normalized;
-			if (fatigueFinished2 < PauseScript.a.relativeTime
+			if (fatigueFinished2 < _pauseScript.relativeTime
 				&& movDir.sqrMagnitude > 0f && grounded
 				&& (relForward != 0 || relSideways != 0)) {
 
-				fatigueFinished2 = PauseScript.a.relativeTime
+				fatigueFinished2 = _pauseScript.relativeTime
 								   + fatigueWaneTickSecs;
 
-				if (!Inventory.a.BoosterActive()) {
+				if (!_inventory.BoosterActive()) {
 					if (isSprinting) fatigue += fatiguePerSprintTick;
 					else fatigue += fatiguePerWalkTick;
 				}
@@ -1400,7 +1401,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		// Handle fall damage (no impact damage in cyber space 5/5/18, JJ)
 		float velChange = Mathf.Abs((oldVelocity.y - rbody.linearVelocity.y));
 		if (velChange >= fallDamageSpeed) {
-			DamageData dd = new DamageData ();
+			DamageData dd = new DamageData (_consts);
 			float falltake = fallDamage - UnityEngine.Random.Range(0,68f);
 			if (falltake > hm.health && falltake - hm.health < 5f) falltake = hm.health - 1f; // some small saving grace
 			dd.damage = falltake; // No need for GetDamageTakeAmount since this is strictly internal to Player
@@ -1409,11 +1410,11 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			dd.isOtherNPC = false;
 			// No impact force from fall damage.
 			hm.TakeDamage (dd);
-			PlayerHealth.a.makingNoise = true;
+			_playerHealth.makingNoise = true;
 		}
 		
 		if (velChange >= 3f) {
-			Physics.Raycast(transform.position, Vector3.down,out tempHit,feetRayLength,Const.a.layerMaskPlayerFeet);
+			Physics.Raycast(transform.position, Vector3.down,out tempHit,feetRayLength,_consts.layerMaskPlayerFeet);
 			if (tempHit.collider == null) return;
 			
 			GameObject hitGO = tempHit.collider.transform.gameObject;
@@ -1428,7 +1429,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			FootStepType fstep = GetFootstepTypeForPrefab(prefID.constIndex);
 			AudioClip stcp = JumpLandSound(fstep);
 			float vol = Mathf.Max(Mathf.Min(1f - ((fallDamageSpeed - velChange) / fallDamageSpeed),1f),0.5f);
-			Utils.PlayTempAudio(transform.position - feetOffset,stcp,vol);
+			Utils.PlayTempAudio(_consts,transform.position - feetOffset,stcp,vol);
 		}
 	}
 
@@ -1445,8 +1446,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 		inputtingMovement = false;
 
-		if (GetInput.a.Forward()) {
-			if (turboFinished > PauseScript.a.relativeTime) {
+		if (_getInput.Forward()) {
+			if (turboFinished > _pauseScript.relativeTime) {
 				if (Vector3.Project(rbody.linearVelocity, (cameraObject.transform.forward)).magnitude < playerSpeed * 2f)
 					rbody.AddForce(cameraObject.transform.forward * walkAcceleration * 1.3f * 2f * Time.deltaTime,ForceMode.Acceleration); // double speed with turbo on
 			} else {
@@ -1456,8 +1457,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			inputtingMovement = true;
 		}
 
-		if (GetInput.a.Backpedal()) {
-			if (turboFinished > PauseScript.a.relativeTime) {
+		if (_getInput.Backpedal()) {
+			if (turboFinished > _pauseScript.relativeTime) {
 				if (Vector3.Project(rbody.linearVelocity, (cameraObject.transform.forward * -1f)).magnitude < playerSpeed * 2f)
 				rbody.AddForce(cameraObject.transform.forward * walkAcceleration * 1.3f * 2f * Time.deltaTime * -1f,ForceMode.Acceleration); // double speed with turbo on
 			} else {
@@ -1467,8 +1468,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			inputtingMovement = true;
 		}
 
-		if (GetInput.a.StrafeLeft()) {
-			if (turboFinished > PauseScript.a.relativeTime) {
+		if (_getInput.StrafeLeft()) {
+			if (turboFinished > _pauseScript.relativeTime) {
 				if (Vector3.Project(rbody.linearVelocity, (cameraObject.transform.right * -1f)).magnitude < playerSpeed * 2f)
 				rbody.AddForce(cameraObject.transform.right * walkAcceleration * 1.3f * 2f * Time.deltaTime * -1f,ForceMode.Acceleration); // double speed with turbo on
 			} else {
@@ -1478,8 +1479,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			inputtingMovement = true;
 		}
 
-		if (GetInput.a.StrafeRight()) {
-			if (turboFinished > PauseScript.a.relativeTime) {
+		if (_getInput.StrafeRight()) {
+			if (turboFinished > _pauseScript.relativeTime) {
 				if (Vector3.Project(rbody.linearVelocity, cameraObject.transform.right).magnitude < playerSpeed * 2f)
 				rbody.AddForce(cameraObject.transform.right * walkAcceleration * 1.3f * 2f * Time.deltaTime,ForceMode.Acceleration); // double speed with turbo on
 			} else {
@@ -1489,14 +1490,14 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			inputtingMovement = true;
 		}
 
-		if (Const.a.difficultyCyber > 1) {
+		if (_consts.difficultyCyber > 1) {
 			if (rbody.linearVelocity.magnitude < walkAcceleration * 0.05f) {
-				tempVec = MouseCursor.a.GetCursorScreenPointForRay();
-				tempVec = MouseLookScript.a.playerCamera.ScreenPointToRay(tempVec).direction;
+				tempVec = _mouseCursor.GetCursorScreenPointForRay();
+				tempVec = _mouseLookScript.playerCamera.ScreenPointToRay(tempVec).direction;
 				rbody.AddForce(tempVec * walkAcceleration*0.05f * Time.deltaTime); // turbo doesn't affect detrimental forces :)
 			}
 		} else {
-			if (!inputtingMovement && !inCyberTube) rbody.linearVelocity = Const.a.vectorZero;
+			if (!inputtingMovement && !inCyberTube) rbody.linearVelocity = _consts.vectorZero;
 		}
 	}
 
@@ -1504,8 +1505,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		if (!CheatNoclip) return;
 
 		rbody.AddRelativeForce(relSideways * 2f * walkAcceleration * Time.deltaTime, 0, relForward * 2f * walkAcceleration * Time.deltaTime);
-		if (GetInput.a.SwimUp()) rbody.AddRelativeForce(0, 4f * walkAcceleration * Time.deltaTime, 0); // Noclip up and down
-		if (GetInput.a.SwimDn()) rbody.AddRelativeForce(0, 4f * walkAcceleration * Time.deltaTime * -1, 0);
+		if (_getInput.SwimUp()) rbody.AddRelativeForce(0, 4f * walkAcceleration * Time.deltaTime, 0); // Noclip up and down
+		if (_getInput.SwimDn()) rbody.AddRelativeForce(0, 4f * walkAcceleration * Time.deltaTime * -1, 0);
 	}
 
 	Vector2 GetClampedHorizontalMovement() {
@@ -1529,7 +1530,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		if (fatigue < 0) fatigue = 0; // Clamp at 0% minimum.
 
 		if (fatigue > 80f && !fatigueWarned && !inCyberSpace) {
-			twm.SendWarning(Const.a.stringTable[868],0.1f,0,HUDColor.White,324);
+			twm.SendWarning(_consts.stringTable[868],0.1f,0,HUDColor.White,324);
 			fatigueWarned = true;
 		} else {
 			fatigueWarned = false;
@@ -1537,9 +1538,9 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 		if (inCyberSpace) return;
 		if (CheatNoclip || FatigueCheat) { fatigue = 0; return; }
-		if (fatigueFinished >= PauseScript.a.relativeTime) return;
+		if (fatigueFinished >= _pauseScript.relativeTime) return;
 
-		fatigueFinished = PauseScript.a.relativeTime + fatigueWaneTickSecs;
+		fatigueFinished = _pauseScript.relativeTime + fatigueWaneTickSecs;
 		switch (bodyState) {
 			case BodyState.Standing:    fatigue -= fatigueWanePerTick; break;
 			case BodyState.Crouch:      fatigue -= fatigueWanePerTickCrouched; break;
@@ -1587,7 +1588,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		if (inCyberSpace) return;
 		if (CheatNoclip) return;
 		if (consoleActivated) return;
-		if (!GetInput.a.Prone()) return;
+		if (!_getInput.Prone()) return;
 
 		if (bodyState != BodyState.Prone && bodyState != BodyState.ProningDown) {
 			bodyState = BodyState.ProningDown;
@@ -1595,7 +1596,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			if (bodyState == BodyState.Prone || bodyState == BodyState.ProningDown) {
 				if (CantStand()) {
 					if (CantCrouch()) {
-						Const.sprint(Const.a.stringTable[188]);
+						_consts.sprint(_consts.stringTable[188]);
 						return; // Can't crouch here
 					} else bodyState = BodyState.ProningUp; // Can't stand, but can crouch here
 
@@ -1610,12 +1611,12 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 	bool CantStand() {
 		// Capsule default height is 2f.
 		// 0.02f cushion added to 0.16f dist to top of head from camera.
-		// 0.18f = 0.02f + (capsuleHeight * 0.5f) - Const.a.playerCameraOffsetY
+		// 0.18f = 0.02f + (capsuleHeight * 0.5f) - _consts.playerCameraOffsetY
 		// = 0.02f + (1 - 0.84f) = 0.02f + 0.16f
 		//
 		// Crouch/Prone add:
 		// 1.6f = capsule height (2f) - (capsule height (2f) * prone ratio (0.2f)) = 2f - 0.4f.
-		float ofsY = ((1f - Const.a.playerCameraOffsetY) + 0.02f
+		float ofsY = ((1f - _consts.playerCameraOffsetY) + 0.02f
 					 + ((1f - currentCrouchRatio) * 1.6f)); // Crouch/Prone add
 
 		Vector3 ofs = new Vector3(0f,ofsY,0f);
@@ -1635,17 +1636,17 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		if (inCyberSpace) return;
 		if (CheatNoclip) return;
 		if (consoleActivated) return;
-		if (!GetInput.a.Crouch()) return;
+		if (!_getInput.Crouch()) return;
 
 		if ((bodyState == BodyState.Crouch) || (bodyState == BodyState.CrouchingDown)) {
-			if (CantStand()) Const.sprint(Const.a.stringTable[187]); // Can't stand here
+			if (CantStand()) _consts.sprint(_consts.stringTable[187]); // Can't stand here
 			else bodyState = BodyState.StandingUp; // Start standing up
 		} else {
 			if ((bodyState == BodyState.Standing) || (bodyState == BodyState.StandingUp)) {
 				bodyState = BodyState.CrouchingDown; // Start crouching down
 			} else {
 				if ((bodyState == BodyState.Prone) || (bodyState == BodyState.ProningDown)) {
-					if ((CantCrouch())) { Const.sprint(Const.a.stringTable[188]); return; } // Can't crouch here
+					if ((CantCrouch())) { _consts.sprint(_consts.stringTable[188]); return; } // Can't crouch here
 					
 					bodyState = BodyState.ProningUp; // Start getting up to crouch
 				}
@@ -1659,11 +1660,11 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		bool conditions = (grounded || CheatNoclip || ladderState > 0
 						   || gravliftState);
 
-		if (GetInput.a.Sprint()) {
-			if (conditions) return !(GetInput.a.CapsLockOn());
+		if (_getInput.Sprint()) {
+			if (conditions) return !(_getInput.CapsLockOn());
 			return false;
 		} else {
-			if (conditions) return GetInput.a.CapsLockOn();
+			if (conditions) return _getInput.CapsLockOn();
 			return false; // Can't sprint in the air.
 		}
 	}
@@ -1672,7 +1673,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		if (inCyberSpace && !cyberSetup) {
 			cyberCollider.enabled = true;
 			capsuleCollider.enabled = false;
-			MouseLookScript.a.inCyberSpace = true; // Enable full camera rotation up/down by disabling clamp
+			_mouseLookScript.inCyberSpace = true; // Enable full camera rotation up/down by disabling clamp
 			oldBodyState = bodyState;
 			bodyState = BodyState.Standing; // Put to "standing" to prevent speed anomolies
 			cyberSetup = true;
@@ -1685,8 +1686,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			cyberDesetup = false;
 			cyberSetup = false;
 			cyberCollider.enabled = false; // Can't touch dis!
-			Mathf.Clamp(MouseLookScript.a.xRotation, -90f, 90f); // Pre-clamp camera rotation.
-			MouseLookScript.a.inCyberSpace = false; // Disable full camera rotation up/down by enabling auto clamp.
+			Mathf.Clamp(_mouseLookScript.xRotation, -90f, 90f); // Pre-clamp camera rotation.
+			_mouseLookScript.inCyberSpace = false; // Disable full camera rotation up/down by enabling auto clamp.
 			bodyState = oldBodyState; // Return to what we were doing in the "real world" (real lol)
 			if (CheatNoclip) { // Flying cheat...also map editing mode!
 				capsuleCollider.enabled = false; //na nana na, na na, can't touch dis
@@ -1760,7 +1761,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 	// Reset grounded to false when player is mid-air
 	void OnCollisionExit (){
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			// Automatically set grounded to false to prevent ability to climb any wall (Cheat!)
 			if (!CheatWallSticky) {
 				grounded = false;
@@ -1772,17 +1773,17 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 
 	// Sets grounded based on normal angle of the impact point (NOTE: This is not the surface normal!)
 	void OnCollisionStay(Collision collision) {
-		if (PauseScript.a.Paused() || inCyberSpace) return;
+		if (_pauseScript.Paused() || inCyberSpace) return;
 		
 		int contactCount = collision.contactCount;
 		float maxSlope = 0.35f;
-		if (Inventory.a.BoosterActive()) maxSlope = 0.7f;
+		if (_inventory.BoosterActive()) maxSlope = 0.7f;
 		for(tempInt=0;tempInt<collision.contactCount;tempInt++) {
 			contactPoint = collision.GetContact(tempInt);;
 			floorAng = contactPoint.normal;
 			floorDot = Vector3.Dot(floorAng,Vector3.up);
 			if (floorDot <= 1f && floorDot >= maxSlope) {
-				if (!grounded) stepFinished = PauseScript.a.relativeTime;
+				if (!grounded) stepFinished = _pauseScript.relativeTime;
 				grounded = true;
 				return;
 			}
@@ -1807,12 +1808,12 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 			case 12: arsenal = cheatL6arsenal; break;
 			default: arsenal = cheatL1arsenal; break;
 		}
-		GameObject cheatArsenal = Instantiate(arsenal,transform.position,
-								    Const.a.quaternionIdentity) as GameObject;
+		GameObject cheatArsenal = GameBindings.InstantiatePrefab(arsenal,transform.position,
+								    _consts.quaternionIdentity) as GameObject;
 									
 		if (cheatArsenal == null) return; // Failed!
 
-		Transform prt = LevelManager.a.GetCurrentDynamicContainer().transform;
+		Transform prt = _levelManager.GetCurrentDynamicContainer().transform;
 		cheatArsenal.transform.SetParent(prt);
 		int childCount = cheatArsenal.transform.childCount;
 		for (int i=childCount - 1;i>= 0; i--) {
@@ -1830,7 +1831,7 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		consolebg.enabled = false;
 		consoleentryText.text = "";
 		consoleentryText.enabled = false;
-		ConsoleEmulator.consoleMemdex = consoleMemdex = 0;
+		_consoleEmulator.consoleMemdex = consoleMemdex = 0;
 	}
 
 	void ConsoleEnable() {
@@ -1844,21 +1845,22 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		consoleinpFd.ActivateInputField();
 		consolebg.enabled = true;
 		consoleentryText.enabled = true;
-		ConsoleEmulator.consoleMemdex = consoleMemdex = 0;
+		_consoleEmulator.consoleMemdex = consoleMemdex = 0;
 	}
 
     public void ToggleConsole() {
 		if (consoleActivated) {
 			ConsoleDisable();
-			PauseScript.a.PauseDisable();
+			_pauseScript.PauseDisable();
 		} else {
 			ConsoleEnable();
-			PauseScript.a.PauseEnable();
+			_pauseScript.PauseEnable();
 		}
     }
 
 	public static string Save(GameObject go) {
 		PlayerMovement pm = go.GetComponent<PlayerMovement>();
+		var pauseScript = pm._pauseScript;
 		s1.Clear();
 		s1.Append(Utils.SaveTransform(go.transform));
 		s1.Append(Utils.splitChar);
@@ -1894,9 +1896,9 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(pm.justJumped,"justJumped"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pm.fatigueFinished,"fatigueFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.fatigueFinished,"fatigueFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pm.fatigueFinished2,"fatigueFinished2"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.fatigueFinished2,"fatigueFinished2"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(pm.cyberSetup,"cyberSetup"));
 		s1.Append(Utils.splitChar);
@@ -1908,19 +1910,19 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(pm.leanShift,"leanShift"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pm.jumpSFXFinished,"jumpSFXFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.jumpSFXFinished,"jumpSFXFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pm.jumpLandSoundFinished,"jumpLandSoundFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.jumpLandSoundFinished,"jumpLandSoundFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pm.jumpJetEnergySuckTickFinished,"jumpJetEnergySuckTickFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.jumpJetEnergySuckTickFinished,"jumpJetEnergySuckTickFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(pm.fatigueWarned,"fatigueWarned"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pm.turboFinished,"turboFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.turboFinished,"turboFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pm.ressurectingFinished,"ressurectingFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.ressurectingFinished,"ressurectingFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pm.doubleJumpFinished,"doubleJumpFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.doubleJumpFinished,"doubleJumpFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(pm.SFX.time,"SFX.time"));
 		s1.Append(Utils.splitChar);
@@ -1931,8 +1933,9 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		return s1.ToString();
 	}
 
-	public static int Load(GameObject go, ref string[] entries, int index) {
+	public static int Load(Const @consts,GameObject go, ref string[] entries, int index) {
 		PlayerMovement pm = go.GetComponent<PlayerMovement>();
+		var pauseScript = pm._pauseScript;
 		float readFloatx, readFloaty, readFloatz;
 		string oldpos = go.transform.localPosition.ToString();
 		index = Utils.LoadTransform(go.transform,ref entries,index);
@@ -1956,8 +1959,8 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		pm.oldVelocity = new Vector3(readFloatx,readFloaty,readFloatz);
 		pm.fatigue = Utils.GetFloatFromString(entries[index],"fatigue"); index++;
 		pm.justJumped = Utils.GetBoolFromString(entries[index],"justJumped"); index++;
-		pm.fatigueFinished = Utils.LoadRelativeTimeDifferential(entries[index],"fatigueFinished"); index++;
-		pm.fatigueFinished2 = Utils.LoadRelativeTimeDifferential(entries[index],"fatigueFinished2"); index++;
+		pm.fatigueFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"fatigueFinished"); index++;
+		pm.fatigueFinished2 = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"fatigueFinished2"); index++;
 		pm.cyberSetup = Utils.GetBoolFromString(entries[index],"cyberSetup"); index++;
 		pm.cyberDesetup = Utils.GetBoolFromString(entries[index],"cyberDesetup"); index++;
 		pm.oldBodyState = Utils.IntToBodyState(Utils.GetIntFromString(entries[index],"oldBodyState")); index++;
@@ -1965,20 +1968,20 @@ public class PlayerMovement : MonoBehaviour, ISingletonInitializer {
 		pm.leanShift = Utils.GetFloatFromString(entries[index],"leanShift"); index++;
 		pm.leanTransform.localRotation = Quaternion.Euler(0, 0, pm.leanTarget);
 		pm.leanTransform.localPosition = new Vector3(pm.leanShift,0,0);
-		pm.jumpSFXFinished = Utils.LoadRelativeTimeDifferential(entries[index],"jumpSFXFinished"); index++;
-		pm.jumpLandSoundFinished = Utils.LoadRelativeTimeDifferential(entries[index],"jumpLandSoundFinished"); index++;
-		pm.jumpJetEnergySuckTickFinished = Utils.LoadRelativeTimeDifferential(entries[index],"jumpJetEnergySuckTickFinished"); index++;
+		pm.jumpSFXFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"jumpSFXFinished"); index++;
+		pm.jumpLandSoundFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"jumpLandSoundFinished"); index++;
+		pm.jumpJetEnergySuckTickFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"jumpJetEnergySuckTickFinished"); index++;
 		pm.fatigueWarned = Utils.GetBoolFromString(entries[index],"fatigueWarned"); index++;
-		pm.turboFinished = Utils.LoadRelativeTimeDifferential(entries[index],"turboFinished"); index++;
-		pm.ressurectingFinished = Utils.LoadRelativeTimeDifferential(entries[index],"ressurectingFinished"); index++;
-		pm.doubleJumpFinished = Utils.LoadRelativeTimeDifferential(entries[index],"doubleJumpFinished"); index++;
+		pm.turboFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"turboFinished"); index++;
+		pm.ressurectingFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"ressurectingFinished"); index++;
+		pm.doubleJumpFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"doubleJumpFinished"); index++;
 		float sfxTime = Utils.GetFloatFromString(entries[index],"SFX.time"); index++;
 		pm.SFXIndex = Utils.GetIntFromString(entries[index],"SFXIndex"); index++;
 		pm.ladderSFXFinished = 0;
 		if (pm.SFXIndex >= 0) {
 			pm.SFX.time = sfxTime;
-			pm.SFX.clip = Const.a.sounds[pm.SFXIndex];
-			Utils.PlayOneShotSavable(pm.SFX,Const.a.sounds[pm.SFXIndex]);
+			pm.SFX.clip = consts.sounds[pm.SFXIndex];
+			Utils.PlayOneShotSavable(pm.SFX,consts.sounds[pm.SFXIndex]);
 		}
 
 		pm.ConsoleDisable();

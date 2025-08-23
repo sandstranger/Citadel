@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Zenject;
 
 public class PauseAnimation : MonoBehaviour {
 	private Animation anim;
 
+	[Inject] private Const _consts;
+	
 	void Awake () {
 		Initialize();
 	}
 
 	void Initialize() {
 		anim = GetComponent<Animation>();
-		if (!Const.a.panimsList.Contains(this)) Const.a.panimsList.Add(this);
+		if (!_consts.panimsList.Contains(this)) _consts.panimsList.Add(this);
 	}
 
 	void OnEnable () {

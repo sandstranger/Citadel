@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,6 +17,12 @@ public class EnergyOverloadButton : MonoBehaviour {
     private Image buttonSprite;
     private float clickFinished;
 
+    [Inject] private Const _consts;
+    [Inject] private MFDManager _mfdManager;
+    [Inject] private Inventory _inventory;
+    [Inject] private WeaponFire _weaponFire;
+    [Inject] private WeaponCurrent _weaponCurrent;
+
     private void Awake() {
         buttonSprite = GetComponent<Image>();
         buttonSprite.overrideSprite = normalButtonSprite;
@@ -27,7 +34,7 @@ public class EnergyOverloadButton : MonoBehaviour {
     }
 
     public void OverloadEnergyClick() {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
         OverloadButtonAction();
     }
 
@@ -35,25 +42,25 @@ public class EnergyOverloadButton : MonoBehaviour {
         if (clickFinished >= Time.time) return;
 
         clickFinished = Time.time + 0.4f;
-        if (Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] > 25f) {
-            Const.sprint(Const.a.stringTable[12]);
+        if (_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] > 25f) {
+            _consts.sprint(_consts.stringTable[12]);
             return;
         }
 
-        if (WeaponFire.a.overloadEnabled) {
-            Const.sprint(Const.a.stringTable[13]);
-            WeaponFire.a.overloadEnabled = false;
+        if (_weaponFire.overloadEnabled) {
+            _consts.sprint(_consts.stringTable[13]);
+            _weaponFire.overloadEnabled = false;
             buttonSprite.overrideSprite = normalButtonSprite;
             buttonText.color = textClickableColor;
             energySettingText.color = textEnergySetting;
-            energySettingText.text = Const.a.stringTable[16];
+            energySettingText.text = _consts.stringTable[16];
         } else { 
-            Const.sprint(Const.a.stringTable[17]);
-            WeaponFire.a.overloadEnabled = true;
+            _consts.sprint(_consts.stringTable[17]);
+            _weaponFire.overloadEnabled = true;
             buttonSprite.overrideSprite = overloadButtonSprite;
             buttonText.color = textOverloadColor;
             energySettingText.color = textEnergyOverloaded;
-            energySettingText.text = Const.a.stringTable[18];
+            energySettingText.text = _consts.stringTable[18];
         }
     }
 

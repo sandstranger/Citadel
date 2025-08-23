@@ -2,15 +2,18 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
+using Zenject;
 
 public class MultiMediaLogTableButton : MonoBehaviour {
 	public int logTableButtonIndex;
 
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Inventory _inventory;
 	void LogTableButtonClick() {
-		Inventory.a.hardwareIsActive[2] = true;
-		MFDManager.a.OpenEReaderInItemsTab();
-		MFDManager.a.mouseClickHeldOverGUI = true;
-		MFDManager.a.OpenLogsLevelFolder(logTableButtonIndex);
+		_inventory.hardwareIsActive[2] = true;
+		_mfdManager.OpenEReaderInItemsTab();
+		_mfdManager.mouseClickHeldOverGUI = true;
+		_mfdManager.OpenLogsLevelFolder(logTableButtonIndex);
 	}
 
 	void Start() {

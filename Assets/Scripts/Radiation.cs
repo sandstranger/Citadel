@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class Radiation : MonoBehaviour {
@@ -8,40 +9,43 @@ public class Radiation : MonoBehaviour {
 	private float intervalTime = 1f;
 	private float radFinished = 0f;
 
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
+
 	void Start() {
-		radFinished = PauseScript.a.relativeTime + (intervalTime * 2);
+		radFinished = _pauseScript.relativeTime + (intervalTime * 2);
 	}
 
 	void OnTriggerEnter (Collider col) {
 		if (col.gameObject.CompareTag("Player")) {
-			if (PlayerHealth.a.hm.health > 0f) {
-				PlayerHealth.a.radiationArea = true;
-				PlayerHealth.a.GiveRadiation(radiationAmount);
-				radFinished = PauseScript.a.relativeTime + (intervalTime*Random.Range(1f,1.5f));
+			if (_playerHealth.hm.health > 0f) {
+				_playerHealth.radiationArea = true;
+				_playerHealth.GiveRadiation(radiationAmount);
+				radFinished = _pauseScript.relativeTime + (intervalTime*Random.Range(1f,1.5f));
 			}
 		}
 	}
 
 	void  OnTriggerStay (Collider col) {
 		if (col.gameObject.CompareTag("Player")) {
-			if (PlayerHealth.a.hm.health > 0f && (radFinished < PauseScript.a.relativeTime)) {
-				PlayerHealth.a.radiationArea = true;
-				PlayerHealth.a.GiveRadiation(radiationAmount);
-				radFinished = PauseScript.a.relativeTime + (intervalTime*Random.Range(1f,1.5f));
+			if (_playerHealth.hm.health > 0f && (radFinished < _pauseScript.relativeTime)) {
+				_playerHealth.radiationArea = true;
+				_playerHealth.GiveRadiation(radiationAmount);
+				radFinished = _pauseScript.relativeTime + (intervalTime*Random.Range(1f,1.5f));
 			}
 		}
 	}
 
 	void OnTriggerExit (Collider col) {
 		if (col.gameObject.CompareTag("Player")) { 
-			if (PlayerHealth.a.hm.health > 0f) {
-				PlayerHealth.a.radiationArea = false;
-				radFinished = PauseScript.a.relativeTime;  // reset so re-triggering is instant
+			if (_playerHealth.hm.health > 0f) {
+				_playerHealth.radiationArea = false;
+				radFinished = _pauseScript.relativeTime;  // reset so re-triggering is instant
 			}
 		}
 	}
 	
 	void OnDisable() {
-		PlayerHealth.a.radiationArea = false;
+		_playerHealth.radiationArea = false;
 	}
 }

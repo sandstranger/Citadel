@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class TriggerCounter : MonoBehaviour {
@@ -10,6 +11,8 @@ public class TriggerCounter : MonoBehaviour {
 	public float delay;
 	public bool dontReset;
 
+	[Inject] private Const _consts;
+	
 	public void Targetted (UseData ud) {
 		counter++;
 		if (counter == countToTrigger) {
@@ -26,7 +29,7 @@ public class TriggerCounter : MonoBehaviour {
 
 	void Target(UseData ud) {
 		ud.argvalue = argvalue;
-		Const.a.UseTargets(gameObject,ud,target);
+		_consts.UseTargets(gameObject,ud,target);
 	}
 
     IEnumerator DelayedTarget(UseData ud) {

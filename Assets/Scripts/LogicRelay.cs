@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class LogicRelay : MonoBehaviour {
 	public string target;
@@ -11,8 +12,10 @@ public class LogicRelay : MonoBehaviour {
 	public bool onceEver = false; // save
 	[HideInInspector] public bool alreadyDone = false; // save
 	private UseData tempUd;
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100 * 200);
 
+	[Inject] private Const _consts;
+	
 	public void Targetted (UseData ud) {
 		if (!relayEnabled) return;
 
@@ -43,7 +46,7 @@ public class LogicRelay : MonoBehaviour {
 			}
 		}
 
-		Const.a.UseTargets(null,ud,target);
+		_consts.UseTargets(null,ud,target);
 		if (onceEver) alreadyDone = true;
 	}
 

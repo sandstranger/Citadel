@@ -6,8 +6,9 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
 using Citadel.Game;
+using Zenject;
 
-public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
+public class MouseLookScript : MonoBehaviour, IInitializer {
     // External references
 	public GameObject player;
 	public GameObject canvasContainer;
@@ -99,12 +100,25 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 	private float bobTarget;
 	private float headBobXVel;
 	private float headBobYVel;
+	[Inject] private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Automap _automap;
+	[Inject] private GUIState _guiState;
+	[Inject] private GetInput _getInput;
+	[Inject] private Inventory _inventory;
+	[Inject] private MainMenuHandler _mainMenuHandler;
+	[Inject] private MissionTimer _missionTimer;
+	[Inject] private MouseCursor _mouseCursor;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerMovement _playerMovement;
+	[Inject] private WeaponFire _weaponFire;
+	[Inject] private WeaponCurrent _weaponCurrent;
+	[Inject] private DynamicCulling _dynamicCulling;
+
 	private static readonly StringBuilder s1 = new StringBuilder(500 * 1024);
     
-	public static MouseLookScript a;
-
 	public void Initialize() {
-		a = this;
 		playerCamera = GetComponent<Camera>(); // Needed elsewhere, do early.
 	}
 
@@ -129,7 +143,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		firstTimePickup = true;
 		firstTimeSearch = true;
 		inCyberSpace = false;
-		shakeFinished = PauseScript.a.relativeTime;
+		shakeFinished = _pauseScript.relativeTime;
 		returnFromCyberspaceFinished = 0;
 		dropFinished = 0;
 
@@ -138,38 +152,38 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
         // -> -> MainCamera: MouseLookScript component.
 		playerCapsuleTransform = transform.parent.transform.parent.transform;
 
-		randomShakeFinished = PauseScript.a.relativeTime;
-		randomKlaxonFinished = PauseScript.a.relativeTime;
-		headBobShiftFinished = PauseScript.a.relativeTime;
+		randomShakeFinished = _pauseScript.relativeTime;
+		randomKlaxonFinished = _pauseScript.relativeTime;
+		headBobShiftFinished = _pauseScript.relativeTime;
 		bobTarget = 0.3f;
     }
     
     void OnPreCull() {
-		DynamicCulling.a.Cull(false); // Update dynamic culling system.
+		_dynamicCulling.Cull(false); // Update dynamic culling system.
 	}
 
 	void Update() {
 		// Allow quick load straight from the menu or pause.
 		if (Input.GetKeyUp(f9)) {
 			if (inCyberSpace) {
-				Const.sprint(Const.a.stringTable[1023]); // "Cannot load in cyberspace"
+				_consts.sprint(_consts.stringTable[1023]); // "Cannot load in cyberspace"
 				return;
 			}
 
-			MainMenuHandler.a.LoadGame(7);
+			_mainMenuHandler.LoadGame(7);
 		}
 
-        if (PauseScript.a.MenuActive()) {
+        if (_pauseScript.MenuActive()) {
 			// Ignore mouselook and turn off camera when main menu is up.
-			if (!MainMenuHandler.a.fileBrowserOpen) Cursor.visible = false;
+			if (!_mainMenuHandler.fileBrowserOpen) Cursor.visible = false;
 			else Cursor.visible = true;
 
 			if (playerCamera.enabled) playerCamera.enabled = false;
 			return;
 		}
 
-		if (PauseScript.a.Paused()) return;
-		if (PlayerMovement.a.ressurectingFinished > PauseScript.a.relativeTime) return;
+		if (_pauseScript.Paused()) return;
+		if (_playerMovement.ressurectingFinished > _pauseScript.relativeTime) return;
 
 		Utils.EnableCamera(playerCamera);
 
@@ -177,47 +191,47 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		// ====================================================================
 		if (Input.GetKeyUp(f6)) {
 			if (inCyberSpace) {
-				Const.sprint(Const.a.stringTable[602]); // Cannot save in cyberspace
+				_consts.sprint(_consts.stringTable[602]); // Cannot save in cyberspace
 				return;
 			}
 			
-			if (MissionTimer.a.timesUP) {
+			if (_missionTimer.timesUP) {
 				return;
 			}
 
-			Const.a.StartSave(7,qsavename);
+			_consts.StartSave(7,qsavename);
 		}
 
 		// Toggle inventory mode<->shoot mode
-		if(GetInput.a.ToggleMode()) ToggleInventoryMode();
+		if(_getInput.ToggleMode()) ToggleInventoryMode();
 
-		if (Const.a.questData.SelfDestructActivated
+		if (_consts.questData.SelfDestructActivated
 			&& LevelManager.currentLevel != 13   // Not Cyberspace
 			&& LevelManager.currentLevel != 9) { // Not the bridge, separated
 
-			if (randomShakeFinished < PauseScript.a.relativeTime) {
-				randomShakeFinished = PauseScript.a.relativeTime
+			if (randomShakeFinished < _pauseScript.relativeTime) {
+				randomShakeFinished = _pauseScript.relativeTime
 				                      + UnityEngine.Random.Range(5f,20f);
 				ScreenShake(3f,2f);
 			}
 			
-			if (randomKlaxonFinished < PauseScript.a.relativeTime) {
-				randomKlaxonFinished = PauseScript.a.relativeTime
+			if (randomKlaxonFinished < _pauseScript.relativeTime) {
+				randomKlaxonFinished = _pauseScript.relativeTime
 				                       + UnityEngine.Random.Range(10f,20f);
 
-				Utils.PlayUIOneShotSavable(104); // klaxon
+				Utils.PlayUIOneShotSavable(_consts,104); // klaxon
 			}
 		}
 
 		RecoilAndRest(); // Spring Back to Rest from Recoil
-		keyboardTurnSpeed = 15f * Const.a.MouseSensitivity;
+		keyboardTurnSpeed = 15f * _consts.MouseSensitivity;
 		if (Application.platform == RuntimePlatform.Android) {
-			if (Const.a.MouseSensitivity == 100f) Const.a.MouseSensitivity = 20f;
+			if (_consts.MouseSensitivity == 100f) _consts.MouseSensitivity = 20f;
 		} 
 		KeyboardTurn();
 		KeyboardLookUpDn();
 		if (inCyberSpace) { // Barrel roll!
-			if (GetInput.a.LeanLeft()) {
+			if (_getInput.LeanLeft()) {
 				playerCapsuleTransform.RotateAround(
 					playerCapsuleTransform.transform.position,
 					playerCapsuleTransform.transform.forward,
@@ -225,7 +239,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 				);
 			}
 
-			if (GetInput.a.LeanRight()) {
+			if (_getInput.LeanRight()) {
 				playerCapsuleTransform.RotateAround(
 					playerCapsuleTransform.transform.position,
 					playerCapsuleTransform.transform.forward,
@@ -241,16 +255,16 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		}
 
 		if (!inventoryMode) Mouselook(); // Only do mouselook in Shoot Mode.
-		if(GetInput.a.Use()) Frob(); // Frob what is under our cursor.
+		if(_getInput.Use()) Frob(); // Frob what is under our cursor.
 	}
 
 	public void Frob() {
 		if (vmailActive && !inCyberSpace) {
-			Inventory.a.DeactivateVMail(); vmailActive = false;
+			_inventory.DeactivateVMail(); vmailActive = false;
 			return;
 		}
 
-		if (!GUIState.a.isBlocking && !inCyberSpace) {
+		if (!_guiState.isBlocking && !inCyberSpace) {
 			if (dropFinished < Time.time) {
 				currentButton = null; // Force this to reset.
 				if (holdingObject) {
@@ -261,7 +275,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			//We are holding cursor over the GUI
 			if (holdingObject && !inCyberSpace) {
 				AddItemToInventory(heldObjectIndex,heldObjectCustomIndex);
-				MouseCursor.a.liveGrenade = false;
+				_mouseCursor.liveGrenade = false;
 				ResetHeldItem();
 			} else InventoryButtonUse();
 		}
@@ -277,8 +291,8 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		float angX = 0f; // Angle change for X.
 		float angY = 0f; // Angle change for Y.
 		// Handle mouse input from a standard mouse.
-		float deltaX = Input.GetAxisRaw(mouseX) * Const.a.MouseSensitivity * Const.a.GraphicsFOV;
-		float deltaY = Input.GetAxisRaw(mouseY) * Const.a.MouseSensitivity * Const.a.GraphicsFOV;
+		float deltaX = Input.GetAxisRaw(mouseX) * _consts.MouseSensitivity * _consts.GraphicsFOV;
+		float deltaY = Input.GetAxisRaw(mouseY) * _consts.MouseSensitivity * _consts.GraphicsFOV;
 
 		// Handle thumbstick input from a controller.
 		Vector2 rightThumbstick = new Vector2(Input.GetAxisRaw("JoyAxis4"), // Horizontal Left < 0, Right > 0
@@ -292,7 +306,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		}
 
 		joyXSignLast = signX;
-		rightThumbstick.x *= Const.a.MouseSensitivity * 20f;
+		rightThumbstick.x *= _consts.MouseSensitivity * 20f;
 		rotSpeedX += rightThumbstick.x; // Integrate to give fine initial.
 		if (rightThumbstick.x == 0f) rotSpeedX = 0f;
 		if (rotSpeedX != 0f) deltaX = rotSpeedX;
@@ -306,7 +320,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		}
 
 		joyYSignLast = signY;
-		rightThumbstick.y *= Const.a.MouseSensitivity * 20f;
+		rightThumbstick.y *= _consts.MouseSensitivity * 20f;
 		rotSpeedY += rightThumbstick.y; // Integrate to give fine initial.
 		if (rightThumbstick.y == 0) rotSpeedY = 0f;
 		if (rotSpeedY != 0f) deltaY = rotSpeedY;
@@ -318,8 +332,8 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			angY = deltaY;
 		} else {
 			// Using mouse, map input to deg per screen half / screen.
-			angX = deltaX * ((Const.a.GraphicsFOV / 2f) / Screen.width / 2f);
-			angY = deltaY * ((Const.a.GraphicsFOV / 2f) / Screen.height / 2f);
+			angX = deltaX * ((_consts.GraphicsFOV / 2f) / Screen.width / 2f);
+			angY = deltaY * ((_consts.GraphicsFOV / 2f) / Screen.height / 2f);
 		}
 
 		// For my inspector viewing pleasure.
@@ -327,14 +341,14 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		debugAng = new Vector2(angX,angY);
 
 		// High pass filter to prevent jumpy behavior.
-		if (angX > Const.a.GraphicsFOV) angX = Const.a.GraphicsFOV;
-		if (angY > Const.a.GraphicsFOV) angY = Const.a.GraphicsFOV;
+		if (angX > _consts.GraphicsFOV) angX = _consts.GraphicsFOV;
+		if (angY > _consts.GraphicsFOV) angY = _consts.GraphicsFOV;
 
 		// APPLY MOUSE LOOK
 		// --------------------------------------------------------------------
 		if (inCyberSpace) {
 			// CYBER MOUSE LOOK
-			if (Const.a.InputInvertCyberspaceLook) xRotation = -angY;
+			if (_consts.InputInvertCyberspaceLook) xRotation = -angY;
 			else xRotation = angY;
 
 			xRotation = Clamp0360(xRotation); // Limit up/down to within 360°.
@@ -350,7 +364,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			);
 		} else {
 			// NORMAL MOUSE LOOK
-			if (Const.a.InputInvertLook) xRotation += angY;
+			if (_consts.InputInvertLook) xRotation += angY;
 			else xRotation -= angY;
 
 			xRotation = Mathf.Clamp(xRotation, -90f, 90f); // Limit up/down.
@@ -377,26 +391,26 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 	public void EnterCyberspace(Vector3 entryPoint) {
 		cyberspaceRecallPoint = entryPoint;
 		playerRadiationTreatmentFlash.SetActive(true);
-		cyberspaceReturnPoint = PlayerMovement.a.transform.position;
+		cyberspaceReturnPoint = _playerMovement.transform.position;
 		cyberspaceReturnCameraLocalRotation = transform.localRotation.eulerAngles;
 		cyberspaceReturnPlayerCapsuleLocalRotation = playerCapsuleTransform.localRotation.eulerAngles;
 		cyberspaceReturnLevel = LevelManager.currentLevel;
-		MFDManager.a.EnterCyberspace();
-		LevelManager.a.LoadLevel(13,cyberspaceRecallPoint);
-		PlayerMovement.a.inCyberSpace = true;
-		PlayerMovement.a.leanCapsuleCollider.enabled = false;
+		_mfdManager.EnterCyberspace();
+		_levelManager.LoadLevel(13,cyberspaceRecallPoint);
+		_playerMovement.inCyberSpace = true;
+		_playerMovement.leanCapsuleCollider.enabled = false;
 		hm.inCyberSpace = true;
 		inCyberSpace = true;
 		playerCamera.useOcclusionCulling = false;
-		MFDManager.a.DrawTicks(true);
+		_mfdManager.DrawTicks(true);
 		SetCameraCullDistances();
-		Utils.PlayUIOneShotSavable(81); // cyber
+		Utils.PlayUIOneShotSavable(_consts,81); // cyber
 	}
 
 	public void ExitCyberspace() {
 		playerRadiationTreatmentFlash.SetActive(true);
-		MFDManager.a.ExitCyberspace();
-		LevelManager.a.LoadLevel(cyberspaceReturnLevel,cyberspaceReturnPoint);
+		_mfdManager.ExitCyberspace();
+		_levelManager.LoadLevel(cyberspaceReturnLevel,cyberspaceReturnPoint);
 
 		// Left/right component applied to capsule.
 		playerCapsuleTransform.localRotation = Quaternion.Euler(0f,
@@ -412,21 +426,21 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 		returnFromCyberspaceFinished = Time.time + 0.1f; // Prevent mouselook
 														 // messing it up.
-		PlayerMovement.a.inCyberSpace = false;
-		PlayerMovement.a.rbody.linearVelocity = Const.a.vectorZero;
-		PlayerMovement.a.leanCapsuleCollider.enabled = true;
+		_playerMovement.inCyberSpace = false;
+		_playerMovement.rbody.linearVelocity = _consts.vectorZero;
+		_playerMovement.leanCapsuleCollider.enabled = true;
 		hm.inCyberSpace = false;
 		inCyberSpace = false;
 		playerCamera.useOcclusionCulling = true;
-		Const.a.decoyActive = false;
-		MFDManager.a.DrawTicks(true);
-		Utils.PlayUIOneShotSavable(81); // cyber
+		_consts.decoyActive = false;
+		_mfdManager.DrawTicks(true);
+		Utils.PlayUIOneShotSavable(_consts,81); // cyber
 		SetCameraCullDistances();
 	}
 
 	// Draw line from cursor - used for projectile firing, e.g. magpulse/stugngun/railgun/plasma
 	public void SetCameraFocusPoint() {
-		cursorPoint = MouseCursor.a.GetCursorScreenPointForRay();
+		cursorPoint = _mouseCursor.GetCursorScreenPointForRay();
         if (Physics.Raycast(playerCamera.ScreenPointToRay(cursorPoint), out tempHit, Mathf.Infinity)) cameraFocusPoint = tempHit.point;
 	}
 
@@ -465,7 +479,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		}
 		
 		if (rightTouchstick.y < 0f) {
-			if ((inCyberSpace && Const.a.InputInvertCyberspaceLook) || (!inCyberSpace && Const.a.InputInvertLook))
+			if ((inCyberSpace && _consts.InputInvertCyberspaceLook) || (!inCyberSpace && _consts.InputInvertLook))
 				xRotation -= keyboardTurnSpeed;
 			else
 				xRotation += keyboardTurnSpeed;
@@ -474,7 +488,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			transform.localRotation = Quaternion.Euler(xRotation,0f,
 													   transform.localRotation.z);
 		} else if (rightTouchstick.y > 0f) {
-			if ((inCyberSpace && Const.a.InputInvertCyberspaceLook) || (!inCyberSpace && Const.a.InputInvertLook))
+			if ((inCyberSpace && _consts.InputInvertCyberspaceLook) || (!inCyberSpace && _consts.InputInvertLook))
 				xRotation += keyboardTurnSpeed * rightTouchstick.y;
 			else
 				xRotation -= keyboardTurnSpeed * rightTouchstick.y;
@@ -488,16 +502,16 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 	void KeyboardTurn() {
 		if (inCyberSpace) {
 			float angX = 0f;
-			if (GetInput.a.TurnLeft()) {
+			if (_getInput.TurnLeft()) {
 				// Modulate input to deg per screen half / screen.
-				angX = -keyboardTurnSpeed * 18f * ((Const.a.GraphicsFOV / 2f) / Screen.width / 2f);
+				angX = -keyboardTurnSpeed * 18f * ((_consts.GraphicsFOV / 2f) / Screen.width / 2f);
 				yRotation = angX;
 				playerCapsuleTransform.RotateAround(
 					playerCapsuleTransform.transform.position,
 					playerCapsuleTransform.transform.up,yRotation
 				);
-			} else if (GetInput.a.TurnRight()) {
-				angX = keyboardTurnSpeed * 18f * ((Const.a.GraphicsFOV / 2f) / Screen.width / 2f);
+			} else if (_getInput.TurnRight()) {
+				angX = keyboardTurnSpeed * 18f * ((_consts.GraphicsFOV / 2f) / Screen.width / 2f);
 				yRotation = angX;
 				playerCapsuleTransform.RotateAround(
 					playerCapsuleTransform.transform.position,
@@ -505,10 +519,10 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 				);
 			}
 		} else {
-			if (GetInput.a.TurnLeft()) {
+			if (_getInput.TurnLeft()) {
 				yRotation -= keyboardTurnSpeed;
 				playerCapsuleTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
-			} else if (GetInput.a.TurnRight()) {
+			} else if (_getInput.TurnRight()) {
 				yRotation += keyboardTurnSpeed;
 				playerCapsuleTransform.localRotation = Quaternion.Euler(0f, yRotation, 0f);
 			}
@@ -518,10 +532,10 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 	void KeyboardLookUpDn() {
 		if (inCyberSpace) {
 			float angY = 0f;
-			if (GetInput.a.LookDown()) {
+			if (_getInput.LookDown()) {
 				// Modulate input to deg per screen half / screen.
-				angY = -keyboardTurnSpeed * 18f * ((Const.a.GraphicsFOV / 2f) / Screen.height / 2f);
-				if (Const.a.InputInvertCyberspaceLook) xRotation = -angY;
+				angY = -keyboardTurnSpeed * 18f * ((_consts.GraphicsFOV / 2f) / Screen.height / 2f);
+				if (_consts.InputInvertCyberspaceLook) xRotation = -angY;
 				else xRotation = angY;
 			
 				xRotation = Clamp0360(xRotation); // Limit up/down to within 360°.
@@ -529,9 +543,9 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 					playerCapsuleTransform.transform.position,
 					playerCapsuleTransform.transform.right,-xRotation
 				);
-			} else if (GetInput.a.LookUp()) {
-				angY = keyboardTurnSpeed * 18f * ((Const.a.GraphicsFOV / 2f) / Screen.height / 2f);
-				if (Const.a.InputInvertCyberspaceLook) xRotation = -angY;
+			} else if (_getInput.LookUp()) {
+				angY = keyboardTurnSpeed * 18f * ((_consts.GraphicsFOV / 2f) / Screen.height / 2f);
+				if (_consts.InputInvertCyberspaceLook) xRotation = -angY;
 				else xRotation = angY;
 			
 				xRotation = Clamp0360(xRotation); // Limit up/down to within 360°.
@@ -542,8 +556,8 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			}
 		} else {
 			// Cyberspace...more like a plane so giving the option to invert it separately.
-			if (GetInput.a.LookDown()) {
-				if ((inCyberSpace && Const.a.InputInvertCyberspaceLook) || (!inCyberSpace && Const.a.InputInvertLook))
+			if (_getInput.LookDown()) {
+				if ((inCyberSpace && _consts.InputInvertCyberspaceLook) || (!inCyberSpace && _consts.InputInvertLook))
 					xRotation -= keyboardTurnSpeed;
 				else
 					xRotation += keyboardTurnSpeed;
@@ -551,8 +565,8 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 				if (!inCyberSpace) xRotation = Mathf.Clamp(xRotation, -90f, 90f);  // Limit up and down angle.
 				transform.localRotation = Quaternion.Euler(xRotation,0f,
 														transform.localRotation.z);
-			} else if (GetInput.a.LookUp()) {
-				if ((inCyberSpace && Const.a.InputInvertCyberspaceLook) || (!inCyberSpace && Const.a.InputInvertLook))
+			} else if (_getInput.LookUp()) {
+				if ((inCyberSpace && _consts.InputInvertCyberspaceLook) || (!inCyberSpace && _consts.InputInvertLook))
 					xRotation += keyboardTurnSpeed;
 				else
 					xRotation -= keyboardTurnSpeed;
@@ -566,7 +580,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 	bool RayOffset() {
 		bool successfulRay = false;
-		successfulRay = Physics.Raycast(playerCamera.ScreenPointToRay(cursorPoint), out tempHit,Const.frobDistance,Const.a.layerMaskPlayerFrob);
+		successfulRay = Physics.Raycast(playerCamera.ScreenPointToRay(cursorPoint), out tempHit,Const.frobDistance,_consts.layerMaskPlayerFrob);
 // 		Debug.DrawRay(playerCamera.ScreenPointToRay(cursorPoint).origin,playerCamera.ScreenPointToRay(cursorPoint).direction * Const.frobDistance, Color.green,1f,true);
 		if (successfulRay) {
 			successfulRay = (tempHit.collider != null);
@@ -579,18 +593,18 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 	bool TargetIDFrob(Vector3 cP) {
 		if (Application.platform == RuntimePlatform.Android) {
-			if (MouseLookScript.a.inCyberSpace) {
-				WeaponFire.a.FireCyberWeapon();
+			if (inCyberSpace) {
+				_weaponFire.FireCyberWeapon();
 				return true;
 			}
 		}
 
 		if (inCyberSpace) return false;
 
-		float dist = TargetID.GetTargetIDSensingRange(true);
+		float dist = TargetID.GetTargetIDSensingRange(_inventory,true);
 		bool successfulRay = Physics.Raycast(playerCamera.ScreenPointToRay(cP),
 											 out tempHit,dist,
-											 Const.a.layerMaskPlayerTargetIDFrob);
+											 _consts.layerMaskPlayerTargetIDFrob);
 
 		// Success here means hit a useable something.
 		// If a ray hits a wall or other unusable something, that's not success
@@ -616,9 +630,9 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			}
 		}
 
-		if (Inventory.a.hasHardware[4] && Inventory.a.hardwareVersion[4] > 1) {
+		if (_inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1) {
 			if (!aic.hasTargetIDAttached) {
-				WeaponFire.a.CreateTargetIDInstance(-1f,aic.healthManager,-1f);
+				_weaponFire.CreateTargetIDInstance(-1f,aic.healthManager,-1f);
 				if (Application.platform != RuntimePlatform.Android) {
 					return true;
 				}
@@ -627,14 +641,14 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 		if (Application.platform == RuntimePlatform.Android) {
 			// Cyber handled just above, normal fire condition only here.
-			int constDex = WeaponCurrent.a.weaponIndex;
+			int constDex = _weaponCurrent.weaponIndex;
 			int wepdex = WeaponFire.Get16WeaponIndexFromConstIndex(constDex);
-			WeaponFire.a.StartNormalAttack(wepdex);
+			_weaponFire.StartNormalAttack(wepdex);
 			return true;
 		}
 
 		// "Can't use <enemy>"
-		Const.sprint(Const.a.stringTable[29] + Const.a.nameForNPC[aic.index],
+		_consts.sprint(_consts.stringTable[29] + _consts.nameForNPC[aic.index],
 					 player);
 
 		return true;
@@ -645,13 +659,13 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 		RaycastHit firstHit;
 		float offset = Screen.height * 0.02f;
-		cursorPoint = MouseCursor.a.GetCursorScreenPointForRay();
+		cursorPoint = _mouseCursor.GetCursorScreenPointForRay();
 		if (TargetIDFrob(cursorPoint)) return;
 
 		Ray castDir = playerCamera.ScreenPointToRay(cursorPoint);
 		bool successfulRay = Physics.Raycast(castDir, out tempHit,
 											 Const.frobDistance,
-											 Const.a.layerMaskPlayerFrob);
+											 _consts.layerMaskPlayerFrob);
 
 // 		Debug.DrawRay(playerCamera.ScreenPointToRay(cursorPoint).origin,
 // 					  playerCamera.ScreenPointToRay(cursorPoint).direction
@@ -756,15 +770,15 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 				currentSearchItem = tempHit.collider.gameObject;
 				SearchObject(currentSearchItem.GetComponent<SearchableItem>().lookUpIndex);
 			} else {
-				Const.sprint(29); // "Can't use "
+				_consts.sprint(29); // "Can't use "
 			}
 		} else { // Frobbed into empty space, so whatever it is is too far.
 			if (tempHit.collider != null) {
 				// Can't use <something>
-				UseName.UseNameSprint(tempHit.collider.gameObject);
+				UseName.UseNameSprint(_consts,tempHit.collider.gameObject);
 			} else {
 				// You are too far away from that
-				Const.sprint(Const.a.stringTable[30],player);
+				_consts.sprint(_consts.stringTable[30],player);
 			}
 		}
 	}
@@ -783,7 +797,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 		if (!frobUser) return false;
 
-		cursorPoint = MouseCursor.a.GetCursorScreenPointForRay();
+		cursorPoint = _mouseCursor.GetCursorScreenPointForRay();
 		if (!Physics.Raycast(playerCamera.ScreenPointToRay(cursorPoint),
 							 out tempHit, Const.frobDistance)) {
 			return false; // Can't use it on something, go ahead and drop it.
@@ -802,7 +816,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		UseHandler uh = go.GetComponent<UseHandler>();
 		bool playedSound = false;
 		if (uh != null) {
-			Utils.PlayUIOneShotSavable(91); // searchsound
+			Utils.PlayUIOneShotSavable(_consts,91); // searchsound
 			playedSound = true;
 			uh.Use(ud);
 			return true; // Item can get absorbed, not dropped.
@@ -811,7 +825,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		UseHandlerRelay uhr = go.GetComponent<UseHandlerRelay>();
 		if (uhr != null) {
 			
-			if (!playedSound) Utils.PlayUIOneShotSavable(91); // searchsound
+			if (!playedSound) Utils.PlayUIOneShotSavable(_consts,91); // searchsound
 			uhr.referenceUseHandler.Use(ud);
 			return true; // Item can get absorbed, not dropped.
 		}
@@ -832,7 +846,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		heldObjectAmmo = ammo1;
 		heldObjectAmmo2 = ammo2;
 		heldObjectLoadedAlternate = loadedAlt;
-		if (fromButton) GUIState.a.ClearOverButton();
+		if (fromButton) _guiState.ClearOverButton();
 		ForceInventoryMode();
 	}
 
@@ -841,20 +855,20 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		// other strings I need to CTRL+F my way to this buggy code!
 		WeaponButton wepbut = currentButton.GetComponent<WeaponButton>();
 		int indexPriorToRemoval = wepbut.useableItemIndex;
-		int am1 = WeaponCurrent.a.currentMagazineAmount[wepbut.WepButtonIndex];
-		WeaponCurrent.a.currentMagazineAmount[wepbut.WepButtonIndex] = 0;
-		int am2 = WeaponCurrent.a.currentMagazineAmount2[wepbut.WepButtonIndex];
-		WeaponCurrent.a.currentMagazineAmount2[wepbut.WepButtonIndex] = 0;
+		int am1 = _weaponCurrent.currentMagazineAmount[wepbut.WepButtonIndex];
+		_weaponCurrent.currentMagazineAmount[wepbut.WepButtonIndex] = 0;
+		int am2 = _weaponCurrent.currentMagazineAmount2[wepbut.WepButtonIndex];
+		_weaponCurrent.currentMagazineAmount2[wepbut.WepButtonIndex] = 0;
 		bool loadAlt = false;
 		if (am2 > 0) loadAlt = true;
 		PutObjectInHand(indexPriorToRemoval,-1,am1,am2,loadAlt,true);
-		WeaponCurrent.a.RemoveWeapon(wepbut.WepButtonIndex);
-		Inventory.a.RemoveWeapon(wepbut.WepButtonIndex);
-		MFDManager.a.SetAmmoIcons(-1,false) ; // Clear the ammo icons.
-		MFDManager.a.HideAmmoAndEnergyItems();
+		_weaponCurrent.RemoveWeapon(wepbut.WepButtonIndex);
+		_inventory.RemoveWeapon(wepbut.WepButtonIndex);
+		_mfdManager.SetAmmoIcons(-1,false) ; // Clear the ammo icons.
+		_mfdManager.HideAmmoAndEnergyItems();
 		wepbut.useableItemIndex = -1;
-		wepbut = MFDManager.a.wepbutMan.wepButtonsScripts[0];
-		WeaponCurrent.a.WeaponChange(wepbut.useableItemIndex,
+		wepbut = _mfdManager.wepbutMan.wepButtonsScripts[0];
+		_weaponCurrent.WeaponChange(wepbut.useableItemIndex,
 									 wepbut.WepButtonIndex);
 	}
 
@@ -862,32 +876,32 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 	// click behavior...or any other reasonable mouse button interaction.
 	void InventoryButtonUse() {
 		if (holdingObject) return;
-		if (!GUIState.a.overButton) return;
-		if (GUIState.a.overButtonType == ButtonType.None) return;
+		if (!_guiState.overButton) return;
+		if (_guiState.overButtonType == ButtonType.None) return;
 		if (currentButton == null) return;
 
 		int indexPriorToRemoval = -1;
 		int customIndexPrior = -1;
-		switch(GUIState.a.overButtonType) {
+		switch(_guiState.overButtonType) {
 			case ButtonType.Weapon: RemoveWeapon(); break;
 			case ButtonType.Grenade:
 				GrenadeButton grenbut = currentButton.GetComponent<GrenadeButton>();
 				indexPriorToRemoval = grenbut.useableItemIndex;
-				Inventory.a.grenAmmo[grenbut.GrenButtonIndex]--;
-				Inventory.a.GrenadeCycleDown();
-				//Inventory.a.grenadeCurrent = -1; This was up here, and seemed fine.  Might need to revert line 473 add.
-				if (Inventory.a.grenAmmo[grenbut.GrenButtonIndex] <= 0) {
-					Inventory.a.grenAmmo[grenbut.GrenButtonIndex] = 0;
-					Inventory.a.grenadeCurrent = -1;
+				_inventory.grenAmmo[grenbut.GrenButtonIndex]--;
+				_inventory.GrenadeCycleDown();
+				//_inventory.grenadeCurrent = -1; This was up here, and seemed fine.  Might need to revert line 473 add.
+				if (_inventory.grenAmmo[grenbut.GrenButtonIndex] <= 0) {
+					_inventory.grenAmmo[grenbut.GrenButtonIndex] = 0;
+					_inventory.grenadeCurrent = -1;
 					for (int i = 0; i < 7; i++) {
-						if (Inventory.a.grenAmmo[i] > 0) {
-							Inventory.a.grenadeCurrent = i;
+						if (_inventory.grenAmmo[i] > 0) {
+							_inventory.grenadeCurrent = i;
 						}
 					}
 
-					MFDManager.a.SendInfoToItemTab(Inventory.a.grenadeCurrent);
-					if (Inventory.a.grenadeCurrent < 0) {
-						Inventory.a.grenadeCurrent = 0;
+					_mfdManager.SendInfoToItemTab(_inventory.grenadeCurrent);
+					if (_inventory.grenadeCurrent < 0) {
+						_inventory.grenadeCurrent = 0;
 					}
 				}
 
@@ -897,17 +911,17 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			case ButtonType.Patch:
 				PatchButton patbut = currentButton.GetComponent<PatchButton>();
 				indexPriorToRemoval = patbut.useableItemIndex;
-				Inventory.a.patchCounts[patbut.PatchButtonIndex]--;
-				if (Inventory.a.patchCounts[patbut.PatchButtonIndex] <= 0) {
-					Inventory.a.patchCounts[patbut.PatchButtonIndex] = 0;
-					Inventory.a.patchCurrent = -1;
-					GUIState.a.ClearOverButton();
+				_inventory.patchCounts[patbut.PatchButtonIndex]--;
+				if (_inventory.patchCounts[patbut.PatchButtonIndex] <= 0) {
+					_inventory.patchCounts[patbut.PatchButtonIndex] = 0;
+					_inventory.patchCurrent = -1;
+					_guiState.ClearOverButton();
 					for (int i = 0; i < 7; i++) {
-						if (Inventory.a.patchCounts[i] > 0) Inventory.a.patchCurrent = i;
+						if (_inventory.patchCounts[i] > 0) _inventory.patchCurrent = i;
 					}
-					MFDManager.a.SendInfoToItemTab(Inventory.a.patchCurrent);
-					if (Inventory.a.patchCurrent < 0) {
-						Inventory.a.patchCurrent = 0;
+					_mfdManager.SendInfoToItemTab(_inventory.patchCurrent);
+					if (_inventory.patchCurrent < 0) {
+						_inventory.patchCurrent = 0;
 					}
 				}
 				PutObjectInHand(indexPriorToRemoval,-1,0,0,false,true);
@@ -918,29 +932,29 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 				// Access Cards button
 				if (genbut.GeneralInvButtonIndex == 0) {
-					MFDManager.a.OpenLastItemSide();
-					MFDManager.a.SendInfoToItemTab(81);
+					_mfdManager.OpenLastItemSide();
+					_mfdManager.SendInfoToItemTab(81);
 					return;
 				}
 
 				indexPriorToRemoval = genbut.useableItemIndex;
 				customIndexPrior = genbut.customIndex;
-				Inventory.a.generalInventoryIndexRef[genbut.GeneralInvButtonIndex] = -1;
-				Inventory.a.generalInvCurrent = -1;
+				_inventory.generalInventoryIndexRef[genbut.GeneralInvButtonIndex] = -1;
+				_inventory.generalInvCurrent = -1;
 				for (int i = 0; i < 7; i++) {
-					if (Inventory.a.generalInventoryIndexRef[i] >= 0) {
-						Inventory.a.generalInvCurrent = i;
+					if (_inventory.generalInventoryIndexRef[i] >= 0) {
+						_inventory.generalInvCurrent = i;
 					}
 				}
 				int referenceIndex = -1;
-				if (Inventory.a.generalInvCurrent >= 0) {
-					referenceIndex = Inventory.a.genButtons[Inventory.a.generalInvCurrent].transform.GetComponent<GeneralInvButton>().useableItemIndex;
+				if (_inventory.generalInvCurrent >= 0) {
+					referenceIndex = _inventory.genButtons[_inventory.generalInvCurrent].transform.GetComponent<GeneralInvButton>().useableItemIndex;
 				}
 
 				if (referenceIndex < 0 || referenceIndex > 110) {
-					MFDManager.a.ResetItemTab();
+					_mfdManager.ResetItemTab();
 				} else {
-					MFDManager.a.SendInfoToItemTab(referenceIndex,genbut.customIndex);
+					_mfdManager.SendInfoToItemTab(referenceIndex,genbut.customIndex);
 				}
 				PutObjectInHand(indexPriorToRemoval,customIndexPrior,0,0,false,true);
 				break;
@@ -970,7 +984,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 				break;
 			case ButtonType.ShootMode:
 				ForceShootMode();
-				GUIState.a.ClearOverButton();
+				_guiState.ClearOverButton();
 				break;
 			case ButtonType.GrenadeTimerSlider:
 				Button btn = currentButton.GetComponent<Button>();
@@ -991,30 +1005,30 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		
 		sebut.contents[index] = -1;
 		sebut.customIndex[index] = -1;
-		MFDManager.a.DisableSearchItemImage(index);
+		_mfdManager.DisableSearchItemImage(index);
 		sebut.CheckForEmpty();
-		GUIState.a.ClearOverButton();
-		if (Const.a.InputQuickItemPickup) {
+		_guiState.ClearOverButton();
+		if (_consts.InputQuickItemPickup) {
 			AddItemToInventory(heldObjectIndex,heldObjectCustomIndex);
 			ResetHeldItem();
 		} else {
-			Const.sprint(Const.a.stringTable[heldObjectIndex + 326] + Const.a.stringTable[319],player);
+			_consts.sprint(_consts.stringTable[heldObjectIndex + 326] + _consts.stringTable[319],player);
 			ForceInventoryMode();
 		}	
 	}
 
 	void RecoilAndRest() {
-		float targetY = Const.a.playerCameraOffsetY
-						* PlayerMovement.a.currentCrouchRatio;
+		float targetY = _consts.playerCameraOffsetY
+						* _playerMovement.currentCrouchRatio;
 		float targetX = 0f;
-		if (PlayerMovement.a.relSideways > 0) targetX += 0.12f;
-		if (PlayerMovement.a.relSideways < 0) targetX -= 0.12f;
-		if (PlayerMovement.a.relForward != 0) targetY -= 0.08f;
+		if (_playerMovement.relSideways > 0) targetX += 0.12f;
+		if (_playerMovement.relSideways < 0) targetX -= 0.12f;
+		if (_playerMovement.relForward != 0) targetY -= 0.08f;
 
 		// If not shaking or bobbing, this will stay this to lerp to normal.
-// 		headBobY = Const.a.playerCameraOffsetY
-// 				   * PlayerMovement.a.currentCrouchRatio;
-		if (shakeFinished > PauseScript.a.relativeTime) {
+// 		headBobY = _consts.playerCameraOffsetY
+// 				   * _playerMovement.currentCrouchRatio;
+		if (shakeFinished > _pauseScript.relativeTime) {
 			headBobX = transform.localPosition.x
 					   + UnityEngine.Random.Range(shakeForce * -0.17f,
 												  shakeForce * 0.17f);
@@ -1028,14 +1042,14 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 												  shakeForce * 0.17f);
 		} else {
 			headBobZ = 0f;
-			Vector3 vel = PlayerMovement.a.rbody.linearVelocity;
+			Vector3 vel = _playerMovement.rbody.linearVelocity;
 			vel.y = 0f;
-			if (PlayerMovement.a.relForward + PlayerMovement.a.relSideways != 0
-				&& Const.a.HeadBob) {
+			if (_playerMovement.relForward + _playerMovement.relSideways != 0
+				&& _consts.HeadBob) {
 
-				if (headBobShiftFinished < PauseScript.a.relativeTime) {
-					headBobShiftFinished = PauseScript.a.relativeTime + 0.2f;
-					if (!PlayerMovement.a.isSprinting) {
+				if (headBobShiftFinished < _pauseScript.relativeTime) {
+					headBobShiftFinished = _pauseScript.relativeTime + 0.2f;
+					if (!_playerMovement.isSprinting) {
 						headBobShiftFinished += 0.1f;
 					}
 
@@ -1043,14 +1057,14 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 								* Mathf.Sign(bobTarget);
 				}
 
-				if (PlayerMovement.a.rbody.linearVelocity.magnitude > 0.1f){
+				if (_playerMovement.rbody.linearVelocity.magnitude > 0.1f){
 					headBobY = Mathf.SmoothDamp(headBobY,targetY + bobTarget,ref headBobYVel,Const.HeadBobRate);
 				}
 
 				headBobX = Mathf.SmoothDamp(headBobX,targetX,ref headBobXVel,Const.HeadBobRate);
 			} else {
 				headBobX = Mathf.SmoothDamp(headBobX,0f,ref headBobXVel,Const.HeadBobRate);
-				headBobY = Mathf.SmoothDamp(headBobY,Const.a.playerCameraOffsetY * PlayerMovement.a.currentCrouchRatio,ref headBobYVel,Const.HeadBobRate);
+				headBobY = Mathf.SmoothDamp(headBobY,_consts.playerCameraOffsetY * _playerMovement.currentCrouchRatio,ref headBobYVel,Const.HeadBobRate);
 			}
 		}
 		
@@ -1065,12 +1079,12 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 	void AddItemFail(int index) { // Expects usableItem index
 		DropHeldItem();
-		Const.sprint(Const.a.stringTable[32] + Const.a.stringTable[index + 326]
-					 + Const.a.stringTable[318],player); // Inventory full.
+		_consts.sprint(_consts.stringTable[32] + _consts.stringTable[index + 326]
+					 + _consts.stringTable[318],player); // Inventory full.
 	}
 
 	public void AddItemToInventory(int index, int customIndex) {
-		MFDManager.a.mouseClickHeldOverGUI = true; // Prevent gun shooting.
+		_mfdManager.mouseClickHeldOverGUI = true; // Prevent gun shooting.
 		if (index < 0) index = 0; // Good check on paper.
 		if (index > 110) index = 94; // Way to get a head.
 		if ((index >= 0 && index <= 5)
@@ -1079,68 +1093,68 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
              || (index >= 52 && index < 59)
              || (index >= 61 && index <= 64)
              || (index >= 92 && index <= 101)) {
-			if (!Inventory.a.AddGeneralObjectToInventory(index,customIndex)) {
+			if (!_inventory.AddGeneralObjectToInventory(index,customIndex)) {
 				AddItemFail(index);
 			}
 		} else if (index == 6) {
-			Inventory.a.AddAudioLogToInventory(heldObjectCustomIndex);
+			_inventory.AddAudioLogToInventory(heldObjectCustomIndex);
 		} else if (index >= 36 && index <= 51) {
-			if (!Inventory.a.AddWeaponToInventory(index,heldObjectAmmo,
+			if (!_inventory.AddWeaponToInventory(index,heldObjectAmmo,
 												  heldObjectAmmo2,
 												  heldObjectLoadedAlternate)) {
 				AddItemFail(index);
 			}
 		} else if (index == 34 || index == 81 || (index >= 83 && index <= 91) || index == 110) {
-			Inventory.a.AddAccessCardToInventory(index);
+			_inventory.AddAccessCardToInventory(index);
 		} else {
 			switch (index) {
-				case 7:  Inventory.a.AddGrenadeToInventory(0,index); break; // Frag
-				case 8:  Inventory.a.AddGrenadeToInventory(3,index); break; // Concussion
-				case 9:  Inventory.a.AddGrenadeToInventory(1,index); break; // EMP
-				case 10: Inventory.a.AddGrenadeToInventory(6,index); break; // Earth Shaker
-				case 11: Inventory.a.AddGrenadeToInventory(4,index); break; // Land Mine
-				case 12: Inventory.a.AddGrenadeToInventory(5,index); break; // Nitropak
-				case 13: Inventory.a.AddGrenadeToInventory(2,index); break; // Gas
-				case 14: Inventory.a.AddPatchToInventory(2,index); break;
-				case 15: Inventory.a.AddPatchToInventory(6,index); break;
-				case 16: Inventory.a.AddPatchToInventory(5,index); break;
-				case 17: Inventory.a.AddPatchToInventory(3,index); break;
-				case 18: Inventory.a.AddPatchToInventory(4,index); break;
-				case 19: Inventory.a.AddPatchToInventory(1,index); break;
-				case 20: Inventory.a.AddPatchToInventory(0,index); break;
-				case 21: Inventory.a.AddHardwareToInventory(0,index,customIndex,true); break;
-				case 22: Inventory.a.AddHardwareToInventory(1,index,customIndex,true); break;
-				case 23: Inventory.a.AddHardwareToInventory(2,index,customIndex,true); break;
-				case 24: Inventory.a.AddHardwareToInventory(3,index,customIndex,true); break;
-				case 25: Inventory.a.AddHardwareToInventory(4,index,customIndex,true); break;
-				case 26: Inventory.a.AddHardwareToInventory(5,index,customIndex,true); break;
-				case 27: Inventory.a.AddHardwareToInventory(6,index,customIndex,true); break;
-				case 28: Inventory.a.AddHardwareToInventory(7,index,customIndex,true); break;
-				case 29: Inventory.a.AddHardwareToInventory(8,index,customIndex,true); break;
-				case 30: Inventory.a.AddHardwareToInventory(9,index,customIndex,true); break;
-				case 31: Inventory.a.AddHardwareToInventory(10,index,customIndex,true); break;
-				case 32: Inventory.a.AddHardwareToInventory(11,index,customIndex,true); break;
-				case 60: Inventory.a.AddAmmoToInventory(12,index, Const.a.magazinePitchCountForWeapon[12], false); break; // rubber slugs
-				case 65: Inventory.a.AddAmmoToInventory(8,index, Const.a.magazinePitchCountForWeapon2[8], true); break; // magpulse cartridge super
-				case 66: Inventory.a.AddAmmoToInventory(2,index, Const.a.magazinePitchCountForWeapon[2], false); break; // needle darts
-				case 67: Inventory.a.AddAmmoToInventory(2,index, Const.a.magazinePitchCountForWeapon2[2], true); break; // tranquilizer darts
-				case 68: Inventory.a.AddAmmoToInventory(9,index, Const.a.magazinePitchCountForWeapon[9], false); break; // standard bullets
-				case 69: Inventory.a.AddAmmoToInventory(9,index, Const.a.magazinePitchCountForWeapon2[9], true); break; // teflon bullets
-				case 70: Inventory.a.AddAmmoToInventory(7,index, Const.a.magazinePitchCountForWeapon[7], false); break; // hollow point rounds
-				case 71: Inventory.a.AddAmmoToInventory(7,index, Const.a.magazinePitchCountForWeapon2[7], true); break; // slug rounds
-				case 72: Inventory.a.AddAmmoToInventory(0,index, Const.a.magazinePitchCountForWeapon[0], false); break; // magnesium tipped slugs
-				case 73: Inventory.a.AddAmmoToInventory(0,index, Const.a.magazinePitchCountForWeapon2[0], true); break; // penetrator slugs
-				case 74: Inventory.a.AddAmmoToInventory(3,index, Const.a.magazinePitchCountForWeapon[3], false); break; // hornet clip
-				case 75: Inventory.a.AddAmmoToInventory(3,index, Const.a.magazinePitchCountForWeapon2[3], true); break; // splinter clip
-				case 76: Inventory.a.AddAmmoToInventory(11,index, Const.a.magazinePitchCountForWeapon[11], false); break; // rail rounds
-				case 77: Inventory.a.AddAmmoToInventory(13,index, Const.a.magazinePitchCountForWeapon[13], false); break; // slag magazine
-				case 78: Inventory.a.AddAmmoToInventory(13,index, Const.a.magazinePitchCountForWeapon2[13], true); break; // large slag magazine
-				case 79: Inventory.a.AddAmmoToInventory(8,index, Const.a.magazinePitchCountForWeapon[8], false); break; // magpulse cartridges
-				case 80: Inventory.a.AddAmmoToInventory(8,index, Const.a.magazinePitchCountForWeapon2[8], false); break; // small magpulse cartridges
+				case 7:  _inventory.AddGrenadeToInventory(0,index); break; // Frag
+				case 8:  _inventory.AddGrenadeToInventory(3,index); break; // Concussion
+				case 9:  _inventory.AddGrenadeToInventory(1,index); break; // EMP
+				case 10: _inventory.AddGrenadeToInventory(6,index); break; // Earth Shaker
+				case 11: _inventory.AddGrenadeToInventory(4,index); break; // Land Mine
+				case 12: _inventory.AddGrenadeToInventory(5,index); break; // Nitropak
+				case 13: _inventory.AddGrenadeToInventory(2,index); break; // Gas
+				case 14: _inventory.AddPatchToInventory(2,index); break;
+				case 15: _inventory.AddPatchToInventory(6,index); break;
+				case 16: _inventory.AddPatchToInventory(5,index); break;
+				case 17: _inventory.AddPatchToInventory(3,index); break;
+				case 18: _inventory.AddPatchToInventory(4,index); break;
+				case 19: _inventory.AddPatchToInventory(1,index); break;
+				case 20: _inventory.AddPatchToInventory(0,index); break;
+				case 21: _inventory.AddHardwareToInventory(0,index,customIndex,true); break;
+				case 22: _inventory.AddHardwareToInventory(1,index,customIndex,true); break;
+				case 23: _inventory.AddHardwareToInventory(2,index,customIndex,true); break;
+				case 24: _inventory.AddHardwareToInventory(3,index,customIndex,true); break;
+				case 25: _inventory.AddHardwareToInventory(4,index,customIndex,true); break;
+				case 26: _inventory.AddHardwareToInventory(5,index,customIndex,true); break;
+				case 27: _inventory.AddHardwareToInventory(6,index,customIndex,true); break;
+				case 28: _inventory.AddHardwareToInventory(7,index,customIndex,true); break;
+				case 29: _inventory.AddHardwareToInventory(8,index,customIndex,true); break;
+				case 30: _inventory.AddHardwareToInventory(9,index,customIndex,true); break;
+				case 31: _inventory.AddHardwareToInventory(10,index,customIndex,true); break;
+				case 32: _inventory.AddHardwareToInventory(11,index,customIndex,true); break;
+				case 60: _inventory.AddAmmoToInventory(12,index, _consts.magazinePitchCountForWeapon[12], false); break; // rubber slugs
+				case 65: _inventory.AddAmmoToInventory(8,index, _consts.magazinePitchCountForWeapon2[8], true); break; // magpulse cartridge super
+				case 66: _inventory.AddAmmoToInventory(2,index, _consts.magazinePitchCountForWeapon[2], false); break; // needle darts
+				case 67: _inventory.AddAmmoToInventory(2,index, _consts.magazinePitchCountForWeapon2[2], true); break; // tranquilizer darts
+				case 68: _inventory.AddAmmoToInventory(9,index, _consts.magazinePitchCountForWeapon[9], false); break; // standard bullets
+				case 69: _inventory.AddAmmoToInventory(9,index, _consts.magazinePitchCountForWeapon2[9], true); break; // teflon bullets
+				case 70: _inventory.AddAmmoToInventory(7,index, _consts.magazinePitchCountForWeapon[7], false); break; // hollow point rounds
+				case 71: _inventory.AddAmmoToInventory(7,index, _consts.magazinePitchCountForWeapon2[7], true); break; // slug rounds
+				case 72: _inventory.AddAmmoToInventory(0,index, _consts.magazinePitchCountForWeapon[0], false); break; // magnesium tipped slugs
+				case 73: _inventory.AddAmmoToInventory(0,index, _consts.magazinePitchCountForWeapon2[0], true); break; // penetrator slugs
+				case 74: _inventory.AddAmmoToInventory(3,index, _consts.magazinePitchCountForWeapon[3], false); break; // hornet clip
+				case 75: _inventory.AddAmmoToInventory(3,index, _consts.magazinePitchCountForWeapon2[3], true); break; // splinter clip
+				case 76: _inventory.AddAmmoToInventory(11,index, _consts.magazinePitchCountForWeapon[11], false); break; // rail rounds
+				case 77: _inventory.AddAmmoToInventory(13,index, _consts.magazinePitchCountForWeapon[13], false); break; // slag magazine
+				case 78: _inventory.AddAmmoToInventory(13,index, _consts.magazinePitchCountForWeapon2[13], true); break; // large slag magazine
+				case 79: _inventory.AddAmmoToInventory(8,index, _consts.magazinePitchCountForWeapon[8], false); break; // magpulse cartridges
+				case 80: _inventory.AddAmmoToInventory(8,index, _consts.magazinePitchCountForWeapon2[8], false); break; // small magpulse cartridges
 			}
 		}
 
-		Utils.PlayUIOneShotSavable(87); // frob_item
+		Utils.PlayUIOneShotSavable(_consts,87); // frob_item
 		int numberFoundContents = 0;
 		if (currentSearchItem != null) {
 			SearchableItem curSearchScript = currentSearchItem.GetComponent<SearchableItem>();
@@ -1153,7 +1167,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			}
 	    	if (numberFoundContents == 0) {
 				currentSearchItem = null;
-				MFDManager.a.ReturnTabsFromSearch();
+				_mfdManager.ReturnTabsFromSearch();
 			}
 		}
 		firstTimePickup = false;
@@ -1167,16 +1181,16 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			return;
 		}
 
-		if (!grenadeActive) heldObject = Const.a.GetPrefab(heldObjectIndex + 307); // heldObject is set by UseGrenade() so don't override here.
+		if (!grenadeActive) heldObject = _consts.GetPrefab(heldObjectIndex + 307); // heldObject is set by UseGrenade() so don't override here.
 		if (heldObject == null) {
-			Const.sprint("BUG: Object "+heldObjectIndex.ToString()+" not assigned, vaporized.",player);
+			_consts.sprint("BUG: Object "+heldObjectIndex.ToString()+" not assigned, vaporized.",player);
 			ResetHeldItem();
 			return;
 		}
 
 		GameObject tossObject = null;
 		bool freeObjectInPoolFound = false;
-		GameObject levelDynamicContainer = LevelManager.a.GetCurrentDynamicContainer();
+		GameObject levelDynamicContainer = _levelManager.GetCurrentDynamicContainer();
 
 		// Find any free inactive objects within the level's Levelnumber.Dynamic container and activate those before instantiating
 		if (!grenadeActive) {
@@ -1196,7 +1210,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 			if (freeObjectInPoolFound) {
 				if (tossObject == null) {
-					Const.sprint("BUG: Failed to get freeObjectInPool for object being dropped!",player);
+					_consts.sprint("BUG: Failed to get freeObjectInPool for object being dropped!",player);
 					ResetHeldItem();
 					return;
 				} else {
@@ -1204,9 +1218,10 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 				}
 			} else {
 				// Debug.Log("WARNING: Failed to get freeObjectInPool for object " + heldObject.ToString() + "being dropped! MouseLookScript DropHeldItem.",player);
-				tossObject = Instantiate(heldObject,(transform.position + (transform.forward * tossOffset)),Const.a.quaternionIdentity) as GameObject;  //effect
+				tossObject = GameBindings.InstantiatePrefab(heldObject,(transform.position + (transform.forward * tossOffset)),
+					_consts.quaternionIdentity);  //effect
 				if (tossObject == null) {
-					Const.sprint("BUG: Failed to instantiate object being dropped!",player);
+					_consts.sprint("BUG: Failed to instantiate object being dropped!",player);
 					ResetHeldItem();
 					return;
 				}
@@ -1216,7 +1231,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 				tossObject.transform.SetParent(levelDynamicContainer.transform,true);
 			}
 
-			Vector3 tossDir = MouseCursor.a.GetCursorScreenPointForRay();
+			Vector3 tossDir = _mouseCursor.GetCursorScreenPointForRay();
 			tossDir = playerCamera.ScreenPointToRay(tossDir).direction;
 			Rigidbody rbody = tossObject.GetComponent<Rigidbody>();
 			if (rbody != null) {
@@ -1233,20 +1248,21 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		} else {
 			// Throw an active grenade
 			grenadeActive = false;
-			MFDManager.a.mouseClickHeldOverGUI = true; // Prevent shooting it.
-			tossObject = Instantiate(heldObject,(transform.position + (transform.forward * tossOffset)),Const.a.quaternionIdentity) as GameObject;  //effect
+			_mfdManager.mouseClickHeldOverGUI = true; // Prevent shooting it.
+			tossObject = GameBindings.InstantiatePrefab(heldObject,(transform.position + (transform.forward * tossOffset)),
+				_consts.quaternionIdentity);  //effect
 			if (tossObject == null) {
-				Const.sprint("BUG: Failed to instantiate object being dropped!",player);
+				_consts.sprint("BUG: Failed to instantiate object being dropped!",player);
 				ResetHeldItem();
 				return;
 			}
 
-            Const.a.grenadesThrown++;
+            _consts.grenadesThrown++;
 			if (levelDynamicContainer != null){
 				tossObject.transform.SetParent(levelDynamicContainer.transform,true);
 			}
 			tossObject.layer = 11; // Set to player bullets layer to prevent collision and still be visible.
-			Vector3 tossDir = MouseCursor.a.GetCursorScreenPointForRay();
+			Vector3 tossDir = _mouseCursor.GetCursorScreenPointForRay();
 			tossDir = playerCamera.ScreenPointToRay(tossDir).direction;
 			Rigidbody rbody = tossObject.GetComponent<Rigidbody>();
 			if (rbody != null) {
@@ -1256,7 +1272,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 			}
 			GrenadeActivate ga = tossObject.GetComponent<GrenadeActivate>();
 			if (ga != null) ga.Activate(); // Time to boom!
-			MouseCursor.a.liveGrenade = false;
+			_mouseCursor.liveGrenade = false;
 		}
 		ResetHeldItem();
 	}
@@ -1269,7 +1285,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		heldObjectLoadedAlternate = false;
 		holdingObject = false;
 		grenadeActive = false;
-		MouseCursor.a.justDroppedItemInHelper = true;
+		_mouseCursor.justDroppedItemInHelper = true;
 	}
 
 	public void ToggleInventoryMode() {
@@ -1278,11 +1294,11 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void ForceShootMode() {
-		if (Const.a.NoShootMode) return; // We are being like the original now!
+		if (_consts.NoShootMode) return; // We are being like the original now!
 
-		GUIState.a.ClearOverButton();
-		MFDManager.a.mouseClickHeldOverGUI = false;
-		Automap.a.CloseFullmap();
+		_guiState.ClearOverButton();
+		_mfdManager.mouseClickHeldOverGUI = false;
+		_automap.CloseFullmap();
 		Cursor.lockState = CursorLockMode.Locked;
 		Cursor.visible = false;
 		inventoryMode = false;
@@ -1293,7 +1309,7 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		}
 
 		if (vmailActive) {
-			Inventory.a.DeactivateVMail();
+			_inventory.DeactivateVMail();
 			vmailActive = false;
 		}
 	}
@@ -1301,8 +1317,8 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 	public void ForceInventoryMode() {
 		if (inventoryMode) return;
 
-		GUIState.a.ClearOverButton();
-		if (PauseScript.a.MenuActive() || PauseScript.a.Paused()) {
+		_guiState.ClearOverButton();
+		if (_pauseScript.MenuActive() || _pauseScript.Paused()) {
 			Cursor.lockState = CursorLockMode.None;
 		} else {
 			#if UNITY_EDITOR
@@ -1313,12 +1329,12 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		}
 		MouseCursor.SetCursorPosInternal((int)(Screen.width * 0.5f),(int)(Screen.height * 0.5f));
 		Cursor.visible = false;
-		MouseCursor.a.deltaX = 0;
-		MouseCursor.a.deltaY = 0;
-		MouseCursor.a.cursorPosition.x = (Screen.width / 2);
-		MouseCursor.a.cursorPosition.y = (Screen.height / 2);
+		_mouseCursor.deltaX = 0;
+		_mouseCursor.deltaY = 0;
+		_mouseCursor.cursorPosition.x = (Screen.width / 2);
+		_mouseCursor.cursorPosition.y = (Screen.height / 2);
 		inventoryMode = true;
-		if (!Const.a.noHUD) shootModeButton.SetActive(true);
+		if (!_consts.noHUD) shootModeButton.SetActive(true);
 		else shootModeButton.SetActive(false);
 	}
 
@@ -1330,22 +1346,22 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		if (curSearchScript.searchableInUse) {
 			for (int i=0;i<4;i++) {
 				if (curSearchScript.contents[i] >= 0) {
-					MouseCursor.a.GetComponent<MouseCursor>().cursorImage = Const.a.useableItemsFrobIcons[curSearchScript.contents[i]];
+					_mouseCursor.cursorImage = _consts.useableItemsFrobIcons[curSearchScript.contents[i]];
 					heldObjectIndex = curSearchScript.contents[i];
 					heldObjectCustomIndex = curSearchScript.customIndex[i];
 					curSearchScript.contents[i] = -1;
 					curSearchScript.customIndex[i] = -1;
 					if (heldObjectIndex != -1) holdingObject = true;
-					Const.sprint(Const.a.stringTable[heldObjectIndex + 326]
-								 + Const.a.stringTable[319],player); // picked up
+					_consts.sprint(_consts.stringTable[heldObjectIndex + 326]
+								 + _consts.stringTable[319],player); // picked up
 
-					MFDManager.a.DisableSearchItemImage(i);
+					_mfdManager.DisableSearchItemImage(i);
 					useFX = false;
 					break;
 				}
 			}
 		} else {
-			Utils.PlayUIOneShotSavable(91); // searchsound
+			Utils.PlayUIOneShotSavable(_consts,91); // searchsound
 		}
 
 		curSearchScript.searchableInUse = true;
@@ -1363,9 +1379,9 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 
 		if (firstTimeSearch) {
 			firstTimeSearch = false;
-			MFDManager.a.OpenTab (4, true, TabMSG.Search, -1,Handedness.LH);
+			_mfdManager.OpenTab (4, true, TabMSG.Search, -1,Handedness.LH);
 		}
-		MFDManager.a.SendSearchToDataTab(curSearchScript.objectName,
+		_mfdManager.SendSearchToDataTab(curSearchScript.objectName,
 										 numberFoundContents,resultContents,
 										 resultCustomIndex,
 										 currentSearchItem.transform.position,
@@ -1374,37 +1390,38 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void UseGrenade (int index) {
-		if (holdingObject) { Const.sprint(Const.a.stringTable[311],player); return; } // Can't use grenade, hands full
+		if (holdingObject) { _consts.sprint(_consts.stringTable[311],player); return; } // Can't use grenade, hands full
 		if (index < 7 || index > 13) { Debug.Log("BUG: index outside of 7 to 13 passed to UseGrenade() in MouseLookScript.cs"); return; }
 
 		ForceInventoryMode();  // Inventory mode is turned on when picking something up.
 		ResetHeldItem();
-		MouseCursor.a.liveGrenade = true;
+		_mouseCursor.liveGrenade = true;
 		grenadeActive = true;
-		Const.sprint(Const.a.stringTable[index + 326]
-					 + Const.a.stringTable[320],player); // activated, grenade is LIVE!
+		_consts.sprint(_consts.stringTable[index + 326]
+					 + _consts.stringTable[320],player); // activated, grenade is LIVE!
 
 		switch(index) { // Subtract one from the correct grenade inventory
-			case 7:  heldObject = Const.a.GetPrefab(370); Inventory.a.RemoveGrenade(0); break; // Frag
-			case 8:  heldObject = Const.a.GetPrefab(372); Inventory.a.RemoveGrenade(3); break; // Concussion
-			case 9:  heldObject = Const.a.GetPrefab(387); Inventory.a.RemoveGrenade(1); break; // EMP
-			case 10: heldObject = Const.a.GetPrefab(389); Inventory.a.RemoveGrenade(6); break; // Earth Shaker
-			case 11: heldObject = Const.a.GetPrefab(402); Inventory.a.RemoveGrenade(4); break; // Land Mine
-			case 12: heldObject = Const.a.GetPrefab(403); Inventory.a.RemoveGrenade(5); break; // Nitropak
-			case 13: heldObject = Const.a.GetPrefab(404); Inventory.a.RemoveGrenade(2); break; // Gas
+			case 7:  heldObject = _consts.GetPrefab(370); _inventory.RemoveGrenade(0); break; // Frag
+			case 8:  heldObject = _consts.GetPrefab(372); _inventory.RemoveGrenade(3); break; // Concussion
+			case 9:  heldObject = _consts.GetPrefab(387); _inventory.RemoveGrenade(1); break; // EMP
+			case 10: heldObject = _consts.GetPrefab(389); _inventory.RemoveGrenade(6); break; // Earth Shaker
+			case 11: heldObject = _consts.GetPrefab(402); _inventory.RemoveGrenade(4); break; // Land Mine
+			case 12: heldObject = _consts.GetPrefab(403); _inventory.RemoveGrenade(5); break; // Nitropak
+			case 13: heldObject = _consts.GetPrefab(404); _inventory.RemoveGrenade(2); break; // Gas
 		}
-		MFDManager.a.ResetItemTab();
+		_mfdManager.ResetItemTab();
 		PutObjectInHand(index,-1,0,0,false,true);
 	}
 
 	public void ScreenShake (float force, float duration) {
-		shakeFinished = PauseScript.a.relativeTime + duration;
+		shakeFinished = _pauseScript.relativeTime + duration;
 		if (force < 0.48f) shakeForce = force;
 		else shakeForce = 0.48f;
 	}
 
 	public static string Save(GameObject go) {
 		MouseLookScript ml = go.GetComponent<MouseLookScript>();
+		var pauseScript = ml._pauseScript;
         s1.Clear();
 		s1.Append(Utils.BoolToString(ml.gameObject.activeSelf,"MouseLookScript.gameObject.activeSelf"));
 		s1.Append(Utils.splitChar);
@@ -1466,24 +1483,25 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.UintToString(ml.cyberspaceReturnLevel,"cyberspaceReturnLevel"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(ml.returnFromCyberspaceFinished,"returnFromCyberspaceFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ml.returnFromCyberspaceFinished,"returnFromCyberspaceFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(ml.randomShakeFinished,"randomShakeFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ml.randomShakeFinished,"randomShakeFinished"));
         s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(ml.randomKlaxonFinished,"randomKlaxonFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ml.randomKlaxonFinished,"randomKlaxonFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(ml.shakeFinished,"shakeFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ml.shakeFinished,"shakeFinished"));
 		return s1.ToString();
 	}
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		MouseLookScript ml = go.GetComponent<MouseLookScript>();
+		var pauseScript = ml._pauseScript;
 		float readFloatx, readFloaty, readFloatz;
 		ml.gameObject.SetActive(Utils.GetBoolFromString(entries[index],"MouseLookScript.gameObject.activeSelf")); index++;
 		ml.playerCamera.enabled = Utils.GetBoolFromString(entries[index],"playerCamera.enabled"); index++;
 		ml.inventoryMode = !Utils.GetBoolFromString(entries[index],"inventoryMode"); index++; // Take opposite because we are about to opposite again...
 		ml.ToggleInventoryMode(); // ...correctly set cursor lock state, and opposite again, now it is what was saved
-		PauseScript.a.previousInvMode = ml.inventoryMode; // Prevent it changing it inadvertently after load unpauses.
+		pauseScript.previousInvMode = ml.inventoryMode; // Prevent it changing it inadvertently after load unpauses.
 		ml.holdingObject = Utils.GetBoolFromString(entries[index],"holdingObject"); index++;
 		ml.heldObjectIndex = Utils.GetIntFromString(entries[index],"heldObjectIndex"); index++;
 		ml.heldObjectCustomIndex = Utils.GetIntFromString(entries[index],"heldObjectCustomIndex"); index++;
@@ -1517,10 +1535,10 @@ public class MouseLookScript : MonoBehaviour, ISingletonInitializer {
 		readFloatz = Utils.GetFloatFromString(entries[index],"cyberspaceRecallPoint.z"); index++;
 		ml.cyberspaceRecallPoint = new Vector3(readFloatx,readFloaty,readFloatz);
 		ml.cyberspaceReturnLevel = Utils.GetIntFromString(entries[index],"cyberspaceReturnLevel"); index++;
-		ml.returnFromCyberspaceFinished = Utils.LoadRelativeTimeDifferential(entries[index],"returnFromCyberspaceFinished"); index++;
-		ml.randomShakeFinished = Utils.LoadRelativeTimeDifferential(entries[index],"randomShakeFinished"); index++;
-		ml.randomKlaxonFinished = Utils.LoadRelativeTimeDifferential(entries[index],"randomKlaxonFinished"); index++;
-		ml.shakeFinished = Utils.LoadRelativeTimeDifferential(entries[index],"shakeFinished"); index++;
+		ml.returnFromCyberspaceFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"returnFromCyberspaceFinished"); index++;
+		ml.randomShakeFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"randomShakeFinished"); index++;
+		ml.randomKlaxonFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"randomKlaxonFinished"); index++;
+		ml.shakeFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"shakeFinished"); index++;
 
 		// Prevent picking up first item immediately. Not currently possible to
 		// save references (without a lot of work, aherm).

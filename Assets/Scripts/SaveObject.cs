@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 //#if UNITY_EDITOR
 //	using UnityEditor;
@@ -16,6 +17,8 @@ public class SaveObject : MonoBehaviour {
 	[HideInInspector] public string saveableType;
 	[HideInInspector] public bool initialized = false;
 
+	[Inject] private LevelManager _levelManager;
+	
 	public void Start() {
 		if (initialized) return;
 
@@ -63,7 +66,7 @@ public class SaveObject : MonoBehaviour {
 	}
 
 	// Generates a string of object data with the specific object type's info.
-	public static string Save(GameObject go) {
+	public static string Save(LevelManager levelManager, GameObject go) {
 		SaveObject so = SaveLoad.GetPrefabSaveObject(go);
 		if (so == null) return "";
 
@@ -97,8 +100,7 @@ public class SaveObject : MonoBehaviour {
 		int levelID = 1;
 		bool isNPC = (so.saveType == SaveableType.NPC);
 		if (so.instantiated) {
-			if (LevelManager.a == null) levelID = 1;
-			else levelID = LevelManager.a.GetInstantiateParent(go,isNPC,prefID);
+			levelID = levelManager.GetInstantiateParent(go,isNPC,prefID);
 		}
 
 		s1.Append(Utils.UintToString(levelID,"levelID"));     // 19
@@ -169,7 +171,7 @@ public class SaveObject : MonoBehaviour {
 	}
 
 	// Called after prefab has been instantiated.
-	public static void Load(GameObject go, ref string[] entries, int lineNum,
+	public static void Load(Const consts,LevelManager levelManager,GameObject go, ref string[] entries, int lineNum,
 							PrefabIdentifier prefID) {
 
 		if (prefID == null) { 
@@ -210,7 +212,7 @@ public class SaveObject : MonoBehaviour {
 		int levelID = Utils.GetIntFromString(entries[index],"levelID"); index++; // 19
 		if (so.instantiated) {
 			bool isNPC = (so.saveType == SaveableType.NPC);
-			LevelManager.a.SetInstantiateParent(levelID,go,isNPC);
+			levelManager.SetInstantiateParent(levelID,go,isNPC);
 		}
 				
 		if (index != 20 && ! (go.transform is RectTransform rectTr)) {
@@ -219,15 +221,15 @@ public class SaveObject : MonoBehaviour {
 		}
 
 		switch (so.saveType) {
-			case SaveableType.Player:				  index = PlayerReferenceManager.LoadPlayerDataToPlayer(go,ref entries,index,prefID,levelID); break;
+			case SaveableType.Player:				  index = PlayerReferenceManager.LoadPlayerDataToPlayer(consts,go,ref entries,index,prefID,levelID); break;
 			case SaveableType.Useable:				  index =       UseableObjectUse.Load(go,ref entries,index); break;
 			case SaveableType.Grenade:				  index =        GrenadeActivate.Load(go,ref entries,index); break;
 			case SaveableType.NPC:					  index =          HealthManager.Load(go,ref entries,index,prefID,levelID); // Loads TargetIO
-													  index =           AIController.Load(go,ref entries,index,prefID,levelID); // Handles SearchableDestructable for corpse child
-													  index =  AIAnimationController.Load(go,ref entries,index); break;
+													  index =           AIController.Load(consts,go,ref entries,index,prefID,levelID); // Handles SearchableDestructable for corpse child
+													  index =  AIAnimationController.Load(consts,go,ref entries,index); break;
 			case SaveableType.Destructable:			  index =          HealthManager.Load(go,ref entries,index,prefID,levelID); break; // Loads TargetIO
-			case SaveableType.SearchableStatic:		  index =         SearchableItem.Load(go,ref entries,index,prefID); break;
-			case SaveableType.SearchableDestructable: index =         SearchableItem.Load(go,ref entries,index,prefID);
+			case SaveableType.SearchableStatic:		  index =         SearchableItem.Load(consts.MfdManager,go,ref entries,index,prefID); break;
+			case SaveableType.SearchableDestructable: index =         SearchableItem.Load(consts.MfdManager,go,ref entries,index,prefID);
 													  index =          HealthManager.Load(go,ref entries,index,prefID,levelID); break; // Loads TargetIO
 			case SaveableType.Door:                   index =                   Door.Load(go,ref entries,index,prefID);
 													  index =               TargetIO.Load(go,ref entries,index); break;
@@ -235,7 +237,7 @@ public class SaveObject : MonoBehaviour {
 													  index =               TargetIO.Load(go,ref entries,index); break;
 			case SaveableType.Switch:                 index =           ButtonSwitch.Load(go,ref entries,index);
 													  index =               TargetIO.Load(go,ref entries,index); break;
-			case SaveableType.FuncWall:               index =               FuncWall.Load(go.transform.GetChild(0).gameObject,ref entries,index);
+			case SaveableType.FuncWall:               index =               FuncWall.Load(consts,go.transform.GetChild(0).gameObject,ref entries,index);
 													  index =               TargetIO.Load(go.transform.GetChild(0).gameObject,ref entries,index); break;
 			case SaveableType.TeleDest:               index =          TeleportTouch.Load(go,ref entries,index); break;
 			case SaveableType.LBranch:                index =            LogicBranch.Load(go,ref entries,index);
@@ -247,7 +249,7 @@ public class SaveObject : MonoBehaviour {
 													  index =               TargetIO.Load(go,ref entries,index); break;
 			case SaveableType.ElevatorPanel:          index =         KeypadElevator.Load(go,ref entries,index);
 													  index =               TargetIO.Load(go,ref entries,index); break;
-			case SaveableType.Keypad:                 index =          KeypadKeycode.Load(go,ref entries,index);
+			case SaveableType.Keypad:                 index =          KeypadKeycode.Load(consts.MfdManager,go,ref entries,index);
 													  index =               TargetIO.Load(go,ref entries,index); break;
 			case SaveableType.PuzzleGrid:             index =       PuzzleGridPuzzle.Load(go,ref entries,index);
 													  index =               TargetIO.Load(go,ref entries,index); break;

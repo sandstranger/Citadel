@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Zenject;
 
 public class TeleportFXStatic : MonoBehaviour {
 	public float intervalTime = 0.08f;
@@ -13,12 +14,15 @@ public class TeleportFXStatic : MonoBehaviour {
 	private bool yFlipped = false;
 	private RectTransform rect;
 
+	[Inject] private MouseCursor _mouseCursor;
+	[Inject] private PauseScript _pauseScript;
+
 	void OnEnable () {
-		cursorTexture = MouseCursor.a.cursorImage; //store correct cursor
-		MouseCursor.a.cursorImage = tempCursorTexture; //give dummy cursor to hide it
-		effectFinished = PauseScript.a.relativeTime + activeTime;
+		cursorTexture = _mouseCursor.cursorImage; //store correct cursor
+		_mouseCursor.cursorImage = tempCursorTexture; //give dummy cursor to hide it
+		effectFinished = _pauseScript.relativeTime + activeTime;
 		rect = GetComponent<RectTransform>();
-		flipTime = PauseScript.a.relativeTime + intervalTime;
+		flipTime = _pauseScript.relativeTime + intervalTime;
 	}
 
 	void FlipX () {
@@ -42,15 +46,15 @@ public class TeleportFXStatic : MonoBehaviour {
 	}
 
 	void Deactivate () {
-		MouseCursor.a.cursorImage = cursorTexture; //return to previous cursor
+		_mouseCursor.cursorImage = cursorTexture; //return to previous cursor
 		gameObject.SetActive(false);
 	}
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
-			if (effectFinished < PauseScript.a.relativeTime) Deactivate();
-			if (flipTime < PauseScript.a.relativeTime) {
-				flipTime = PauseScript.a.relativeTime + intervalTime;
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
+			if (effectFinished < _pauseScript.relativeTime) Deactivate();
+			if (flipTime < _pauseScript.relativeTime) {
+				flipTime = _pauseScript.relativeTime + intervalTime;
 				randHolder = Random.Range(0f,1f);
 				if (randHolder < 0.5) {
 					FlipX();

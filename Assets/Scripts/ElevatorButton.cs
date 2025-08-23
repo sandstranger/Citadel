@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Zenject;
 
 public class ElevatorButton : MonoBehaviour {
 	public bool floorAccessible = false;
@@ -27,6 +28,11 @@ public class ElevatorButton : MonoBehaviour {
 	private string levG4 = "G4";
 	private string levC = "C";
 
+	[Inject]
+	private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	
 	void Awake() {
 		childText = GetComponentInChildren<Text>(true);
 		doorOpen = false;
@@ -37,34 +43,34 @@ public class ElevatorButton : MonoBehaviour {
 	}
 
 	public void ElevButtonClick () {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 
-		if (MFDManager.a.linkedElevatorDoor == null) {
-			Const.sprint(Const.a.stringTable[6]); // Too far away from that.
+		if (_mfdManager.linkedElevatorDoor == null) {
+			_consts.sprint(_consts.stringTable[6]); // Too far away from that.
 			return;
 		}
 
-		bool dC = MFDManager.a.linkedElevatorDoor.doorOpen == DoorState.Closed;
-		Vector3 plyPos = MFDManager.a.playerCapsuleTransform.position;
-		float dist = Vector3.Distance(MFDManager.a.objectInUsePos,plyPos);
+		bool dC = _mfdManager.linkedElevatorDoor.doorOpen == DoorState.Closed;
+		Vector3 plyPos = _mfdManager.playerCapsuleTransform.position;
+		float dist = Vector3.Distance(_mfdManager.objectInUsePos,plyPos);
 		if (dist > Const.elevatorPadUseDistance && !dC) {
-			Const.sprint(Const.a.stringTable[6]); // Too far away from that.
+			_consts.sprint(_consts.stringTable[6]); // Too far away from that.
 			return;
 		}
 
 		if (!dC) {
-			Const.sprint(Const.a.stringTable[7]); // Door not closed.
+			_consts.sprint(_consts.stringTable[7]); // Door not closed.
 			return;
 		}
 
 		if (floorAccessible) {
 			if (targetDestination == null) {
-				LevelManager.a.LoadLevel(levelIndex,Vector3.zero);
+				_levelManager.LoadLevel(levelIndex,Vector3.zero);
 			} else {
-				LevelManager.a.LoadLevel(levelIndex,targetDestination.transform.position);
+				_levelManager.LoadLevel(levelIndex,targetDestination.transform.position);
 			}
 		} else {
-			Const.sprint(Const.a.stringTable[8]);
+			_consts.sprint(_consts.stringTable[8]);
 		}
 	}
 

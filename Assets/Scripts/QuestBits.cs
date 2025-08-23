@@ -35,6 +35,15 @@ public class QuestBits {
 	public bool BridgeSeparated;
 	public bool IsolinearChipsetInstalled;
 
+	private readonly LevelManager _levelManager;
+	private readonly Const _consts;
+
+	public QuestBits(LevelManager levelManager,Const @const)
+	{
+		_levelManager = levelManager;
+		_consts = @const;
+	}
+
 	public void ResetQuestData(QuestBits qD) {
 		qD.lev1SecCode = Random.Range(0,10); // Must do repeatedly to prevent
 											 // these all being the same number.
@@ -216,7 +225,7 @@ public class QuestBits {
 		ShieldActivated = Utils.GetBoolFromString(entries[index],
 		                                          "ShieldActivated");
 		index++;
-		LevelManager.a.exterior_shield.SetActive(ShieldActivated);
+		_levelManager.exterior_shield.SetActive(ShieldActivated);
 
 		LaserSafetyOverriden = Utils.GetBoolFromString(entries[index],
 		                                               "LaserSafetyOverriden");
@@ -292,6 +301,6 @@ public class QuestBits {
 	private void RunTargets(UseData ud, TargetIO tio, string target, string argvalue) {
 		ud.argvalue = argvalue; // grr, arg! (Mutant Enemy reference alert)
 		ud.SetBits(tio);
-		Const.a.UseTargets(null,ud,target);
+		_consts.UseTargets(null,ud,target);
 	}
 }

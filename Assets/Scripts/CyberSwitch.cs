@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class CyberSwitch : MonoBehaviour {
@@ -12,8 +13,11 @@ public class CyberSwitch : MonoBehaviour {
 	public GameObject deactiveCenter;
 	public GameObject iceNode;
 	[HideInInspector] public bool iceActive;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new StringBuilder(100 *500);
 
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	
 	void Awake() {
 		if (iceNode != null && iceNode.activeSelf) iceActive = true;
 		Initialize(active,iceActive);
@@ -39,7 +43,7 @@ public class CyberSwitch : MonoBehaviour {
 		if (active) return;
 
 		if (other.gameObject.CompareTag("Player")) {
-			MFDManager.a.CyberSprint(Const.a.stringTable[textIndex]);
+			_mfdManager.CyberSprint(_consts.stringTable[textIndex]);
 			active = true;
 			deactiveCenter.SetActive(false);
 			activeCenter.SetActive(true);
@@ -47,7 +51,7 @@ public class CyberSwitch : MonoBehaviour {
 			UseData ud = new UseData();
 			ud.owner = other.gameObject;
 			ud.argvalue = argvalue;
-			Const.a.UseTargets(gameObject,ud,target);
+			_consts.UseTargets(gameObject,ud,target);
 		}
 	}
 

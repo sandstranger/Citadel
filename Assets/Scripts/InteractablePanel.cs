@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class InteractablePanel : MonoBehaviour {
@@ -21,7 +22,10 @@ public class InteractablePanel : MonoBehaviour {
 	
 	private AudioSource SFX;
 	private Animator anim;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(100 * 200);
+
+	[Inject] private Const _consts;
+	[Inject] private MouseLookScript _mouseLookScript;
 
 	void Start() {
 		anim = GetComponent<Animator>();
@@ -31,7 +35,7 @@ public class InteractablePanel : MonoBehaviour {
 	public void Use(UseData ud) {
 		if (open) {
 			if (installed && ud.mainIndex == -1) {
-				Const.sprint(alreadyInstalledMessageLingdex);
+				_consts.sprint(alreadyInstalledMessageLingdex);
 				return; // do nothing already done here
 			}
 
@@ -41,13 +45,13 @@ public class InteractablePanel : MonoBehaviour {
 												  && ud.customIndex == 1))) {
 												     // Abe Ghiran's head.
 				if (installed) { 					 // ... is big
-					Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXAlreadyInstalledIndex]);
+					Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXAlreadyInstalledIndex]);
 					return; // do nothing already done here
 				}
 				installed = true;
 				if (installationItem != null) installationItem.SetActive(true);
-				Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXInstallationIndex]);
-				Const.sprint(installedMessageLingdex);
+				Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXInstallationIndex]);
+				_consts.sprint(installedMessageLingdex);
 				// any extra effect objects?  activate them here...good for sparks or turning on any extra bits and bobs
 				if (effects.Length > 0) {
 					for(int i=0;i<effects.Length;i++) {
@@ -62,20 +66,20 @@ public class InteractablePanel : MonoBehaviour {
 					}
 				}
 
-				MouseLookScript.a.ResetHeldItem();
+				_mouseLookScript.ResetHeldItem();
 
 				// use the target now that we are active
 				ud.argvalue = argvalue;
-				Const.a.UseTargets(gameObject,ud,target);
+				_consts.UseTargets(gameObject,ud,target);
 			} else {
-				Utils.PlayOneShotSavable(SFX,Const.a.sounds[43]); // button_deny, aaaahhh!! Try again
-				Const.sprint(wrongItemMessageLingdex);
+				Utils.PlayOneShotSavable(SFX,_consts.sounds[43]); // button_deny, aaaahhh!! Try again
+				_consts.sprint(wrongItemMessageLingdex);
 			}
 		} else {
 			open = true;
 			anim.Play("Open");
-			Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXOpenIndex]);
-			Const.sprint(openMessageLingdex);
+			Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXOpenIndex]);
+			_consts.sprint(openMessageLingdex);
 		}
 	}
 

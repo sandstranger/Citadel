@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Zenject;
 
 public class KeypadKeycodeButtons : MonoBehaviour {
 	public KeycodeDigitImage digit1s;
@@ -15,6 +16,11 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 	private int entryHuns;
 	private AudioSource SFXSource;
 
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GetInput _getInput;
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake () {
 		ResetEntry();
 		SFXSource = GetComponent<AudioSource>();
@@ -28,7 +34,7 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 	}
 	
 	public void Keypress (int button) {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		KeypressAction(button);
 	}
 
@@ -36,7 +42,7 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 		if (keypad == null) return;
 		if (keypad.solved) return;
 		
-		Utils.PlayOneShotSavable(SFXSource,39);
+		Utils.PlayOneShotSavable(_consts,SFXSource,39);
 		// Digit key pressed 0 thru 9
 		if ((button >= 0) && (button <= 9))
 			SetDigit(button);
@@ -71,20 +77,20 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 		
 		if (currentEntry == keycode) {
 			if ((entryHuns != -1)) {
-				Utils.PlayOneShotSavable(SFXSource,46);
+				Utils.PlayOneShotSavable(_consts,SFXSource,46);
 			}
 			keypad.UseTargets();
 			keypad.solved = true;
 		} else {
 			if ((entryHuns != -1)) {
-				Utils.PlayOneShotSavable(SFXSource,43);
+				Utils.PlayOneShotSavable(_consts,SFXSource,43);
 			}
 		}
 	}
 
 	void SetDigit(int value) {
 		if ((value > 9) || (value < 0)) {
-			Const.sprint("BUG: incorrect value sent to keypad controller");
+			_consts.sprint("BUG: incorrect value sent to keypad controller");
 			return;
 		}
 
@@ -113,8 +119,8 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive())  return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive())  return;
 		if (keypad == null) return;
 
 		digit1s.digitIndex = entryOnes;
@@ -122,18 +128,18 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 		digit100s.digitIndex = entryHuns;
 		if (keypad.solved) return;
 
-		if (GetInput.a.Numpad0()) { KeypressAction(0); }
-		if (GetInput.a.Numpad1()) { KeypressAction(1); }
-		if (GetInput.a.Numpad2()) { KeypressAction(2); }
-		if (GetInput.a.Numpad3()) { KeypressAction(3); }
-		if (GetInput.a.Numpad4()) { KeypressAction(4); }
-		if (GetInput.a.Numpad5()) { KeypressAction(5); }
-		if (GetInput.a.Numpad6()) { KeypressAction(6); }
-		if (GetInput.a.Numpad7()) { KeypressAction(7); }
-		if (GetInput.a.Numpad8()) { KeypressAction(8); }
-		if (GetInput.a.Numpad9()) { KeypressAction(9); }
-		if (GetInput.a.NumpadMinus()) { KeypressAction(10); }
-		if (GetInput.a.NumpadPeriod()) { KeypressAction(11); }
-		if (GetInput.a.Backspace()) { KeypressAction(10); }
+		if (_getInput.Numpad0()) { KeypressAction(0); }
+		if (_getInput.Numpad1()) { KeypressAction(1); }
+		if (_getInput.Numpad2()) { KeypressAction(2); }
+		if (_getInput.Numpad3()) { KeypressAction(3); }
+		if (_getInput.Numpad4()) { KeypressAction(4); }
+		if (_getInput.Numpad5()) { KeypressAction(5); }
+		if (_getInput.Numpad6()) { KeypressAction(6); }
+		if (_getInput.Numpad7()) { KeypressAction(7); }
+		if (_getInput.Numpad8()) { KeypressAction(8); }
+		if (_getInput.Numpad9()) { KeypressAction(9); }
+		if (_getInput.NumpadMinus()) { KeypressAction(10); }
+		if (_getInput.NumpadPeriod()) { KeypressAction(11); }
+		if (_getInput.Backspace()) { KeypressAction(10); }
 	}
 }

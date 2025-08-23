@@ -1454,46 +1454,46 @@ public class Utils {
 		PlayOneShotSavable(SFX,fxclip,0);
 	}
 
-	public static void PlayOneShotSavable(AudioSource SFX, int fx) {
+	public static void PlayOneShotSavable(Const consts,AudioSource SFX, int fx) {
 		if (fx < 0) return;
-		if (fx >= Const.a.sounds.Length) return;
+		if (fx >= consts.sounds.Length) return;
 
-		PlayOneShotSavable(SFX,Const.a.sounds[fx],0);
+		PlayOneShotSavable(SFX,consts.sounds[fx],0);
 	}
 
-	public static void PlayOneShotSavable(AudioSource SFX, int fx, float vol) {
+	public static void PlayOneShotSavable(Const consts,AudioSource SFX, int fx, float vol) {
 		if (fx < 0) return;
-		if (fx >= Const.a.sounds.Length) return;
+		if (fx >= consts.sounds.Length) return;
 
-		PlayOneShotSavable(SFX,Const.a.sounds[fx],vol);
+		PlayOneShotSavable(SFX,consts.sounds[fx],vol);
 	}
 	
-	public static void PlayUIOneShotSavable(int fx, float vol) {
+	public static void PlayUIOneShotSavable(Const consts,int fx, float vol) {
 		if (fx < 0) return;
-		if (fx >= Const.a.sounds.Length) return;
+		if (fx >= consts.sounds.Length) return;
 
 		AudioSource aud = null;
-		for (int i=0;i<MFDManager.a.UIAudSource.Length;i++) { 
-			if (MFDManager.a.UIAudSource[i].isPlaying) continue;
+		for (int i=0;i<consts.MfdManager.UIAudSource.Length;i++) { 
+			if (consts.MfdManager.UIAudSource[i].isPlaying) continue;
 			
-			aud = MFDManager.a.UIAudSource[i]; // Free channel.
+			aud = consts.MfdManager.UIAudSource[i]; // Free channel.
 		}
 		
 		if (aud == null) return; // Couldn't find a free channel.
 		
-		PlayOneShotSavable(aud,Const.a.sounds[fx],vol);
+		PlayOneShotSavable(aud,consts.sounds[fx],vol);
 	}
 	
-	public static void PlayUIOneShotSavable(int fx) {
-		PlayUIOneShotSavable(fx,1.0f);
+	public static void PlayUIOneShotSavable(Const @consts,int fx) {
+		PlayUIOneShotSavable(consts,fx,1.0f);
 	}
 	
-	public static void PlayUIOneShotSavable(AudioClip fxclip) {
+	public static void PlayUIOneShotSavable(MFDManager mfdManager,AudioClip fxclip) {
 		AudioSource aud = null;
-		for (int i=0;i<MFDManager.a.UIAudSource.Length;i++) { 
-			if (MFDManager.a.UIAudSource[i].isPlaying) continue;
+		for (int i=0;i<mfdManager.UIAudSource.Length;i++) { 
+			if (mfdManager.UIAudSource[i].isPlaying) continue;
 			
-			aud = MFDManager.a.UIAudSource[i]; // Free channel.
+			aud = mfdManager.UIAudSource[i]; // Free channel.
 		}
 		
 		if (aud == null) return; // Couldn't find a free channel.
@@ -1505,8 +1505,8 @@ public class Utils {
 		PlayAudioSavable(SFX,fxclip,0,false);
 	}
 
-	public static void PlaySavable(AudioSource SFX, int fxclip) {
-		PlayAudioSavable(SFX,Const.a.sounds[fxclip],0,false);
+	public static void PlaySavable(Const @consts,AudioSource SFX, int fxclip) {
+		PlayAudioSavable(SFX,consts.sounds[fxclip],0,false);
 	}
 
 	private static StringBuilder auds1 = new StringBuilder();
@@ -1544,7 +1544,7 @@ public class Utils {
 		return index;
 	}
 
-    // Using "relative time" = PauseScript.a.relativeTime and "finished" = some
+    // Using "relative time" = _pauseScript.relativeTime and "finished" = some
     // script's timer float value, e.g. attackFinished, in the notes below...
     //
     // If the relative time is 123 when we save and finished is 156, then when
@@ -1565,22 +1565,21 @@ public class Utils {
     // in case there is a whackado one-off instance of comparing (time - 
     // finished) somewhere instead of (finished < time) which is my usual Quake
     // derived timer pattern.
-    public static string SaveRelativeTimeDifferential(float timerValue,
+    public static string SaveRelativeTimeDifferential(PauseScript pauseScript,float timerValue,
 													  string name) {
 
-        if (PauseScript.a == null) return name + ":0000.00000";
-        float val = timerValue - PauseScript.a.relativeTime; // Remove current
+        if (pauseScript == null) return name + ":0000.00000";
+        float val = timerValue - pauseScript.relativeTime; // Remove current
                                                              // instance's
                                                              // relative time.
         return FloatToString(val,name);
     }
 
-    public static float LoadRelativeTimeDifferential(string savedTimer,
+    public static float LoadRelativeTimeDifferential(PauseScript pauseScript,string savedTimer,
 													 string name) {
 
         float val = GetFloatFromString(savedTimer,name);
-        if (PauseScript.a == null) return val;
-        return PauseScript.a.relativeTime + val; // Add current instance's
+        return pauseScript.relativeTime + val; // Add current instance's
                                                  // relative time to get same
                                                  // timer in context of current
                                                  // time.  See above notes.
@@ -1669,7 +1668,7 @@ public class Utils {
 		rbody.AddForceAtPosition((attackNormal*impactVelocity*30f),spot);
 	}
 
-	public static void ApplyImpactForceSphere(DamageData dd, Vector3 centerPoint, float radius, float impactScale) {
+	public static void ApplyImpactForceSphere(Const @const,DamageData dd, Vector3 centerPoint, float radius, float impactScale) {
 		HealthManager hm = null;
 		Collider[] colliders = Physics.OverlapSphere(centerPoint, radius);
 		int i = 0;
@@ -1690,7 +1689,7 @@ public class Utils {
 
 			if (!applyImpact) {
 				// Only raycast if not close
-				bool raycastHit = Physics.Raycast(centerPoint, dir, out hit, radius + 0.02f, Const.a.layerMaskExplosion);
+				bool raycastHit = Physics.Raycast(centerPoint, dir, out hit, radius + 0.02f, @const.layerMaskExplosion);
 				applyImpact = raycastHit && (hit.collider == colliders[i] || (hit.rigidbody == rbody && rbody != null));
 			}
 
@@ -1730,8 +1729,8 @@ public class Utils {
 		}
 	}
 	
-	public static void PlayTempAudio(Vector3 spot,AudioClip clip,float volume) {
-		GameObject tempAud = Const.a.GetObjectFromPool(PoolType.TempAudioSources);
+	public static void PlayTempAudio(Const @consts,Vector3 spot,AudioClip clip,float volume) {
+		GameObject tempAud = consts.GetObjectFromPool(PoolType.TempAudioSources);
 		if (tempAud != null) {
 			tempAud.transform.position = spot; // set temporary audiosource to right here
 			PooledItemDestroy poolDet = tempAud.GetComponent<PooledItemDestroy>();
@@ -1742,8 +1741,8 @@ public class Utils {
 		}
 	}
 
-	public static void PlayTempAudio(Vector3 spot,AudioClip clip) {
-		PlayTempAudio(spot,clip,1f);
+	public static void PlayTempAudio(Const @const,Vector3 spot,AudioClip clip) {
+		PlayTempAudio(@const,spot,clip,1f);
 	}
 
 	public static HealthManager GetMainHealthManager(GameObject go) {
@@ -1838,14 +1837,14 @@ public class Utils {
         return logFilePath;
     }
     
-    public static GameObject CreateSEGIEmitter(GameObject go, int curlevel, int lineNum, Light lit) {
+    public static GameObject CreateSEGIEmitter(Const @consts,GameObject go, int curlevel, int lineNum, Light lit) {
 		GameObject segiEmitter = new GameObject("SEGIEmitter" + curlevel.ToString() + "." + lineNum.ToString());
         segiEmitter.transform.parent = go.transform;
         segiEmitter.transform.localPosition = new Vector3(0f,0f,0f);
         MeshFilter mf = segiEmitter.AddComponent<MeshFilter>();
-        mf.sharedMesh = Const.a.sphereMesh;
+        mf.sharedMesh = consts.sphereMesh;
         MeshRenderer mR = segiEmitter.AddComponent<MeshRenderer>();
-        mR.material = Const.a.segiEmitterMaterial1;
+        mR.material = consts.segiEmitterMaterial1;
         mR.material.SetColor("_EmissionColor",new Color(lit.color.r * lit.intensity,lit.color.g * lit.intensity,lit.color.b * lit.intensity,1f));
         segiEmitter.transform.localScale = new Vector3(Mathf.Max(lit.range * Const.segiVoxelSize,8f),Mathf.Max(lit.range * Const.segiVoxelSize,8f),Mathf.Max(lit.range * Const.segiVoxelSize,8f));
         segiEmitter.layer = 2; // IgnoreRaycast

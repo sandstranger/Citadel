@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Zenject;
 
 public class ImageSequenceTextureArray : MonoBehaviour {
 	public string resourceFolder;
@@ -28,6 +29,9 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 	private int frameCounterGlow = 0;
 	private PrefabIdentifier pid;
 
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake() {
 		//Get a reference to the Material of the game object this script is attached to.
 		mR = GetComponent<MeshRenderer>();
@@ -49,7 +53,7 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 
 	// called by HealthManager.cs's ScreenDeath
 	public void Destroy() {
-		Utils.PlayOneShotSavable(SFX,Const.a.sounds[69]); // screen_destroy
+		Utils.PlayOneShotSavable(SFX,_consts.sounds[69]); // screen_destroy
 		if (lightContainer != null) lightContainer.SetActive(false);
 		screenDestroyed = true; // if not already dead, say so
 	}
@@ -60,13 +64,13 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 		if (health > 0) {
 			screenDestroyed = screenDestroyedDone = false;
 			if (lightContainer != null) lightContainer.SetActive(true);
-			tickFinished = PauseScript.a.relativeTime + tick;
+			tickFinished = _pauseScript.relativeTime + tick;
 			SetFrameIndices();
 		} else {
 			if (lightContainer != null) lightContainer.SetActive(false);
 			screenDestroyed = true;
-			goMaterial.mainTexture = Const.a.sequenceTextures[5]; // End frame of destroyed texture
-			goMaterial.SetTexture("_EmissionMap", Const.a.sequenceTextures[5]);
+			goMaterial.mainTexture = _consts.sequenceTextures[5]; // End frame of destroyed texture
+			goMaterial.SetTexture("_EmissionMap", _consts.sequenceTextures[5]);
 		}
 	}
 
@@ -87,14 +91,14 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 	}
 
 	void Start () {
-		if (PauseScript.a == null) { this.enabled = false; return; }
+		if (_pauseScript == null) { this.enabled = false; return; }
 
 		//Load all textures found on the Sequence folder, that is placed inside the resources folder
 		if (string.IsNullOrWhiteSpace(resourceFolder)) resourceFolder = glowResourceFolder;
 		if (string.IsNullOrWhiteSpace(resourceFolder)) return;
 
 		tick = frameDelay;
-		tickFinished = PauseScript.a.relativeTime + tick;
+		tickFinished = _pauseScript.relativeTime + tick;
 
 		// New method...long, but reduces overall memory load from duplicate
 		// frames and reduces startup time by over 8 seconds. :party:
@@ -839,13 +843,13 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			if (string.IsNullOrWhiteSpace(resourceFolder)) { this.enabled = false; return; }
 
 			if (mR.isVisible) {
-				if (tickFinished < PauseScript.a.relativeTime) {
+				if (tickFinished < _pauseScript.relativeTime) {
 					Think();
-					tickFinished = PauseScript.a.relativeTime + tick;
+					tickFinished = _pauseScript.relativeTime + tick;
 				}
 			}
 		}
@@ -869,8 +873,8 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 
 			//Set the material's texture to the current value of the frameCounter variable
 			if (frameCounter >= 0 && frameCounter <= 5) {
-				goMaterial.mainTexture = Const.a.sequenceTextures[frameCounter]; // 0 thru 5
-				goMaterial.SetTexture("_EmissionMap", Const.a.sequenceTextures[frameCounter]);
+				goMaterial.mainTexture = _consts.sequenceTextures[frameCounter]; // 0 thru 5
+				goMaterial.SetTexture("_EmissionMap", _consts.sequenceTextures[frameCounter]);
 			}
 			return;
 		}
@@ -904,8 +908,8 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 		if (constArrayLookupGlow != null) {
 			if (constArrayLookupGlow.Length > 0) {
 				if (frameCounterGlow < constArrayLookupGlow.Length) {
-					if (constArrayLookupGlow[frameCounterGlow] < Const.a.sequenceTextures.Length && constArrayLookupGlow[frameCounterGlow] >= 0) {
-						goMaterial.SetTexture("_EmissionMap", Const.a.sequenceTextures[constArrayLookupGlow[frameCounterGlow]]);
+					if (constArrayLookupGlow[frameCounterGlow] < _consts.sequenceTextures.Length && constArrayLookupGlow[frameCounterGlow] >= 0) {
+						goMaterial.SetTexture("_EmissionMap", _consts.sequenceTextures[constArrayLookupGlow[frameCounterGlow]]);
 					}
 				}
 			}
@@ -915,11 +919,11 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 
 		if (constArrayLookup != null) {
 			if (constArrayLookup.Length > 0 && frameCounter < constArrayLookup.Length) {
-				if (constArrayLookup[frameCounter] < Const.a.sequenceTextures.Length && constArrayLookup[frameCounter] >= 0) {
-					if (goMaterial.mainTexture != Const.a.sequenceTextures[constArrayLookup[frameCounter]]) goMaterial.mainTexture = Const.a.sequenceTextures[constArrayLookup[frameCounter]];
+				if (constArrayLookup[frameCounter] < _consts.sequenceTextures.Length && constArrayLookup[frameCounter] >= 0) {
+					if (goMaterial.mainTexture != _consts.sequenceTextures[constArrayLookup[frameCounter]]) goMaterial.mainTexture = _consts.sequenceTextures[constArrayLookup[frameCounter]];
 					if (pid != null) {
 						if (pid.constIndex == 279) {
-							goMaterial.SetTexture("_EmissionMap", Const.a.sequenceTextures[constArrayLookup[frameCounter]]);
+							goMaterial.SetTexture("_EmissionMap", _consts.sequenceTextures[constArrayLookup[frameCounter]]);
 						}
 					}
 				}

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class TargetID : MonoBehaviour {
@@ -26,6 +27,10 @@ public class TargetID : MonoBehaviour {
 	public TextMesh nameText;
 	public bool stunned = false;
 
+	[Inject] private Const _consts;
+	[Inject] private Inventory _inventory;
+	[Inject] private PauseScript _pauseScript;
+
     void Start() {
 		secondaryDisplayString = System.String.Empty;
 		nameText.text = System.String.Empty;
@@ -40,22 +45,22 @@ public class TargetID : MonoBehaviour {
 		if (linkedHM == null) return;
 
 		if (dd.attackType == AttackType.Tranq) {
-			currentText = Const.a.stringTable[536]; // STUNNED
-			damageTimeFinished = PauseScript.a.relativeTime - 1f; // Expire damage text, Update handles "STUNNED"
+			currentText = _consts.stringTable[536]; // STUNNED
+			damageTimeFinished = _pauseScript.relativeTime - 1f; // Expire damage text, Update handles "STUNNED"
 		} else {
 			if (damage > linkedHM.maxhealth * 0.75f) {
-				currentText = Const.a.stringTable[514]; // SEVERE DAMAGE
+				currentText = _consts.stringTable[514]; // SEVERE DAMAGE
 			} else if (damage > linkedHM.maxhealth * 0.50f) {
-				currentText = Const.a.stringTable[515]; // MAJOR DAMAGE
+				currentText = _consts.stringTable[515]; // MAJOR DAMAGE
 			} else if (damage > linkedHM.maxhealth * 0.25f) {
-				currentText = Const.a.stringTable[513]; // NORMAL DAMAGE
+				currentText = _consts.stringTable[513]; // NORMAL DAMAGE
 			} else if (damage > 0f) {
-				currentText = Const.a.stringTable[512]; // MINOR DAMAGE
+				currentText = _consts.stringTable[512]; // MINOR DAMAGE
 			} else {
-				currentText = Const.a.stringTable[511]; // NO DAMAGE
+				currentText = _consts.stringTable[511]; // NO DAMAGE
 			}
 			damageTime = (damage == 0f) ? 1f : 2.5f;
-			damageTimeFinished = PauseScript.a.relativeTime + damageTime;
+			damageTimeFinished = _pauseScript.relativeTime + damageTime;
 			text.text = currentText;
 		}
 	}
@@ -81,7 +86,7 @@ public class TargetID : MonoBehaviour {
 			}
 
 			if (linkedHM.isNPC && linkedHM.aic != null) {
-				if (linkedHM.aic.tranquilizeFinished > PauseScript.a.relativeTime) {
+				if (linkedHM.aic.tranquilizeFinished > _pauseScript.relativeTime) {
 					stunned = true;
 				} else {
 					stunned = false;
@@ -105,7 +110,7 @@ public class TargetID : MonoBehaviour {
 			return;
 		}
 
-		if (lifetimeFinished < PauseScript.a.relativeTime) {
+		if (lifetimeFinished < _pauseScript.relativeTime) {
 			Deactivate();
 			return;
 		}
@@ -133,18 +138,18 @@ public class TargetID : MonoBehaviour {
 		if (displayAttitude && linkedHM != null) {
 			if (displayRange || displayHealth) secondaryDisplayString += comma;
 			if (linkedHM.aic.asleep) {
-				secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[519]); // Asleep
+				secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[519]); // Asleep
 			} else {
 				switch (linkedHM.aic.currentState) {
-					case AIState.Walk: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[517]); break; // Cautious
-					case AIState.Inspect: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[517]); break; // Cautious
-					case AIState.Interacting: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[517]); break; // Cautious
-					case AIState.Run: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[518]); break; // Hostile
-					case AIState.Attack1: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[518]); break; // Hostile
-					case AIState.Attack2: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[518]); break; // Hostile
-					case AIState.Attack3: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[518]); break; // Hostile
-					case AIState.Pain: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[518]); break; // Hostile
-					default: secondaryDisplayString = (secondaryDisplayString + Const.a.stringTable[516]); break; // Idle
+					case AIState.Walk: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[517]); break; // Cautious
+					case AIState.Inspect: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[517]); break; // Cautious
+					case AIState.Interacting: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[517]); break; // Cautious
+					case AIState.Run: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[518]); break; // Hostile
+					case AIState.Attack1: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[518]); break; // Hostile
+					case AIState.Attack2: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[518]); break; // Hostile
+					case AIState.Attack3: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[518]); break; // Hostile
+					case AIState.Pain: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[518]); break; // Hostile
+					default: secondaryDisplayString = (secondaryDisplayString + _consts.stringTable[516]); break; // Idle
 				}
 			}
 		}
@@ -152,14 +157,14 @@ public class TargetID : MonoBehaviour {
 		if (currentText != System.String.Empty) {
 			if (linkedHM != null) {
 				if (linkedHM.aic != null) {
-					if (linkedHM.aic.tranquilizeFinished > PauseScript.a.relativeTime
-						&& damageTimeFinished < PauseScript.a.relativeTime) {
-						currentText = Const.a.stringTable[536]; // STUNNED
+					if (linkedHM.aic.tranquilizeFinished > _pauseScript.relativeTime
+						&& damageTimeFinished < _pauseScript.relativeTime) {
+						currentText = _consts.stringTable[536]; // STUNNED
 					} else {
-						if (damageTimeFinished < PauseScript.a.relativeTime) {
+						if (damageTimeFinished < _pauseScript.relativeTime) {
 							currentText = "";
-							if (!Inventory.a.hasHardware[4]
-								&& (currentText != Const.a.stringTable[511])) {
+							if (!_inventory.hasHardware[4]
+								&& (currentText != _consts.stringTable[511])) {
 
 								Deactivate();
 								return;
@@ -172,11 +177,11 @@ public class TargetID : MonoBehaviour {
 		}
     }
 
-	public static float GetTargetIDSensingRange(bool manual) {
+	public static float GetTargetIDSensingRange(Inventory inventory,bool manual) {
 		float sensingRange = 12f;
 		if (manual) {
 			// Get manual lockon distance for frob raytrace.  Less than tether.
-			switch (Inventory.a.hardwareVersion[4]) {
+			switch (inventory.hardwareVersion[4]) {
 				case 1: sensingRange = 13f; break;
 				case 2: sensingRange = 13f; break;
 				case 3: sensingRange = 13f; break;
@@ -184,7 +189,7 @@ public class TargetID : MonoBehaviour {
 			}
 		} else {
 			// Get auto-lock distance.  Less than tether.
-			switch (Inventory.a.hardwareVersion[4]) {
+			switch (inventory.hardwareVersion[4]) {
 				case 1: sensingRange = 0f; break; // No auto-lock on v1
 				case 2: sensingRange = 0f; break; // No auto-lock on v2
 				case 3: sensingRange = 13f; break;
@@ -195,9 +200,9 @@ public class TargetID : MonoBehaviour {
 	}
 
 	// Set to higher than the auto-lock distances above.
-	public static float GetTargetIDTetherRange() {
+	public static float GetTargetIDTetherRange(Inventory inventory) {
 		float dist = 15f;
-		switch (Inventory.a.hardwareVersion[4]) {
+		switch (inventory.hardwareVersion[4]) {
 			case 1: dist = 15f; break; // Set higher than manual lockons.
 			case 2: dist = 15f; break; // Set higher than manual lockons.
 			case 3: dist = 15f; break;

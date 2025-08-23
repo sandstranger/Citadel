@@ -126,7 +126,7 @@ public class SearchableItem : MonoBehaviour {
 		return s1.ToString();
 	}
 
-	public static int Load(GameObject go, ref string[] entries, int index,
+	public static int Load(MFDManager mfdManager,GameObject go, ref string[] entries, int index,
 						   PrefabIdentifier prefID) {
 		
 		SearchableItem se;
@@ -175,15 +175,15 @@ public class SearchableItem : MonoBehaviour {
 				if (se.contents[i] > -1) numberFoundContents++;
 			}
 
-			if (MFDManager.a.tetheredSearchable != se) {
-				if (MFDManager.a.tetheredSearchable != null) {
-					MFDManager.a.tetheredSearchable.ResetSearchable(false);
-					MFDManager.a.tetheredSearchable = null;
+			if (mfdManager.tetheredSearchable != se) {
+				if (mfdManager.tetheredSearchable != null) {
+					mfdManager.tetheredSearchable.ResetSearchable(false);
+					mfdManager.tetheredSearchable = null;
 				}
 			}
-			MFDManager.a.tetheredSearchable = se;
-			MFDManager.a.objectInUsePos = se.gameObject.transform.position;
-			MFDManager.a.usingObject = true;
+			mfdManager.tetheredSearchable = se;
+			mfdManager.objectInUsePos = se.gameObject.transform.position;
+			mfdManager.usingObject = true;
 		}
 		return index;
 	}

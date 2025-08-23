@@ -6,8 +6,9 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System;
 using Citadel.Game;
+using Zenject;
 
-public class MouseCursor : MonoBehaviour, ISingletonInitializer {
+public class MouseCursor : MonoBehaviour {
     public GameObject playerCamera;
 	public GameObject uiCamera;
 	private Camera uiCameraCam;
@@ -62,14 +63,18 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 	public GraphicRaycaster raycaster;
 	private List<RaycastResult> graphicCastResults;
 	private PointerEventData pev;
-	
-	public static MouseCursor a;
 
-	public void Initialize() {
-		a = this;
-		a.uiCameraCam = uiCamera.GetComponent<Camera>();
+	[Inject] private Const _consts;
+	[Inject] private GUIState _guiState;
+	[Inject] private MinigameCursor _miniGameCursor;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private WeaponCurrent _weaponCurrent;
+
+	private void Awake() {
+		uiCameraCam = uiCamera.GetComponent<Camera>();
 		cursorSize = Screen.width * cursorScreenPercentage;
-		a.drawTexture = new Rect((Screen.width * halfFactor) - offsetX, (Screen.height * halfFactor) - cursorSize,
+		drawTexture = new Rect((Screen.width * halfFactor) - offsetX, (Screen.height * halfFactor) - cursorSize,
 			cursorSize, cursorSize);
 		deltaX = deltaY = 0;
 		lastMousePos = cursorPosition = Input.mousePosition;
@@ -139,7 +144,7 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 	}
 	
 	private void EnableTooltips() {
-		if (toolTipHasText && !PauseScript.a.Paused() && !PauseScript.a.MenuActive() && (MouseLookScript.a.inventoryMode || liveGrenade)) {
+		if (toolTipHasText && !_pauseScript.Paused() && !_pauseScript.MenuActive() && (_mouseLookScript.inventoryMode || liveGrenade)) {
 			switch(toolTipType) {
 				case Handedness.LH:
 					tooltipLeft.SetActive(true);
@@ -174,11 +179,11 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 	
 	private void EnableLiveGrenadeTooltip() {
 		tooltipLiveGrenade.SetActive(true); // Display "live" next to cursor
-		tooltipLiveGrenadeText.text = Const.a.stringTable[586];
+		tooltipLiveGrenadeText.text = _consts.stringTable[586];
 	}
 
 	void Update() {
-		if (Const.a.noHUD) {
+		if (_consts.noHUD) {
 			cursorSize = Screen.width * cursorScreenPercentage * 0.1f;// 1 pixel "beauty" cursor.
 		} else {
 			cursorSize = Screen.width * cursorScreenPercentage;
@@ -197,29 +202,29 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 		UpdateInventoryAddHelper();
 
 		// Maintain cursor mode.
-		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) {
+		if (_pauseScript.Paused() || _pauseScript.MenuActive()) {
 			Cursor.lockState = CursorLockMode.None;
-		} else if (MouseLookScript.a.inventoryMode) {
+		} else if (_mouseLookScript.inventoryMode) {
 // 			#if UNITY_EDITOR
 				Cursor.lockState = CursorLockMode.None;
 // 			#else	
 // 				Cursor.lockState = CursorLockMode.Confined;
 // 			#endif
 
-			if (GUIState.a.overButton || GUIState.a.overButtonType != ButtonType.None) {
-				GUIState.a.isBlocking = true;
+			if (_guiState.overButton || _guiState.overButtonType != ButtonType.None) {
+				_guiState.isBlocking = true;
 			}
 		} else {
 			Cursor.lockState = CursorLockMode.Locked;
-			GUIState.a.isBlocking = false;
+			_guiState.isBlocking = false;
 		}
 		
 		bool hideCursorForMinigame = false;
-		if (MinigameCursor.a != null) {
-			if (MinigameCursor.a.mouseOverPanel) hideCursorForMinigame = true;
+		if (_miniGameCursor != null) {
+			if (_miniGameCursor.mouseOverPanel) hideCursorForMinigame = true;
 		}
 
-		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) {
+		if (_pauseScript.Paused() || _pauseScript.MenuActive()) {
             // Pause / Menu Cursor
  			SetCursorPositionMovable();
 			DisableTooltips();
@@ -236,17 +241,17 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 			if (!cursorUIImage.gameObject.activeSelf) cursorUIImage.gameObject.SetActive(true);
 		}
 		
-		if (MouseLookScript.a.inventoryMode) {
+		if (_mouseLookScript.inventoryMode) {
             // Inventory Mode Cursor
  			SetCursorPositionMovable();
-			if (toolTipHasText && GUIState.a.isBlocking) EnableTooltips();
+			if (toolTipHasText && _guiState.isBlocking) EnableTooltips();
 			else                                         DisableTooltips();
 			
 			if (liveGrenade) EnableLiveGrenadeTooltip();
 			else             DisableLiveGrenadeTooltip();
 			
-			if (MouseLookScript.a.inCyberSpace) {
-				if (GUIState.a.isBlocking) {
+			if (_mouseLookScript.inCyberSpace) {
+				if (_guiState.isBlocking) {
 					if (toolTipHasText) {
 						cursorImage = tooltipTexture;
 					} else {						
@@ -258,16 +263,16 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 				
 				DisableLiveGrenadeTooltip();
 			} else {
-				if (MouseLookScript.a.vmailActive) {
-					cursorImage = Const.a.useableItemsFrobIcons[108]; // vmail
-				} else if (GUIState.a.isBlocking && !MouseLookScript.a.holdingObject) {
+				if (_mouseLookScript.vmailActive) {
+					cursorImage = _consts.useableItemsFrobIcons[108]; // vmail
+				} else if (_guiState.isBlocking && !_mouseLookScript.holdingObject) {
 					if (toolTipHasText) {
 						cursorImage = tooltipTexture;
 					} else {						
 						cursorImage = cursorGUI;
 					}
-				} else if (MouseLookScript.a.holdingObject && MouseLookScript.a.heldObjectIndex >= 0) {
-					cursorImage = Const.a.useableItemsFrobIcons[MouseLookScript.a.heldObjectIndex];
+				} else if (_mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0) {
+					cursorImage = _consts.useableItemsFrobIcons[_mouseLookScript.heldObjectIndex];
 				} else {
 					cursorImage = GetWeaponCursor();
 				}
@@ -279,12 +284,12 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 			if (liveGrenade) EnableLiveGrenadeTooltip();
 			else             DisableLiveGrenadeTooltip();
 			
-			if (MouseLookScript.a.inCyberSpace) {				
+			if (_mouseLookScript.inCyberSpace) {				
 				cursorImage = cyberspaceCursor;
 				DisableLiveGrenadeTooltip();
 			} else {
-				if (MouseLookScript.a.holdingObject && MouseLookScript.a.heldObjectIndex >= 0) {
-					cursorImage = Const.a.useableItemsFrobIcons[MouseLookScript.a.heldObjectIndex];
+				if (_mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0) {
+					cursorImage = _consts.useableItemsFrobIcons[_mouseLookScript.heldObjectIndex];
 				} else {
 					cursorImage = GetWeaponCursor();
 				}
@@ -296,48 +301,48 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 	}
 	
 	private Texture2D GetWeaponCursor() {
-		switch(WeaponCurrent.a.weaponIndex) {
-			case 36: return Const.a.useableItemsFrobIcons[102]; // red
-			case 37: return Const.a.useableItemsFrobIcons[107]; // blue
-			case 38: return Const.a.useableItemsFrobIcons[102]; // red
-			case 39: return Const.a.useableItemsFrobIcons[105]; // green
-			case 40: return Const.a.useableItemsFrobIcons[107]; // blue
-			case 41: return Const.a.useableItemsFrobIcons[103]; // orange
-			case 42: return Const.a.useableItemsFrobIcons[103]; // orange
-			case 43: return Const.a.useableItemsFrobIcons[102]; // red
-			case 44: return Const.a.useableItemsFrobIcons[104]; // yellow
-			case 45: return Const.a.useableItemsFrobIcons[102]; // red
-			case 46: return Const.a.useableItemsFrobIcons[106]; // teal
-			case 47: return Const.a.useableItemsFrobIcons[104]; // yellow
-			case 48: return Const.a.useableItemsFrobIcons[102]; // red
-			case 49: return Const.a.useableItemsFrobIcons[105]; // green
-			case 50: return Const.a.useableItemsFrobIcons[107]; // blue
-			case 51: return Const.a.useableItemsFrobIcons[106]; // teal
-			default: return Const.a.useableItemsFrobIcons[105]; // green
+		switch(_weaponCurrent.weaponIndex) {
+			case 36: return _consts.useableItemsFrobIcons[102]; // red
+			case 37: return _consts.useableItemsFrobIcons[107]; // blue
+			case 38: return _consts.useableItemsFrobIcons[102]; // red
+			case 39: return _consts.useableItemsFrobIcons[105]; // green
+			case 40: return _consts.useableItemsFrobIcons[107]; // blue
+			case 41: return _consts.useableItemsFrobIcons[103]; // orange
+			case 42: return _consts.useableItemsFrobIcons[103]; // orange
+			case 43: return _consts.useableItemsFrobIcons[102]; // red
+			case 44: return _consts.useableItemsFrobIcons[104]; // yellow
+			case 45: return _consts.useableItemsFrobIcons[102]; // red
+			case 46: return _consts.useableItemsFrobIcons[106]; // teal
+			case 47: return _consts.useableItemsFrobIcons[104]; // yellow
+			case 48: return _consts.useableItemsFrobIcons[102]; // red
+			case 49: return _consts.useableItemsFrobIcons[105]; // green
+			case 50: return _consts.useableItemsFrobIcons[107]; // blue
+			case 51: return _consts.useableItemsFrobIcons[106]; // teal
+			default: return _consts.useableItemsFrobIcons[105]; // green
 		}	
 	}
 
 	void UpdateSafeZone() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 
 		if (cursorPosition.x < (0.96925f * Screen.width) && cursorPosition.x > (0.029282f * Screen.width)
 			&& cursorPosition.y > (0.13541f * Screen.height) && cursorPosition.y < (0.70703f * Screen.height)) {
-			GUIState.a.isBlocking = false; // in the safe zone!
+			_guiState.isBlocking = false; // in the safe zone!
 		}
 	}
 
 	void UpdateEventSystemPointerStatus() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 
 		pev.position = cursorPosition;
 		graphicCastResults.Clear();
-		if (!MouseLookScript.a.inventoryMode) return;
+		if (!_mouseLookScript.inventoryMode) return;
 		
 		raycaster.Raycast(pev, graphicCastResults);
 		if (graphicCastResults.Count > 0) {
-			GUIState.a.isBlocking = true;
+			_guiState.isBlocking = true;
 			EventSystem.current.SetSelectedGameObject(graphicCastResults[0].gameObject);
 			EventTrigger evt = graphicCastResults[0].gameObject.GetComponent<EventTrigger>();
 			if (evt != null) {
@@ -354,42 +359,42 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 				ExecuteEvents.Execute(graphicCastResults[0].gameObject, pev, ExecuteEvents.submitHandler);
 			}
 		} else {
-			GUIState.a.isBlocking = false;
+			_guiState.isBlocking = false;
 			EventSystem.current.SetSelectedGameObject(null);
 		}
 	}
 
 	void CheckIfOutOfScreenBounds() {
-		if (PauseScript.a.MenuActive()) return;
-		if (PauseScript.a.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
 
 		if (cursorPosition.y > Screen.height || cursorPosition.y < 0
 			|| cursorPosition.x < 0 || cursorPosition.x > Screen.width) {
-			GUIState.a.isBlocking = true; // outside the screen, don't shoot we're innocent!
+			_guiState.isBlocking = true; // outside the screen, don't shoot we're innocent!
 		}
 	}
 
 	void UpdateInventoryAddHelper() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 
 		if (cursorPosition.y > (0.13541f*Screen.height)
 			&& cursorPosition.y < (0.70703f*Screen.height)
 			&& cursorPosition.x < (0.96925f*Screen.width)
 			&& cursorPosition.x > (0.029282f*Screen.width)) {
-			GUIState.a.isBlocking = false; // in the safe zone!
+			_guiState.isBlocking = false; // in the safe zone!
 		}
 
-		if (MouseLookScript.a.inventoryMode && MouseLookScript.a.holdingObject) {
+		if (_mouseLookScript.inventoryMode && _mouseLookScript.holdingObject) {
 			// Be sure to pass the camera to the 3rd parameter if using
 			// "Screen Space - Camera" on the Canvas, otherwise use "null"
 			if (RectTransformUtility.RectangleContainsScreenPoint(centerMFDPanel,cursorPosition,uiCameraCam)) {
 				if (!inventoryAddHelper.activeInHierarchy) inventoryAddHelper.SetActive(true);
-				GUIState.a.isBlocking = true;
+				_guiState.isBlocking = true;
 			} else {
 				if (inventoryAddHelper.activeInHierarchy) inventoryAddHelper.SetActive(false);
 				if (justDroppedItemInHelper) {
-					GUIState.a.ClearOverButton();
+					_guiState.ClearOverButton();
 					justDroppedItemInHelper = false; // only disable blocking state once, not constantly
 				}
 			}
@@ -397,7 +402,7 @@ public class MouseCursor : MonoBehaviour, ISingletonInitializer {
 			if (justDroppedItemInHelper) {
 				justDroppedItemInHelper = false; // only disable blocking state once, not constantly
 				inventoryAddHelper.SetActive(false);
-				GUIState.a.ClearOverButton();
+				_guiState.ClearOverButton();
 			}
 		}
 	}

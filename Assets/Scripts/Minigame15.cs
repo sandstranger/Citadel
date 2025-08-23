@@ -1,3 +1,4 @@
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,6 +41,10 @@ public class Minigame15 : MonoBehaviour {
     public Vector3[] position = new Vector3[17];
     private float slideTickFinished;
 
+    [Inject] private Const _consts;
+    [Inject] private MinigameCursor _miniGameCursor;
+    [Inject] private PauseScript _pauseScript;
+
     void OnEnable() {
         Reset();
     }
@@ -50,7 +55,7 @@ public class Minigame15 : MonoBehaviour {
         // TODO: Pick image, set size, hide numbers if using image.
         for (int i=1;i<=16;i++) { curNum[i] = i; sliding[i] = false; }
         int sixteenIndex = 16;
-        int shuffleIter = Const.a.difficultyPuzzle * 5;
+        int shuffleIter = _consts.difficultyPuzzle * 5;
         while (shuffleIter > 0) {
             int randIter = 32;
             while (randIter > 0) { // Find cell next to empty slot
@@ -90,7 +95,7 @@ public class Minigame15 : MonoBehaviour {
                 new Vector3(position[i].x,position[i].y,0f);
         }
 
-        slideTickFinished = PauseScript.a.relativeTime;
+        slideTickFinished = _pauseScript.relativeTime;
     }
 
     private void SetAlignments() {
@@ -113,16 +118,16 @@ public class Minigame15 : MonoBehaviour {
     }
 
     bool AABBCursorCheck(int left, int right, int up, int down) {
-        if (MinigameCursor.a.minigameMouseX < left)  return false;
-        if (MinigameCursor.a.minigameMouseX > right) return false;
-        if (MinigameCursor.a.minigameMouseY > up)    return false;
-        if (MinigameCursor.a.minigameMouseY < down)  return false;
+        if (_miniGameCursor.minigameMouseX < left)  return false;
+        if (_miniGameCursor.minigameMouseX > right) return false;
+        if (_miniGameCursor.minigameMouseY > up)    return false;
+        if (_miniGameCursor.minigameMouseY < down)  return false;
         return true;
     }
 
     void Update() {
-        if (PauseScript.a.Paused()) return;
-        if (PauseScript.a.MenuActive()) return;
+        if (_pauseScript.Paused()) return;
+        if (_pauseScript.MenuActive()) return;
 
         if      (AABBCursorCheck(col1Left,col1Right,row1Up,row1Dn)) BtnCheck(1);
         else if (AABBCursorCheck(col2Left,col2Right,row1Up,row1Dn)) BtnCheck(2);
@@ -153,11 +158,11 @@ public class Minigame15 : MonoBehaviour {
             }
         }
 
-        if (slideTickFinished < PauseScript.a.relativeTime) {
-            float tdiff = PauseScript.a.relativeTime - slideTickFinished;
+        if (slideTickFinished < _pauseScript.relativeTime) {
+            float tdiff = _pauseScript.relativeTime - slideTickFinished;
             float tickCount = tdiff / 0.04f;
             float shift = tickCount * 12f;
-            slideTickFinished = PauseScript.a.relativeTime + 0.04f;
+            slideTickFinished = _pauseScript.relativeTime + 0.04f;
             for (int i=1;i<=16;i++) {
                 if (!sliding[i]) continue;
 
@@ -211,7 +216,7 @@ public class Minigame15 : MonoBehaviour {
             ydiff = Mathf.Abs(ydiff) > 2f ? ydiff : 0f;
             Vector2 sliddirBefore = new Vector2(xdiff,ydiff);
             slideDir[to] = new Vector2(Utils.Sign(xdiff),Utils.Sign(ydiff));
-            slideTickFinished = PauseScript.a.relativeTime + 0.1f;
+            slideTickFinished = _pauseScript.relativeTime + 0.1f;
         }
 
         curNum[to] = fromNum;

@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class KeypadElevator : MonoBehaviour {
 	public Door linkedDoor;
@@ -20,8 +21,13 @@ public class KeypadElevator : MonoBehaviour {
 	public string lockedTarget;
 	public string argvalue;
 	public int lockedMessageIndex = -1;
+
+	[Inject] 
+	private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
 	
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(100 * 1024);
 
 	void Start () {
 		padInUse = false;
@@ -32,12 +38,12 @@ public class KeypadElevator : MonoBehaviour {
 	}
 
 	public void Use (UseData ud) {
-		if (LevelManager.a.GetCurrentLevelSecurity() > securityThreshhold) {
-			MFDManager.a.BlockedBySecurity(transform.position);
+		if (_levelManager.GetCurrentLevelSecurity() > securityThreshhold) {
+			_mfdManager.BlockedBySecurity(transform.position);
 			return;
 		}
 
-		if (LevelManager.a.superoverride || Const.a.difficultyMission == 0) {
+		if (_levelManager.superoverride || _consts.difficultyMission == 0) {
 			// SHODAN can go anywhere!  Full security override!
 			locked = false;
 		}
@@ -45,15 +51,15 @@ public class KeypadElevator : MonoBehaviour {
 		if (locked) {
 			// Target something because we are locked like an info_message to say
 			// hey we are locked, e.g. vox: "Non emergency life pods disabled."
-			Const.sprint(lockedMessageIndex);
+			_consts.sprint(lockedMessageIndex);
 			ud.argvalue = argvalue;
-			Const.a.UseTargets(gameObject,ud,lockedTarget);
+			_consts.UseTargets(gameObject,ud,lockedTarget);
 			return;
 		}
 
 		padInUse = true;
-		Utils.PlayUIOneShotSavable(91);
-		MFDManager.a.SendElevatorKeypadToDataTab(this,buttonsEnabled,
+		Utils.PlayUIOneShotSavable(_consts,91);
+		_mfdManager.SendElevatorKeypadToDataTab(this,buttonsEnabled,
 												 buttonsDarkened,buttonText,
 												 targetDestination,
 												 transform.position,linkedDoor,

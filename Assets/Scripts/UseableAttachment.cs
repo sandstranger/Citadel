@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class UseableAttachment : MonoBehaviour {
@@ -12,6 +13,8 @@ public class UseableAttachment : MonoBehaviour {
 	public float timeTillPlastiqueExplode; // minimum of 1f
 	public bool activated = false;
 
+	[Inject] private PauseScript _pauseScript;
+	
 	void Awake () {
 		activated = false;
 		timerFinished = -1f;
@@ -29,7 +32,7 @@ public class UseableAttachment : MonoBehaviour {
 				// Z-44 Plastique Explosive
 				activated = true;
 				targettedObject.SendMessageUpwards("Use", ud);
-				timerFinished = PauseScript.a.relativeTime + timeTillPlastiqueExplode;
+				timerFinished = _pauseScript.relativeTime + timeTillPlastiqueExplode;
 				break;
 			case 57:
 				// Interface Demodulator
@@ -53,11 +56,11 @@ public class UseableAttachment : MonoBehaviour {
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused() || _pauseScript.MenuActive()) return;
 		if (!activated) return;
 
 		if (timerFinished != -1f) { // Plastique delayed effect (to give player time to escape of course)
-			if (timerFinished < PauseScript.a.relativeTime) {
+			if (timerFinished < _pauseScript.relativeTime) {
 				explosion.SetActive (true);
 				for (int i = 0; i < destructables.Length; i++) {
 					destructables [i].SetActive (false); // blow up the walls and floor

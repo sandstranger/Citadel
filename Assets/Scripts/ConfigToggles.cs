@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,10 +8,14 @@ public class ConfigToggles : MonoBehaviour {
 	// External references
 	public ConfigToggleType ToggleType;
 
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+	[Inject] private Music _music;
+
 	// Internal references
 	private Toggle self;
 
-	void Start () { // Wait for Const.a. to initialize.
+	void Start () { // Wait for _consts. to initialize.
 		AlignWithConfigFile();
 	}
 
@@ -21,43 +26,43 @@ public class ConfigToggles : MonoBehaviour {
 	public void AlignWithConfigFile() {
 		if (self == null) self = GetComponent<Toggle>();
 		switch (ToggleType) {
-			case ConfigToggleType.Fullscreen: self.isOn = Const.a.GraphicsFullscreen; break;
-			case ConfigToggleType.SSAO: self.isOn = Const.a.GraphicsSSAO; break;
-			case ConfigToggleType.Bloom: self.isOn = Const.a.GraphicsBloom; break;
-			case ConfigToggleType.SEGI: self.isOn = Const.a.GraphicsSEGI; break;
-			case ConfigToggleType.Reverb: self.isOn = Const.a.AudioReverb; break;
-			case ConfigToggleType.InvertLook: self.isOn = Const.a.InputInvertLook; break;
-			case ConfigToggleType.InvertCyber: self.isOn = Const.a.InputInvertCyberspaceLook; break;
-			case ConfigToggleType.InvertInventoryCycling: self.isOn = Const.a.InputInvertInventoryCycling; break;
-			case ConfigToggleType.QuickPickup: self.isOn = Const.a.InputQuickItemPickup; break;
-			case ConfigToggleType.QuickReload: self.isOn = Const.a.InputQuickReloadWeapons; break;
-			case ConfigToggleType.Vsync: self.isOn = Const.a.GraphicsVSync; break;
-			case ConfigToggleType.NoShootMode: self.isOn = Const.a.NoShootMode; break;
-			case ConfigToggleType.DynamicMusic: self.isOn = Const.a.DynamicMusic; break;
-			case ConfigToggleType.HeadBob: self.isOn = Const.a.HeadBob; break;
-			case ConfigToggleType.Footsteps: self.isOn = Const.a.Footsteps; break;
+			case ConfigToggleType.Fullscreen: self.isOn = _consts.GraphicsFullscreen; break;
+			case ConfigToggleType.SSAO: self.isOn = _consts.GraphicsSSAO; break;
+			case ConfigToggleType.Bloom: self.isOn = _consts.GraphicsBloom; break;
+			case ConfigToggleType.SEGI: self.isOn = _consts.GraphicsSEGI; break;
+			case ConfigToggleType.Reverb: self.isOn = _consts.AudioReverb; break;
+			case ConfigToggleType.InvertLook: self.isOn = _consts.InputInvertLook; break;
+			case ConfigToggleType.InvertCyber: self.isOn = _consts.InputInvertCyberspaceLook; break;
+			case ConfigToggleType.InvertInventoryCycling: self.isOn = _consts.InputInvertInventoryCycling; break;
+			case ConfigToggleType.QuickPickup: self.isOn = _consts.InputQuickItemPickup; break;
+			case ConfigToggleType.QuickReload: self.isOn = _consts.InputQuickReloadWeapons; break;
+			case ConfigToggleType.Vsync: self.isOn = _consts.GraphicsVSync; break;
+			case ConfigToggleType.NoShootMode: self.isOn = _consts.NoShootMode; break;
+			case ConfigToggleType.DynamicMusic: self.isOn = _consts.DynamicMusic; break;
+			case ConfigToggleType.HeadBob: self.isOn = _consts.HeadBob; break;
+			case ConfigToggleType.Footsteps: self.isOn = _consts.Footsteps; break;
 		}
 	}
 
-	public void ToggleFullscreen () { Const.a.GraphicsFullscreen = self.isOn; Config.WriteConfig(); }
-	public void ToggleSSAO () { Const.a.GraphicsSSAO = self.isOn; Config.WriteConfig(); }
-	public void ToggleBloom () { Const.a.GraphicsBloom = self.isOn; Config.WriteConfig(); }
-	public void ToggleSEGI () { Const.a.GraphicsSEGI = self.isOn; Config.WriteConfig(); }
+	public void ToggleFullscreen () { _consts.GraphicsFullscreen = self.isOn; _config.WriteConfig(); }
+	public void ToggleSSAO () { _consts.GraphicsSSAO = self.isOn; _config.WriteConfig(); }
+	public void ToggleBloom () { _consts.GraphicsBloom = self.isOn; _config.WriteConfig(); }
+	public void ToggleSEGI () { _consts.GraphicsSEGI = self.isOn; _config.WriteConfig(); }
 	public void ToggleReverb () {
-		Const.a.AudioReverb = self.isOn;
-		if (Const.a.AudioReverb) Const.a.ReverbOn();
-		else Const.a.ReverbOff();
+		_consts.AudioReverb = self.isOn;
+		if (_consts.AudioReverb) _consts.ReverbOn();
+		else _consts.ReverbOff();
 
-		Config.WriteConfig();
+		_config.WriteConfig();
 	}
-	public void ToggleInvertLook () { Const.a.InputInvertLook = self.isOn; Config.WriteConfig(); }
-	public void ToggleInvertCyberLook () { Const.a.InputInvertCyberspaceLook = self.isOn; Config.WriteConfig(); }
-	public void ToggleInvertInventoryCycling () { Const.a.InputInvertInventoryCycling = self.isOn; Config.WriteConfig(); }
-	public void ToggleQuickItemPickup () { Const.a.InputQuickItemPickup = self.isOn; Config.WriteConfig(); }
-	public void ToggleQuickReloadWeapon () { Const.a.InputQuickReloadWeapons = self.isOn; Config.WriteConfig(); }
-	public void ToggleVSync () { Const.a.GraphicsVSync = self.isOn; Config.WriteConfig(); }
-	public void ToggleNoShootMode () { Const.a.NoShootMode = self.isOn; Config.WriteConfig(); }
-	public void ToggleDynamicMusic () { Const.a.DynamicMusic = self.isOn; Config.WriteConfig(); Music.a.Stop(); }
-	public void ToggleHeadBob () { Const.a.HeadBob = self.isOn; Config.WriteConfig(); }
-	public void ToggleFootsteps () { Const.a.Footsteps = self.isOn; Config.WriteConfig(); }
+	public void ToggleInvertLook () { _consts.InputInvertLook = self.isOn; _config.WriteConfig(); }
+	public void ToggleInvertCyberLook () { _consts.InputInvertCyberspaceLook = self.isOn; _config.WriteConfig(); }
+	public void ToggleInvertInventoryCycling () { _consts.InputInvertInventoryCycling = self.isOn; _config.WriteConfig(); }
+	public void ToggleQuickItemPickup () { _consts.InputQuickItemPickup = self.isOn; _config.WriteConfig(); }
+	public void ToggleQuickReloadWeapon () { _consts.InputQuickReloadWeapons = self.isOn; _config.WriteConfig(); }
+	public void ToggleVSync () { _consts.GraphicsVSync = self.isOn; _config.WriteConfig(); }
+	public void ToggleNoShootMode () { _consts.NoShootMode = self.isOn; _config.WriteConfig(); }
+	public void ToggleDynamicMusic () { _consts.DynamicMusic = self.isOn; _config.WriteConfig(); _music.Stop(); }
+	public void ToggleHeadBob () { _consts.HeadBob = self.isOn; _config.WriteConfig(); }
+	public void ToggleFootsteps () { _consts.Footsteps = self.isOn; _config.WriteConfig(); }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class CyberPush : MonoBehaviour {
@@ -8,8 +9,11 @@ public class CyberPush : MonoBehaviour {
 	private Rigidbody otherRbody;
 	private Vector3 tempVec;
 
+	[Inject] private Const _consts;
+	[Inject] private Music _music;
+
 	void OnTriggerStay(Collider col) {
-		if (Const.a.difficultyCyber < 1) return;
+		if (_consts.difficultyCyber < 1) return;
 
 		if (col.gameObject.CompareTag("Player")) {
 			PlayerMovement pm = col.gameObject.GetComponent<PlayerMovement>();
@@ -20,7 +24,7 @@ public class CyberPush : MonoBehaviour {
 					otherRbody.AddForce(direction * force * Time.deltaTime, ForceMode.Acceleration);
 				}
 			}
-			Music.a.NotifyCyberTube();
+			_music.NotifyCyberTube();
 		}
 	}
 
@@ -28,7 +32,7 @@ public class CyberPush : MonoBehaviour {
 		if (col.gameObject.CompareTag("Player")) {
 			PlayerMovement pm = col.gameObject.GetComponent<PlayerMovement>();
 			if (pm != null) pm.inCyberTube = false; // To re-allow for easy cyber difficulty to stop motion
-			Music.a.NotifyLeftCyberTube();
+			_music.NotifyLeftCyberTube();
 		}
 	}
 }

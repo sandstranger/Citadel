@@ -59,74 +59,32 @@ public static class SaveLoad {
         0.0f, //
         0.0f  //
     };
-
-    public static string SavePrefab(GameObject go) {
-        if (go == null) { Debug.LogError("Tried to save null GameObject in SavePrefab()"); return ""; }
-
-        PrefabIdentifier pid = GetPrefabIdentifier(go,false);
-        if (pid == null) { Debug.LogError("Tried to save " + go.name + ", but had no PrefabIdentifier!"); return ""; }
-
-        if (pid.constIndex == 717) return ""; // Not a saveable prefab, child only.
-        if (pid.constIndex == 718) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 719) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 721) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 722) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 723) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 724) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 725) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 726) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 727) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 728) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 729) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 730) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 731) return ""; // Not a saveable prefab, temp ent.
-        if (pid.constIndex == 732) return ""; // Unused? ef_sparkspits
-        if (pid.constIndex == 736) return ""; // Not a saveable prefab, temp ent.
-
-        if (ConsoleEmulator.ConstIndexIsGeometry(pid.constIndex)) {
-            return SaveGeometry(go,pid);
-        } else if (ConsoleEmulator.ConstIndexIsDynamicObject(pid.constIndex)) {
-            return SaveObject.Save(go);
-        } else if (ConsoleEmulator.ConstIndexIsDoor(pid.constIndex)) {
-            return SaveObject.Save(go);
-        } else if (ConsoleEmulator.ConstIndexIsStaticObjectSaveable(pid.constIndex)) {
-            return SaveObject.Save(go);
-        } else if (ConsoleEmulator.ConstIndexIsNPC(pid.constIndex)) {
-            return SaveObject.Save(go);
-        } else if (ConsoleEmulator.ConstIndexIsStaticObjectImmutable(pid.constIndex)) {
-           return SaveStaticImmutable(go,pid);
-        } else {
-            Light lit = go.GetComponent<Light>();
-            if (lit != null) {
-                return SaveLight(go);
-            } else return "";
-        }
-    }
     
-    public static GameObject LoadPrefab(ref string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null, GameObject lightsParent = null) {
+    public static GameObject LoadPrefab(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager,
+        ref string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null, GameObject lightsParent = null) {
         if (!(entries[0].Contains("constIndex"))) { // [sic], need to fix light file to start with constIndex:7777
-            return LoadLight(entries,lineNum,curlevel, lightsParent);
+            return LoadLight(@const,levelManager,entries,lineNum,curlevel, lightsParent);
         }
 
         int constIndex = Utils.GetIntFromString(entries[0],"constIndex");
         if (ConsoleEmulator.ConstIndexIsGeometry(constIndex)) {
-            return LoadGeometry(entries,lineNum,curlevel, levelGeometryParent);
+            return LoadGeometry(@const,consoleEmulator,entries,lineNum,curlevel, levelGeometryParent);
         } else if (ConsoleEmulator.ConstIndexIsDynamicObject(constIndex)
                    || ConsoleEmulator.ConstIndexIsDoor(constIndex)
                    || ConsoleEmulator.ConstIndexIsStaticObjectSaveable(constIndex)
                    || ConsoleEmulator.ConstIndexIsNPC(constIndex)) {
 
             int saveID = Utils.GetIntFromString(entries[2],"SaveID");
-            GameObject container = LevelManager.a.GetRequestedLevelDynamicContainer(LevelManager.currentLevel);
-			GameObject newGO = ConsoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,container,saveID);
+            GameObject container = levelManager.GetRequestedLevelDynamicContainer(LevelManager.currentLevel);
+			GameObject newGO = consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,container,saveID);
 			PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(newGO,true);
-			if (newGO != null) SaveObject.Load(newGO,ref entries,lineNum,prefID);
+			if (newGO != null) SaveObject.Load(@const,levelManager,newGO,ref entries,lineNum,prefID);
 			return newGO;
         } else if (ConsoleEmulator.ConstIndexIsStaticObjectImmutable(constIndex)) {
-            return LoadStaticImmutable(entries,lineNum,curlevel);
+            return LoadStaticImmutable(@const,consoleEmulator,entries,lineNum,curlevel);
         } else {
             // Something went wrong, rebuild the line and print it.
-            StringBuilder s1 = new StringBuilder();
+            StringBuilder s1 = new StringBuilder(100 * 500);
             s1.Clear();
             for (int i=0;i<entries.Length;i++) {
                 s1.Append(entries[i]);
@@ -141,7 +99,7 @@ public static class SaveLoad {
     
     // GameObect already null checked by originator.
     // PrefabIdentifier already null checked by originator.  
-    private static string SaveStaticImmutable(GameObject go, PrefabIdentifier pid) {
+    private static string SaveStaticImmutable(Const consts,GameObject go, PrefabIdentifier pid) {
         StringBuilder s1 = new StringBuilder();
         s1.Clear();
         s1.Append(Utils.IntToString(pid.constIndex,"constIndex"));
@@ -351,7 +309,7 @@ public static class SaveLoad {
         return s1.ToString();
     }
 
-    private static GameObject LoadStaticImmutable(string[] entries, int lineNum, int curlevel) {
+    private static GameObject LoadStaticImmutable(Const @const,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel) {
         if (entries.Length <= 1) { 
             Debug.Log("Can't load static immutable from line "
                       + lineNum.ToString() + ", line had only one or no "
@@ -366,7 +324,7 @@ public static class SaveLoad {
             return null;
         }
 
-        GameObject go = ConsoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,null,0);
+        GameObject go = consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,null,0);
         index = Utils.LoadTransform(go.transform,ref entries,index);
         if (constIndex == 552) { // prop_cyber_datafrag
             CyberDataFragment cybfrag = go.GetComponent<CyberDataFragment>();
@@ -398,7 +356,7 @@ public static class SaveLoad {
             
             int matIndex = Utils.GetIntFromString(entries[index],"matIndex"); index++;
             MeshRenderer mr = go.GetComponent<MeshRenderer>();
-            mr.sharedMaterial = Const.a.genericMaterials[matIndex]; // sharedMaterial doesn't create new instance.
+            mr.sharedMaterial = @const.genericMaterials[matIndex]; // sharedMaterial doesn't create new instance.
         } else if (constIndex == 595) { // trigger_cyberpush
             CyberPush cybp = go.GetComponent<CyberPush>();
             cybp.force = Utils.GetFloatFromString(entries[index],"force"); index++;
@@ -615,7 +573,7 @@ public static class SaveLoad {
         return s1.ToString();
     }
 
-    private static GameObject LoadGeometry(string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null) {
+    private static GameObject LoadGeometry(Const consts,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null) {
         if (entries.Length <= 1) { 
             Debug.Log("Can't load geometry from line " + lineNum.ToString()
                       + ", line had only one or no entries[]");
@@ -629,7 +587,7 @@ public static class SaveLoad {
             return null;
         }
 
-        GameObject chunk = ConsoleEmulator.SpawnDynamicObject(constdex,curlevel,false,null,0);
+        GameObject chunk = consoleEmulator.SpawnDynamicObject(constdex,curlevel,false,null,0);
         if (chunk == null) return null;
 
         if (levelGeometryParent != null)
@@ -647,8 +605,8 @@ public static class SaveLoad {
         MeshRenderer childMR = null;
         // Shadowcaster mode for ceilings set in DynamicCulling so that if sky is visible we preserve twosided shadows and don't get sun leaks.
         if (mr != null) {
-            if (pointsUp && mr.sharedMaterial != Const.a.shadowCaster) mr.shadowCastingMode = ShadowCastingMode.Off;
-//             if (mr.sharedMaterial == Const.a.shadowCaster) {
+            if (pointsUp && mr.sharedMaterial != @consts.shadowCaster) mr.shadowCastingMode = ShadowCastingMode.Off;
+//             if (mr.sharedMaterial == _consts.shadowCaster) {
 //                 mr.shadowCastingMode = ShadowCastingMode.ShadowsOnly;
 //             }
         }
@@ -776,7 +734,7 @@ public static class SaveLoad {
                     if (subtr != null) {
                         MeshRenderer shadRenderer = subtr.GetComponent<MeshRenderer>();
                         if (shadRenderer != null) {
-                            if (shadRenderer.sharedMaterial == Const.a.shadowCaster) {
+                            if (shadRenderer.sharedMaterial == consts.shadowCaster) {
                                 MonoBehaviour.DestroyImmediate(shadRenderer);
                                 shadRenderer = null;
                                 MonoBehaviour.DestroyImmediate(subtr.gameObject);
@@ -799,19 +757,19 @@ public static class SaveLoad {
                 if (childChunk != null) {
                     childMR = childChunk.gameObject.GetComponent<MeshRenderer>();
                     if (childMR != null) {
-                        childMR.sharedMaterial = Const.a.genericMaterials[matVal];
+                        childMR.sharedMaterial = consts.genericMaterials[matVal];
                     }
                 }
             }
             
             if (mr != null) {
-                mr.sharedMaterial = Const.a.genericMaterials[matVal];
+                mr.sharedMaterial = consts.genericMaterials[matVal];
             } else if (chunk.transform.childCount > 0) {
                 childChunk = chunk.transform.GetChild(0);
                 if (childChunk != null) {
                     childMR = childChunk.gameObject.GetComponent<MeshRenderer>();
                     if (childMR != null) {
-                        childMR.sharedMaterial = Const.a.genericMaterials[matVal];
+                        childMR.sharedMaterial = consts.genericMaterials[matVal];
                     }
                 }
             }
@@ -861,19 +819,19 @@ public static class SaveLoad {
                 if (childChunk != null) {
                     childMR = childChunk.gameObject.GetComponent<MeshRenderer>();
                     if (childMR != null) {
-                        childMR.sharedMaterial = Const.a.genericMaterials[matVal];
+                        childMR.sharedMaterial = consts.genericMaterials[matVal];
                     }
                 }
             }
             
             if (mr != null) {
-                mr.sharedMaterial = Const.a.genericMaterials[matVal];
+                mr.sharedMaterial = consts.genericMaterials[matVal];
             } else if (chunk.transform.childCount > 0) {
                 childChunk = chunk.transform.GetChild(0);
                 if (childChunk != null) {
                     childMR = childChunk.gameObject.GetComponent<MeshRenderer>();
                     if (childMR != null) {
-                        childMR.sharedMaterial = Const.a.genericMaterials[matVal];
+                        childMR.sharedMaterial = consts.genericMaterials[matVal];
                     }
                 }
             }
@@ -933,13 +891,13 @@ public static class SaveLoad {
     }
 
     public static int numLightsWithShadows = 0;
-    private static GameObject LoadLight(string[] entries, int lineNum, int curlevel, GameObject lightsParent = null) {
+    private static GameObject LoadLight(Const @consts,LevelManager levelManager,string[] entries, int lineNum, int curlevel, GameObject lightsParent = null) {
         if (entries.Length <= 1) { Debug.Log("Couldn't load light on line number: " + lineNum.ToString()); return null; }
 
         int index = 0;
 		float readFloatx, readFloaty, readFloatz, readFloatw;
         GameObject go = new GameObject("PointLight" + curlevel.ToString() + "." + lineNum.ToString());
-        go.transform.parent = lightsParent!=null ? lightsParent.transform : LevelManager.a.GetRequestedLightsStaticImmutableContainer(curlevel).transform;
+        go.transform.parent = lightsParent!=null ? lightsParent.transform : levelManager.GetRequestedLightsStaticImmutableContainer(curlevel).transform;
         Light lit = go.AddComponent<Light>();
         index = Utils.LoadTransform(go.transform,ref entries,index);
         lit.intensity = Utils.GetFloatFromString(entries[index],"intensity"); index++;
@@ -953,7 +911,7 @@ public static class SaveLoad {
         lit.spotAngle = Utils.GetFloatFromString(entries[index],"spotAngle"); index++;
         lit.shadows = GetLightShadowsFromString(entries[index],"shadows"); index++;
         float luminosity = (lit.intensity / (lit.range * lit.range));
-        float thresh = Const.a.shadowThreshold;
+        float thresh = consts.shadowThreshold;
         if (curlevel >= 10) thresh += 0.015f;
         if (curlevel == 7 || curlevel == 0 || curlevel == 8) thresh += 0.0051f; // makes it 0.0451, heehehe
         if (curlevel == 8) thresh += 0.005f;
@@ -973,7 +931,7 @@ public static class SaveLoad {
         lit.shadowNearPlane = 0.02f; // Force all to match the player camera value of 1 chunk texel.
         lit.layerShadowCullDistances = shadCullArray;
         lit.cullingMask = litCullingMask;
-        Utils.CreateSEGIEmitter(go,curlevel,lineNum,lit);
+        Utils.CreateSEGIEmitter(@consts,go,curlevel,lineNum,lit);
         return go;
     }
 

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class ItemTabManager : MonoBehaviour {
     public GameObject iconManager;
@@ -16,10 +17,14 @@ public class ItemTabManager : MonoBehaviour {
 	public GameObject grenadeTimerSlider;
 	public GameObject grenadeTimerSliderSlider;
 
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Inventory _inventory;
+	
 	public void Reset() {
 		eReaderSectionsContainer.SetActive(false);
 		iconManager.GetComponent<Image>().overrideSprite =
-			Const.a.useableItemsIcons[0]; //nullsprite
+			_consts.useableItemsIcons[0]; //nullsprite
 
 		textManager.GetComponent<Text>().text = System.String.Empty;
 		applyButton.SetActive(false);
@@ -37,10 +42,10 @@ public class ItemTabManager : MonoBehaviour {
 		grenadeTimerSliderSlider.SetActive(false);
 		eReaderSectionsContainer.SetActive(true);
 		iconManager.GetComponent<Image>().overrideSprite =
-			Const.a.useableItemsIcons[23]; //datareader
+			_consts.useableItemsIcons[23]; //datareader
 
 		textManager.GetComponent<Text>().text =
-			Const.a.stringTable[349]; // MULTIMEDIA DATA READER
+			_consts.stringTable[349]; // MULTIMEDIA DATA READER
 	}
 
 	public void SendItemDataToItemTab(int constIndex, int customIndex) {
@@ -73,20 +78,20 @@ public class ItemTabManager : MonoBehaviour {
 
 			if (ind >= 0 && ind < 38) {
 				iconManager.GetComponent<Image>().overrideSprite =
-					Const.a.logImages[ind];
+					_consts.logImages[ind];
 			} else {
 				iconManager.GetComponent<Image>().overrideSprite =
-					Const.a.logImages[0];
+					_consts.logImages[0];
 			}
 		} else {
-			if (Const.a.useableItemsIcons[constIndex] != null) {
+			if (_consts.useableItemsIcons[constIndex] != null) {
 				iconManager.GetComponent<Image>().overrideSprite =
-					Const.a.useableItemsIcons[constIndex]; //datareader
+					_consts.useableItemsIcons[constIndex]; //datareader
 			}
 		}
 
 		textManager.GetComponent<Text>().text =
-			Const.a.stringTable[constIndex + 326];
+			_consts.stringTable[constIndex + 326];
 
 		// Access Cards need special list enabled.
 		if (constIndex == 34 || constIndex == 81 || constIndex == 110
@@ -100,7 +105,7 @@ public class ItemTabManager : MonoBehaviour {
 				acc = (AccessCardType)cardTypes.GetValue(i);
 				if (acc == AccessCardType.None) continue;
 
-				if (Inventory.a.HasAccessCard(acc)) {
+				if (_inventory.HasAccessCard(acc)) {
 					s1.Append(" " + Inventory.AccessCardCodeForType(acc));
 				}
 			}
@@ -117,7 +122,7 @@ public class ItemTabManager : MonoBehaviour {
 			vaporizeButton.SetActive(false);
 			grenadeTimerSlider.SetActive(false);
 			grenadeTimerSliderSlider.SetActive(false);
-			MFDManager.a.applyButtonReferenceIndex = constIndex;
+			_mfdManager.applyButtonReferenceIndex = constIndex;
 		} else {
 			applyButton.SetActive(false);
 		}

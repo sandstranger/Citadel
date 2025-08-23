@@ -1,10 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Citadel.Game;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 using DigitalRuby.LightningBolt;
+using Zenject;
+using Random = UnityEngine.Random;
 
 public class AIController : MonoBehaviour {
 	// External manually assigned references, required
@@ -125,13 +129,25 @@ public class AIController : MonoBehaviour {
 	private static StringBuilder s1 = new StringBuilder();
 	private static Vector3 targetOffset = new Vector3(0f,0.24f,0f);
 
+	[Inject] 
+	private LevelManager _levelManager;
+	[Inject]
+	private ConsoleEmulator _consoleEmulator;
+	[Inject] private Const _consts;
+	[Inject] private Inventory _inventory;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
+	[Inject] private PlayerMovement _playerMovement;
+	[Inject] private WeaponFire _weaponFire;
+	[Inject] private DynamicCulling _dynamicCulling;
+
 	public float Tranquilize(float amount, bool energy) {
 		float tranqSecs = amount;
-		if (tranqSecs < 3f) tranqSecs = Const.a.timeForTranquilizationForNPC[index];
+		if (tranqSecs < 3f) tranqSecs = _consts.timeForTranquilizationForNPC[index];
 		
-		if (Const.a.typeForNPC[index] != NPCType.Robot || energy) {
+		if (_consts.typeForNPC[index] != NPCType.Robot || energy) {
 			float was = tranquilizeFinished;
-			tranquilizeFinished = Mathf.Max(PauseScript.a.relativeTime + tranqSecs,tranquilizeFinished + tranqSecs);
+			tranquilizeFinished = Mathf.Max(_pauseScript.relativeTime + tranqSecs,tranquilizeFinished + tranqSecs);
 // 			Debug.Log("Tranquilize fed " + amount.ToString() + ", was: " + was.ToString() + ", is now: " + tranquilizeFinished.ToString());
 			return tranqSecs;
 		}
@@ -167,7 +183,7 @@ public class AIController : MonoBehaviour {
 	}
 
 	public bool IsCyberNPC() {
-		return (Const.a.typeForNPC[index] == NPCType.Cyber);
+		return (_consts.typeForNPC[index] == NPCType.Cyber);
 	}
 
 	// Initialization and find components
@@ -184,7 +200,7 @@ public class AIController : MonoBehaviour {
 					  + ", set to index 0.");
 		}
 
-		if (Const.a.moveTypeForNPC[index] == AIMoveType.Fly || IsCyberNPC()) {
+		if (_consts.moveTypeForNPC[index] == AIMoveType.Fly || IsCyberNPC()) {
 			rbody.useGravity = false;
 			rbody.isKinematic = false;
 		} else {
@@ -206,30 +222,30 @@ public class AIController : MonoBehaviour {
 
 		if (sightPoint == null) sightPoint = gameObject;
 		if (currentDestination == null) currentDestination = sightPoint.transform.position;
-		idleTime = PauseScript.a.relativeTime + Random.Range(Const.a.timeIdleSFXMinForNPC[index],
-									                         Const.a.timeIdleSFXMaxForNPC[index]);
-		attack1SoundTime = PauseScript.a.relativeTime;
-		attack2SoundTime = PauseScript.a.relativeTime;
-		attack3SoundTime = PauseScript.a.relativeTime;
-		timeTillEnemyChangeFinished = PauseScript.a.relativeTime;
+		idleTime = _pauseScript.relativeTime + Random.Range(_consts.timeIdleSFXMinForNPC[index],
+									                         _consts.timeIdleSFXMaxForNPC[index]);
+		attack1SoundTime = _pauseScript.relativeTime;
+		attack2SoundTime = _pauseScript.relativeTime;
+		attack3SoundTime = _pauseScript.relativeTime;
+		timeTillEnemyChangeFinished = _pauseScript.relativeTime;
 		SetHuntFinished();
-		attackFinished = PauseScript.a.relativeTime;
-		attack2Finished = PauseScript.a.relativeTime;
-		attack3Finished = PauseScript.a.relativeTime;
-		timeTillPainFinished = PauseScript.a.relativeTime;
-		timeTillDeadFinished = PauseScript.a.relativeTime;
-		meleeDamageFinished = PauseScript.a.relativeTime;
-		gracePeriodFinished = PauseScript.a.relativeTime;
-		randomWaitForNextAttack1Finished = PauseScript.a.relativeTime;
-		randomWaitForNextAttack2Finished = PauseScript.a.relativeTime;
-		randomWaitForNextAttack3Finished = PauseScript.a.relativeTime;
-		tranquilizeFinished = PauseScript.a.relativeTime;
-		deathBurstFinished = PauseScript.a.relativeTime;
-		wanderFinished = PauseScript.a.relativeTime;
-		posCheckFinished = PauseScript.a.relativeTime;
+		attackFinished = _pauseScript.relativeTime;
+		attack2Finished = _pauseScript.relativeTime;
+		attack3Finished = _pauseScript.relativeTime;
+		timeTillPainFinished = _pauseScript.relativeTime;
+		timeTillDeadFinished = _pauseScript.relativeTime;
+		meleeDamageFinished = _pauseScript.relativeTime;
+		gracePeriodFinished = _pauseScript.relativeTime;
+		randomWaitForNextAttack1Finished = _pauseScript.relativeTime;
+		randomWaitForNextAttack2Finished = _pauseScript.relativeTime;
+		randomWaitForNextAttack3Finished = _pauseScript.relativeTime;
+		tranquilizeFinished = _pauseScript.relativeTime;
+		deathBurstFinished = _pauseScript.relativeTime;
+		wanderFinished = _pauseScript.relativeTime;
+		posCheckFinished = _pauseScript.relativeTime;
 		lastPosition = transform.position;
 		timeSinceMovedEnough = 0f;
-		damageData = new DamageData();
+		damageData = new DamageData(_consts);
 		damageData.ownerIsNPC = true;
 		tempHit = new RaycastHit();
 		tempVec = new Vector3(0f, 0f, 0f);
@@ -255,12 +271,12 @@ public class AIController : MonoBehaviour {
 			Utils.Activate(sleepingCables);
 		}
 		
-		tickFinished = PauseScript.a.relativeTime + Const.aiTickTime + Random.value;
+		tickFinished = _pauseScript.relativeTime + Const.aiTickTime + Random.value;
 		raycastingTickFinished = tickFinished + Random.value; // Separate rand.
-		attackFinished = PauseScript.a.relativeTime + 1f;
+		attackFinished = _pauseScript.relativeTime + 1f;
 		idealTransformForward = sightPoint.transform.forward;
-		if (!IsCyberNPC()) targetID = Const.GetTargetID(index);
-		else             targetID = Const.GetCyberTargetID(index);
+		if (!IsCyberNPC()) targetID = _consts.GetTargetID(index);
+		else             targetID = _consts.GetCyberTargetID(index);
 
 		if (asleep) Utils.Activate(sleepingCables);
 		startInitialized = true;
@@ -289,11 +305,11 @@ public class AIController : MonoBehaviour {
 		lookRot = Quaternion.LookRotation(faceVec,up);
 		transform.rotation =
 			Quaternion.Slerp(transform.rotation,lookRot,Const.aiTickTime
-							 * Const.a.yawSpeedForNPC[index] * Time.deltaTime); 
+							 * _consts.yawSpeedForNPC[index] * Time.deltaTime); 
 	}
 
 	void LateUpdate() {
-		Const.a.numberOfRaycastsThisFrame = 0;
+		_consts.numberOfRaycastsThisFrame = 0;
 	}
 
 	public bool HasHealth(HealthManager hm) {
@@ -315,12 +331,12 @@ public class AIController : MonoBehaviour {
 	void Update() {
 		if (!startInitialized) return;
 
-		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused() || _pauseScript.MenuActive()) return;
 
 		rbody.isKinematic = false;
-		if (raycastingTickFinished >= PauseScript.a.relativeTime) return;
+		if (raycastingTickFinished >= _pauseScript.relativeTime) return;
 
-		raycastingTickFinished = PauseScript.a.relativeTime + Const.raycastTick;
+		raycastingTickFinished = _pauseScript.relativeTime + Const.raycastTick;
 		EnableAutomapOverlay();
 		inSight = CheckIfPlayerInSight();
 		if (enemy != null && HasHealth(healthManager)) {
@@ -334,14 +350,14 @@ public class AIController : MonoBehaviour {
 					} else {
 						// Enemy is dead, let's wander around aimlessly now
 						wandering = true;
-						wanderFinished = PauseScript.a.relativeTime + UnityEngine.Random.Range(3f,8f);
+						wanderFinished = _pauseScript.relativeTime + UnityEngine.Random.Range(3f,8f);
 						currentState = AIState.Walk;
 					}
 					
 					enemy = null; // Forget the enemy.
 					Debug.Log("enemy forgotten");
 					enemyHM = null;
-					posCheckFinished = PauseScript.a.relativeTime;
+					posCheckFinished = _pauseScript.relativeTime;
 					lastPosition = transform.position;
 				}
 			}
@@ -355,32 +371,32 @@ public class AIController : MonoBehaviour {
 		} else {
 			infront = false;
 			inProjFOV = false;
-			rangeToEnemy = Const.a.sightRangeForNPC[index]
-						   * Const.a.sightRangeForNPC[index];
+			rangeToEnemy = _consts.sightRangeForNPC[index]
+						   * _consts.sightRangeForNPC[index];
 		}
 	}
 
 	void FixedUpdate() {
-		if (PauseScript.a.Paused()) return; // Don't do any checks or anything
-		if (PauseScript.a.MenuActive()) return; // else...we're paused!
+		if (_pauseScript.Paused()) return; // Don't do any checks or anything
+		if (_pauseScript.MenuActive()) return; // else...we're paused!
 		if (!startInitialized) return;
 
 		if ((!rbody.useGravity && !IsCyberNPC()
-			&& Const.a.moveTypeForNPC[index] != AIMoveType.Fly)
+			&& _consts.moveTypeForNPC[index] != AIMoveType.Fly)
 			&& !(currentState == AIState.Dead
 				 || currentState == AIState.Dying)) {
 			rbody.useGravity = true;
 		}
 
         // Think every tick seconds to save on CPU and prevent race conditions.
-        if (tickFinished < PauseScript.a.relativeTime) {
-			tickFinished = PauseScript.a.relativeTime + Const.aiTickTime;
+        if (tickFinished < _pauseScript.relativeTime) {
+			tickFinished = _pauseScript.relativeTime + Const.aiTickTime;
 			Think();
 			if (healthManager.linkedOverlay != null) {
 				if (!IsCyberNPC()
 					//&& healthManager.health > 0 // Only health, not cyber.
-					&& Inventory.a.hasHardware[1]
-					&& Inventory.a.NavUnitVersion() > 1) {
+					&& _inventory.hasHardware[1]
+					&& _inventory.NavUnitVersion() > 1) {
 
 					healthManager.UpdateLinkedOverlay();
 				} else {
@@ -416,8 +432,8 @@ public class AIController : MonoBehaviour {
 	}
 
 	void Think() {
-		if (!DynamicCulling.a.cullEnabled) withinPVS = true;
-		if (dyingSetup && deathBurstFinished < PauseScript.a.relativeTime
+		if (!_dynamicCulling.cullEnabled) withinPVS = true;
+		if (dyingSetup && deathBurstFinished < _pauseScript.relativeTime
 			&& !deathBurstDone) { // Activate any death effects
 			
 			if (deathBurst != null) deathBurst.SetActive(true);
@@ -460,28 +476,28 @@ public class AIController : MonoBehaviour {
 			return; // Don't check for an enemy, we are sleeping! shh!!
 		}
 
-		if (Const.a.moveTypeForNPC[index] == AIMoveType.Fly
-			&& tranquilizeFinished < PauseScript.a.relativeTime) {
+		if (_consts.moveTypeForNPC[index] == AIMoveType.Fly
+			&& tranquilizeFinished < _pauseScript.relativeTime) {
 			FlierMoveToHoverHeight();
 		}
 	}
 
 	void FlierMoveToHoverHeight() {
-		if (Const.a.runSpeedForNPC[index] <= 0) return;
+		if (_consts.runSpeedForNPC[index] <= 0) return;
 
 		float distUp = 0;
 		float distDn = 0;
 		Vector3 floorPoint = new Vector3();
-		floorPoint = Const.a.vectorZero;
+		floorPoint = _consts.vectorZero;
 		if (enemy != null) {
 		    idealPos = transform.position; // Where it's at
 		    idealPos.y = enemy.transform.position.y + 0.24f; // Player eye height.
-		} else if (!Const.a.RaycastBudgetExceeded()) {
+		} else if (!_consts.RaycastBudgetExceeded()) {
 			if (Physics.Raycast(sightPoint.transform.position,
 								sightPoint.transform.up * -1,out tempHit,
-								Const.a.sightRangeForNPC[index],
-								Const.a.layerMaskNPCSight)) {
-				Const.a.numberOfRaycastsThisFrame++;
+								_consts.sightRangeForNPC[index],
+								_consts.layerMaskNPCSight)) {
+				_consts.numberOfRaycastsThisFrame++;
 				distDn = Vector3.Distance(sightPoint.transform.position,
 										  tempHit.point);
 				floorPoint = tempHit.point;
@@ -489,16 +505,16 @@ public class AIController : MonoBehaviour {
 
 			if (Physics.Raycast(sightPoint.transform.position,
 								sightPoint.transform.up,out tempHit,
-								Const.a.sightRangeForNPC[index],
-								Const.a.layerMaskNPCSight)) {
-				Const.a.numberOfRaycastsThisFrame++;
+								_consts.sightRangeForNPC[index],
+								_consts.layerMaskNPCSight)) {
+				_consts.numberOfRaycastsThisFrame++;
 				distUp = Vector3.Distance(sightPoint.transform.position,
 										  tempHit.point);
 			}
 
 			float distT = (distUp + distDn);
-			float yHeight = Const.a.flightHeightForNPC[index];
-			if (Const.a.flightHeightIsPercentageForNPC[index]) {
+			float yHeight = _consts.flightHeightForNPC[index];
+			if (_consts.flightHeightIsPercentageForNPC[index]) {
 				yHeight *= distT;
 			}
 
@@ -508,26 +524,26 @@ public class AIController : MonoBehaviour {
 		float dist = Mathf.Abs(idealPos.y - transform.position.y);
 		if (dist < 0.16f) return; // Close enuff
 
-		float spd = Const.a.runSpeedForNPC[index] * Time.deltaTime;
+		float spd = _consts.runSpeedForNPC[index] * Time.deltaTime;
 		transform.position = Vector3.MoveTowards(transform.position,idealPos,spd);
 	}
 
 	public bool CheckPain() {
 		if (IsCyberNPC()) return false;
 		if (asleep) return false;
-		if (Const.a.timeBetweenPainForNPC[index] <= 0) return false;
+		if (_consts.timeBetweenPainForNPC[index] <= 0) return false;
 
-		if (goIntoPain && timeTillPainFinished < PauseScript.a.relativeTime) {
+		if (goIntoPain && timeTillPainFinished < _pauseScript.relativeTime) {
 			currentState = AIState.Pain;
 			if (attacker != null) {
-				if (timeTillEnemyChangeFinished < PauseScript.a.relativeTime) {
-					timeTillEnemyChangeFinished = PauseScript.a.relativeTime
-						+ Const.a.timeToChangeEnemyForNPC[index];
+				if (timeTillEnemyChangeFinished < _pauseScript.relativeTime) {
+					timeTillEnemyChangeFinished = _pauseScript.relativeTime
+						+ _consts.timeToChangeEnemyForNPC[index];
 						
 					AIController attackerAIC = attacker.GetComponent<AIController>();
 					if (attackerAIC != null && attacker.layer != 12) { // Attacker is an NPC and not the player.
-						NPCType myType = Const.a.typeForNPC[index];
-						NPCType attackerType = Const.a.typeForNPC[attackerAIC.index];
+						NPCType myType = _consts.typeForNPC[index];
+						NPCType attackerType = _consts.typeForNPC[attackerAIC.index];
 						bool canInfight = false;
 						
 						// Check infighting rules
@@ -548,9 +564,9 @@ public class AIController : MonoBehaviour {
 					} else {
 						enemy = attacker; // Attacker is the player, set enemy to player.
 					}
-					posCheckFinished = PauseScript.a.relativeTime + positionCheckDelay;
+					posCheckFinished = _pauseScript.relativeTime + positionCheckDelay;
 					wandering = false;
-					wanderFinished = PauseScript.a.relativeTime;
+					wanderFinished = _pauseScript.relativeTime;
 					lastPosition = transform.position;
 					if (enemy != null) {
 						enemyHM = Utils.GetMainHealthManager(enemy);
@@ -560,8 +576,8 @@ public class AIController : MonoBehaviour {
 				}
 			}
 			goIntoPain = false;
-			timeTillPainFinished = PauseScript.a.relativeTime
-								   + Const.a.timeToPainForNPC[index];
+			timeTillPainFinished = _pauseScript.relativeTime
+								   + _consts.timeToPainForNPC[index];
 			return true;
 		}
 		return false;
@@ -573,14 +589,14 @@ public class AIController : MonoBehaviour {
 			return;
 		}
 
-		if (idleTime < PauseScript.a.relativeTime) {
+		if (idleTime < _pauseScript.relativeTime) {
 			if (UnityEngine.Random.Range(0,1f) < 0.5f) { // 50% Chance of idle.
-				SFXIndex = Const.a.sfxIdleForNPC[index];
-				Utils.PlayOneShotSavable(SFX,SFXIndex);
+				SFXIndex = _consts.sfxIdleForNPC[index];
+				Utils.PlayOneShotSavable(_consts,SFX,SFXIndex);
 			}
-			idleTime = PauseScript.a.relativeTime
-					   + Random.Range(Const.a.timeIdleSFXMinForNPC[index],
-									  Const.a.timeIdleSFXMaxForNPC[index]);
+			idleTime = _pauseScript.relativeTime
+					   + Random.Range(_consts.timeIdleSFXMinForNPC[index],
+									  _consts.timeIdleSFXMaxForNPC[index]);
 		}
 
 		if (asleep) {
@@ -608,14 +624,14 @@ public class AIController : MonoBehaviour {
 		if (asleep) return;
         if (inSight || enemy != null) { currentState = AIState.Run; return; }
         if (actAsTurret) { currentState = AIState.Idle; return; }
-        if (Const.a.moveTypeForNPC[index] == AIMoveType.None) return;
-		if (tranquilizeFinished >= PauseScript.a.relativeTime) return;
-		if (!withinPVS && DynamicCulling.a.cullEnabled) return;
+        if (_consts.moveTypeForNPC[index] == AIMoveType.None) return;
+		if (tranquilizeFinished >= _pauseScript.relativeTime) return;
+		if (!withinPVS && _dynamicCulling.cullEnabled) return;
 		
 		float dist = Vector3.Distance(sightPoint.transform.position,currentDestination);
 		if (wandering) {
-			if (wanderFinished < PauseScript.a.relativeTime || (dist < (stopDistance * 0.5f))) {
-				wanderFinished = PauseScript.a.relativeTime + UnityEngine.Random.Range(3f,8f);
+			if (wanderFinished < _pauseScript.relativeTime || (dist < (stopDistance * 0.5f))) {
+				wanderFinished = _pauseScript.relativeTime + UnityEngine.Random.Range(3f,8f);
 				currentDestination = GetWanderPoint();
 			}
 		}
@@ -623,7 +639,7 @@ public class AIController : MonoBehaviour {
 		// Destination still far away and turned to within angle to move, move
 		if (dist > stopDistance) {
 			if (WithinAngleToTarget()) {
-				if (Const.a.hopsOnMoveForNPC[index]) {
+				if (_consts.hopsOnMoveForNPC[index]) {
 					// Move it move it.
 					float playbackTime = 1f;
 					if (hopAnimator != null) {
@@ -646,17 +662,17 @@ public class AIController : MonoBehaviour {
 					}
 				} else {
 					tempVec = (sightPoint.transform.forward
-							   * Const.a.walkSpeedForNPC[index]);
+							   * _consts.walkSpeedForNPC[index]);
 
-					if (Const.a.numberOfRaycastsThisFrame <= Const.maxRaycastsPerFrame
-						&& Const.a.moveTypeForNPC[index] != AIMoveType.Fly) {
+					if (_consts.numberOfRaycastsThisFrame <= Const.maxRaycastsPerFrame
+						&& _consts.moveTypeForNPC[index] != AIMoveType.Fly) {
 
 						Vector3 checkPos = sightPoint.transform.position
 										   + (tempVec.normalized * 0.48f);
 
-						int mk = Const.a.layerMaskNPCCollision;
+						int mk = _consts.layerMaskNPCCollision;
 						if (!Physics.Raycast(checkPos,Vector3.down,2.56f,mk)) {
-							Const.a.numberOfRaycastsThisFrame++;
+							_consts.numberOfRaycastsThisFrame++;
 							tempVec.x = 0f;
 							tempVec.z = 0f;
 						}
@@ -704,10 +720,10 @@ public class AIController : MonoBehaviour {
 
 	bool CanAttack1(float dist) {
     	if (rangeToEnemy >= dist) return false;
-		if (Const.a.attackTypeForNPC[index] == AttackType.None) return false;
+		if (_consts.attackTypeForNPC[index] == AttackType.None) return false;
 		if (IsCyberNPC()) return true;
 		if (!infront) return false;
-		if (randomWaitForNextAttack1Finished >= PauseScript.a.relativeTime) {
+		if (randomWaitForNextAttack1Finished >= _pauseScript.relativeTime) {
 			return false;
 		}
 
@@ -716,11 +732,11 @@ public class AIController : MonoBehaviour {
 
 	bool CanAttack2(float dist) {
     	if (rangeToEnemy >= dist) return false;
-		if (Const.a.attackTypeForNPC2[index] == AttackType.None) return false;
+		if (_consts.attackTypeForNPC2[index] == AttackType.None) return false;
 		if (IsCyberNPC()) return true;
 		if (!infront) return false;
 		if (!inProjFOV) return false;
-		if (randomWaitForNextAttack2Finished >= PauseScript.a.relativeTime) {
+		if (randomWaitForNextAttack2Finished >= _pauseScript.relativeTime) {
 			return false;
 		}
 
@@ -729,15 +745,15 @@ public class AIController : MonoBehaviour {
 
 	bool CanAttack3(float dist) {
     	if (rangeToEnemy >= dist) return false;
-		if (rangeToEnemy < 7f && Const.a.attackTypeForNPC3[index] == AttackType.ProjectileLaunched
-			&& (Const.a.projectile3PrefabForNPC[index] == 370 || Const.a.projectile3PrefabForNPC[index] == 372
-			    || Const.a.projectile3PrefabForNPC[index] == 387 || Const.a.projectile3PrefabForNPC[index] == 404)) return false;
+		if (rangeToEnemy < 7f && _consts.attackTypeForNPC3[index] == AttackType.ProjectileLaunched
+			&& (_consts.projectile3PrefabForNPC[index] == 370 || _consts.projectile3PrefabForNPC[index] == 372
+			    || _consts.projectile3PrefabForNPC[index] == 387 || _consts.projectile3PrefabForNPC[index] == 404)) return false;
 			
-		if (Const.a.attackTypeForNPC3[index] == AttackType.None) return false;
+		if (_consts.attackTypeForNPC3[index] == AttackType.None) return false;
 		if (IsCyberNPC()) return true;
 		if (!infront) return false;
 		if (!inProjFOV) return false;
-		if (randomWaitForNextAttack3Finished >= PauseScript.a.relativeTime) {
+		if (randomWaitForNextAttack3Finished >= _pauseScript.relativeTime) {
 			return false;
 		}
 
@@ -754,39 +770,39 @@ public class AIController : MonoBehaviour {
 
 	void StartAttack1() {
 		BrakingMovement();
-		attackFinished = PauseScript.a.relativeTime
-						 + Const.a.timeBetweenAttack1ForNPC[index]
-						 + Const.a.timeToActualAttack1ForNPC[index];
+		attackFinished = _pauseScript.relativeTime
+						 + _consts.timeBetweenAttack1ForNPC[index]
+						 + _consts.timeToActualAttack1ForNPC[index];
 
-		gracePeriodFinished = PauseScript.a.relativeTime
-							  + Const.a.timeToActualAttack1ForNPC[index];
+		gracePeriodFinished = _pauseScript.relativeTime
+							  + _consts.timeToActualAttack1ForNPC[index];
 
 		currentState = AIState.Attack1;
-		if (Const.a.preactivateMeleeCollidersForNPC[index]) {
+		if (_consts.preactivateMeleeCollidersForNPC[index]) {
 			PreActivateMeleeColliders();
 		}
 	}
 
 	void StartAttack2() {
 		BrakingMovement();
-		attackFinished = PauseScript.a.relativeTime
-						 + Const.a.timeBetweenAttack2ForNPC[index]
-						 + Const.a.timeToActualAttack2ForNPC[index];
+		attackFinished = _pauseScript.relativeTime
+						 + _consts.timeBetweenAttack2ForNPC[index]
+						 + _consts.timeToActualAttack2ForNPC[index];
 
-		gracePeriodFinished = PauseScript.a.relativeTime
-							  + Const.a.timeToActualAttack2ForNPC[index];
+		gracePeriodFinished = _pauseScript.relativeTime
+							  + _consts.timeToActualAttack2ForNPC[index];
 
 		currentState = AIState.Attack2;
 	}
 
 	void StartAttack3() {
 		BrakingMovement();
-		attackFinished = PauseScript.a.relativeTime
-						 + Const.a.timeBetweenAttack3ForNPC[index]
-						 + Const.a.timeToActualAttack3ForNPC[index];
+		attackFinished = _pauseScript.relativeTime
+						 + _consts.timeBetweenAttack3ForNPC[index]
+						 + _consts.timeToActualAttack3ForNPC[index];
 
-		gracePeriodFinished = PauseScript.a.relativeTime
-							  + Const.a.timeToActualAttack3ForNPC[index];
+		gracePeriodFinished = _pauseScript.relativeTime
+							  + _consts.timeToActualAttack3ForNPC[index];
 
 		currentState = AIState.Attack3;
 	}
@@ -814,16 +830,16 @@ public class AIController : MonoBehaviour {
 	void RunMove() {
 		if (actAsTurret) return;
 
-		tempVec = sightPoint.transform.forward * Const.a.runSpeedForNPC[index];
+		tempVec = sightPoint.transform.forward * _consts.runSpeedForNPC[index];
 		if (rbody.useGravity) tempVec.y = rbody.linearVelocity.y; // Keep gravity.
 		rbody.linearVelocity = tempVec;
 	}
 	
 	Vector3 GetAStarPoint() {
-		if (DynamicCulling.a == null) return GetWanderPoint();
+		if (_dynamicCulling == null) return GetWanderPoint();
 		
-		Vector2Int currentCell = DynamicCulling.a.PosToCellCoords(transform.position);
-		if (!DynamicCulling.a.XYPairInBounds(currentCell.x,currentCell.y)) return GetWanderPoint();
+		Vector2Int currentCell = _dynamicCulling.PosToCellCoords(transform.position);
+		if (!_dynamicCulling.XYPairInBounds(currentCell.x,currentCell.y)) return GetWanderPoint();
 			
 		bool clearNorth = false;
 		bool clearSouth = false;
@@ -834,23 +850,23 @@ public class AIController : MonoBehaviour {
 		Vector3 eastPoint = transform.position + new Vector3(2.56f,0f,0f);
 		Vector3 westPoint = transform.position + new Vector3(-2.56f,0f,0f);
 		List<Vector3> availablePositions = new List<Vector3>();
-		if (DynamicCulling.a.XYPairInBounds(currentCell.x,currentCell.y + 1)) {
-			clearNorth = (DynamicCulling.a.gridCells[currentCell.x,currentCell.y + 1].open && !DynamicCulling.a.gridCells[currentCell.x,currentCell.y].closedNorth);
+		if (_dynamicCulling.XYPairInBounds(currentCell.x,currentCell.y + 1)) {
+			clearNorth = (_dynamicCulling.gridCells[currentCell.x,currentCell.y + 1].open && !_dynamicCulling.gridCells[currentCell.x,currentCell.y].closedNorth);
 			if (clearNorth) availablePositions.Add(northPoint);
 		}
 		
-		if (DynamicCulling.a.XYPairInBounds(currentCell.x,currentCell.y - 1)) {		
-			clearSouth = (DynamicCulling.a.gridCells[currentCell.x,currentCell.y - 1].open && !DynamicCulling.a.gridCells[currentCell.x,currentCell.y].closedSouth);
+		if (_dynamicCulling.XYPairInBounds(currentCell.x,currentCell.y - 1)) {		
+			clearSouth = (_dynamicCulling.gridCells[currentCell.x,currentCell.y - 1].open && !_dynamicCulling.gridCells[currentCell.x,currentCell.y].closedSouth);
 			if (clearSouth) availablePositions.Add(southPoint);
 		}
 		
-		if (DynamicCulling.a.XYPairInBounds(currentCell.x + 1,currentCell.y)) {		
-			clearEast = (DynamicCulling.a.gridCells[currentCell.x + 1,currentCell.y].open && !DynamicCulling.a.gridCells[currentCell.x,currentCell.y].closedEast);
+		if (_dynamicCulling.XYPairInBounds(currentCell.x + 1,currentCell.y)) {		
+			clearEast = (_dynamicCulling.gridCells[currentCell.x + 1,currentCell.y].open && !_dynamicCulling.gridCells[currentCell.x,currentCell.y].closedEast);
 			if (clearEast) availablePositions.Add(eastPoint);
 		}
 		
-		if (DynamicCulling.a.XYPairInBounds(currentCell.x - 1,currentCell.y)) {		
-			clearWest = (DynamicCulling.a.gridCells[currentCell.x - 1,currentCell.y].open && !DynamicCulling.a.gridCells[currentCell.x,currentCell.y].closedWest);
+		if (_dynamicCulling.XYPairInBounds(currentCell.x - 1,currentCell.y)) {		
+			clearWest = (_dynamicCulling.gridCells[currentCell.x - 1,currentCell.y].open && !_dynamicCulling.gridCells[currentCell.x,currentCell.y].closedWest);
 			if (clearWest) availablePositions.Add(westPoint);
 		}
 
@@ -866,7 +882,7 @@ public class AIController : MonoBehaviour {
 	Vector3 GetSearchPoint(bool hunting) {
 		//if (hunting) return lastKnownEnemyPos; // When we can't see the enemy, go to the last spot we saw them.
 		
-		switch(Const.a.typeForNPC[index]) {
+		switch(_consts.typeForNPC[index]) {
 			case NPCType.Mutant: return GetWanderPoint();
 			case NPCType.Supermutant: return GetWanderPoint();
 			case NPCType.Robot: return GetAStarPoint();
@@ -880,15 +896,15 @@ public class AIController : MonoBehaviour {
 	
 	private void SetHuntFinished() {
 // 		Debug.Log("Set hunt finished time");
-		huntFinished = PauseScript.a.relativeTime;
-		int diff = Const.a.difficultyCombat;
-		if (IsCyberNPC()) diff = Const.a.difficultyCyber;
+		huntFinished = _pauseScript.relativeTime;
+		int diff = _consts.difficultyCombat;
+		if (IsCyberNPC()) diff = _consts.difficultyCyber;
 		if (diff <= 1) { // More forgetful on easy.
-			huntFinished += Mathf.Max((Const.a.huntTimeForNPC[index] * 0.75f),60f);
+			huntFinished += Mathf.Max((_consts.huntTimeForNPC[index] * 0.75f),60f);
 		} else if (diff >= 3) { // Good memory on hard.
-			huntFinished += Mathf.Max((Const.a.huntTimeForNPC[index] * 2.00f),60f); 
+			huntFinished += Mathf.Max((_consts.huntTimeForNPC[index] * 2.00f),60f); 
 		} else {
-		    huntFinished += Mathf.Max(Const.a.huntTimeForNPC[index],60f);
+		    huntFinished += Mathf.Max(_consts.huntTimeForNPC[index],60f);
 		}
 	}
 
@@ -897,18 +913,18 @@ public class AIController : MonoBehaviour {
 		if (asleep) return;
 		if (enemy == null) { currentState = AIState.Idle; return; }
 
-		if (tranquilizeFinished >= PauseScript.a.relativeTime
+		if (tranquilizeFinished >= _pauseScript.relativeTime
 			&& !IsCyberNPC()) {
 			return;
 		}
 
-		if (posCheckFinished <= PauseScript.a.relativeTime && !IsCyberNPC()) {
-			posCheckFinished = PauseScript.a.relativeTime + positionCheckDelay;
+		if (posCheckFinished <= _pauseScript.relativeTime && !IsCyberNPC()) {
+			posCheckFinished = _pauseScript.relativeTime + positionCheckDelay;
 			float distToEnem = Vector3.Distance(sightPoint.transform.position,enemy.transform.position);
 			distToLastPos = Vector3.Distance(transform.position,lastPosition);
 			lastPosition = transform.position;
 			if (distToLastPos < 0.48f && distToEnem > stopDistance && !wandering) {
-				wanderFinished = PauseScript.a.relativeTime + searchTime;
+				wanderFinished = _pauseScript.relativeTime + searchTime;
 				wandering = true;
 				currentDestination = GetSearchPoint(false);
 			} else {
@@ -917,14 +933,14 @@ public class AIController : MonoBehaviour {
 		}
 
         if (!inSight) {
-            if (huntFinished > PauseScript.a.relativeTime) {
+            if (huntFinished > _pauseScript.relativeTime) {
                 Hunt();
             } else {
 				Debug.Log("enemy hunt ended");
                 enemy = null;
 				enemyHM = null;
 				wandering = true; // Sometimes look like we are still searching
-				wanderFinished = PauseScript.a.relativeTime + 1f;
+				wanderFinished = _pauseScript.relativeTime + 1f;
                 currentState = AIState.Walk;
             }
             return;
@@ -938,9 +954,9 @@ public class AIController : MonoBehaviour {
 
 		shotFired = false;
 		SetHuntFinished();
-		near = Const.a.rangeForNPC[index]  * Const.a.rangeForNPC[index];
-		mid  = Const.a.rangeForNPC2[index] * Const.a.rangeForNPC2[index];
-		far  = Const.a.rangeForNPC3[index] * Const.a.rangeForNPC3[index];
+		near = _consts.rangeForNPC[index]  * _consts.rangeForNPC[index];
+		mid  = _consts.rangeForNPC2[index] * _consts.rangeForNPC2[index];
+		far  = _consts.rangeForNPC3[index] * _consts.rangeForNPC3[index];
         if (CanAttack1(near)) {
 			StartAttack1();
 			return;
@@ -953,13 +969,13 @@ public class AIController : MonoBehaviour {
 		}
 
 		// Enemy still far away and turned to within angle, then move
-		if ((Const.a.moveTypeForNPC[index] != AIMoveType.None)
+		if ((_consts.moveTypeForNPC[index] != AIMoveType.None)
 			&& (rangeToEnemy > (stopDistance * stopDistance))) {
 			if (WithinAngleToTarget()) {
-				if (Const.a.hopsOnMoveForNPC[index]) HopMove();
+				if (_consts.hopsOnMoveForNPC[index]) HopMove();
 				else                                 RunMove(); // <<<<<RUN
 			} else {
-				if (Const.a.difficultyCombat >= 2) {
+				if (_consts.difficultyCombat >= 2) {
 					if (Random.Range(0f,1f) < 0.5f) AI_Face(currentDestination);
 				}
 			}
@@ -976,9 +992,9 @@ public class AIController : MonoBehaviour {
 		}
 
 		// Destination is still far enough away and within angle, then move.
-		if (Const.a.moveTypeForNPC[index] == AIMoveType.None) return;
+		if (_consts.moveTypeForNPC[index] == AIMoveType.None) return;
 		if (actAsTurret) return; // Enemy marked to not move (e.g. on pillar).
-		if (Const.a.runSpeedForNPC[index] <= 0) return; // Enemy doesn't move.
+		if (_consts.runSpeedForNPC[index] <= 0) return; // Enemy doesn't move.
 
 		Transform eyeTr = sightPoint.transform;
 		Vector3 eyePos = eyeTr.position;
@@ -986,7 +1002,7 @@ public class AIController : MonoBehaviour {
 		if (sqrDist <= (stopDistance * stopDistance)) return; // At stop point.
 		if (!WithinAngleToTarget()) return;
 
-		rbody.linearVelocity = (eyeTr.forward * Const.a.runSpeedForNPC[index]);
+		rbody.linearVelocity = (eyeTr.forward * _consts.runSpeedForNPC[index]);
     }
 
 	// Commonized function to remove previous boilerplate code from all 3
@@ -1001,7 +1017,7 @@ public class AIController : MonoBehaviour {
 		}
 
 		if (speedToApply <= 0) return;
-		if (tranquilizeFinished >= PauseScript.a.relativeTime) return;
+		if (tranquilizeFinished >= _pauseScript.relativeTime) return;
 
 		// Attack3 used targettingPosition but it is so rare I decided to use
 		// the known working method from Attack1 and Attack2.
@@ -1021,13 +1037,13 @@ public class AIController : MonoBehaviour {
 		goIntoPain = false; // Prevent doing pain immediately after attack.
 		currentState = AIState.Run; // Done with attack.
 		if (attackNum < 1 || attackNum > 3) attackNum = 1;
-		float now = PauseScript.a.relativeTime;
+		float now = _pauseScript.relativeTime;
 		switch (attackNum) {
 			case 1: // Attack1
-				float perc1Chance = Const.a.timeAttack1WaitChanceForNPC[index];
+				float perc1Chance = _consts.timeAttack1WaitChanceForNPC[index];
 				if (Random.Range(0f,1f) < perc1Chance) {
-					float min1 = Const.a.timeAttack1WaitMinForNPC[index];
-					float max1 = Const.a.timeAttack1WaitMaxForNPC[index];
+					float min1 = _consts.timeAttack1WaitMinForNPC[index];
+					float max1 = _consts.timeAttack1WaitMaxForNPC[index];
 					float wait1 = Random.Range(min1,max1);
 					randomWaitForNextAttack1Finished = now + wait1;
 				} else {
@@ -1035,10 +1051,10 @@ public class AIController : MonoBehaviour {
 				}
 				break;
 			case 2: // Attack2
-				float perc2Chance = Const.a.timeAttack2WaitChanceForNPC[index];
+				float perc2Chance = _consts.timeAttack2WaitChanceForNPC[index];
 				if (Random.Range(0f,1f) < perc2Chance) {
-					float min2 = Const.a.timeAttack2WaitMinForNPC[index];
-					float max2 = Const.a.timeAttack2WaitMaxForNPC[index];
+					float min2 = _consts.timeAttack2WaitMinForNPC[index];
+					float max2 = _consts.timeAttack2WaitMaxForNPC[index];
 					float wait2 = Random.Range(min2,max2);
 					randomWaitForNextAttack2Finished = now + wait2;
 				} else {
@@ -1046,10 +1062,10 @@ public class AIController : MonoBehaviour {
 				}
 				break;
 			case 3: // Attack3
-				float perc3Chance = Const.a.timeAttack3WaitChanceForNPC[index];
+				float perc3Chance = _consts.timeAttack3WaitChanceForNPC[index];
 				if (Random.Range(0f,1f) < perc3Chance) {
-					float min3 = Const.a.timeAttack3WaitMinForNPC[index];
-					float max3 = Const.a.timeAttack3WaitMaxForNPC[index];
+					float min3 = _consts.timeAttack3WaitMinForNPC[index];
+					float max3 = _consts.timeAttack3WaitMaxForNPC[index];
 					float wait3 = Random.Range(min3,max3);
 					randomWaitForNextAttack3Finished = now + wait3;
 				} else {
@@ -1064,7 +1080,7 @@ public class AIController : MonoBehaviour {
 		if (idealTransformForward.sqrMagnitude <= Mathf.Epsilon) return false;
 
 		Quaternion lookRot = Quaternion.LookRotation(idealTransformForward);
-		float fovMov = Const.a.fovStartMovementForNPC[index];
+		float fovMov = _consts.fovStartMovementForNPC[index];
 		float ang = Quaternion.Angle(transform.rotation,lookRot);
 		if (ang < fovMov) return true;
 		if (ang < (fovMov * 1.5f)) {
@@ -1107,21 +1123,21 @@ public class AIController : MonoBehaviour {
 			case 3:
 				return (targPos - GetAttackStartPoint(attackNum)).normalized;
 		}
-		return Const.a.vectorZero;
+		return _consts.vectorZero;
 	}
 
 	float GetRangeForAttack(int attackNum) {
 		if (attackNum < 1 || attackNum > 3) attackNum = 1;
-		float range = Const.a.rangeForNPC[index];
+		float range = _consts.rangeForNPC[index];
 		switch (attackNum) {
 			case 1:
-				range = Const.a.rangeForNPC[index];
+				range = _consts.rangeForNPC[index];
 				break;
 			case 2:
-				range = Const.a.rangeForNPC2[index];
+				range = _consts.rangeForNPC2[index];
 				break;
 			case 3:
-				range = Const.a.rangeForNPC3[index];
+				range = _consts.rangeForNPC3[index];
 				break;
 		}
 		return range;
@@ -1134,9 +1150,9 @@ public class AIController : MonoBehaviour {
 		GameObject impact = null;
         if (tempHM != null) {
 			offset = 0.08f;
-            impact = Const.a.GetImpactType(tempHM); // Returns blood type.
+            impact = _consts.GetImpactType(tempHM); // Returns blood type.
         } else { // Didn't hit object with a HealthManager script, use sparks.
-			impact = Const.a.GetObjectFromPool(PoolType.SparksSmall); 
+			impact = _consts.GetObjectFromPool(PoolType.SparksSmall); 
 		}
 
 		if (impact == null) return;
@@ -1173,10 +1189,10 @@ public class AIController : MonoBehaviour {
 		tempVec = GetDirectionRayToEnemy(targettingPosition,attackNum);
 		Vector3 pos = GetAttackStartPoint(attackNum);
 		float range = GetRangeForAttack(attackNum);
-		int mask = Const.a.layerMaskNPCAttack;
+		int mask = _consts.layerMaskNPCAttack;
 		if (!Physics.Raycast(pos,tempVec,out tempHit,range,mask)) return false;
 
-		Const.a.numberOfRaycastsThisFrame++;
+		_consts.numberOfRaycastsThisFrame++;
 		tempHM = Utils.GetMainHealthManager(tempHit);
 		return true;
     }
@@ -1184,19 +1200,19 @@ public class AIController : MonoBehaviour {
 	void MakeLaserEffect(int attackNum) {
 		bool hasLaser = false;
 		switch(attackNum) {
-			case 1: hasLaser = Const.a.hasLaserOnAttack1ForNPC[index]; break;
-			case 2: hasLaser = Const.a.hasLaserOnAttack2ForNPC[index]; break;
-			case 3: hasLaser = Const.a.hasLaserOnAttack3ForNPC[index]; break;
+			case 1: hasLaser = _consts.hasLaserOnAttack1ForNPC[index]; break;
+			case 2: hasLaser = _consts.hasLaserOnAttack2ForNPC[index]; break;
+			case 3: hasLaser = _consts.hasLaserOnAttack3ForNPC[index]; break;
 		}
 
 		if (!hasLaser) return;
 
-		GameObject laz = Instantiate(Const.a.GetPrefab(408),transform.position,
-									 Const.a.quaternionIdentity) as GameObject;
+		GameObject laz = GameBindings.InstantiatePrefab(_consts.GetPrefab(408),transform.position,
+									 _consts.quaternionIdentity) as GameObject;
 
 		if (laz == null) return; // No laser!
 
-		GameObject dCont = LevelManager.a.GetCurrentDynamicContainer();
+		GameObject dCont = _levelManager.GetCurrentDynamicContainer();
 		laz.transform.SetParent(dCont.transform,true);
 		LaserDrawing ldraw = laz.GetComponent<LaserDrawing>();
 		ldraw.startPoint = sightPoint.transform.position;
@@ -1242,7 +1258,7 @@ public class AIController : MonoBehaviour {
 			if (attackNum == 3) MakeTargettingLaser();
 			if (tempHM != null) {
 				// SetNPCData sets: owner, damage, penetration, offense
-				damageData = DamageData.SetNPCData(index,attackNum,gameObject);
+				damageData = DamageData.SetNPCData(_consts,index,attackNum,gameObject);
 
 				// Using tempHit.transform instead of
 				// tempHit.collider.transform to get overall parent of another
@@ -1282,7 +1298,7 @@ public class AIController : MonoBehaviour {
 		Vector3 startPos = GetAttackStartPoint(attackNum);
 
 		// SetNPCData sets: owner, damage, penetration, offense
-		damageData = DamageData.SetNPCData(index,attackNum,gameObject);
+		damageData = DamageData.SetNPCData(_consts,index,attackNum,gameObject);
 		damageData.attacknormal = tempVec;
 		damageData.attackType = AttackType.ProjectileLaunched;
 		// Can't call DamageData.GetDamageTakeAmount here since we haven't hit
@@ -1298,21 +1314,21 @@ public class AIController : MonoBehaviour {
 		int masterIndex = 370; // Default frag.
 		switch (attackNum) {
 			case 1:
-				masterIndex = Const.a.projectile1PrefabForNPC[index];
-				launchSpeed = Const.a.projectileSpeedAttack1ForNPC[index];
+				masterIndex = _consts.projectile1PrefabForNPC[index];
+				launchSpeed = _consts.projectileSpeedAttack1ForNPC[index];
 				break;
 			case 2:
-				masterIndex = Const.a.projectile2PrefabForNPC[index];
-				launchSpeed = Const.a.projectileSpeedAttack2ForNPC[index];
+				masterIndex = _consts.projectile2PrefabForNPC[index];
+				launchSpeed = _consts.projectileSpeedAttack2ForNPC[index];
 				break;
 			case 3:
-				masterIndex = Const.a.projectile3PrefabForNPC[index];
-				launchSpeed = Const.a.projectileSpeedAttack3ForNPC[index];
+				masterIndex = _consts.projectile3PrefabForNPC[index];
+				launchSpeed = _consts.projectileSpeedAttack3ForNPC[index];
 				break;
 		}
 
-		beachball = ConsoleEmulator.SpawnDynamicObject(masterIndex,-1);
-		if (beachball == null) beachball = Const.a.GetPrefab(370); // Frag
+		beachball = _consoleEmulator.SpawnDynamicObject(masterIndex,-1);
+		if (beachball == null) beachball = _consts.GetPrefab(370); // Frag
 		beachball.tag = "NPC";
 		beachball.layer = 24; // NPCBullet
 		ProjectileEffectImpact pei = 
@@ -1341,7 +1357,7 @@ public class AIController : MonoBehaviour {
 		if (!IsCyberNPC()) shove += rbody.linearVelocity;
 
 		// Ensure no velocity to start with.
-		beachball.GetComponent<Rigidbody>().linearVelocity = Const.a.vectorZero;
+		beachball.GetComponent<Rigidbody>().linearVelocity = _consts.vectorZero;
 		beachball.GetComponent<Rigidbody>().AddForce(shove, ForceMode.Impulse);
 	}
 
@@ -1349,14 +1365,14 @@ public class AIController : MonoBehaviour {
 	//   attackNum of 1 = Attack1, 2 = Attack2, 3 = Attack3
 	void ExplodeAttack(int attackNum) {
 		if (attackNum < 1 || attackNum > 3) attackNum = 3;
-		DamageData dd = DamageData.SetNPCData(index,attackNum,gameObject);
+		DamageData dd = DamageData.SetNPCData(_consts,index,attackNum,gameObject);
 		if (dd == null) return;
 
 		float take = DamageData.GetDamageTakeAmount(dd);
 		dd.other = gameObject;
 		dd.damage = take;
-		Utils.ApplyImpactForceSphere(dd,sightPoint.transform.position,
-									 Const.a.attack3RadiusForNPC[index],1.5f);
+		Utils.ApplyImpactForceSphere(_consts,dd,sightPoint.transform.position,
+									 _consts.attack3RadiusForNPC[index],1.5f);
 
 		healthManager.TakeDamage(dd); // Self destruct.
 	}
@@ -1370,89 +1386,89 @@ public class AIController : MonoBehaviour {
 
 		switch (att_type) {
 			case AttackType.Melee:				ProjectileRaycast(ind); break;
-			case AttackType.Projectile:			ProjectileRaycast(ind); WeaponFire.a.fogFac += 1; break;
-			case AttackType.ProjectileLaunched:	ProjectileLaunched(ind); WeaponFire.a.fogFac += 1; break;
+			case AttackType.Projectile:			ProjectileRaycast(ind); _weaponFire.fogFac += 1; break;
+			case AttackType.ProjectileLaunched:	ProjectileLaunched(ind); _weaponFire.fogFac += 1; break;
 		}
 	}
 
 	// Typically used for melee.
 	void Attack1() {
-		ApplyAttackMovement(Const.a.attack1SpeedForNPC[index]);
-		if (gracePeriodFinished < PauseScript.a.relativeTime) {
+		ApplyAttackMovement(_consts.attack1SpeedForNPC[index]);
+		if (gracePeriodFinished < _pauseScript.relativeTime) {
 			if (!shotFired) {
 				shotFired = true;
-				if (attack1SoundTime < PauseScript.a.relativeTime) {
-					SFXIndex = Const.a.sfxAttack1ForNPC[index];
-					Utils.PlayOneShotSavable(SFX,SFXIndex);
-					attack1SoundTime = PauseScript.a.relativeTime
-						+ Const.a.timeBetweenAttack1ForNPC[index];
+				if (attack1SoundTime < _pauseScript.relativeTime) {
+					SFXIndex = _consts.sfxAttack1ForNPC[index];
+					Utils.PlayOneShotSavable(_consts,SFX,SFXIndex);
+					attack1SoundTime = _pauseScript.relativeTime
+						+ _consts.timeBetweenAttack1ForNPC[index];
 				}
-				AIAttack(Const.a.attackTypeForNPC[index],1);
+				AIAttack(_consts.attackTypeForNPC[index],1);
 			}
         }
 
-        if (attackFinished < PauseScript.a.relativeTime) {
+        if (attackFinished < _pauseScript.relativeTime) {
 			Transition_AttackToRun(1);  // Handle exiting this state.
 		}
 	}
 
 	// Typically used for normal projectile attack
     void Attack2() {
-		ApplyAttackMovement(Const.a.attack2SpeedForNPC[index]);
-        if (gracePeriodFinished < PauseScript.a.relativeTime) {
+		ApplyAttackMovement(_consts.attack2SpeedForNPC[index]);
+        if (gracePeriodFinished < _pauseScript.relativeTime) {
             if (!shotFired) {
                 shotFired = true; 
-                if (attack2SoundTime < PauseScript.a.relativeTime) {
-					SFXIndex = Const.a.sfxAttack2ForNPC[index];
-					Utils.PlayOneShotSavable(SFX,SFXIndex);
-                    attack2SoundTime = PauseScript.a.relativeTime
-						+ Const.a.timeBetweenAttack2ForNPC[index];
+                if (attack2SoundTime < _pauseScript.relativeTime) {
+					SFXIndex = _consts.sfxAttack2ForNPC[index];
+					Utils.PlayOneShotSavable(_consts,SFX,SFXIndex);
+                    attack2SoundTime = _pauseScript.relativeTime
+						+ _consts.timeBetweenAttack2ForNPC[index];
                 }
-				AIAttack(Const.a.attackTypeForNPC2[index],2);
+				AIAttack(_consts.attackTypeForNPC2[index],2);
             }
         }
 
-        if (attackFinished < PauseScript.a.relativeTime) {
+        if (attackFinished < _pauseScript.relativeTime) {
 			Transition_AttackToRun(2); // Handle exiting this state.
 		}
 	}
 
 	// Typically used for secondary projectile or grenade attack
 	void Attack3() {
-		if (Const.a.explodeOnAttack3ForNPC[index]) {
-			WeaponFire.a.fogFac += 5;
+		if (_consts.explodeOnAttack3ForNPC[index]) {
+			_weaponFire.fogFac += 5;
 			ExplodeAttack(3);
 			return;  // No time check, this is only done once without delay.
 					 // We are dead now so exit on out.
 		}
 
-		ApplyAttackMovement(Const.a.attack3SpeedForNPC[index]);
-        if (gracePeriodFinished < PauseScript.a.relativeTime) {
+		ApplyAttackMovement(_consts.attack3SpeedForNPC[index]);
+        if (gracePeriodFinished < _pauseScript.relativeTime) {
             if (!shotFired) {
                 shotFired = true;
-				if (attack3SoundTime < PauseScript.a.relativeTime) {
-					SFXIndex = Const.a.sfxAttack3ForNPC[index];
-					Utils.PlayOneShotSavable(SFX,SFXIndex);
-					attack3SoundTime = PauseScript.a.relativeTime
-						+ Const.a.timeBetweenAttack3ForNPC[index];
+				if (attack3SoundTime < _pauseScript.relativeTime) {
+					SFXIndex = _consts.sfxAttack3ForNPC[index];
+					Utils.PlayOneShotSavable(_consts,SFX,SFXIndex);
+					attack3SoundTime = _pauseScript.relativeTime
+						+ _consts.timeBetweenAttack3ForNPC[index];
 				}
-				AIAttack(Const.a.attackTypeForNPC3[index],3);
+				AIAttack(_consts.attackTypeForNPC3[index],3);
             }
         }
 
 		PositionTargettingLaser();
 
-        if (attackFinished < PauseScript.a.relativeTime) {
+        if (attackFinished < _pauseScript.relativeTime) {
 			Transition_AttackToRun(3); // Handle exiting this state.
 		}
 	}
 
 	void Pain() {
-		if (timeTillPainFinished < PauseScript.a.relativeTime) {
+		if (timeTillPainFinished < _pauseScript.relativeTime) {
 			currentState = AIState.Run; // Go into run after we get hurt
 			goIntoPain = false;
-			timeTillPainFinished = PauseScript.a.relativeTime
-				+ Const.a.timeBetweenPainForNPC[index];
+			timeTillPainFinished = _pauseScript.relativeTime
+				+ _consts.timeBetweenPainForNPC[index];
 		}
 	}
 
@@ -1460,9 +1476,9 @@ public class AIController : MonoBehaviour {
 // 		Debug.Log("NPC " + gameObject.name + " start of dying setup");
 		enemy = null; // Reset for loading from saves
 
-		if (Const.a.deathBurstTimerForNPC[index] > 0) {
-			deathBurstFinished = PauseScript.a.relativeTime
-				+ Const.a.deathBurstTimerForNPC[index];
+		if (_consts.deathBurstTimerForNPC[index] > 0) {
+			deathBurstFinished = _pauseScript.relativeTime
+				+ _consts.deathBurstTimerForNPC[index];
 		} else {
 			if (!deathBurstDone) {
 				Utils.Activate(deathBurst); // Activate death effects
@@ -1474,11 +1490,11 @@ public class AIController : MonoBehaviour {
 		if (healthManager != null) {
 			if (!healthManager.actAsCorpseOnly && !healthManager.teleportOnDeath) {
 				Utils.Deactivate(healthManager.linkedOverlay.gameObject);
-				SFXIndex = Const.a.sfxDeathForNPC[index];
-				Utils.PlayOneShotSavable(SFX,SFXIndex);
+				SFXIndex = _consts.sfxDeathForNPC[index];
+				Utils.PlayOneShotSavable(_consts,SFX,SFXIndex);
 			}
 
-			if (Const.a.moveTypeForNPC[index] == AIMoveType.Fly
+			if (_consts.moveTypeForNPC[index] == AIMoveType.Fly
 				&& (!healthManager.gibOnDeath || index == 2)) { // Avian Mutant
 				if (healthManager.gibOnDeath) rbody.useGravity = false;
 				else rbody.useGravity = true; // Avian Mutant and Zero-G Mutant
@@ -1511,9 +1527,9 @@ public class AIController : MonoBehaviour {
 		firstSighting = true;
 
 		// Timer for wait until death animation finishes before Dead().
-		timeTillDeadFinished = PauseScript.a.relativeTime;
-		timeTillDeadFinished += Const.a.timeTillDeadForNPC[index];
-		if (Const.a.switchMaterialOnDeathForNPC[index]
+		timeTillDeadFinished = _pauseScript.relativeTime;
+		timeTillDeadFinished += _consts.timeTillDeadForNPC[index];
+		if (_consts.switchMaterialOnDeathForNPC[index]
 			&& deathMaterial != null && actualSMR != null) {
 			actualSMR.material = deathMaterial;
 		}
@@ -1537,7 +1553,7 @@ public class AIController : MonoBehaviour {
 		if (!dyingSetup) DyingSetup();
 
 		// Check if timer for dying animation is finished letting it play.
-		if (timeTillDeadFinished < PauseScript.a.relativeTime) {
+		if (timeTillDeadFinished < _pauseScript.relativeTime) {
 			ai_dead = true;
 // 			Debug.Log("NPC " + gameObject.name + " has now died");
 			ai_dying = false;
@@ -1610,24 +1626,24 @@ public class AIController : MonoBehaviour {
 		if (!HasHealth(healthManager)) return false;
 		
 		bool enemyIsNPC = enemy.layer == 10;
-	    int diff = Const.a.difficultyCombat;
+	    int diff = _consts.difficultyCombat;
 		if (IsCyberNPC()) {
-			diff = Const.a.difficultyCyber;
+			diff = _consts.difficultyCyber;
 		} else {
-			if ((!withinPVS && !enemyIsNPC) && DynamicCulling.a.cullEnabled) return false;
+			if ((!withinPVS && !enemyIsNPC) && _dynamicCulling.cullEnabled) return false;
 		}
 
         if (diff == 0 && index != 28) return false;
 
-		if (PlayerMovement.a.Notarget && !enemyIsNPC) {
+		if (_playerMovement.Notarget && !enemyIsNPC) {
 			enemy = null; // Force forget when using Notarget cheat.
-			posCheckFinished = PauseScript.a.relativeTime + positionCheckDelay;
+			posCheckFinished = _pauseScript.relativeTime + positionCheckDelay;
 			lastPosition = transform.position;
 			LOSpossible = false;
 			return false;
 		}
 
-		if (IsCyberNPC() && Const.a.decoyActive) {
+		if (IsCyberNPC() && _consts.decoyActive) {
 			//Debug.Log("Decoy forget!");
 			LOSpossible = false; // Silly decoy hack to prevent seeing player.
 			return false;
@@ -1637,23 +1653,23 @@ public class AIController : MonoBehaviour {
 		float dist = Vector3.Distance(enemy.transform.position,
 									  sightPoint.transform.position);
 
-		if (dist > Const.a.sightRangeForNPC[index]) {
+		if (dist > _consts.sightRangeForNPC[index]) {
 			//Debug.Log("Distance to enemy is too far to see");
 			return false;
 		}
 
 		if (IsCyberNPC() || enemyIsNPC) return true;
 
-		if (Const.a.numberOfRaycastsThisFrame > Const.maxRaycastsPerFrame) {
+		if (_consts.numberOfRaycastsThisFrame > Const.maxRaycastsPerFrame) {
 			return inSight; // Zero order hold last until next actual update.
 		}
 
 		// Get vector line made from enemy to found player
 		Vector3 line = enemy.transform.position - sightPoint.transform.position;
         if (Physics.Raycast(sightPoint.transform.position,line.normalized,
-							out tempHit, Const.a.sightRangeForNPC[index],
-							Const.a.layerMaskNPCSight)) {
-			Const.a.numberOfRaycastsThisFrame++;
+							out tempHit, _consts.sightRangeForNPC[index],
+							_consts.layerMaskNPCSight)) {
+			_consts.numberOfRaycastsThisFrame++;
 			GameObject hitObj = tempHit.collider.gameObject;
             if (hitObj == enemy) {
 				LOSpossible = true;
@@ -1661,7 +1677,7 @@ public class AIController : MonoBehaviour {
 			} else {
 				// If we are a smart cookie, open doors if we see a door while trying to look at player.
 				if (hitObj != null && (Vector3.Distance(tempHit.point,sightPoint.transform.position) < 2f)
-					&& Const.a.typeForNPC[index] != NPCType.Mutant && Const.a.typeForNPC[index] != NPCType.Supermutant && Const.a.typeForNPC[index] != NPCType.Cyber) {
+					&& _consts.typeForNPC[index] != NPCType.Mutant && _consts.typeForNPC[index] != NPCType.Supermutant && _consts.typeForNPC[index] != NPCType.Cyber) {
 
 					Door dr = hitObj.GetComponent<Door>();
 					if (dr == null) {
@@ -1674,9 +1690,9 @@ public class AIController : MonoBehaviour {
 					}
 
 					if (dr != null) {
-						if ((dr.doorOpen == DoorState.Closed || (dr.doorOpen == DoorState.Closing && Const.a.difficultyCombat > 2))
-							&& !dr.locked && (LevelManager.a.GetCurrentLevelSecurity() <= dr.securityThreshhold)
-							&& (dr.requiredAccessCard == AccessCardType.None || dr.accessCardUsedByPlayer || Inventory.a.HasAccessCard(dr.requiredAccessCard))) {
+						if ((dr.doorOpen == DoorState.Closed || (dr.doorOpen == DoorState.Closing && _consts.difficultyCombat > 2))
+							&& !dr.locked && (_levelManager.GetCurrentLevelSecurity() <= dr.securityThreshhold)
+							&& (dr.requiredAccessCard == AccessCardType.None || dr.accessCardUsedByPlayer || _inventory.HasAccessCard(dr.requiredAccessCard))) {
 						
 							dr.DoorActuate();
 						}
@@ -1692,11 +1708,11 @@ public class AIController : MonoBehaviour {
 	}
 
 	bool CheckIfPlayerInSight() {
-	    int diff = Const.a.difficultyCombat;
+	    int diff = _consts.difficultyCombat;
 		if (IsCyberNPC()) {
-			diff = Const.a.difficultyCyber;
+			diff = _consts.difficultyCyber;
 		} else {
-			if (!withinPVS && DynamicCulling.a.cullEnabled) return false;
+			if (!withinPVS && _dynamicCulling.cullEnabled) return false;
 		}
 
         if (diff == 0 && index != 28) return false;
@@ -1705,25 +1721,25 @@ public class AIController : MonoBehaviour {
 		LOSpossible = false; // Reset line of sight value. Doing this after 
 							 // CheckIfEnemyInSight so it doesn't break it.
 
-		if (IsCyberNPC() && Const.a.decoyActive) {
+		if (IsCyberNPC() && _consts.decoyActive) {
 			//Debug.Log("Decoy forget!");
 			return false;
 		}
-		if (Const.a.player1Capsule == null) return false; // No found player
+		if (_consts.player1Capsule == null) return false; // No found player
 
 		// Can't see him, he's on notarget.
-		if (PlayerMovement.a.Notarget) return false;
+		if (_playerMovement.Notarget) return false;
 
-		tempVec = Const.a.player1Capsule.transform.position;
+		tempVec = _consts.player1Capsule.transform.position;
 
 		// Get distance between enemy and found player
 		float dist = Vector3.Distance(tempVec,sightPoint.transform.position);
 
 		// Don't waste time raycasting if we won't be able to see them anyway.
-		if (dist > Const.a.sightRangeForNPC[index]) return false;
+		if (dist > _consts.sightRangeForNPC[index]) return false;
         
         if (IsCyberNPC()) {
-			SetEnemy(Const.a.player1Capsule,Const.a.player1TargettingPos);
+			SetEnemy(_consts.player1Capsule,_consts.player1TargettingPos);
 			PlaySightSound();
 			return true;
 		}
@@ -1731,56 +1747,56 @@ public class AIController : MonoBehaviour {
 		// Get vector line made from enemy to found player
 		Vector3 checkline = tempVec - sightPoint.transform.position;
 		float angle = Vector3.Angle(checkline,sightPoint.transform.forward);
-		if (angle < (Const.a.fovForNPC[index] * 0.5f)) {
+		if (angle < (_consts.fovForNPC[index] * 0.5f)) {
 			// Check for line of sight
-			if (Const.a.RaycastBudgetExceeded()) return inSight; // No change.
+			if (_consts.RaycastBudgetExceeded()) return inSight; // No change.
 
 			// Changed from using sight range to dist to minimize checkdistance.
 			if (Physics.Raycast(sightPoint.transform.position,
 								checkline.normalized,out tempHit,
-								(dist + 0.1f),Const.a.layerMaskNPCSight)) {
-				Const.a.numberOfRaycastsThisFrame++;
-				if (tempHit.collider.gameObject == Const.a.player1Capsule) {
+								(dist + 0.1f),_consts.layerMaskNPCSight)) {
+				_consts.numberOfRaycastsThisFrame++;
+				if (tempHit.collider.gameObject == _consts.player1Capsule) {
 					LOSpossible = true;  // Clear path from enemy to found player
-					SetEnemy(Const.a.player1Capsule,Const.a.player1TargettingPos);
+					SetEnemy(_consts.player1Capsule,_consts.player1TargettingPos);
 					PlaySightSound();
 					return true;
 				}
 			} else {
-				if (PlayerHealth.a.makingNoise) {
-					if (dist < Const.a.hearingRangeForNPC[index]) {
-						SetEnemy(Const.a.player1Capsule,Const.a.player1TargettingPos);
+				if (_playerHealth.makingNoise) {
+					if (dist < _consts.hearingRangeForNPC[index]) {
+						SetEnemy(_consts.player1Capsule,_consts.player1TargettingPos);
 						PlaySightSound();
 						return true;
 					}
 				}
 			}
 		} else {
-			if (dist < Const.a.distToSeeBehindForNPC[index]) {
+			if (dist < _consts.distToSeeBehindForNPC[index]) {
 				// Still check for line of sight, some locations there could be
 				// walls in the ways still due to the angles.  Changed from
 				// using sight range to dist to minimize checkdistance; added
 				// slight amount to it though to avoid quantization inaccuracies.
 
-				if (Const.a.numberOfRaycastsThisFrame > Const.maxRaycastsPerFrame) {
+				if (_consts.numberOfRaycastsThisFrame > Const.maxRaycastsPerFrame) {
 					return inSight; // Don't change it, zero order hold.
 				}
 
 				if (Physics.Raycast(sightPoint.transform.position,
 									checkline.normalized, out tempHit,
-									(dist + 0.1f),Const.a.layerMaskNPCSight)) {
-					Const.a.numberOfRaycastsThisFrame++;
-					if (tempHit.collider.gameObject == Const.a.player1Capsule) {
+									(dist + 0.1f),_consts.layerMaskNPCSight)) {
+					_consts.numberOfRaycastsThisFrame++;
+					if (tempHit.collider.gameObject == _consts.player1Capsule) {
 						LOSpossible = true; // Clear path from enemy to player.
-						SetEnemy(Const.a.player1Capsule,Const.a.player1TargettingPos);
+						SetEnemy(_consts.player1Capsule,_consts.player1TargettingPos);
 						PlaySightSound();
 						return true;
 					}
 				}
 			}
-			if (PlayerHealth.a.makingNoise) {
-				if (dist < Const.a.hearingRangeForNPC[index]) {
-					SetEnemy(Const.a.player1Capsule,Const.a.player1TargettingPos);
+			if (_playerHealth.makingNoise) {
+				if (dist < _consts.hearingRangeForNPC[index]) {
+					SetEnemy(_consts.player1Capsule,_consts.player1TargettingPos);
 					PlaySightSound();
 					return true;
 				}
@@ -1794,9 +1810,9 @@ public class AIController : MonoBehaviour {
 		if (enemSent == null) return;
 
 		enemy = enemSent;
-		posCheckFinished = PauseScript.a.relativeTime + positionCheckDelay;
+		posCheckFinished = _pauseScript.relativeTime + positionCheckDelay;
 		wandering = false;
-		wanderFinished = PauseScript.a.relativeTime;
+		wanderFinished = _pauseScript.relativeTime;
 		lastPosition = transform.position;
 		enemyHM = Utils.GetMainHealthManager(enemSent);
 		lastKnownEnemyPos = enemy.transform.position;
@@ -1808,8 +1824,8 @@ public class AIController : MonoBehaviour {
 		if (firstSighting && HasHealth(healthManager)) {
 			firstSighting = false;
 			if (!healthManager.actAsCorpseOnly) {
-				SFXIndex = Const.a.sfxSightSoundForNPC[index];
-				Utils.PlayOneShotSavable(SFX,SFXIndex);	
+				SFXIndex = _consts.sfxSightSoundForNPC[index];
+				Utils.PlayOneShotSavable(_consts,SFX,SFXIndex);	
 			}
 		}
 	}
@@ -1843,9 +1859,9 @@ public class AIController : MonoBehaviour {
     }
 
 	public void Alert(UseData ud) {
-		if (Const.a.difficultyCombat == 0) return;
+		if (_consts.difficultyCombat == 0) return;
 
-		SetEnemy(Const.a.player1Capsule,Const.a.player1Capsule.transform);
+		SetEnemy(_consts.player1Capsule,_consts.player1Capsule.transform);
 		currentDestination = enemy.transform.position;
 		inSight = false;
 	}
@@ -1858,6 +1874,7 @@ public class AIController : MonoBehaviour {
 
 	public static string Save(GameObject go, PrefabIdentifier prefID) {
 		AIController aic = go.GetComponent<AIController>();
+		var pauseScript = aic._pauseScript;
 		s1.Clear();
 		if (!aic.startInitialized) aic.Start();
 		s1.Append(Utils.UintToString(aic.index,"AIController.index"));
@@ -1882,17 +1899,17 @@ public class AIController : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aic.hasTargetIDAttached,"hasTargetIDAttached"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.idleTime,"idleTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.idleTime,"idleTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.attack1SoundTime,"attack1SoundTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.attack1SoundTime,"attack1SoundTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.attack2SoundTime,"attack2SoundTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.attack2SoundTime,"attack2SoundTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.attack3SoundTime,"attack3SoundTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.attack3SoundTime,"attack3SoundTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.gracePeriodFinished,"gracePeriodFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.gracePeriodFinished,"gracePeriodFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.meleeDamageFinished,"meleeDamageFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.meleeDamageFinished,"meleeDamageFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aic.inSight,"inSight"));
 		s1.Append(Utils.splitChar);
@@ -1922,17 +1939,17 @@ public class AIController : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(aic.currentDestination.z,"currentDestination.z"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.timeTillEnemyChangeFinished,"timeTillEnemyChangeFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.timeTillEnemyChangeFinished,"timeTillEnemyChangeFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.timeTillDeadFinished,"timeTillDeadFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.timeTillDeadFinished,"timeTillDeadFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.timeTillPainFinished,"timeTillPainFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.timeTillPainFinished,"timeTillPainFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.tickFinished,"tickFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.tickFinished,"tickFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.raycastingTickFinished,"raycastingTickFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.raycastingTickFinished,"raycastingTickFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.huntFinished,"huntFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.huntFinished,"huntFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aic.hadEnemy,"hadEnemy"));
 		s1.Append(Utils.splitChar);
@@ -1950,11 +1967,11 @@ public class AIController : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aic.shotFired,"shotFired"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.randomWaitForNextAttack1Finished,"randomWaitForNextAttack1Finished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.randomWaitForNextAttack1Finished,"randomWaitForNextAttack1Finished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.randomWaitForNextAttack2Finished,"randomWaitForNextAttack2Finished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.randomWaitForNextAttack2Finished,"randomWaitForNextAttack2Finished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.randomWaitForNextAttack3Finished,"randomWaitForNextAttack3Finished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.randomWaitForNextAttack3Finished,"randomWaitForNextAttack3Finished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(aic.idealTransformForward.x,"idealTransformForward.x"));
 		s1.Append(Utils.splitChar);
@@ -1968,11 +1985,11 @@ public class AIController : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(aic.idealPos.z,"idealPos.z"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.attackFinished,"attackFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.attackFinished,"attackFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.attack2Finished,"attack2Finished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.attack2Finished,"attack2Finished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.attack3Finished,"attack3Finished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.attack3Finished,"attack3Finished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(aic.targettingPosition.x,"targettingPosition.x"));
 		s1.Append(Utils.splitChar);
@@ -1980,7 +1997,7 @@ public class AIController : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(aic.targettingPosition.z,"targettingPosition.z"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.deathBurstFinished,"deathBurstFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.deathBurstFinished,"deathBurstFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aic.deathBurstDone,"deathBurstDone")); // bool
 		if (aic.deathBurst != null) {
@@ -2014,13 +2031,13 @@ public class AIController : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aic.asleep,"asleep"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.tranquilizeFinished,"tranquilizeFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.tranquilizeFinished,"tranquilizeFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aic.hopDone,"hopDone"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aic.wandering,"wandering"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aic.wanderFinished,"wanderFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,aic.wanderFinished,"wanderFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.UintToString(aic.SFXIndex,"SFXIndex"));
 		if (aic.searchColliderGO != null) {
@@ -2041,10 +2058,11 @@ public class AIController : MonoBehaviour {
 		return s1.ToString();
 	}
 
-	public static int Load(GameObject go, ref string[] entries, int index,
+	public static int Load(Const @const,GameObject go, ref string[] entries, int index,
 						   PrefabIdentifier prefID, int levID) {
 
 		AIController aic = go.GetComponent<AIController>();
+		var pauseScript = aic._pauseScript;
 		if (aic == null) {
 			Debug.Log("AIController.Load failure, aic == null");
 			return index + 55;
@@ -2066,10 +2084,10 @@ public class AIController : MonoBehaviour {
 		int state = Utils.GetIntFromString(entries[index],"currentState"); index++;
 		aic.currentState = Utils.GetAIStateFromInt(state);
 		int enemIDRead = Utils.GetIntFromString(entries[index],"enemID"); index++;
-		if (enemIDRead >= 0) aic.enemy = Const.a.player1Capsule;
+		if (enemIDRead >= 0) aic.enemy = @const.player1Capsule;
 		else aic.enemy = null;
 		
-		aic.posCheckFinished = PauseScript.a.relativeTime + positionCheckDelay;
+		aic.posCheckFinished = pauseScript.relativeTime + positionCheckDelay;
 		aic.lastPosition = aic.transform.position;
 
 		aic.walkPathOnStart = Utils.GetBoolFromString(entries[index],"walkPathOnStart"); index++;
@@ -2078,12 +2096,12 @@ public class AIController : MonoBehaviour {
 		aic.actAsTurret = Utils.GetBoolFromString(entries[index],"actAsTurret"); index++;
 		aic.targetID = Utils.LoadString(entries[index],"targetID"); index++;
 		aic.hasTargetIDAttached = Utils.GetBoolFromString(entries[index],"hasTargetIDAttached"); index++;
-		aic.idleTime = Utils.LoadRelativeTimeDifferential(entries[index],"idleTime"); index++;
-		aic.attack1SoundTime = Utils.LoadRelativeTimeDifferential(entries[index],"attack1SoundTime"); index++;
-		aic.attack2SoundTime = Utils.LoadRelativeTimeDifferential(entries[index],"attack2SoundTime"); index++;
-		aic.attack3SoundTime = Utils.LoadRelativeTimeDifferential(entries[index],"attack3SoundTime"); index++;
-		aic.gracePeriodFinished = Utils.LoadRelativeTimeDifferential(entries[index],"gracePeriodFinished"); index++;
-		aic.meleeDamageFinished = Utils.LoadRelativeTimeDifferential(entries[index],"meleeDamageFinished"); index++;
+		aic.idleTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"idleTime"); index++;
+		aic.attack1SoundTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"attack1SoundTime"); index++;
+		aic.attack2SoundTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"attack2SoundTime"); index++;
+		aic.attack3SoundTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"attack3SoundTime"); index++;
+		aic.gracePeriodFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"gracePeriodFinished"); index++;
+		aic.meleeDamageFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"meleeDamageFinished"); index++;
 		aic.inSight = Utils.GetBoolFromString(entries[index],"inSight"); index++;
 		aic.infront = Utils.GetBoolFromString(entries[index],"infront"); index++;
 		aic.inProjFOV = Utils.GetBoolFromString(entries[index],"inProjFOV"); index++;
@@ -2099,12 +2117,12 @@ public class AIController : MonoBehaviour {
 		readFloaty = Utils.GetFloatFromString(entries[index],"currentDestination.y"); index++;
 		readFloatz = Utils.GetFloatFromString(entries[index],"currentDestination.z"); index++;
 		aic.currentDestination = new Vector3(readFloatx,readFloaty,readFloatz);
-		aic.timeTillEnemyChangeFinished = Utils.LoadRelativeTimeDifferential(entries[index],"timeTillEnemyChangeFinished"); index++;
-		aic.timeTillDeadFinished = Utils.LoadRelativeTimeDifferential(entries[index],"timeTillDeadFinished"); index++;
-		aic.timeTillPainFinished = Utils.LoadRelativeTimeDifferential(entries[index],"timeTillPainFinished"); index++;
-		aic.tickFinished = Utils.LoadRelativeTimeDifferential(entries[index],"tickFinished"); index++;
-		aic.raycastingTickFinished = Utils.LoadRelativeTimeDifferential(entries[index],"raycastingTickFinished"); index++;
-		aic.huntFinished = Utils.LoadRelativeTimeDifferential(entries[index],"huntFinished"); index++;
+		aic.timeTillEnemyChangeFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"timeTillEnemyChangeFinished"); index++;
+		aic.timeTillDeadFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"timeTillDeadFinished"); index++;
+		aic.timeTillPainFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"timeTillPainFinished"); index++;
+		aic.tickFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"tickFinished"); index++;
+		aic.raycastingTickFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"raycastingTickFinished"); index++;
+		aic.huntFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"huntFinished"); index++;
 		aic.hadEnemy = Utils.GetBoolFromString(entries[index],"hadEnemy"); index++;
 		readFloatx = Utils.GetFloatFromString(entries[index],"lastKnownEnemyPos.x"); index++;
 		readFloaty = Utils.GetFloatFromString(entries[index],"lastKnownEnemyPos.y"); index++;
@@ -2115,9 +2133,9 @@ public class AIController : MonoBehaviour {
 		readFloatz = Utils.GetFloatFromString(entries[index],"tempVec.z"); index++;
 		aic.tempVec = new Vector3(readFloatx,readFloaty,readFloatz);
 		aic.shotFired = Utils.GetBoolFromString(entries[index],"shotFired"); index++;
-		aic.randomWaitForNextAttack1Finished = Utils.LoadRelativeTimeDifferential(entries[index],"randomWaitForNextAttack1Finished"); index++;
-		aic.randomWaitForNextAttack2Finished = Utils.LoadRelativeTimeDifferential(entries[index],"randomWaitForNextAttack2Finished"); index++; // float
-		aic.randomWaitForNextAttack3Finished = Utils.LoadRelativeTimeDifferential(entries[index],"randomWaitForNextAttack3Finished"); index++; // float
+		aic.randomWaitForNextAttack1Finished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"randomWaitForNextAttack1Finished"); index++;
+		aic.randomWaitForNextAttack2Finished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"randomWaitForNextAttack2Finished"); index++; // float
+		aic.randomWaitForNextAttack3Finished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"randomWaitForNextAttack3Finished"); index++; // float
 		readFloatx = Utils.GetFloatFromString(entries[index],"idealTransformForward.x"); index++;
 		readFloaty = Utils.GetFloatFromString(entries[index],"idealTransformForward.y"); index++;
 		readFloatz = Utils.GetFloatFromString(entries[index],"idealTransformForward.z"); index++;
@@ -2126,14 +2144,14 @@ public class AIController : MonoBehaviour {
 		readFloaty = Utils.GetFloatFromString(entries[index],"idealPos.y"); index++;
 		readFloatz = Utils.GetFloatFromString(entries[index],"idealPos.z"); index++;
 		aic.idealPos = new Vector3(readFloatx,readFloaty,readFloatz);
-		aic.attackFinished = Utils.LoadRelativeTimeDifferential(entries[index],"attackFinished"); index++;
-		aic.attack2Finished = Utils.LoadRelativeTimeDifferential(entries[index],"attack2Finished"); index++;
-		aic.attack3Finished = Utils.LoadRelativeTimeDifferential(entries[index],"attack3Finished"); index++;
+		aic.attackFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"attackFinished"); index++;
+		aic.attack2Finished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"attack2Finished"); index++;
+		aic.attack3Finished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"attack3Finished"); index++;
 		readFloatx = Utils.GetFloatFromString(entries[index],"targettingPosition.x"); index++;
 		readFloaty = Utils.GetFloatFromString(entries[index],"targettingPosition.y"); index++;
 		readFloatz = Utils.GetFloatFromString(entries[index],"targettingPosition.z"); index++;
 		aic.targettingPosition = new Vector3(readFloatx,readFloaty,readFloatz);
-		aic.deathBurstFinished = Utils.LoadRelativeTimeDifferential(entries[index],"deathBurstFinished"); index++;
+		aic.deathBurstFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"deathBurstFinished"); index++;
 		aic.deathBurstDone = Utils.GetBoolFromString(entries[index],"deathBurstDone"); index++;
 		bool dbActive = Utils.GetBoolFromString(entries[index],"deathBurst.activeSelf"); index++;
 		int numChildrenFromSave = Utils.GetIntFromString(entries[index],"deathBurst.transform.childCount"); index++;
@@ -2165,16 +2183,16 @@ public class AIController : MonoBehaviour {
 		aic.asleep = Utils.GetBoolFromString(entries[index],"asleep"); index++;
 		if (aic.asleep) Utils.Activate(aic.sleepingCables);
 		else Utils.Deactivate(aic.sleepingCables);
-		aic.tranquilizeFinished = Utils.LoadRelativeTimeDifferential(entries[index],"tranquilizeFinished"); index++;
+		aic.tranquilizeFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"tranquilizeFinished"); index++;
 		aic.hopDone = Utils.GetBoolFromString(entries[index],"hopDone"); index++;
 		aic.wandering = Utils.GetBoolFromString(entries[index],"wandering"); index++;
-		aic.wanderFinished = Utils.LoadRelativeTimeDifferential(entries[index],"wanderFinished"); index++;
+		aic.wanderFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"wanderFinished"); index++;
 		aic.SFXIndex = Utils.GetIntFromString(entries[index],"SFXIndex"); index++;
 		if (aic.healthManager != null) {
 			if (aic.HasHealth(aic.healthManager)) {
 				Utils.EnableCollision(aic.gameObject);
 				aic.gameObject.layer = 10; // NPC Layer.
-				if (Const.a.moveTypeForNPC[aic.index] != AIMoveType.Fly
+				if (@const.moveTypeForNPC[aic.index] != AIMoveType.Fly
 					&& !aic.IsCyberNPC()) {
 
 					aic.rbody.useGravity = true;
@@ -2184,7 +2202,7 @@ public class AIController : MonoBehaviour {
 				// Sky layer only collides with Geometry. This prevents the NPC
 				// falling out of the world.
 				aic.gameObject.layer = 15;
-				if (Const.a.moveTypeForNPC[aic.index] != AIMoveType.Fly) {
+				if (@const.moveTypeForNPC[aic.index] != AIMoveType.Fly) {
 					aic.rbody.useGravity = true;
 					aic.rbody.isKinematic = false;
 				}
@@ -2220,7 +2238,7 @@ public class AIController : MonoBehaviour {
 		if (aic.searchColliderGO != null) {
 			aic.searchColliderGO.SetActive(Utils.GetBoolFromString(entries[index],"searchColliderGO.activeSelf"));
 			index++;
-			index = SearchableItem.Load(aic.searchColliderGO, ref entries,index,prefID);
+			index = SearchableItem.Load(@const.MfdManager,aic.searchColliderGO, ref entries,index,prefID);
 			if (aic.healthManager != null) {
 				if (!aic.healthManager.gibOnDeath
 					|| prefID.constIndex == 421 /* avian mutant */) {
@@ -2233,7 +2251,7 @@ public class AIController : MonoBehaviour {
 
 
 		if (aic.currentState == AIState.Attack1) {
-			if (Const.a.preactivateMeleeCollidersForNPC[aic.index]) {
+			if (@const.preactivateMeleeCollidersForNPC[aic.index]) {
 				aic.PreActivateMeleeColliders();
 			} else {
 				aic.DeactivateMeleeColliders();

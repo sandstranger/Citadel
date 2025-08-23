@@ -2,35 +2,35 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 // Level Editor for creating new levels or modifying the base game's levels.
 public class LevelEditor : MonoBehaviour {
     public bool inEditMode;
 
-    public static LevelEditor a;
-
-    void Awake() {
-        a = this;
-    }
+    [Inject] private Const _consts;
+    [Inject] private MouseLookScript _mouseLookScript;
+    [Inject] private PauseScript _pauseScript;
+    [Inject] private PlayerMovement _playerMovement;
 
     private void EditorEntry() {
         inEditMode = true;
-        PauseScript.a.PauseSystems();
-        PlayerMovement.a.ConsoleDisable();
+        _pauseScript.PauseSystems();
+        _playerMovement.ConsoleDisable();
     }
 
     public void EditorExit() {
         inEditMode = false;
-        PauseScript.a.UnpauseSystems();
+        _pauseScript.UnpauseSystems();
     }
 
     void Update() {
-        if (!Const.a.editMode) return;
+        if (!_consts.editMode) return;
 
         if (!inEditMode) EditorEntry();
 
-        if (MouseLookScript.a.inventoryMode) ToolMode();
+        if (_mouseLookScript.inventoryMode) ToolMode();
     }
 
     void ToolMode() {

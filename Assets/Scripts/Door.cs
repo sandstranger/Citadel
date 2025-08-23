@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class Door : MonoBehaviour {
 	public string target;
@@ -50,7 +51,14 @@ public class Door : MonoBehaviour {
 	private bool initialized = false;
 	private AnimatorStateInfo asi;
 	private bool delayFrame = false;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(100 * 1024);
+
+	[Inject] private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Inventory _inventory;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private QuestLogNotesManager _questLogNotesManager;
 
 	void Start () {
 		if (initialized) return;
@@ -62,7 +70,7 @@ public class Door : MonoBehaviour {
 		}
 		
 		SFX = GetComponent<AudioSource>();		
-		useFinished = PauseScript.a.relativeTime;
+		useFinished = _pauseScript.relativeTime;
 		if (startOpen) {
 			stayOpen = true;
 			OpenDoor();
@@ -81,43 +89,43 @@ public class Door : MonoBehaviour {
 		if (ud == null) return;
 		if (ud.owner == null) return;
 		
-		if (LevelManager.a.GetCurrentLevelSecurity() > securityThreshhold) {
-			MFDManager.a.BlockedBySecurity(transform.position);
+		if (_levelManager.GetCurrentLevelSecurity() > securityThreshhold) {
+			_mfdManager.BlockedBySecurity(transform.position);
 			return;
 		}
 
 		// SHODAN can go anywhere!  Full security override!
-		if (LevelManager.a.superoverride || Const.a.difficultyMission <= 0) {
+		if (_levelManager.superoverride || _consts.difficultyMission <= 0) {
 			locked = false;
 			requiredAccessCard = AccessCardType.None;
 			accessCardUsedByPlayer = true;
 		}
 
-		if (Const.a.difficultyMission <= 1) {
+		if (_consts.difficultyMission <= 1) {
 			requiredAccessCard = AccessCardType.None;
 			accessCardUsedByPlayer = true;
 		}
 
 		asi = anim.GetCurrentAnimatorStateInfo(0);
 		animatorPlaybackTime = asi.normalizedTime;
-		if (useFinished >= PauseScript.a.relativeTime) return;
+		if (useFinished >= _pauseScript.relativeTime) return;
 
-		useFinished = PauseScript.a.relativeTime + useTimeDelay;	
+		useFinished = _pauseScript.relativeTime + useTimeDelay;	
 		if (requiredAccessCard == AccessCardType.None
-			|| Inventory.a.HasAccessCard(requiredAccessCard)
+			|| _inventory.HasAccessCard(requiredAccessCard)
 			|| accessCardUsedByPlayer) {
 
 			if (!locked) {
 				if (requiredAccessCard != AccessCardType.None) {
 					// State that we just used a keycard and access was granted
-					Const.sprint(Inventory.AccessCardCodeForType(requiredAccessCard) + Const.a.stringTable[4]);
+					_consts.sprint(Inventory.AccessCardCodeForType(requiredAccessCard) + _consts.stringTable[4]);
 					accessCardUsedByPlayer = true;
 				}
 
 				if ((onlyTargetOnce && !targetAlreadyDone) || !onlyTargetOnce) {
 					targetAlreadyDone = true;
 					ud.argvalue = argvalue;
-					Const.a.UseTargets(gameObject,ud,target);
+					_consts.UseTargets(gameObject,ud,target);
 				}
 
 				if (ajar) {
@@ -129,20 +137,20 @@ public class Door : MonoBehaviour {
 			} else {
 				// Use access card
 				if (requiredAccessCard != AccessCardType.None) {
-					Const.sprint(requiredAccessCard.ToString() + Const.a.stringTable[4] + Const.a.stringTable[5]);
+					_consts.sprint(requiredAccessCard.ToString() + _consts.stringTable[4] + _consts.stringTable[5]);
 					accessCardUsedByPlayer = true;
 				} else {
-					Const.sprint(lockedMessageLingdex); 
-					Utils.PlayOneShotSavable(SFX,Const.a.sounds[467],0.55f);
-					if (QuestLogNotesManager.a != null) {
-						QuestLogNotesManager.a.NotifyLockedDoorAttempt(this);
+					_consts.sprint(lockedMessageLingdex); 
+					Utils.PlayOneShotSavable(SFX,_consts.sounds[467],0.55f);
+					if (_questLogNotesManager != null) {
+						_questLogNotesManager.NotifyLockedDoorAttempt(this);
 					}
 				}
 			}
 		} else {
 			// Tell owner of the Use command that an access card is needed.
-			Const.sprint(requiredAccessCard.ToString() + Const.a.stringTable[2]);
-			Utils.PlayOneShotSavable(SFX,Const.a.sounds[466],0.7f);
+			_consts.sprint(requiredAccessCard.ToString() + _consts.stringTable[2]);
+			Utils.PlayOneShotSavable(SFX,_consts.sounds[466],0.7f);
 		}
 	}
 	
@@ -160,13 +168,13 @@ public class Door : MonoBehaviour {
 		} else if (doorOpen == DoorState.Opening) {
 			doorOpen = DoorState.Closing;
 			anim.Play(closeClipName,0,topTime - animatorPlaybackTime);
-			Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXIndex]);
+			Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXIndex]);
 			delayFrame = true;
 		} else if (doorOpen == DoorState.Closing) {
 			doorOpen = DoorState.Opening;
-			waitBeforeClose = PauseScript.a.relativeTime + delay;
+			waitBeforeClose = _pauseScript.relativeTime + delay;
 			anim.Play(openClipName,0,topTime - animatorPlaybackTime);
-			Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXIndex]);
+			Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXIndex]);
 			delayFrame = true;
 		}
 	}
@@ -174,8 +182,8 @@ public class Door : MonoBehaviour {
 	void Targetted (UseData ud) {
 		if (locked) {
 			locked = false;
-			if (QuestLogNotesManager.a != null) {
-				QuestLogNotesManager.a.NotifyDoorUnlock(this);
+			if (_questLogNotesManager != null) {
+				_questLogNotesManager.NotifyDoorUnlock(this);
 			}
 		}
 
@@ -202,8 +210,8 @@ public class Door : MonoBehaviour {
 
 	public void Unlock() {
 		locked = false;
-		if (QuestLogNotesManager.a != null) {
-			QuestLogNotesManager.a.NotifyDoorUnlock(this);
+		if (_questLogNotesManager != null) {
+			_questLogNotesManager.NotifyDoorUnlock(this);
 		}
 	}
 
@@ -225,9 +233,9 @@ public class Door : MonoBehaviour {
 		if (anim == null) anim = GetComponent<Animator>();
 		if (anim != null) anim.speed = defaultSpeed;
 		doorOpen = DoorState.Opening;
-		waitBeforeClose = PauseScript.a.relativeTime + delay;
+		waitBeforeClose = _pauseScript.relativeTime + delay;
 		if (anim != null) anim.Play(openClipName,0,0f);
-		Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXIndex]);
+		Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXIndex]);
 		SetCollisionLayer(19); // InterDebris
 	}
 
@@ -236,8 +244,8 @@ public class Door : MonoBehaviour {
 		if (anim != null) anim.speed = defaultSpeed;
 		doorOpen = DoorState.Closing;
 		if (anim != null) anim.Play(closeClipName,0,0f);
-		Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXIndex]);
-		dynamicObjectsContainer = LevelManager.a.GetCurrentDynamicContainer();
+		Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXIndex]);
+		dynamicObjectsContainer = _levelManager.GetCurrentDynamicContainer();
 
 		// Horrible hack to keep objects that have their physics sleeping from
 		// ghosting through the door as it closes.  Unity physics sucks.
@@ -283,8 +291,8 @@ public class Door : MonoBehaviour {
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused()) { anim.speed = speedZero; return; }
-		if (PauseScript.a.MenuActive()) { anim.speed = speedZero; return; }
+		if (_pauseScript.Paused()) { anim.speed = speedZero; return; }
+		if (_pauseScript.MenuActive()) { anim.speed = speedZero; return; }
 		if (firstUpdateAfterLoad) { SetAnimAfterLoad(); return; }
 		if (ajar) { SetAjar(); return; }
 			
@@ -303,7 +311,7 @@ public class Door : MonoBehaviour {
 			}
 		}
 
-		if (PauseScript.a.relativeTime > waitBeforeClose) {
+		if (_pauseScript.relativeTime > waitBeforeClose) {
 			if ((doorOpen == DoorState.Open) && (!stayOpen) && (!startOpen) && !delayFrame) {
 				Debug.Log("Close Door, stayOpen: " + stayOpen.ToString());
 				CloseDoor();
@@ -365,6 +373,7 @@ public class Door : MonoBehaviour {
 
 	public static string Save(GameObject go, PrefabIdentifier prefID) {
 		Door dr = go.GetComponent<Door>();
+		var pauseScript = dr._pauseScript;
 		s1.Clear();
 		s1.Append(Utils.SaveString(dr.target,"target"));
 		s1.Append(Utils.splitChar);
@@ -394,15 +403,15 @@ public class Door : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(dr.blocked,"blocked"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(dr.useFinished,"useFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,dr.useFinished,"useFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(dr.waitBeforeClose,"waitBeforeClose"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,dr.waitBeforeClose,"waitBeforeClose"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(Utils.AccessCardTypeToInt(dr.requiredAccessCard),"requiredAccessCard"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(dr.timeBeforeLasersOn,"timeBeforeLasersOn"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(dr.lasersFinished,"lasersFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,dr.lasersFinished,"lasersFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(dr.accessCardUsedByPlayer,"accessCardUsedByPlayer"));
 		s1.Append(Utils.splitChar);
@@ -421,6 +430,7 @@ public class Door : MonoBehaviour {
 	public static int Load(GameObject go, ref string[] entries, int index,
 						   PrefabIdentifier prefID) {
 		Door dr = go.GetComponent<Door>();
+		var pauseScript = dr._pauseScript;
 		if (dr == null) {
 			Debug.Log("Door.Load failure, dr == null on " + go.name);
 			return index + 10;
@@ -450,11 +460,11 @@ public class Door : MonoBehaviour {
 		dr.useTimeDelay = Utils.GetFloatFromString(entries[index],"useTimeDelay"); index++;
 		dr.lockedMessageLingdex = Utils.GetIntFromString(entries[index],"lockedMessageLingdex"); index++;
 		dr.blocked = Utils.GetBoolFromString(entries[index],"blocked"); index++;
-		dr.useFinished = Utils.LoadRelativeTimeDifferential(entries[index],"useFinished"); index++;
-		dr.waitBeforeClose = Utils.LoadRelativeTimeDifferential(entries[index],"waitBeforeClose"); index++;
+		dr.useFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"useFinished"); index++;
+		dr.waitBeforeClose = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"waitBeforeClose"); index++;
 		dr.requiredAccessCard = Utils.IntToAccessCardType(Utils.GetIntFromString(entries[index],"requiredAccessCard")); index++;
 		dr.timeBeforeLasersOn = Utils.GetFloatFromString(entries[index],"timeBeforeLasersOn"); index++;
-		dr.lasersFinished = Utils.LoadRelativeTimeDifferential(entries[index],"lasersFinished"); index++;
+		dr.lasersFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"lasersFinished"); index++;
 		dr.accessCardUsedByPlayer = Utils.GetBoolFromString(entries[index],"accessCardUsedByPlayer"); index++;
 		dr.toggleLasers = Utils.GetBoolFromString(entries[index],"toggleLasers"); index++;
 		dr.targettingOnlyUnlocks = Utils.GetBoolFromString(entries[index],"targettingOnlyUnlocks"); index++;

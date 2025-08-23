@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class ObjectImpact : MonoBehaviour {
@@ -13,6 +14,9 @@ public class ObjectImpact : MonoBehaviour {
 	[HideInInspector] public Rigidbody rbody;
 	[HideInInspector] public Vector3 oldVelocity;
 
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
+
 	void Start () {
 		rbody = GetComponent<Rigidbody>();
 		if (rbody == null) this.enabled = false;
@@ -20,15 +24,15 @@ public class ObjectImpact : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision collision) {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 		if (collision == null) return;
 
 		if (collision.relativeVelocity.sqrMagnitude > (minVolumeSpeed * minVolumeSpeed)) {
 			if (SFXSource != null) {
 				SFXSource.pitch = (UnityEngine.Random.Range(0.8f,1.2f));
 				float vol = (collision.relativeVelocity.magnitude/maxVolumeSpeed) * 0.3f;
-				Utils.PlayOneShotSavable(SFXSource,Const.a.sounds[impactSFXIndex],vol); // Play sound when object changes velocity significantly enough that it must have hit something
+				Utils.PlayOneShotSavable(SFXSource,_consts.sounds[impactSFXIndex],vol); // Play sound when object changes velocity significantly enough that it must have hit something
 			}
 		}
 	}

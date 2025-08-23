@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class KeypadKeycode : MonoBehaviour {
 	public int securityThreshhold = 100; // If security level is not below this level, this is unusable.
@@ -17,38 +18,46 @@ public class KeypadKeycode : MonoBehaviour {
 	
 	[HideInInspector] public bool padInUse = false; // save
 	private GameObject playerCamera;
-	private static StringBuilder s1 = new StringBuilder();
+	[Inject] 
+	private PlayerReferenceManager _playerReference;
+	[Inject] 
+	private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private MouseLookScript _mouseLookScript;
+
+	private static readonly StringBuilder s1 = new(100 * 1024);
 
 	void Start () {
 		padInUse = false;
-		playerCamera = PlayerReferenceManager.a.playerCapsuleMainCamera;
+		playerCamera = _playerReference.playerCapsuleMainCamera;
 	}
 
 	public void Use (UseData ud) {
-	    if (LevelManager.a.superoverride || Const.a.difficultyMission == 0) {
+	    if (_levelManager.superoverride || _consts.difficultyMission == 0) {
 	        locked = false; // SHODAN can go anywhere!  Full security override!
-		} else if (LevelManager.a.GetCurrentLevelSecurity() > securityThreshhold) {
-		    MFDManager.a.BlockedBySecurity(transform.position);
+		} else if (_levelManager.GetCurrentLevelSecurity() > securityThreshhold) {
+		    _mfdManager.BlockedBySecurity(transform.position);
 		    return;
 		}
 
 		if (locked) {
-			Const.sprint(lockedMessageLingdex);
+			_consts.sprint(lockedMessageLingdex);
 
 			// Target something because we are locked like a Vox message to
 			// say we're locked, e.g. "Non emergency life pods disabled."
 			ud.argvalue = argvalue;
-			Const.a.UseTargets(gameObject,ud,lockedTarget); 
+			_consts.UseTargets(gameObject,ud,lockedTarget); 
 			return;
 		}
 
 		if (useQuestKeycode1) {
-			if (Const.a.questData.lev1SecCode != -1) {
-				if (Const.a.questData.lev2SecCode != -1) {
-					if (Const.a.questData.lev3SecCode != -1) {
-						int tempones = Const.a.questData.lev3SecCode;
-						int temptens = Const.a.questData.lev2SecCode * 10;
-						int temphuns = Const.a.questData.lev1SecCode * 100;
+			if (_consts.questData.lev1SecCode != -1) {
+				if (_consts.questData.lev2SecCode != -1) {
+					if (_consts.questData.lev3SecCode != -1) {
+						int tempones = _consts.questData.lev3SecCode;
+						int temptens = _consts.questData.lev2SecCode * 10;
+						int temphuns = _consts.questData.lev1SecCode * 100;
 						
 						// Decode digits into keycode from levels 1, 2, and 3
 						// in order huns, tens, ones.
@@ -56,18 +65,18 @@ public class KeypadKeycode : MonoBehaviour {
 					}
 				}
 			} else {
-				Const.sprint(289);
+				_consts.sprint(289);
 				return;
 			}
 		}
 
 		if (useQuestKeycode2) {
-			if (Const.a.questData.lev4SecCode != -1) {
-				if (Const.a.questData.lev5SecCode != -1) {
-					if (Const.a.questData.lev6SecCode != -1) {
-						int tempones = Const.a.questData.lev6SecCode;
-						int temptens = Const.a.questData.lev5SecCode * 10;
-						int temphuns = Const.a.questData.lev4SecCode * 100;
+			if (_consts.questData.lev4SecCode != -1) {
+				if (_consts.questData.lev5SecCode != -1) {
+					if (_consts.questData.lev6SecCode != -1) {
+						int tempones = _consts.questData.lev6SecCode;
+						int temptens = _consts.questData.lev5SecCode * 10;
+						int temphuns = _consts.questData.lev4SecCode * 100;
 						
 						// Secode digits into keycode from levels 4, 5, and 
 						// in order huns, tens, ones.
@@ -75,15 +84,15 @@ public class KeypadKeycode : MonoBehaviour {
 					}
 				}
 			} else {
-				Const.sprint(290);
+				_consts.sprint(290);
 				return;
 			}
 		}
 
 		padInUse = true;
-		Utils.PlayUIOneShotSavable(91);
-		MouseLookScript.a.ForceInventoryMode();
-		MFDManager.a.SendKeypadKeycodeToDataTab(keycode,transform.position,
+		Utils.PlayUIOneShotSavable(_consts,91);
+		_mouseLookScript.ForceInventoryMode();
+		_mfdManager.SendKeypadKeycodeToDataTab(keycode,transform.position,
 		                                        this,solved);
 	}
 
@@ -91,8 +100,8 @@ public class KeypadKeycode : MonoBehaviour {
 		UseData ud = new UseData();
 		ud.owner = playerCamera;
 		ud.argvalue = argvalue;
-		Const.a.UseTargets(gameObject,ud,target);
-		Const.sprint(successMessageLingdex);
+		_consts.UseTargets(gameObject,ud,target);
+		_consts.sprint(successMessageLingdex);
 	}
 
 	public static string Save(GameObject go) {
@@ -124,7 +133,7 @@ public class KeypadKeycode : MonoBehaviour {
 		return s1.ToString();
 	}
 
-	public static int Load(GameObject go, ref string[] entries, int index) {
+	public static int Load(MFDManager mfdManager,GameObject go, ref string[] entries, int index) {
 		KeypadKeycode kk = go.GetComponent<KeypadKeycode>();
         kk.securityThreshhold = Utils.GetIntFromString(entries[index],"securityThreshhold"); index++;
         kk.keycode = Utils.GetIntFromString(entries[index],"keycode"); index++;
@@ -139,9 +148,9 @@ public class KeypadKeycode : MonoBehaviour {
 		kk.useQuestKeycode1 = Utils.GetBoolFromString(entries[index],"useQuestKeycode1"); index++;
 		kk.useQuestKeycode2 = Utils.GetBoolFromString(entries[index],"useQuestKeycode2"); index++;
 		if (kk.padInUse) {
-		    MFDManager.a.SendKeypadKeycodeToDataTab(kk.keycode,kk.transform.position,kk,kk.solved);
+		    mfdManager.SendKeypadKeycodeToDataTab(kk.keycode,kk.transform.position,kk,kk.solved);
 		} else {
-		    MFDManager.a.SendKeypadKeycodeToDataTab(-1,Vector3.zero,null,false);
+		    mfdManager.SendKeypadKeycodeToDataTab(-1,Vector3.zero,null,false);
 		}
 		return index;
 	}

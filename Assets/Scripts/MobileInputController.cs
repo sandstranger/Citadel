@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Zenject;
+using UnityEngine;
 using UnityEngine.EventSystems;
 [RequireComponent(typeof(UnityEngine.UI.AspectRatioFitter))]
 public class MobileInputController : MonoBehaviour,IBeginDragHandler,
@@ -15,6 +16,8 @@ public class MobileInputController : MonoBehaviour,IBeginDragHandler,
     public float offset;
 
     Vector2 PointPosition;
+
+    [Inject] private MouseLookScript _mouseLookScript;
 
     // 264,328
     // 1241,328
@@ -54,7 +57,7 @@ public class MobileInputController : MonoBehaviour,IBeginDragHandler,
 //            * ((Background.rect.size.y-Knob.rect.size.y)/2) *offset)
 //            + Background.position.y);
 
-        if (!left) MouseLookScript.a.Mouselook();
+        if (!left) _mouseLookScript.Mouselook();
     }
 
     public void OnEndDrag(PointerEventData eventData) {

@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Citadel.Game;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -58,8 +60,20 @@ public class HealthManager : MonoBehaviour {
 	[HideInInspector] public bool awakeInitialized = false;
 	[HideInInspector] public bool startInitialized = false;
 	private bool isScreen = false;
-	private static StringBuilder s1 = new StringBuilder();
+	[Inject] 
+	private BiomonitorGraphSystem _biomonitorGraphSystem;
+	[Inject] private PlayerEnergy _playerEnergy;
+	[Inject] private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Inventory _inventory;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private Music _music;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
 
+	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
+	
 	public void Awake () {
 		if (awakeInitialized) return;
 
@@ -75,7 +89,7 @@ public class HealthManager : MonoBehaviour {
 			justHurtByEnemy = (Time.time - 31f); // set less than 30s below Time to guarantee we don't start playing action music right away, used by Music.cs
 		}
 		
-		Const.a.RegisterObjectWithHealth(this);
+		_consts.RegisterObjectWithHealth(this);
 		awakeInitialized = true;
 		if (isNPC && !gibOnDeath ) { // Set searchable item to CorpseSearchable layer.
 			if (searchableItem != null) searchableItem.gameObject.layer = 29;
@@ -89,16 +103,16 @@ public class HealthManager : MonoBehaviour {
 		if (isNPC) {
 			aic = GetComponent<AIController>();
 			index = aic.index;
-			if (Const.a != null) {
+			if (_consts != null) {
 				if (IsCyberEntity()) {
-					if (cyberHealth == -1) cyberHealth = Const.a.healthForCyberNPC[index];
-					if (maxhealth == -1) maxhealth = Const.a.healthForCyberNPC[index];
+					if (cyberHealth == -1) cyberHealth = _consts.healthForCyberNPC[index];
+					if (maxhealth == -1) maxhealth = _consts.healthForCyberNPC[index];
 				} else {
-					if (health == -1) health = Const.a.healthForNPC[index]; //leaves possibility of setting health lower than normal, for instance the cortex reaver on level 5
-					if (maxhealth == -1) maxhealth = Const.a.healthForNPC[index]; // set maxhealth to default healthForNPC, possible to set higher, e.g. for cyborg assassins on level 9 whose health is 3 times normal
+					if (health == -1) health = _consts.healthForNPC[index]; //leaves possibility of setting health lower than normal, for instance the cortex reaver on level 5
+					if (maxhealth == -1) maxhealth = _consts.healthForNPC[index]; // set maxhealth to default healthForNPC, possible to set higher, e.g. for cyborg assassins on level 9 whose health is 3 times normal
 				}
 
-				if (Const.a.difficultyCombat == 0) {
+				if (_consts.difficultyCombat == 0) {
 					maxhealth = 1;
 					health = maxhealth;
 				}
@@ -113,11 +127,11 @@ public class HealthManager : MonoBehaviour {
 	void LinkToAutomapOverlay() {
 		if (!isSecCamera && !isNPC) return;
 		if (linkedOverlay != null) return; // Already have an overlay.
-		if (Const.a == null) return; // Editor script save attempt (dynamic object export).
+		if (_consts == null) return; // Editor script save attempt (dynamic object export).
 		
 		PoolType pt = PoolType.AutomapCameraOverlays;
-		if (isNPC && aic.index > 0 && aic.index < Const.a.typeForNPC.Length) {
-			switch (Const.a.typeForNPC[aic.index]) {
+		if (isNPC && aic.index > 0 && aic.index < _consts.typeForNPC.Length) {
+			switch (_consts.typeForNPC[aic.index]) {
 				case NPCType.Mutant:       pt = PoolType.AutomapMutantOverlays;
 										   break;
 				case NPCType.Supermutant:  pt = PoolType.AutomapMutantOverlays;
@@ -133,7 +147,7 @@ public class HealthManager : MonoBehaviour {
 			}
 		}
 
-		GameObject overlay = Const.a.GetObjectFromPool(pt);
+		GameObject overlay = _consts.GetObjectFromPool(pt);
 		if (overlay != null) {
 			linkedOverlay = overlay.GetComponent<Image>();
 			Utils.EnableImage(linkedOverlay); // Enable on automap.
@@ -149,12 +163,12 @@ public class HealthManager : MonoBehaviour {
 		if (!isSecCamera && !isNPC) return;
 		if (IsCyberEntity()) return;
 		if (isNPC) {
-			if (Inventory.a != null) {
-				if (Inventory.a.NavUnitVersion() <= 1) return;
+			if (_inventory != null) {
+				if (_inventory.NavUnitVersion() <= 1) return;
 			}
 		}
 
-		Automap.TurnOnLinkedOverlay(linkedOverlay,health,gameObject,isNPC);
+		Automap.TurnOnLinkedOverlay(_inventory,linkedOverlay,health,gameObject,isNPC);
 		Automap.SetLinkedOverlayPos(linkedOverlay,health,gameObject);
 	}
 
@@ -185,7 +199,7 @@ public class HealthManager : MonoBehaviour {
 
 		UseData ud = new UseData();
 		ud.argvalue = argvalue;
-		Const.a.UseTargets(gameObject,ud,targetOnDeath);
+		_consts.UseTargets(gameObject,ud,targetOnDeath);
 	}
 
 	void InitializeCorpseOnly() {
@@ -201,7 +215,7 @@ public class HealthManager : MonoBehaviour {
 
 	float ApplyAttackTypeAdjustments(float take,DamageData dd) {
 		if (isNPC && health > 0f) {
-			if (Const.a.typeForNPC[index] == NPCType.Mutant) {
+			if (_consts.typeForNPC[index] == NPCType.Mutant) {
 				switch(dd.attackType) {
 					case AttackType.None: take *= 1f; break; // same
 					case AttackType.Melee: take *= 1f; break; // same
@@ -217,7 +231,7 @@ public class HealthManager : MonoBehaviour {
 				}
 			}
 
-			if (Const.a.typeForNPC[index] == NPCType.Supermutant) {
+			if (_consts.typeForNPC[index] == NPCType.Supermutant) {
 				switch(dd.attackType) {
 					case AttackType.None: take *= 1f; break; // same
 					case AttackType.Melee: take *= 1f; break; // same
@@ -233,7 +247,7 @@ public class HealthManager : MonoBehaviour {
 				}
 			}
 
-			if (Const.a.typeForNPC[index] == NPCType.Robot) {
+			if (_consts.typeForNPC[index] == NPCType.Robot) {
 				switch(dd.attackType) {
 					case AttackType.None: take *= 1f; break; // same
 					case AttackType.Melee: take *= 1f; break; // same
@@ -249,7 +263,7 @@ public class HealthManager : MonoBehaviour {
 				}
 			}
 
-			if (Const.a.typeForNPC[index] == NPCType.Cyborg) {
+			if (_consts.typeForNPC[index] == NPCType.Cyborg) {
 				switch(dd.attackType) {
 					case AttackType.None: take *= 1f; break; // same
 					case AttackType.Melee: take *= 1f; break; // same
@@ -265,7 +279,7 @@ public class HealthManager : MonoBehaviour {
 				}
 			}
 
-			if (Const.a.typeForNPC[index] == NPCType.Supercyborg) {
+			if (_consts.typeForNPC[index] == NPCType.Supercyborg) {
 				switch(dd.attackType) {
 					case AttackType.None: take *= 1f; break; // same
 					case AttackType.Melee: take *= 1f; break; // same
@@ -281,7 +295,7 @@ public class HealthManager : MonoBehaviour {
 				}
 			}
 
-			if (Const.a.typeForNPC[index] == NPCType.MutantCyborg) {
+			if (_consts.typeForNPC[index] == NPCType.MutantCyborg) {
 				switch(dd.attackType) {
 					case AttackType.None: take *= 1f; break; // same
 					case AttackType.Melee: take *= 1f; break; // same
@@ -297,7 +311,7 @@ public class HealthManager : MonoBehaviour {
 				}
 			}
 
-			if (Const.a.typeForNPC[index] == NPCType.Cyber) {
+			if (_consts.typeForNPC[index] == NPCType.Cyber) {
 				switch(dd.attackType) {
 					case AttackType.None: take *= 1f; break; // same
 					case AttackType.Melee: take *= 1f; break; // same
@@ -338,8 +352,8 @@ public class HealthManager : MonoBehaviour {
 		if (isPlayer) {
 			float absorb = 0;
 			if (inCyberSpace) {
-				if (Inventory.a.hasSoft[2]) {
-					switch(Inventory.a.softVersions[2]) {
+				if (_inventory.hasSoft[2]) {
+					switch(_inventory.softVersions[2]) {
 						case 0: absorb = 0.00f; break;
 						case 1: absorb = 0.10f; break;
 						case 2: absorb = 0.15f; break;
@@ -360,17 +374,15 @@ public class HealthManager : MonoBehaviour {
 				if (dd.attackType == AttackType.Magnetic) {
 					take = 0f; // don't get hurt by magnetic interactions
 					empstatic.Flash(2);
-					PlayerEnergy.a.TakeEnergy(11f);
-					if (BiomonitorGraphSystem.a != null) {
-						BiomonitorGraphSystem.a.EnergyPulse(11f);
-					}
+					_playerEnergy.TakeEnergy(11f);
+					_biomonitorGraphSystem.EnergyPulse(11f);
 				}
 
-				if (Inventory.a.hardwareIsActive[5] && Inventory.a.hasHardware[5]) {
+				if (_inventory.hardwareIsActive[5] && _inventory.hasHardware[5]) {
 					// Versions of shield protect against 20, 40, 75, 75%'s
 					// Versions of shield thresholds are 0, 10, 15, 30...ooh what's this hang on now...Huh, turns out it absorbs all damage below the thresshold!  Cool!
 					float thresh = 0;
-					switch(Inventory.a.hardwareVersion[5]) {
+					switch(_inventory.hardwareVersion[5]) {
 						case 0: absorb = 0.2f;   thresh = 0f; break;
 						case 1: absorb = 0.4f;  thresh = 10f; break;
 						case 2: absorb = 0.75f; thresh = 15f; break;
@@ -382,14 +394,14 @@ public class HealthManager : MonoBehaviour {
 						if (absorb < 1f) absorb = absorb + UnityEngine.Random.Range(-0.08f,0.08f); // +/- 8% variation - this was in the original I swear!  You could theoretically have 83% shielding max.
 						if (absorb > 1f) absorb = 1f; // cap it at 100%....shouldn't really ever be here, nothing is 92% + 8%
 						take *= (1f-absorb); // shield doing it's thing
-						PlayerHealth.a.shieldEffect.SetActive(true); // Activate shield screen effect to indicate damage was absorbed, effect intensity determined by absorb amount
-						Utils.PlayUIOneShotSavable(94); // Play shield absorb sound
+						_playerHealth.shieldEffect.SetActive(true); // Activate shield screen effect to indicate damage was absorbed, effect intensity determined by absorb amount
+						Utils.PlayUIOneShotSavable(_consts,94); // Play shield absorb sound
 						int abs = (int)(absorb * 100f); //  for int display of absorbption percent
-						Const.sprint(Const.a.stringTable[208] + abs.ToString() + Const.a.stringTable[209],dd.other);  // Shield absorbs x% damage
+						_consts.sprint(_consts.stringTable[208] + abs.ToString() + _consts.stringTable[209],dd.other);  // Shield absorbs x% damage
 					}
 				}
 				if (take > 0 && ((absorb <0.4f) || Random.Range(0,1f) < 0.5f)) {
-					Utils.PlayUIOneShotSavable(140); // Play player pain noise
+					Utils.PlayUIOneShotSavable(_consts,140); // Play player pain noise
 					int intensityOfPainFlash = 0; // 0 = light
 					if (take > 15f) {
 						intensityOfPainFlash = 2; // 2 = heavy
@@ -402,7 +414,7 @@ public class HealthManager : MonoBehaviour {
 					pstatic.Flash(intensityOfPainFlash);
 				}
 
-				if (dd.ownerIsNPC) justHurtByEnemy = PauseScript.a.relativeTime;
+				if (dd.ownerIsNPC) justHurtByEnemy = _pauseScript.relativeTime;
 			}
 		}
 
@@ -411,10 +423,10 @@ public class HealthManager : MonoBehaviour {
 			float cybbefore = cyberHealth;
 			cyberHealth -= take;
 			if (isPlayer) {
-			    Const.a.damageReceived += take;
-				MFDManager.a.DrawTicks(true);
+			    _consts.damageReceived += take;
+				_mfdManager.DrawTicks(true);
 				if (cyberHealth <= 0) {
-					MouseLookScript.a.ExitCyberspace();
+					_mouseLookScript.ExitCyberspace();
 					return 0f;
 				}
 			}
@@ -422,7 +434,7 @@ public class HealthManager : MonoBehaviour {
 			if (dd != null) {
 				if (dd.owner != null) {
 					if (dd.owner.CompareTag("Player")) {
-						Const.a.damageDealt += take;
+						_consts.damageDealt += take;
 					}
 				}
 			}
@@ -443,13 +455,13 @@ public class HealthManager : MonoBehaviour {
 			}
 			health -= take;
 			if (isPlayer) {
-			    Const.a.damageReceived += take;
-				MFDManager.a.DrawTicks(true);
-				Music.a.inCombat = true;
+			    _consts.damageReceived += take;
+				_mfdManager.DrawTicks(true);
+				_music.inCombat = true;
 			}
 			
 			if (dd.owner != null) {
-				if (dd.owner.CompareTag("Player")) Const.a.damageDealt += take;
+				if (dd.owner.CompareTag("Player")) _consts.damageDealt += take;
 			}
 		}
 
@@ -457,7 +469,7 @@ public class HealthManager : MonoBehaviour {
 		if (isNPC && (health > 0f || (IsCyberEntity() && cyberHealth > 0f))) {
 			AIController aic = GetComponent<AIController>();
 			if (aic != null) {
-				if (Const.a.timeBetweenPainForNPC[aic.index] > 0) {
+				if (_consts.timeBetweenPainForNPC[aic.index] > 0) {
 					aic.goIntoPain = true;
 				}
 
@@ -472,12 +484,12 @@ public class HealthManager : MonoBehaviour {
 
 		if (IsCyberEntity()) {
 			if (cyberHealth <= 0f) {
-			    if (!isIce && isNPC) Const.a.cyberkills++;
+			    if (!isIce && isNPC) _consts.cyberkills++;
 				Death(false); // False since you can't vaporize cyberspace corpses.
 			}
 		} else {
 			if (health <= 0f) {
-			    if (isNPC) Const.a.kills++;
+			    if (isNPC) _consts.kills++;
 				Death(dd.attackType == AttackType.EnergyBeam);
 			}
 		}
@@ -496,7 +508,7 @@ public class HealthManager : MonoBehaviour {
 			else if (isGrenade) GrenadeDeath();
 
 			if (isNPC && !teleportOnDeath) NPCDeath();
-			else if (isPlayer) PlayerHealth.a.deaths++;
+			else if (isPlayer) _playerHealth.deaths++;
 
 			deathDone = true;
 		}
@@ -572,7 +584,7 @@ public class HealthManager : MonoBehaviour {
 
 		deathDone = true; // Mark it so we only die once.
 		CreateDeathEffects(deathFX);
-		if (aic.index == 0 && !actAsCorpseOnly) Utils.PlayTempAudio(transform.position,Const.a.sounds[64]); // npc_autobomb: explosion1
+		if (aic.index == 0 && !actAsCorpseOnly) Utils.PlayTempAudio(_consts,transform.position,_consts.sounds[64]); // npc_autobomb: explosion1
 
 		if (aic == null) {
 			if (transform.parent != null) {
@@ -582,7 +594,7 @@ public class HealthManager : MonoBehaviour {
 
 		if (aic == null) return;
 
-		if (Const.a.typeForNPC[aic.index] == NPCType.Cyber) {
+		if (_consts.typeForNPC[aic.index] == NPCType.Cyber) {
 			Utils.SafeDestroy(aic.gameObject);
 		} else {
 			// Ok.  We've been through this.  Must keep the parent collider on
@@ -609,7 +621,7 @@ public class HealthManager : MonoBehaviour {
 		}
 
 		if (securityAffected != SecurityType.None) {
-			LevelManager.a.ReduceCurrentLevelSecurity(securityAffected);
+			_levelManager.ReduceCurrentLevelSecurity(securityAffected);
 		}
 
 		int soundex = 62; // crate_break
@@ -639,7 +651,7 @@ public class HealthManager : MonoBehaviour {
 			case 526: soundex = 68; break; // prop_console02: hit3
 		}
 		
-		Utils.PlayTempAudio(transform.position,Const.a.sounds[soundex]);
+		Utils.PlayTempAudio(_consts,transform.position,_consts.sounds[soundex]);
 		if (deathFX != PoolType.None) HideSelf();
 	}
 
@@ -681,15 +693,13 @@ public class HealthManager : MonoBehaviour {
 	void DropSearchables() {
 		if (searchableItem == null) return;
 
-		MFDManager.a.NotifySearchThatSearchableWasDestroyed();
-		GameObject levelDynamicContainer = LevelManager.a.GetCurrentDynamicContainer();
+		_mfdManager.NotifySearchThatSearchableWasDestroyed();
+		GameObject levelDynamicContainer = _levelManager.GetCurrentDynamicContainer();
 		for (int i=0;i<4;i++) {
 			if (searchableItem.contents[i] < 0) continue;
 
-			GameObject tossObject =
-				Instantiate(Const.a.GetPrefab(searchableItem.contents[i] + 307),
-							transform.position,Const.a.quaternionIdentity)
-								as GameObject;
+			GameObject tossObject = GameBindings.InstantiatePrefab(_consts.GetPrefab(searchableItem.contents[i] + 307),
+				transform.position,_consts.quaternionIdentity);
 
 			if (tossObject != null) {
 				if (tossObject.activeSelf != true) tossObject.SetActive(true);
@@ -697,7 +707,7 @@ public class HealthManager : MonoBehaviour {
 				tossObject.GetComponent<UseableObjectUse>().customIndex =
 					searchableItem.customIndex[i];
 			} else {
-				Const.sprint("BUG: Failed to instantiate object being dropped on gib.");
+				_consts.sprint("BUG: Failed to instantiate object being dropped on gib.");
 			}
 			searchableItem.contents[i] = -1;
 			searchableItem.customIndex[i] = -1;
@@ -713,7 +723,7 @@ public class HealthManager : MonoBehaviour {
 		if (deathDone) return;
 
 		deathDone = true; // Screens maintain collisions, so not disabling here; also maintain visible mesh, don't turn it off
-		Utils.PlayTempAudio(transform.position,Const.a.sounds[69]);
+		Utils.PlayTempAudio(_consts,transform.position,_consts.sounds[69]);
 		ImageSequenceTextureArray ista = GetComponent<ImageSequenceTextureArray>();
 		ista.Destroy(); // ista deada nowa
 		if (gibOnDeath) Gib();
@@ -722,7 +732,7 @@ public class HealthManager : MonoBehaviour {
 	void CreateDeathEffects(PoolType fx) {
 		if (fx == PoolType.None) return;
 
-		GameObject explosionEffect = Const.a.GetObjectFromPool(fx);
+		GameObject explosionEffect = _consts.GetObjectFromPool(fx);
 		if (explosionEffect == null) return;
 
 		Vector3 pos = transform.position;
@@ -764,7 +774,7 @@ public class HealthManager : MonoBehaviour {
 	public void HealingBed(float amount,bool flashBed) {
 		health += amount;
 		if (health > 255) health = 255;
-		if (isPlayer) MFDManager.a.DrawTicks(true);
+		if (isPlayer) _mfdManager.DrawTicks(true);
 		if (flashBed && healingFXFlash != null) healingFXFlash.SetActive(true);
 	}
 
@@ -848,7 +858,7 @@ public class HealthManager : MonoBehaviour {
 		HealthManager hm;
 		if (go.name.Contains("se_corpse_eaten")) hm = go.transform.GetChild(0).GetComponent<HealthManager>(); // se_corpse_eaten
 		else hm = go.GetComponent<HealthManager>();
-		
+		var pauseScript = hm._pauseScript;
 		if (!hm.awakeInitialized) hm.Awake();
 		if (!hm.startInitialized) hm.Start();
 		s1.Clear();
@@ -883,12 +893,12 @@ public class HealthManager : MonoBehaviour {
 			s1.Append(Utils.splitChar);
 			s1.Append(Utils.SaveString(ista.resourceFolder,"resourceFolder"));
 			s1.Append(Utils.splitChar);
-			s1.Append(Utils.SaveRelativeTimeDifferential(ista.tickFinished,"ista.tickFinished"));
+			s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ista.tickFinished,"ista.tickFinished"));
 		} else if (prefID.constIndex == 574) { // prop_healingbed
 			GameObject child = go.transform.GetChild(0).gameObject;
 			ImageSequenceTextureArray ista = child.GetComponent<ImageSequenceTextureArray>();
 			s1.Append(Utils.splitChar);
-			s1.Append(Utils.SaveRelativeTimeDifferential(ista.tickFinished,"ista.tickFinished"));
+			s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ista.tickFinished,"ista.tickFinished"));
 		}
 
 		s1.Append(Utils.splitChar);
@@ -902,6 +912,8 @@ public class HealthManager : MonoBehaviour {
 		if (go.name.Contains("se_corpse_eaten")) hm = go.transform.GetChild(0).GetComponent<HealthManager>(); // se_corpse_eaten
 		else hm = go.GetComponent<HealthManager>();
 
+		var pauseScript = hm._pauseScript;
+		
 		if (!hm.awakeInitialized) hm.Awake();
 		if (!hm.startInitialized) hm.Start();
 		hm.health = Utils.GetFloatFromString(entries[index],"health"); index++;
@@ -937,12 +949,12 @@ public class HealthManager : MonoBehaviour {
 					child.SetActive(Utils.GetBoolFromString(entries[index],"child.activeSelf")); index++;
 					ImageSequenceTextureArray ista = child.GetComponent<ImageSequenceTextureArray>();
 					ista.resourceFolder = Utils.LoadString(entries[index],"resourceFolder"); index++;
-					ista.tickFinished = Utils.LoadRelativeTimeDifferential(entries[index],"ista.tickFinished"); index++;
+					ista.tickFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"ista.tickFinished"); index++;
 				}
 			} else if (prefID.constIndex == 574) { // prop_healingbed
 				GameObject child = go.transform.GetChild(0).gameObject;
 				ImageSequenceTextureArray ista = child.GetComponent<ImageSequenceTextureArray>();
-				ista.tickFinished = Utils.LoadRelativeTimeDifferential(entries[index],"ista.tickFinished"); index++;
+				ista.tickFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"ista.tickFinished"); index++;
 			}
 		} else {
 			if (prefID == null) Debug.LogError("Missing PrefabIdentifier on " + go.name + ".");	

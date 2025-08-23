@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ConfigurationMenuShadowsApply : MonoBehaviour {
 	private Dropdown picker;
 
-	void Start() { // Wait for Const.a. to initialize.
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+
+	void Start() { // Wait for _consts. to initialize.
 		Initialize();
 	}
 
@@ -15,16 +19,16 @@ public class ConfigurationMenuShadowsApply : MonoBehaviour {
 	}
 	
 	public void SetOptionsText() {
-		if (Const.a == null) return;
-		if (!Const.a.stringTableLoaded) return;
+		if (_consts == null) return;
+		if (!_consts.stringTableLoaded) return;
 		if (picker == null) return;
 
 		List<string> shadList = new List<string>();
 		for (int i=0;i<3;i++) {
 			switch(i) {
-				case 0: shadList.Add(Const.a.stringTable[785]); break;
-				case 1: shadList.Add(Const.a.stringTable[786]); break;
-				case 2: shadList.Add(Const.a.stringTable[787]); break;
+				case 0: shadList.Add(_consts.stringTable[785]); break;
+				case 1: shadList.Add(_consts.stringTable[786]); break;
+				case 2: shadList.Add(_consts.stringTable[787]); break;
 			}
 		}
 		picker.ClearOptions();
@@ -36,18 +40,18 @@ public class ConfigurationMenuShadowsApply : MonoBehaviour {
 		if (picker == null) Debug.Log("BUG: ConfigurationMenuShadowsApply missing component for picker.");
 
 		SetOptionsText();
-		if (picker.value != Const.a.GraphicsShadowMode) {
-			picker.value = Const.a.GraphicsShadowMode;
+		if (picker.value != _consts.GraphicsShadowMode) {
+			picker.value = _consts.GraphicsShadowMode;
 		}
 	}
 
 	public void OnDropdownSelect () {
 		if (picker != null)
-			Const.a.GraphicsShadowMode = picker.value;
+			_consts.GraphicsShadowMode = picker.value;
 		else
-			Const.a.GraphicsShadowMode = 0; // Default to off, huge performance impact
+			_consts.GraphicsShadowMode = 0; // Default to off, huge performance impact
 
-		Config.WriteConfig();
-		Config.SetShadows();
+		_config.WriteConfig();
+		_config.SetShadows();
 	}
 }

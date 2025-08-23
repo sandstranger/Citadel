@@ -15,11 +15,15 @@ namespace Citadel.Android.Tools
         [MenuItem("Tools/Generate levels prefabs")]
         internal static void GenerateLevelsPrefabs()
         {
-            if (LevelManager.a == null)
+            LevelManager levelManager = GameObject.FindAnyObjectByType<LevelManager>();
+            ConsoleEmulator consoleEmulator = GameObject.FindAnyObjectByType<ConsoleEmulator>();
+            Const @consts = GameObject.FindAnyObjectByType<Const>();
+            
+            if (levelManager == null || consoleEmulator == null || consts == null)
             {
                 return;
             }
-
+            
             if (Directory.Exists(LevelsPrefabsLocations))
             {
                 Directory.Delete(LevelsPrefabsLocations, true);
@@ -30,8 +34,8 @@ namespace Citadel.Android.Tools
                 var currentLevelPrefabsLocation = Path.Combine(LevelsPrefabsLocations, $"Level_{i}");
                 var levelGeometryParent = new GameObject("LevelGeometry");
                 var levelLightsParent = new GameObject("LevelLights");
-                LoadLevelGeometry(i, levelGeometryParent, levelLightsParent);
-                LoadLevelLights(i, levelLightsParent);
+                LoadLevelGeometry(consts,consoleEmulator, levelManager,i, levelGeometryParent, levelLightsParent);
+                LoadLevelLights(consts,consoleEmulator, levelManager,i, levelLightsParent);
                 
                 SavePrefab(levelGeometryParent, currentLevelPrefabsLocation);
                 SavePrefab(levelLightsParent, currentLevelPrefabsLocation);
@@ -55,7 +59,8 @@ namespace Citadel.Android.Tools
             }
         }
         
-        private static void LoadLevelGeometry(int curlevel, GameObject levelGeometryParent, GameObject lightsParent ) {
+        private static void LoadLevelGeometry(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager, 
+            int curlevel, GameObject levelGeometryParent, GameObject lightsParent ) {
             if (curlevel < 0) return;
 		
             string gName = "CitadelScene_geometry_level"+curlevel.ToString()+".txt";
@@ -80,7 +85,7 @@ namespace Citadel.Android.Tools
 
                     string[] entries = readline.Split(splitter);
 				
-                    go = SaveLoad.LoadPrefab(ref entries,lineNum,curlevel, levelGeometryParent, lightsParent);
+                    go = SaveLoad.LoadPrefab(@const,consoleEmulator,levelManager,ref entries,lineNum,curlevel, levelGeometryParent, lightsParent);
                     if (go != null)
                     {
                         go.transform.SetParent(levelGeometryParent.transform,false);
@@ -117,7 +122,8 @@ namespace Citadel.Android.Tools
             }
         }
         
-        private static void LoadLevelLights(int curlevel,GameObject lightParent) {
+        private static void LoadLevelLights(Const @const,ConsoleEmulator consoleEmulator, 
+            LevelManager levelManager,int curlevel,GameObject lightParent) {
             if (curlevel > MaxLevels) return;
             if (curlevel < 0) return;
 
@@ -137,7 +143,8 @@ namespace Citadel.Android.Tools
                     if (readline == null) break;
 				
                     string[] entries = readline.Split(splitter);
-                    var light = SaveLoad.LoadPrefab(ref entries,lineNum,curlevel, null, lightParent);
+                    var light = SaveLoad.LoadPrefab(@const,consoleEmulator, 
+                        levelManager,ref entries,lineNum,curlevel, null, lightParent);
                     var lightComponent = light.GetComponent<Light>();
                     lightComponent.enabled = true;
                     lightComponent.lightmapBakeType = LightmapBakeType.Mixed;

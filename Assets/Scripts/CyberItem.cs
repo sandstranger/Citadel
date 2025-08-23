@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class CyberItem : MonoBehaviour {
@@ -8,8 +9,11 @@ public class CyberItem : MonoBehaviour {
 	
 	private GameObject explosionEffect;
 
+	[Inject] private Const _consts;
+	[Inject] private Inventory _inventory;
+	
 	void Start() {
-		if (Const.a.difficultyMission == 0) {
+		if (_consts.difficultyMission == 0) {
 			// Disable data objects when Mission difficulty is 0.
 			if (type == SoftwareType.Data) this.gameObject.SetActive(false);
 		}
@@ -20,10 +24,10 @@ public class CyberItem : MonoBehaviour {
 			PlayerMovement pm = other.gameObject.GetComponent<PlayerMovement>();
 			if (pm == null) return;
 
-			if (!Inventory.a.AddSoftwareItem(type,version)) return;
+			if (!_inventory.AddSoftwareItem(type,version)) return;
 
 			explosionEffect = null;
-			explosionEffect = Const.a.GetObjectFromPool(PoolType.CyberDissolve);
+			explosionEffect = _consts.GetObjectFromPool(PoolType.CyberDissolve);
 			if (explosionEffect != null) {
 				explosionEffect.SetActive(true);
 

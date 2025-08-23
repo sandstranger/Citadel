@@ -22,7 +22,7 @@ missionSplitID:
 is an integer value to indicate which split we are on.  Resets to 0 when starting a New Game.
 The splits are as follows, the value is the resulting ID after the split:
 	0 - Game start - as soon as intro cutscene begins to play (cutscene can be skipped quickly by clicking)
-	1 - Medical: Split occurs once player enters into Level 2: Research (Located in code in LevelManager.a.LoadLevel() after check for proper level and ID == 0)
+	1 - Medical: Split occurs once player enters into Level 2: Research (Located in code in _levelManager.LoadLevel() after check for proper level and ID == 0)
 	2 - Laser Destroyed: Split occurs once player has flipped the switch for destroying the laser.
 		The split occurs immediately before the Vmail displays.
 	3 - Master Grove Jettison failure: split occurs once master jettison lever fails on flip (this is after all 3 groves are readied)

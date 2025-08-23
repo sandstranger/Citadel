@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Zenject;
 
 public class PauseParticleSystem : MonoBehaviour {
 	private ParticleSystem psys;
@@ -8,6 +9,8 @@ public class PauseParticleSystem : MonoBehaviour {
 	private bool previousKinematic;
 	private CollisionDetectionMode previouscolDetMode;
 
+	[Inject] private Const _consts;
+	
 	void Awake () {
 		Initialize();
 	}
@@ -17,7 +20,7 @@ public class PauseParticleSystem : MonoBehaviour {
 		{
 			psys = GetComponent<ParticleSystem>();
 		}
-		if (!Const.a.psys.Contains(this)) Const.a.psys.Add(this);
+		if (!_consts.psys.Contains(this)) _consts.psys.Add(this);
 	}
 
 	void OnEnable () {
@@ -43,10 +46,10 @@ public class PauseParticleSystem : MonoBehaviour {
 	}
 	
 	void OnDestroy() {
-		if (Const.a == null) return;
-		if (Const.a.psys == null) return;
+		if (_consts == null) return;
+		if (_consts.psys == null) return;
 		if (this == null) return;
 		
-		if (Const.a.psys.Contains(this)) Const.a.psys.Remove(this);
+		if (_consts.psys.Contains(this)) _consts.psys.Remove(this);
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,58 +28,63 @@ public class SystemAnalyzer : MonoBehaviour {
 	public Text descDelta;
 	public Text delta;
 
+	[Inject] private Const _consts;
+	[Inject] private LevelManager _levelManager;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GUIState _guiState;
+
 	public void Close() {
-		MFDManager.a.sysAnalyzerLH.SetActive(false);
-		MFDManager.a.sysAnalyzerRH.SetActive(false);
-		MFDManager.a.mouseClickHeldOverGUI = true;
-		GUIState.a.ClearOverButton();
+		_mfdManager.sysAnalyzerLH.SetActive(false);
+		_mfdManager.sysAnalyzerRH.SetActive(false);
+		_mfdManager.mouseClickHeldOverGUI = true;
+		_guiState.ClearOverButton();
 	}
     // Start is called before the first frame update
     void Update() {
-		descSecurity.text = Const.a.stringTable[474];
-		security.text = LevelManager.a.levelSecurity[LevelManager.currentLevel] + Const.a.stringTable[307];
-		descLaser.text = Const.a.stringTable[475];
-		laser.text = Const.a.questData.LaserDestroyed ? Const.a.stringTable[486] : Const.a.stringTable[485];
-		descLifepod.text = Const.a.stringTable[476];
-		lifepod.text = Const.a.questData.SelfDestructActivated ? Const.a.stringTable[488] : Const.a.stringTable[487];
-		descShield.text = Const.a.stringTable[477];
-		shield.text = Const.a.questData.ShieldActivated ? Const.a.stringTable[490] : Const.a.stringTable[489];
-		descReactor.text = Const.a.stringTable[478];
-		reactor.text = Const.a.questData.SelfDestructActivated ? Const.a.stringTable[491] : Const.a.stringTable[492];
-		descProcessor.text = Const.a.stringTable[479];
+		descSecurity.text = _consts.stringTable[474];
+		security.text = _levelManager.levelSecurity[LevelManager.currentLevel] + _consts.stringTable[307];
+		descLaser.text = _consts.stringTable[475];
+		laser.text = _consts.questData.LaserDestroyed ? _consts.stringTable[486] : _consts.stringTable[485];
+		descLifepod.text = _consts.stringTable[476];
+		lifepod.text = _consts.questData.SelfDestructActivated ? _consts.stringTable[488] : _consts.stringTable[487];
+		descShield.text = _consts.stringTable[477];
+		shield.text = _consts.questData.ShieldActivated ? _consts.stringTable[490] : _consts.stringTable[489];
+		descReactor.text = _consts.stringTable[478];
+		reactor.text = _consts.questData.SelfDestructActivated ? _consts.stringTable[491] : _consts.stringTable[492];
+		descProcessor.text = _consts.stringTable[479];
 		int nodeCount = 0;
 		for (int i=0;i<14;i++) {
-			nodeCount += LevelManager.a.levelSmallNodeCount[i];
-			nodeCount += LevelManager.a.levelLargeNodeCount[i];
-			nodeCount -= LevelManager.a.levelSmallNodeDestroyedCount[i];
-			nodeCount -= LevelManager.a.levelLargeNodeDestroyedCount[i];
+			nodeCount += _levelManager.levelSmallNodeCount[i];
+			nodeCount += _levelManager.levelLargeNodeCount[i];
+			nodeCount -= _levelManager.levelSmallNodeDestroyedCount[i];
+			nodeCount -= _levelManager.levelLargeNodeDestroyedCount[i];
 		}
 		processor.text = nodeCount.ToString();
-		descProgram.text = Const.a.stringTable[480];
-		if (!Const.a.questData.LaserDestroyed) {
-			program.text = Const.a.stringTable[494];
+		descProgram.text = _consts.stringTable[480];
+		if (!_consts.questData.LaserDestroyed) {
+			program.text = _consts.stringTable[494];
 		} else {
-			if (!Const.a.questData.BetaGroveJettisoned) {
-				program.text = Const.a.stringTable[495];
+			if (!_consts.questData.BetaGroveJettisoned) {
+				program.text = _consts.stringTable[495];
 			} else {
-				if (!(Const.a.questData.AntennaNorthDestroyed && Const.a.questData.AntennaSouthDestroyed && Const.a.questData.AntennaWestDestroyed && Const.a.questData.AntennaEastDestroyed)) {
-					program.text = Const.a.stringTable[496];
+				if (!(_consts.questData.AntennaNorthDestroyed && _consts.questData.AntennaSouthDestroyed && _consts.questData.AntennaWestDestroyed && _consts.questData.AntennaEastDestroyed)) {
+					program.text = _consts.stringTable[496];
 				} else {
-					if (!Const.a.questData.BridgeSeparated) {
-						program.text = Const.a.stringTable[497];
+					if (!_consts.questData.BridgeSeparated) {
+						program.text = _consts.stringTable[497];
 					} else {
-						program.text = Const.a.stringTable[498];
+						program.text = _consts.stringTable[498];
 					}
 				}
 			}
 		}
-		descAlpha.text = Const.a.stringTable[481];
-		alpha.text = Const.a.stringTable[492];
-		descBeta.text = Const.a.stringTable[482];
-		beta.text = Const.a.questData.BetaGroveJettisoned ? Const.a.stringTable[493] : Const.a.stringTable[492];
-		descGamma.text = Const.a.stringTable[483];
-		gamma.text = Const.a.stringTable[493];
-		descDelta.text = Const.a.stringTable[484];
-		delta.text = Const.a.stringTable[492];
+		descAlpha.text = _consts.stringTable[481];
+		alpha.text = _consts.stringTable[492];
+		descBeta.text = _consts.stringTable[482];
+		beta.text = _consts.questData.BetaGroveJettisoned ? _consts.stringTable[493] : _consts.stringTable[492];
+		descGamma.text = _consts.stringTable[483];
+		gamma.text = _consts.stringTable[493];
+		descDelta.text = _consts.stringTable[484];
+		delta.text = _consts.stringTable[492];
 	}
 }

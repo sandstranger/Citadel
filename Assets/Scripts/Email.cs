@@ -1,22 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class Email : MonoBehaviour {
 	public int emailIndex;
 	public bool autoPlayEmail = false;
 
+	[Inject] private Const _consts;
+	[Inject] private Inventory _inventory;
+	
     public void Targetted() {
 		// Give email.
-		if (Inventory.a.hasLog[emailIndex]) return; // Already have it.
+		if (_inventory.hasLog[emailIndex]) return; // Already have it.
 
-		Inventory.a.hasLog[emailIndex] = true;
-		Inventory.a.hasNewEmail = true;
-		Inventory.a.lastAddedIndex = emailIndex;
-		if (Const.a.audioLogType[emailIndex] == AudioLogType.Email) {
-			Inventory.a.beepDone = true;
+		_inventory.hasLog[emailIndex] = true;
+		_inventory.hasNewEmail = true;
+		_inventory.lastAddedIndex = emailIndex;
+		if (_consts.audioLogType[emailIndex] == AudioLogType.Email) {
+			_inventory.beepDone = true;
 		}
 
-		if (autoPlayEmail) Inventory.a.PlayLastAddedLog(emailIndex);
+		if (autoPlayEmail) _inventory.PlayLastAddedLog(emailIndex);
 	}
 }

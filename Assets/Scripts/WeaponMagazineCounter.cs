@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,11 @@ public class WeaponMagazineCounter : MonoBehaviour {
 	private int tempi;
 	private int checkcount;
 	private int[] tempis = new int[] {0,0,0};
+
+	[Inject] private Inventory _inventory;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private WeaponCurrent _weaponCurrent;
 
 	public void UpdateDigits (int newamount) {
 		tempi = newamount;
@@ -35,18 +41,18 @@ public class WeaponMagazineCounter : MonoBehaviour {
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused() || _pauseScript.MenuActive()) return;
 		
-		int index = WeaponCurrent.a.weaponCurrent; // 0 to 6, 7 slots
+		int index = _weaponCurrent.weaponCurrent; // 0 to 6, 7 slots
 		// Changed from this:
-		// Get16WeaponIndexFromConstIndex(WeaponCurrent.a.weaponIndex); 0 to 15
+		// Get16WeaponIndexFromConstIndex(_weaponCurrent.weaponIndex); 0 to 15
 		if (index < 0) return;
 
-		if (WeaponCurrent.a.weaponIndex == -1
-		    || WeaponCurrent.a.weaponIndex == 41
-			|| WeaponCurrent.a.weaponIndex == 42
-			|| MouseLookScript.a.inCyberSpace
-			|| WeaponCurrent.a.weaponCurrentPending >= 0) {
+		if (_weaponCurrent.weaponIndex == -1
+		    || _weaponCurrent.weaponIndex == 41
+			|| _weaponCurrent.weaponIndex == 42
+			|| _mouseLookScript.inCyberSpace
+			|| _weaponCurrent.weaponCurrentPending >= 0) {
 				tempis[0] = 10; // blank
 				tempis[1] = 10; // blank
 				tempis[2] = 10; // blank
@@ -56,10 +62,10 @@ public class WeaponMagazineCounter : MonoBehaviour {
 				return;
 		}
 
-		if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
-			UpdateDigits(WeaponCurrent.a.currentMagazineAmount2[index]);
+		if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
+			UpdateDigits(_weaponCurrent.currentMagazineAmount2[index]);
 		} else {
-			UpdateDigits(WeaponCurrent.a.currentMagazineAmount[index]);
+			UpdateDigits(_weaponCurrent.currentMagazineAmount[index]);
 		}
 	}
 }

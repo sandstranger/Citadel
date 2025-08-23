@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,14 +12,17 @@ public class LogTextReaderManager : MonoBehaviour {
 	public LogBackButton logBackButton;
 	public int refIndex = -1;
 	
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
+
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			if (logTextOutput.GetComponent<Text>().text.Length > 568) {
-				moreButtonText.text = Const.a.stringTable[26];
+				moreButtonText.text = _consts.stringTable[26];
 				if (backButton.activeSelf) backButton.SetActive(false);
 			} else {
-				moreButtonText.text = Const.a.stringTable[27];
-				if (!backButton.activeSelf && Const.a.audioLogSpeech2Text[refIndex].Length > 568) {
+				moreButtonText.text = _consts.stringTable[27];
+				if (!backButton.activeSelf && _consts.audioLogSpeech2Text[refIndex].Length > 568) {
 					backButton.SetActive(true);
 					logBackButton.refIndex = refIndex;
 				}
@@ -33,9 +37,9 @@ public class LogTextReaderManager : MonoBehaviour {
 			return;
 		}
 
-		logTextOutput.GetComponent<Text>().text = Const.a.audioLogSpeech2Text[referenceIndex];
+		logTextOutput.GetComponent<Text>().text = _consts.audioLogSpeech2Text[referenceIndex];
 		refIndex = referenceIndex;
-		if (Const.a.audioLogSpeech2Text[referenceIndex].Length > 568) {
+		if (_consts.audioLogSpeech2Text[referenceIndex].Length > 568) {
 			logBackButton.refIndex = referenceIndex;
 		}
 	}

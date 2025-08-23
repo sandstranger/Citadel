@@ -1,3 +1,4 @@
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,6 +32,10 @@ public class MinigameBotBounce : MonoBehaviour {
     private Color ballColor = new Color(0.6886f,0.6886f,0.6886f);
     private Color paddleHitColor = new Color(0.8902f + 0.05f,0.8745f + 0.05f,0.0f);
 
+    [Inject] private Const _consts;
+    [Inject] private MinigameCursor _miniGameCursor;
+    [Inject] private PauseScript _pauseScript;
+
     void OnEnable() {
         Reset();
     }
@@ -58,13 +63,13 @@ public class MinigameBotBounce : MonoBehaviour {
     private void ResetBall() {
         ball.localPosition = new Vector3(0f,-100f,0f);
         ballDir = GetNewBallDirection();
-        ballResetFinished = PauseScript.a.relativeTime + 2.5f;
+        ballResetFinished = _pauseScript.relativeTime + 2.5f;
     }
 
     void Update() {
-        if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
-        if (frameFinished >= PauseScript.a.relativeTime) return;
+        if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
+        if (frameFinished >= _pauseScript.relativeTime) return;
         if (gameOver.activeInHierarchy) return;
 
         if (numAlive <= 0) {
@@ -72,9 +77,9 @@ public class MinigameBotBounce : MonoBehaviour {
             return;
         }
 
-        frameFinished = PauseScript.a.relativeTime + (1f/30f); // 30fps, it's a potato.
+        frameFinished = _pauseScript.relativeTime + (1f/30f); // 30fps, it's a potato.
         PlayerPaddleUpdate();
-        if (ballResetFinished >= PauseScript.a.relativeTime) return;
+        if (ballResetFinished >= _pauseScript.relativeTime) return;
 
         BallUpdate();
     }
@@ -87,7 +92,7 @@ public class MinigameBotBounce : MonoBehaviour {
         y += ballDir.y * ballSpeed;
         ball.localPosition = new Vector3(x,y,0f);
         if (ball.localPosition.y < -160f) { // More than 133 gives delay.
-            playerPaddleImg.color = Const.a.ssRedText;
+            playerPaddleImg.color = _consts.ssRedText;
             playerScore--;
             Utils.Activate(playerPizzaz);
             ResetBall();
@@ -136,7 +141,7 @@ public class MinigameBotBounce : MonoBehaviour {
                              playerPaddle.localPosition.x - paddleWidthH) {
 
                         ballDir.x *= -1f;
-                        playerPaddleImg.color = Const.a.ssYellowText;
+                        playerPaddleImg.color = _consts.ssYellowText;
                     }
 
                     float add = playerVel * 0.75f;
@@ -159,7 +164,7 @@ public class MinigameBotBounce : MonoBehaviour {
     private void PlayerPaddleUpdate() {
         playerPaddleImg.color = Color.Lerp(playerPaddleImg.color,Color.white,3f);
         x = playerPaddle.localPosition.x;
-        playerVel = (MinigameCursor.a.minigameMouseX - x) / 48f;
+        playerVel = (_miniGameCursor.minigameMouseX - x) / 48f;
         playerVel = Mathf.Clamp(playerVel,-1f,1f);
         x += playerVel * playerRate;
         if (x < (-128f + paddleWidthH)) {

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 // Used on the physical grenade iteslf.
 public class GrenadeActivate : MonoBehaviour {
@@ -21,7 +22,12 @@ public class GrenadeActivate : MonoBehaviour {
 	[HideInInspector] public bool useTimer = false; // save
 	private GameObject explosionEffect;
 	private Rigidbody rbody;
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100 * 500);
+	[Inject] private Const _consts;
+	[Inject] private Inventory _inventory;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
+	[Inject] private WeaponFire _weaponFire;
 
 	void Awake () {
 		rbody = GetComponent<Rigidbody>();
@@ -44,8 +50,8 @@ public class GrenadeActivate : MonoBehaviour {
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 		if (!active) return;
 
 		// Plastique or other explosive device:
@@ -55,23 +61,23 @@ public class GrenadeActivate : MonoBehaviour {
 		}
 
 		// Standard grenade explode route:
-		if ((useTimer && timeFinished < PauseScript.a.relativeTime)
+		if ((useTimer && timeFinished < _pauseScript.relativeTime)
 			|| (useProx && proxSensed)) {
 
 			Explode();
 		}
 	}
 
-	// Index = Const.a.useableItemsFrobIcon index.
+	// Index = _consts.useableItemsFrobIcon index.
 	public void Activate() {
 		switch(constIndex) {
 			case 7: explodeOnContact = true; break; // Fragmentation Grenade
 			case 8: explodeOnContact = true; break; // Concussion Grenade
 			case 9: explodeOnContact = true; break; // EMP Grenade
-			case 10: timeFinished = PauseScript.a.relativeTime + Inventory.a.earthShakerTimeSetting;
+			case 10: timeFinished = _pauseScript.relativeTime + _inventory.earthShakerTimeSetting;
 					 useTimer = true; break;        // Earthshaker Bomb
 			case 11: useProx = true; explodeOnContact = false; break; // Land Mine
-			case 12: timeFinished = PauseScript.a.relativeTime + Inventory.a.nitroTimeSetting; 
+			case 12: timeFinished = _pauseScript.relativeTime + _inventory.nitroTimeSetting; 
 					 useTimer = true; break;        // Nitropack Explosive
 			case 13: explodeOnContact = true; break; // Gas Grenade
 			default: return;
@@ -91,38 +97,38 @@ public class GrenadeActivate : MonoBehaviour {
 	public void Explode() {
 		Debug.Log("Grenade exploded");
 		Utils.DisableCollision(gameObject);
-		DamageData dd = new DamageData();
+		DamageData dd = new DamageData(_consts);
 		dd.damage = damage;
 		dd.attackType = attackType;
 		dd.penetration = penetration;
 		dd.offense = offense;
 		dd.impactVelocity = damage * 1.5f;
 		if (!IsNPCMine()) {
-			dd.owner = Const.a.player1Capsule;
-			PlayerHealth.a.makingNoise = true;
-			PlayerHealth.a.noiseFinished = PauseScript.a.relativeTime + 2f;
+			dd.owner = _consts.player1Capsule;
+			_playerHealth.makingNoise = true;
+			_playerHealth.noiseFinished = _pauseScript.relativeTime + 2f;
 		}
 		
-		Utils.ApplyImpactForceSphere(dd,transform.position,nearradius,1.0f);
-		GameObject explosionEffect = Const.a.GetObjectFromPool(explosionType);
+		Utils.ApplyImpactForceSphere(_consts,dd,transform.position,nearradius,1.0f);
+		GameObject explosionEffect = _consts.GetObjectFromPool(explosionType);
 		if (explosionEffect != null) {
 			explosionEffect.SetActive(true);
 			explosionEffect.transform.position = transform.position;
 			int soundIndex = 60; // attack1_explode
 			switch(constIndex) {
-				case 7:  soundIndex = 64; WeaponFire.a.fogFac += 5; break; // frag, explosion1
-				case 8:  soundIndex = 60; WeaponFire.a.fogFac += 7; break; // conc, attack1_explode
+				case 7:  soundIndex = 64; _weaponFire.fogFac += 5; break; // frag, explosion1
+				case 8:  soundIndex = 60; _weaponFire.fogFac += 7; break; // conc, attack1_explode
 				case 9:  soundIndex = 67; break; // emp, hit2
-				case 10: soundIndex = 60; WeaponFire.a.fogFac += 7; break; // earth, attack1_explode
-				case 11: soundIndex = 64; WeaponFire.a.fogFac += 5; break; // mine, explosion1
-				case 12: soundIndex = 60; WeaponFire.a.fogFac += 6; break; // nitro, attack1_explode
-				case 13: soundIndex = 63; WeaponFire.a.fogFac += 10; break; // gas, explode_minor
+				case 10: soundIndex = 60; _weaponFire.fogFac += 7; break; // earth, attack1_explode
+				case 11: soundIndex = 64; _weaponFire.fogFac += 5; break; // mine, explosion1
+				case 12: soundIndex = 60; _weaponFire.fogFac += 6; break; // nitro, attack1_explode
+				case 13: soundIndex = 63; _weaponFire.fogFac += 10; break; // gas, explode_minor
 			}
 			
-			Utils.PlayTempAudio(transform.position,Const.a.sounds[soundIndex]);
+			Utils.PlayTempAudio(_consts,transform.position,_consts.sounds[soundIndex]);
 		}
 
-		Const.a.Shake(true,-1,-1);
+		_consts.Shake(true,-1,-1);
 		gameObject.SetActive(false);
 	}
 
@@ -136,7 +142,7 @@ public class GrenadeActivate : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(ga.useTimer,"useTimer"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(ga.timeFinished,"timeFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(ga._pauseScript,ga.timeFinished,"timeFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(ga.explodeOnContact,"explodeOnContact"));
 		s1.Append(Utils.splitChar);
@@ -156,7 +162,7 @@ public class GrenadeActivate : MonoBehaviour {
 		ga.constIndex = Utils.GetIntFromString(entries[index],"constIndex"); index++;
 		ga.active = Utils.GetBoolFromString(entries[index],"active"); index++;
 		ga.useTimer = Utils.GetBoolFromString(entries[index],"useTimer"); index++;
-		ga.timeFinished = Utils.LoadRelativeTimeDifferential(entries[index],"timeFinished"); index++;
+		ga.timeFinished = Utils.LoadRelativeTimeDifferential(ga._pauseScript,entries[index],"timeFinished"); index++;
 		ga.explodeOnContact = Utils.GetBoolFromString(entries[index],"explodeOnContact"); index++;
 		ga.useProx = Utils.GetBoolFromString(entries[index],"useProx"); index++;
 		bool isNPC = Utils.GetBoolFromString(entries[index],"IsNPCMine"); index++;

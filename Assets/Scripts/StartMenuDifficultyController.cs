@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,41 +13,43 @@ public class StartMenuDifficultyController : MonoBehaviour {
 	public int difficultySetting;
 	public Text externalTextObject;
 
+	[Inject] private Const _consts;
+	
 	public void SetText() {
 		switch(difficultyType) {
 			case 0: // Combat
 				switch(difficultySetting) {
-					case 0: externalTextObject.text = Const.a.stringTable[752]; break;
-					case 1: externalTextObject.text = Const.a.stringTable[753]; break;
-					case 2: externalTextObject.text = Const.a.stringTable[754]; break;
-					case 3: externalTextObject.text = Const.a.stringTable[755]; break;
+					case 0: externalTextObject.text = _consts.stringTable[752]; break;
+					case 1: externalTextObject.text = _consts.stringTable[753]; break;
+					case 2: externalTextObject.text = _consts.stringTable[754]; break;
+					case 3: externalTextObject.text = _consts.stringTable[755]; break;
 				}
 				
 				break;
 			case 1: // Mission
 				switch(difficultySetting) {
-					case 0: externalTextObject.text = Const.a.stringTable[756]; break;
-					case 1: externalTextObject.text = Const.a.stringTable[757]; break;
-					case 2: externalTextObject.text = Const.a.stringTable[758]; break;
-					case 3: externalTextObject.text = Const.a.stringTable[759]; break;
+					case 0: externalTextObject.text = _consts.stringTable[756]; break;
+					case 1: externalTextObject.text = _consts.stringTable[757]; break;
+					case 2: externalTextObject.text = _consts.stringTable[758]; break;
+					case 3: externalTextObject.text = _consts.stringTable[759]; break;
 				}
 				
 				break;
 			case 2: // Puzzle
 				switch(difficultySetting) {
-					case 0: externalTextObject.text = Const.a.stringTable[760]; break;
-					case 1: externalTextObject.text = Const.a.stringTable[761]; break;
-					case 2: externalTextObject.text = Const.a.stringTable[762]; break;
-					case 3: externalTextObject.text = Const.a.stringTable[763]; break;
+					case 0: externalTextObject.text = _consts.stringTable[760]; break;
+					case 1: externalTextObject.text = _consts.stringTable[761]; break;
+					case 2: externalTextObject.text = _consts.stringTable[762]; break;
+					case 3: externalTextObject.text = _consts.stringTable[763]; break;
 				}
 				
 				break;
 			case 3: // Cyberspace
 				switch(difficultySetting) {
-					case 0: externalTextObject.text = Const.a.stringTable[764]; break;
-					case 1: externalTextObject.text = Const.a.stringTable[765]; break;
-					case 2: externalTextObject.text = Const.a.stringTable[766]; break;
-					case 3: externalTextObject.text = Const.a.stringTable[767]; break;
+					case 0: externalTextObject.text = _consts.stringTable[764]; break;
+					case 1: externalTextObject.text = _consts.stringTable[765]; break;
+					case 2: externalTextObject.text = _consts.stringTable[766]; break;
+					case 3: externalTextObject.text = _consts.stringTable[767]; break;
 				}
 				
 				break;

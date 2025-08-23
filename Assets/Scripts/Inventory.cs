@@ -3,12 +3,13 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Citadel.Game;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 
-public class Inventory : MonoBehaviour, ISingletonInitializer {
+public class Inventory : MonoBehaviour {
 	// Access Cards
 	public AccessCardType[] accessCardsOwned; // save
 	private AccessCardType doorAccessTypeAcquired;
@@ -141,10 +142,18 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 	public Text[] weaponShotsInventory;
 	public Text[] weaponButtonText;
 
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100 *500);
 
-	// Singleton instance
-	public static Inventory a;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GetInput _getInput;
+	[Inject] private MainMenuHandler _mainMenuHandler;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerMovement _playerMovement;
+	[Inject] private WeaponFire _weaponFire;
+	[Inject] private WeaponCurrent _weaponCurrent;
+	[Inject] private QuestLogNotesManager _questLogNotesManager;
 
 	// Index cheat sheets
 	//-------------------------------------------------------------------------
@@ -214,107 +223,105 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		return 0; // Using zero in case I pass this straight into the ever dangerous [ ]
 	}
 
-	public void Initialize() {
-		a = this;
-
+	private void Awake() {
 		// Access Cards
-		a.accessCardsOwned = new AccessCardType[32];
-		for (int i = 0; i < a.accessCardsOwned.Length; i++) {
-			a.accessCardsOwned[i] = AccessCardType.None;
+		accessCardsOwned = new AccessCardType[32];
+		for (int i = 0; i < accessCardsOwned.Length; i++) {
+			accessCardsOwned[i] = AccessCardType.None;
 		}
 
 		// Hardware
-		a.hasHardware = new bool[14];
-		a.hardwareVersion = new int[14];
-		a.hardwareVersionSetting = new int[14];
-		a.hardwareIsActive = new bool[14];
-		a.hardwareInvReferenceIndex = new int[]{21,22,23,24,25,26,27,28,29,30,31,32,0,0}; // Hardcoded lookup indices into the Const main table.
-		for (int i = 0; i < a.hasHardware.Length; i++) {
-			a.hasHardware[i] = a.hardwareIsActive[i] = false; // Default to no hardware present.
-			a.hardwareVersion[i] = a.hardwareVersionSetting[i] = 0; // Default to version 1 acquired for all hardware which is represented by 0.
+		hasHardware = new bool[14];
+		hardwareVersion = new int[14];
+		hardwareVersionSetting = new int[14];
+		hardwareIsActive = new bool[14];
+		hardwareInvReferenceIndex = new int[]{21,22,23,24,25,26,27,28,29,30,31,32,0,0}; // Hardcoded lookup indices into the Const main table.
+		for (int i = 0; i < hasHardware.Length; i++) {
+			hasHardware[i] = hardwareIsActive[i] = false; // Default to no hardware present.
+			hardwareVersion[i] = hardwareVersionSetting[i] = 0; // Default to version 1 acquired for all hardware which is represented by 0.
 		}
-        a.hardwareInvCurrent = a.hardwareInvIndex = 0;
+        hardwareInvCurrent = hardwareInvIndex = 0;
 
 		// General
-		a.generalInventoryIndexRef = new int[14];
-        for (int i = 0; i < a.generalInventoryIndexRef.Length; i++) {
-            if (i != 0) a.generalInventoryIndexRef[i] = -1;
- 			a.genButtons[i].SetActive(false);
+		generalInventoryIndexRef = new int[14];
+        for (int i = 0; i < generalInventoryIndexRef.Length; i++) {
+            if (i != 0) generalInventoryIndexRef[i] = -1;
+ 			genButtons[i].SetActive(false);
         }
 
-        a.generalInvCurrent = a.generalInvIndex = 0;
-        a.generalInventoryIndexRef[0] = 81;
-		a.genButtonsText[0].text = Const.a.stringTable[597]; // ACCESS CARDS
+        generalInvCurrent = generalInvIndex = 0;
+        generalInventoryIndexRef[0] = 81;
+		genButtonsText[0].text = _consts.stringTable[597]; // ACCESS CARDS
 
 		// Grenades
-		a.grenAmmo = new int[7];
-		a.grenCountsLastCount = new int[7];
-		for (int i= 0; i<a.grenAmmo.Length; i++) {
-			a.grenAmmo[i] = a.grenCountsLastCount[i] = 0;
+		grenAmmo = new int[7];
+		grenCountsLastCount = new int[7];
+		for (int i= 0; i<grenAmmo.Length; i++) {
+			grenAmmo[i] = grenCountsLastCount[i] = 0;
 		}
 
-		a.grenadeCurrent = 0;
-		a.nitroTimeSetting = Const.nitroDefaultTime;
-		a.earthShakerTimeSetting = Const.earthShDefaultTime;
+		grenadeCurrent = 0;
+		nitroTimeSetting = Const.nitroDefaultTime;
+		earthShakerTimeSetting = Const.earthShDefaultTime;
 
 		// Logs
-		a.hasLog = new bool[134];
-		a.readLog = new bool[134];
-        for (int i = 0; i < a.hasLog.Length; i++) {
-            a.hasLog[i] = a.readLog[i] = false;
+		hasLog = new bool[134];
+		readLog = new bool[134];
+        for (int i = 0; i < hasLog.Length; i++) {
+            hasLog[i] = readLog[i] = false;
         }
 
-		a.numLogsFromLevel = new int[10];
-        for (int i = 0; i < a.numLogsFromLevel.Length; i++) {
-            a.numLogsFromLevel[i] = 0;
+		numLogsFromLevel = new int[10];
+        for (int i = 0; i < numLogsFromLevel.Length; i++) {
+            numLogsFromLevel[i] = 0;
         }
 
-		a.lastAddedIndex = a.tempRefIndex = -1;
-		a.logPaused = a.beepDone = false;
-		a.emailCurrent = a.emailIndex = 0;
-		a.hasNewEmail = true;
-		a.hasNewNotes = true;
-		a.hasMinigame = new bool[7];
-		for (int i=0;i<7;i++) a.hasMinigame[i] = false;
+		lastAddedIndex = tempRefIndex = -1;
+		logPaused = beepDone = false;
+		emailCurrent = emailIndex = 0;
+		hasNewEmail = true;
+		hasNewNotes = true;
+		hasMinigame = new bool[7];
+		for (int i=0;i<7;i++) hasMinigame[i] = false;
 
 		// Patches
-		a.patchCounts = new int[7];
-		a.patchLastCount = new int[7];
-		for (int i = 0; i < a.patchCounts.Length; i++) {
-			a.patchCounts[i] = a.patchLastCount[i] = 0;
+		patchCounts = new int[7];
+		patchLastCount = new int[7];
+		for (int i = 0; i < patchCounts.Length; i++) {
+			patchCounts[i] = patchLastCount[i] = 0;
 		}
 
-		a.patchCurrent = a.patchIndex = 0;
+		patchCurrent = patchIndex = 0;
 
 		// Software
-		a.currentCyberItem = -1;
-		a.isPulserNotDrill = true;
-		a.softVersions = new int[7];
-		a.hasSoft = new bool[7];
-        for (int i = 0; i < a.softVersions.Length; i++) {
-            a.softVersions[i] = 0;
-			a.hasSoft[i] = false;
+		currentCyberItem = -1;
+		isPulserNotDrill = true;
+		softVersions = new int[7];
+		hasSoft = new bool[7];
+        for (int i = 0; i < softVersions.Length; i++) {
+            softVersions[i] = 0;
+			hasSoft[i] = false;
         }
 
 		// Weapons
-        a.weaponInventoryIndices = new int[]{-1,-1,-1,-1,-1,-1,-1};
-        a.weaponInventoryAmmoIndices = new int[]{-1,-1,-1,-1,-1,-1,-1};	
-		a.globalLookupIndex = -1;
-		a.retval = "0";
-		a.wepAmmo = new int[16];
-		a.wepAmmoSecondary = new int[16];
+        weaponInventoryIndices = new int[]{-1,-1,-1,-1,-1,-1,-1};
+        weaponInventoryAmmoIndices = new int[]{-1,-1,-1,-1,-1,-1,-1};	
+		globalLookupIndex = -1;
+		retval = "0";
+		wepAmmo = new int[16];
+		wepAmmoSecondary = new int[16];
 		for (int i=0;i<16;i++) {
-			a.wepAmmo[i] = a.wepAmmoSecondary[i] = 0;
+			wepAmmo[i] = wepAmmoSecondary[i] = 0;
 		}
 
-		a.currentEnergyWeaponHeat = new float[7];
-		a.wepLoadedWithAlternate = new bool[7];
+		currentEnergyWeaponHeat = new float[7];
+		wepLoadedWithAlternate = new bool[7];
 		for (int i=0;i<7;i++) {
-			a.wepLoadedWithAlternate[i] = false;
-			a.currentEnergyWeaponHeat[i] = 0f;
+			wepLoadedWithAlternate[i] = false;
+			currentEnergyWeaponHeat[i] = 0f;
 		}
 		
-		a.SFXSource = GetComponent<AudioSource>();
+		SFXSource = GetComponent<AudioSource>();
 	}
 
 	void UpdateGeneralInventory() {
@@ -333,16 +340,16 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				if (referenceIndex > -1) {
 					if (i != 0) { // Access Cards text set in Awake the once.
 						genButtonsText[i].text =
-							Const.a.stringTable[referenceIndex + 326];
+							_consts.stringTable[referenceIndex + 326];
 					}
 				} else {
 					genButtonsText[i].text = string.Empty;
 				}
 
 				if (i == generalInvCurrent) {
-					genButtonsText[i].color = Const.a.ssYellowText; // Yellow
+					genButtonsText[i].color = _consts.ssYellowText; // Yellow
 				} else {
-					genButtonsText[i].color = Const.a.ssGreenText; // Green
+					genButtonsText[i].color = _consts.ssGreenText; // Green
 				}
 
 				// Enable Apply button for consumables.
@@ -358,8 +365,8 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		// Access Cards button
 		if (genButtons[0].activeSelf) return;
 
-		for (int j = 0; j < a.accessCardsOwned.Length; j++) {
-			if (a.accessCardsOwned[j] != AccessCardType.None) {
+		for (int j = 0; j < accessCardsOwned.Length; j++) {
+			if (accessCardsOwned[j] != AccessCardType.None) {
 				genButtons[0].SetActive(true);
 				break;
 			}
@@ -371,7 +378,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		int numUnreadLogs = 0;
 		for (int i=readLog.Length - 1;i>=0;i--) {
 			if (!readLog[i] && hasLog[i]) {
-				if (Const.a.audioLogType[i] == AudioLogType.Email) {
+				if (_consts.audioLogType[i] == AudioLogType.Email) {
 					numUnreadEmails++;
 				} else numUnreadLogs++;
 			}
@@ -383,7 +390,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 
 	void Update() {
 		// Logs pause exceptions.
-		if ((PauseScript.a.Paused() || PauseScript.a.MenuActive())
+		if ((_pauseScript.Paused() || _pauseScript.MenuActive())
 			&& !logPaused) {
 			logPaused = true;
 			if (SFXSource == null) SFXSource = GetComponent<AudioSource>();
@@ -393,33 +400,33 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		}
 		//--- End Logs ---
 	
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 
 		// Update Senaraound camera positions to match player camer height.
 		Vector3 camPos =
 		  hardwareButtonManager.sensaroundCenterCamera.transform.localPosition;
 
-		camPos.y = MouseLookScript.a.transform.localPosition.y;
+		camPos.y = _mouseLookScript.transform.localPosition.y;
 		hardwareButtonManager.sensaroundCenterCamera.transform.localPosition =
 			camPos;
 
 		camPos =
 		  hardwareButtonManager.sensaroundCenterCamera.transform.localPosition;
 
-		camPos.y = MouseLookScript.a.transform.localPosition.y;
+		camPos.y = _mouseLookScript.transform.localPosition.y;
 		hardwareButtonManager.sensaroundLHCamera.transform.localPosition =
 			camPos;
 
 		camPos =
 		  hardwareButtonManager.sensaroundCenterCamera.transform.localPosition;
 
-		camPos.y = MouseLookScript.a.transform.localPosition.y;
+		camPos.y = _mouseLookScript.transform.localPosition.y;
 		hardwareButtonManager.sensaroundRHCamera.transform.localPosition =
 			camPos;
 
 		// General
-		if (MFDManager.a.GeneralTab.activeInHierarchy) {
+		if (_mfdManager.GeneralTab.activeInHierarchy) {
 			UpdateGeneralInventory();
 		}
 
@@ -431,41 +438,41 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		//--- End General ---
 
 		// Grenades
-		if (GetInput.a.Grenade()) {
-			if (MouseLookScript.a.inCyberSpace) {
+		if (_getInput.Grenade()) {
+			if (_mouseLookScript.inCyberSpace) {
 				UseCyberspaceItem();
 			} else {
 				if (grenadeCurrent >= 0 && grenadeCurrent < 7) {
 					if (grenAmmo[grenadeCurrent] > 0) {
-						MouseLookScript.a.UseGrenade(
+						_mouseLookScript.UseGrenade(
 							grenButtons[grenadeCurrent].useableItemIndex
 						);
 					} else {
-						Const.sprint(Const.a.stringTable[322] ); // Out of grenades.
+						_consts.sprint(_consts.stringTable[322] ); // Out of grenades.
 					}
 				} else {
-					Const.sprint(Const.a.stringTable[322] ); // Out of grenades.
+					_consts.sprint(_consts.stringTable[322] ); // Out of grenades.
 				}
 			}
 		}
 
-		if (GetInput.a.GrenadeCycUp()) {
-			if (MouseLookScript.a.inCyberSpace) {
+		if (_getInput.GrenadeCycUp()) {
+			if (_mouseLookScript.inCyberSpace) {
 				CycleCyberSpaceItemUp();
 			} else {
 				GrenadeCycleUp();
 			}
 		}
 
-		if (GetInput.a.GrenadeCycDown()) {
-			if (MouseLookScript.a.inCyberSpace) {
+		if (_getInput.GrenadeCycDown()) {
+			if (_mouseLookScript.inCyberSpace) {
 				CycleCyberSpaceItemDn();
 			} else {
 				GrenadeCycleDown();
 			}
 		}
 
-		if (MFDManager.a.MainTab.activeInHierarchy) {
+		if (_mfdManager.MainTab.activeInHierarchy) {
 			for (int i=0;i<grenCountsText.Length;i++) {
 				if (grenButtons[i].gameObject.activeInHierarchy) {
 					if (grenCountsLastCount[i] != grenAmmo[i]) {
@@ -474,11 +481,11 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 					}
 
 					if (i == grenadeCurrent) {
-						grenInventoryText[i].color = Const.a.ssYellowText; // Yellow
-						grenCountsText[i].color = Const.a.ssYellowText; // Yellow
+						grenInventoryText[i].color = _consts.ssYellowText; // Yellow
+						grenCountsText[i].color = _consts.ssYellowText; // Yellow
 					} else {
-						grenInventoryText[i].color = Const.a.ssGreenText; // Green
-						grenCountsText[i].color = Const.a.ssGreenText; // Green
+						grenInventoryText[i].color = _consts.ssGreenText; // Green
+						grenCountsText[i].color = _consts.ssGreenText; // Green
 					}
 				}
 			}
@@ -486,16 +493,16 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		//--- End Grenades ---
 
 		// Hardware
-		if (MFDManager.a.HardwareTab.activeInHierarchy) {
+		if (_mfdManager.HardwareTab.activeInHierarchy) {
 			for (int i=0;i<hardwareInvText.Length;i++) {
 				if (hardwareInvText[i].gameObject.activeInHierarchy) {
 					hardwareInvText[i].text = 
-					  Const.a.stringTable[hardwareInvReferenceIndex[i] + 326]
+					  _consts.stringTable[hardwareInvReferenceIndex[i] + 326]
 					  + " v" + hardwareVersion[i].ToString();
 					if (i == hardwareInvCurrent) {
-						hardwareInvText[i].color = Const.a.ssYellowText; // Yellow
+						hardwareInvText[i].color = _consts.ssYellowText; // Yellow
 					} else {
-						hardwareInvText[i].color = Const.a.ssGreenText; // Green
+						hardwareInvText[i].color = _consts.ssGreenText; // Green
 					}
 				}
 			}
@@ -511,7 +518,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			else SFXSource.UnPause();
 		}
 
-		if(GetInput.a.RecentLog() && (hasHardware[2] == true)) {
+		if(_getInput.RecentLog() && (hasHardware[2] == true)) {
 			if (lastAddedIndex != -1 && !SFXSource.isPlaying) {
 				PlayLog(lastAddedIndex);
 				tempRefIndex = lastAddedIndex;
@@ -524,25 +531,25 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				lastAddedIndex = FindNextUnreadLog();
 				if (lastAddedIndex == tempRefIndex) lastAddedIndex = -1;
 				CheckForUnreadLogs();
-				Const.sprint(Const.a.stringTable[1019]); // "Log playback stopped"
+				_consts.sprint(_consts.stringTable[1019]); // "Log playback stopped"
 			}
 		}
 		//--- End Logs ---
 
 		// Patches
-		if (GetInput.a != null) {
-			if (GetInput.a.Patch()) {
+		if (_getInput != null) {
+			if (_getInput.Patch()) {
 				if (patchCounts[patchCurrent] > 0) {
 					patchButtonScripts[patchCurrent].PatchUse();
 				} else {
-					Const.sprint(Const.a.stringTable[324] ); // Out of patches.
+					_consts.sprint(_consts.stringTable[324] ); // Out of patches.
 				}
 			}
-			if (GetInput.a.PatchCycUp())   PatchCycleUp(true);
-			if (GetInput.a.PatchCycDown()) PatchCycleDown(true);
+			if (_getInput.PatchCycUp())   PatchCycleUp(true);
+			if (_getInput.PatchCycDown()) PatchCycleDown(true);
 		}
 
-		if (MFDManager.a.MainTab.activeInHierarchy) {
+		if (_mfdManager.MainTab.activeInHierarchy) {
 			for (int i = 0; i < patchLastCount.Length; i++) {
 				// Toggle patch button visibility.  Turn on if we have patches of that type.
 				if (patchCounts[i] > 0) {
@@ -559,11 +566,11 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 					}
 
 					if (i == patchCurrent) {
-						patchInventoryText[i].color = Const.a.ssYellowText; // Yellow
-						patchCountTextObjects[i].color = Const.a.ssYellowText; // Yellow
+						patchInventoryText[i].color = _consts.ssYellowText; // Yellow
+						patchCountTextObjects[i].color = _consts.ssYellowText; // Yellow
 					} else {
-						patchInventoryText[i].color = Const.a.ssGreenText; // Yellow
-						patchCountTextObjects[i].color = Const.a.ssGreenText; // Green
+						patchInventoryText[i].color = _consts.ssGreenText; // Yellow
+						patchCountTextObjects[i].color = _consts.ssGreenText; // Green
 					}
 				}
 			}
@@ -571,30 +578,30 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		//--- End Patches ---
 
 		// Weapons
-		if (MFDManager.a.MainTab.activeInHierarchy) {
+		if (_mfdManager.MainTab.activeInHierarchy) {
 			UpdateAmmoText();
-			int yellowWep = WeaponCurrent.a.weaponCurrent;
+			int yellowWep = _weaponCurrent.weaponCurrent;
 			int dullYellowWep = -1;
-			if (WeaponCurrent.a.weaponCurrentPending >= 0) {
-				dullYellowWep = WeaponCurrent.a.weaponCurrentPending; // Next
+			if (_weaponCurrent.weaponCurrentPending >= 0) {
+				dullYellowWep = _weaponCurrent.weaponCurrentPending; // Next
 				yellowWep = -1; // Last wep
 			}
 
 			for (int i=0;i<weaponShotsInventory.Length;i++) {
 				if (weaponButtonText[i].gameObject.activeInHierarchy) {
 					weaponButtonText[i].text =
-						Const.a.stringTable[326 + weaponInventoryIndices[i]];
+						_consts.stringTable[326 + weaponInventoryIndices[i]];
 
 					weaponShotsInventory[i].text = weaponShotsInventoryText[i];
 					if (i == yellowWep) {
-						weaponButtonText[i].color = Const.a.ssYellowText; // Yellow
-						weaponShotsInventory[i].color = Const.a.ssYellowText; // Yellow
+						weaponButtonText[i].color = _consts.ssYellowText; // Yellow
+						weaponShotsInventory[i].color = _consts.ssYellowText; // Yellow
 					} else if (i == dullYellowWep) {
-						weaponButtonText[i].color = Const.a.ssDarkYellowText; // Green
-						weaponShotsInventory[i].color = Const.a.ssDarkYellowText; // Green
+						weaponButtonText[i].color = _consts.ssDarkYellowText; // Green
+						weaponShotsInventory[i].color = _consts.ssDarkYellowText; // Green
 					} else {
-						weaponButtonText[i].color = Const.a.ssGreenText; // Green
-						weaponShotsInventory[i].color = Const.a.ssGreenText; // Green
+						weaponButtonText[i].color = _consts.ssGreenText; // Green
+						weaponShotsInventory[i].color = _consts.ssGreenText; // Green
 					}
 				}
 			}
@@ -663,7 +670,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void AddAccessCardToInventory (int index) {
-		if (MouseLookScript.a.firstTimePickup) MFDManager.a.CenterTabButtonClickSilent(2,true);
+		if (_mouseLookScript.firstTimePickup) _mfdManager.CenterTabButtonClickSilent(2,true);
 		switch (index) {
 			case 34: doorAccessTypeAcquired = AccessCardType.Admin; break;	  // Green Rim, Turquoise Inner with Yellow Cross (card_group5)
 			case 81: doorAccessTypeAcquired = AccessCardType.Standard; break; //CHECKED! Good here.  Orange Rim, Turquoise Inner (card_std)
@@ -678,7 +685,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			case 91: doorAccessTypeAcquired = AccessCardType.Group4; break; // Cyberspace only
 			case 110: doorAccessTypeAcquired = AccessCardType.Per1; break; // Darcy, Purple Rim, Red Inner (card_per5)
 			default: 
-				Const.sprint("BUG: Attempted to add an unmarked access card, we'll treat it as a STANDARD.");
+				_consts.sprint("BUG: Attempted to add an unmarked access card, we'll treat it as a STANDARD.");
 				doorAccessTypeAcquired = AccessCardType.Standard;
 				break;
 		}
@@ -688,7 +695,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			  && HasAccessCard(AccessCardType.Storage) // If Command, only give
 			  && HasAccessCard(AccessCardType.Security)//    message if missing
 			  && HasAccessCard(AccessCardType.Maintenance))) { //        all 3
-			Const.sprint(Const.a.stringTable[44] + AccessCardCodeForType(doorAccessTypeAcquired)); // Already have access: ##
+			_consts.sprint(_consts.stringTable[44] + AccessCardCodeForType(doorAccessTypeAcquired)); // Already have access: ##
 		} else {
 			bool added = false;
 			if (index == 87) {
@@ -720,7 +727,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			if (added) {
 				if (index == 87) {
 					// New accesses gained STO MTN SEC
-					Const.sprint(Const.a.stringTable[45] 
+					_consts.sprint(_consts.stringTable[45] 
 						+ AccessCardCodeForType(AccessCardType.Storage)
 						+ ", "
 						+ AccessCardCodeForType(AccessCardType.Security)
@@ -728,19 +735,19 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 						+ AccessCardCodeForType(AccessCardType.Maintenance)); 
 				} else {
 					 // New accesses gained ##
-					Const.sprint(Const.a.stringTable[45]
+					_consts.sprint(_consts.stringTable[45]
 						+ AccessCardCodeForType(doorAccessTypeAcquired));
 				}
 
-				MFDManager.a.SendInfoToItemTab(index);
-				MFDManager.a.NotifyToCenterTab(2);
-				if (MouseLookScript.a.firstTimePickup) {
-					MFDManager.a.CenterTabButtonClickSilent(2,true);
-					MouseLookScript.a.firstTimePickup = false;
+				_mfdManager.SendInfoToItemTab(index);
+				_mfdManager.NotifyToCenterTab(2);
+				if (_mouseLookScript.firstTimePickup) {
+					_mfdManager.CenterTabButtonClickSilent(2,true);
+					_mouseLookScript.firstTimePickup = false;
 				}
 			} else {
-				Const.sprint("BUG: Something went wrong when trying to add that access card.");
-				MFDManager.a.ResetItemTab();
+				_consts.sprint("BUG: Something went wrong when trying to add that access card.");
+				_mfdManager.ResetItemTab();
 			}
 		}
 	}
@@ -755,14 +762,14 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		if (index < 0) return;
 
 		if (hwversion < 0) {
-			Const.sprint("BUG: Adding hardware with no version, using 0 (v1)");
+			_consts.sprint("BUG: Adding hardware with no version, using 0 (v1)");
 			hwversion = 0;
 		}
 
-		if (overt) MFDManager.a.SendInfoToItemTab(constIndex);
+		if (overt) _mfdManager.SendInfoToItemTab(constIndex);
 		if (hwversion < 0) hwversion = 0;
 		if (hwversion <= hardwareVersion[index] && hwversion > 0) {
-		    if (overt) Const.sprint(Const.a.stringTable[46]); // "THAT WARE IS OBSOLETE. DISCARDED."
+		    if (overt) _consts.sprint(_consts.stringTable[46]); // "THAT WARE IS OBSOLETE. DISCARDED."
 		    return;
 		}
 
@@ -773,20 +780,20 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			case 1: // Navigation Unit
 			    textIndex = 22;
 			    // Turn on HUD compass
-				MouseLookScript.a.compassContainer.SetActive(true);
-				MouseLookScript.a.automapContainerLH.SetActive(true);
-				MouseLookScript.a.automapContainerRH.SetActive(true);
+				_mouseLookScript.compassContainer.SetActive(true);
+				_mouseLookScript.automapContainerLH.SetActive(true);
+				_mouseLookScript.automapContainerRH.SetActive(true);
 				if (hwversion >= 2) {
-				    MouseLookScript.a.compassMidpoints.SetActive(true);
+				    _mouseLookScript.compassMidpoints.SetActive(true);
 				}
 				
 				if (hwversion >= 3) {
-					MouseLookScript.a.compassSmallTicks.SetActive(true);
-					MouseLookScript.a.compassLargeTicks.SetActive(true);
+					_mouseLookScript.compassSmallTicks.SetActive(true);
+					_mouseLookScript.compassLargeTicks.SetActive(true);
 				}
 				
 				if (overt) {
-				    MFDManager.a.OpenTab(2,true,TabMSG.None,0,MFDManager.a.lastAutomapSideRH ? Handedness.RH : Handedness.LH);
+				    _mfdManager.OpenTab(2,true,TabMSG.None,0,_mfdManager.lastAutomapSideRH ? Handedness.RH : Handedness.LH);
 				}
 
 				// Go through all HealthManagers in the game and initialize the
@@ -839,19 +846,19 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 													   // point ok!
 		// Enable HUD button
 		if (button8Index >= 0 && button8Index < 8) {
-			MouseLookScript.a.hardwareButtons[button8Index].SetActive(true);
+			_mouseLookScript.hardwareButtons[button8Index].SetActive(true);
 			hardwareButtonManager.SetVersionIconForButton(hardwareIsActive[index],
 			                                  hardwareVersionSetting[index],4);
 			hardwareButtonManager.buttons[button8Index].gameObject.SetActive(true);
 		}
 
-		if (overt) Const.sprint(Const.a.stringTable[textIndex + 326] + " v" + hwversion.ToString() );
-		if (MouseLookScript.a.firstTimePickup && overt) {
-			MFDManager.a.CenterTabButtonClickSilent(1,true);
+		if (overt) _consts.sprint(_consts.stringTable[textIndex + 326] + " v" + hwversion.ToString() );
+		if (_mouseLookScript.firstTimePickup && overt) {
+			_mfdManager.CenterTabButtonClickSilent(1,true);
 		}
 
 		ActivateHardwareButton(index);
-		if (overt) MFDManager.a.NotifyToCenterTab(1);
+		if (overt) _mfdManager.NotifyToCenterTab(1);
 	}
 
 	// The following utility functions make the code more explicit by removing
@@ -909,7 +916,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 	// Called by main menu since as this uses OnGUI it draws on top.
 	public void HideBioMonitor() {
 		if (hardwareButtonManager == null || hardwareButtonManager.bioMonitorContainer == null || 
-		    MFDManager.a == null)
+		    _mfdManager == null)
 		{
 			return;
 		}
@@ -942,8 +949,8 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			generalInventoryIndexRef[i] = index;
 
 			// Item added to general inventory
-			Const.sprint(Const.a.stringTable[index + 326]
-						 + Const.a.stringTable[31]);
+			_consts.sprint(_consts.stringTable[index + 326]
+						 + _consts.stringTable[31]);
 
 			GeneralInvButton gv = genButtons[i].GetComponent<GeneralInvButton>();
 			if (gv != null) {
@@ -951,14 +958,14 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				gv.customIndex = customIndex;
 			}
 
-			if (Inventory.a.generalInvCurrent == i) { // Only if current.
-				MFDManager.a.SendInfoToItemTab(index,customIndex);
+			if (generalInvCurrent == i) { // Only if current.
+				_mfdManager.SendInfoToItemTab(index,customIndex);
 			}
 
-			MFDManager.a.NotifyToCenterTab(2);
-			if (MouseLookScript.a.firstTimePickup) {
-				MFDManager.a.CenterTabButtonClickSilent(2,true);
-				MouseLookScript.a.firstTimePickup = false;
+			_mfdManager.NotifyToCenterTab(2);
+			if (_mouseLookScript.firstTimePickup) {
+				_mfdManager.CenterTabButtonClickSilent(2,true);
+				_mouseLookScript.firstTimePickup = false;
 			}
 
 			return true;
@@ -995,16 +1002,16 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		}
 		if (lastDex == nextIndex) return; // Don't do anything if we don't have more grenades.
 
-		MFDManager.a.CenterTabButtonClickSilent(0,true);
+		_mfdManager.CenterTabButtonClickSilent(0,true);
 		grenButtons[nextIndex].GrenadeInvSelect();
 		switch(grenadeCurrent) {
-			case 0: Const.sprint(Const.a.stringTable[579]); break;
-			case 1: Const.sprint(Const.a.stringTable[580]); break;
-			case 2: Const.sprint(Const.a.stringTable[581]); break;
-			case 3: Const.sprint(Const.a.stringTable[582]); break;
-			case 4: Const.sprint(Const.a.stringTable[583]); break;
-			case 5: Const.sprint(Const.a.stringTable[584]); break;
-			case 6: Const.sprint(Const.a.stringTable[585]); break;
+			case 0: _consts.sprint(_consts.stringTable[579]); break;
+			case 1: _consts.sprint(_consts.stringTable[580]); break;
+			case 2: _consts.sprint(_consts.stringTable[581]); break;
+			case 3: _consts.sprint(_consts.stringTable[582]); break;
+			case 4: _consts.sprint(_consts.stringTable[583]); break;
+			case 5: _consts.sprint(_consts.stringTable[584]); break;
+			case 6: _consts.sprint(_consts.stringTable[585]); break;
 		}
 	}
 
@@ -1024,16 +1031,16 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		}
 		if (lastDex == nextIndex) return; // Don't do anything if we don't have more grenades.
 
-		MFDManager.a.CenterTabButtonClickSilent(0,true);
+		_mfdManager.CenterTabButtonClickSilent(0,true);
 		grenButtons[nextIndex].GrenadeInvSelect();
 		switch(grenadeCurrent) {
-			case 0: Const.sprint(Const.a.stringTable[579]); break;
-			case 1: Const.sprint(Const.a.stringTable[580]); break;
-			case 2: Const.sprint(Const.a.stringTable[581]); break;
-			case 3: Const.sprint(Const.a.stringTable[582]); break;
-			case 4: Const.sprint(Const.a.stringTable[583]); break;
-			case 5: Const.sprint(Const.a.stringTable[584]); break;
-			case 6: Const.sprint(Const.a.stringTable[585]); break;
+			case 0: _consts.sprint(_consts.stringTable[579]); break;
+			case 1: _consts.sprint(_consts.stringTable[580]); break;
+			case 2: _consts.sprint(_consts.stringTable[581]); break;
+			case 3: _consts.sprint(_consts.stringTable[582]); break;
+			case 4: _consts.sprint(_consts.stringTable[583]); break;
+			case 5: _consts.sprint(_consts.stringTable[584]); break;
+			case 6: _consts.sprint(_consts.stringTable[585]); break;
 		}
 	}
 
@@ -1042,8 +1049,8 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
     public void AddGrenadeToInventory(int index, int useableIndex) {
 		if (index < 0) return;
 
-		if (MouseLookScript.a.firstTimePickup) {
-			MFDManager.a.CenterTabButtonClickSilent(0,true);
+		if (_mouseLookScript.firstTimePickup) {
+			_mfdManager.CenterTabButtonClickSilent(0,true);
 		}
 
 		if (grenAmmo[0] == 0 && grenAmmo[1] == 0 && grenAmmo[2] == 0
@@ -1054,11 +1061,11 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		}
 
 		grenAmmo[index]++;
-		Const.sprint(Const.a.stringTable[useableIndex + 326]
-					 + Const.a.stringTable[34] );
+		_consts.sprint(_consts.stringTable[useableIndex + 326]
+					 + _consts.stringTable[34] );
 
-		MFDManager.a.NotifyToCenterTab(0);
-		MFDManager.a.SendInfoToItemTab(useableIndex);
+		_mfdManager.NotifyToCenterTab(0);
+		_mfdManager.SendInfoToItemTab(useableIndex);
     }
 
 	public void RemoveGrenade(int index) {
@@ -1095,14 +1102,14 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		if (logIndex < 0) return;
 
 		SFXSource.Stop();
-		if (!Inventory.a.hasHardware[2]) return;
+		if (!hasHardware[2]) return;
 
-		Utils.PlayOneShotSavable(SFXSource,Const.a.audioLogs[logIndex],((float)Const.a.AudioVolumeMessage)/100f); // Play the log audio
-		if (!readLog[logIndex]) QuestLogNotesManager.a.LogAdded(logIndex);
+		Utils.PlayOneShotSavable(SFXSource,_consts.audioLogs[logIndex],((float)_consts.AudioVolumeMessage)/100f); // Play the log audio
+		if (!readLog[logIndex]) _questLogNotesManager.LogAdded(logIndex);
 		readLog[logIndex] = true;
-		if (Const.a.audioLogType[logIndex] == AudioLogType.Vmail) {
-			MouseLookScript.a.vmailActive = true; // allow click to end
-			MouseLookScript.a.ForceInventoryMode();
+		if (_consts.audioLogType[logIndex] == AudioLogType.Vmail) {
+			_mouseLookScript.vmailActive = true; // allow click to end
+			_mouseLookScript.ForceInventoryMode();
 			string basePath = Application.streamingAssetsPath;
 			string fileName;
 			string urlPath;
@@ -1110,49 +1117,49 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				case 119:
 					vmailbetajet.SetActive(true);
 					vmailbetajetVideo.Play();
-					if (!MainMenuHandler.a.dataFound) vmailbetajetVideo.SetDirectAudioMute(0,true);
+					if (!_mainMenuHandler.dataFound) vmailbetajetVideo.SetDirectAudioMute(0,true);
 					else vmailbetajetVideo.SetDirectAudioMute(0,false);
 
 					break;
 				case 116:
 					vmailbridgesep.SetActive(true);
 					vmailbridgesepVideo.Play();
-					if (!MainMenuHandler.a.dataFound) vmailbridgesepVideo.SetDirectAudioMute(0,true);
+					if (!_mainMenuHandler.dataFound) vmailbridgesepVideo.SetDirectAudioMute(0,true);
 					else vmailbridgesepVideo.SetDirectAudioMute(0,false);
 
 					break;
 				case 117:
 					vmailcitadestruct.SetActive(true);
 					vmailcitadestructVideo.Play();
-					if (!MainMenuHandler.a.dataFound) vmailcitadestructVideo.SetDirectAudioMute(0,true);
+					if (!_mainMenuHandler.dataFound) vmailcitadestructVideo.SetDirectAudioMute(0,true);
 					else vmailcitadestructVideo.SetDirectAudioMute(0,false);
 
 					break;
 				case 110:
 					vmailgenstatus.SetActive(true);
 					vmailgenstatusVideo.Play();
-					if (!MainMenuHandler.a.dataFound) vmailgenstatusVideo.SetDirectAudioMute(0,true);
+					if (!_mainMenuHandler.dataFound) vmailgenstatusVideo.SetDirectAudioMute(0,true);
 					else vmailgenstatusVideo.SetDirectAudioMute(0,false);
 
 					break;
 				case 114:
 					vmaillaserdest.SetActive(true);
 					vmaillaserdestVideo.Play();
-					if (!MainMenuHandler.a.dataFound) vmaillaserdestVideo.SetDirectAudioMute(0,true);
+					if (!_mainMenuHandler.dataFound) vmaillaserdestVideo.SetDirectAudioMute(0,true);
 					else vmaillaserdestVideo.SetDirectAudioMute(0,false);
 
 					break;
 				case 120:
 					vmailshieldsup.SetActive(true);
 					vmailshieldsupVideo.Play();
-					if (!MainMenuHandler.a.dataFound) vmailshieldsupVideo.SetDirectAudioMute(0,true);
+					if (!_mainMenuHandler.dataFound) vmailshieldsupVideo.SetDirectAudioMute(0,true);
 					else vmailshieldsupVideo.SetDirectAudioMute(0,false);
 
 					break;
 			}
 		}
-		Const.sprint(Const.a.stringTable[1020] + Const.a.audiologNames[logIndex]); // "Playing "
-		MFDManager.a.SendAudioLogToDataTab(logIndex);
+		_consts.sprint(_consts.stringTable[1020] + _consts.audiologNames[logIndex]); // "Playing "
+		_mfdManager.SendAudioLogToDataTab(logIndex);
 	}
 
 	public void PlayLastAddedLog(int logIndex) {
@@ -1170,31 +1177,31 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 
 		if (index == 128) {
 			// Trioptimum Funpack Module, don't play on company time!
-			Const.sprint(Const.a.stringTable[309]);
+			_consts.sprint(_consts.stringTable[309]);
 			return;
 		}
 
 		hasLog[index] = true;
 		lastAddedIndex = index;
-		numLogsFromLevel[Const.a.audioLogLevelFound[index]]++;
-		MouseLookScript.a.logContentsManager.InitializeLogsFromLevelIntoFolder();
-		MFDManager.a.SendInfoToItemTab(6);
-		if (Const.a.audioLogType[index] == AudioLogType.Email) {
+		numLogsFromLevel[_consts.audioLogLevelFound[index]]++;
+		_mouseLookScript.logContentsManager.InitializeLogsFromLevelIntoFolder();
+		_mfdManager.SendInfoToItemTab(6);
+		if (_consts.audioLogType[index] == AudioLogType.Email) {
 			hasNewEmail = true;
-		} else if (Const.a.audioLogType[index] == AudioLogType.Normal) {
+		} else if (_consts.audioLogType[index] == AudioLogType.Normal) {
 			hasNewLogs = true;
 		}
 
 		if (hasHardware[2] == true) {
 			// Audio log ## picked up.  Press '##' to play back.
-			Const.sprint(Const.a.stringTable[36] + Const.a.audiologNames[index]
-						 + Const.a.stringTable[37]
-						 + Const.a.InputValues[Const.a.InputCodeSettings[15]]
-						 + Const.a.stringTable[38]);
+			_consts.sprint(_consts.stringTable[36] + _consts.audiologNames[index]
+						 + _consts.stringTable[37]
+						 + _consts.InputValues[_consts.InputCodeSettings[15]]
+						 + _consts.stringTable[38]);
 		} else {
 			// Audio log ## picked up.  Proper hardware not detected to play.
-			Const.sprint(Const.a.stringTable[36] + Const.a.audiologNames[index]
-						 + Const.a.stringTable[310]);
+			_consts.sprint(_consts.stringTable[36] + _consts.audiologNames[index]
+						 + _consts.stringTable[310]);
 		}
 	}
 	//--- End Logs ---
@@ -1213,7 +1220,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			if (nextIndex < 0) nextIndex = 6;
 			noPatches = (patchCounts[nextIndex] <= 0);
 		}
-		MFDManager.a.CenterTabButtonClickSilent(0,true);
+		_mfdManager.CenterTabButtonClickSilent(0,true);
 		patchButtonScripts[nextIndex].PatchSelect(useSound);
 	}
 
@@ -1230,7 +1237,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			if (nextIndex > 6) nextIndex = 0;
 			noPatches = (patchCounts[nextIndex] <= 0);
 		}
-		MFDManager.a.CenterTabButtonClickSilent(0,true);
+		_mfdManager.CenterTabButtonClickSilent(0,true);
 		patchButtonScripts[nextIndex].PatchSelect(useSound);
 	}
 
@@ -1238,20 +1245,20 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 	public void AddPatchToInventory (int index,int constIndex) {
 		if (index < 0) return;
 
-		if (MouseLookScript.a.firstTimePickup) MFDManager.a.CenterTabButtonClickSilent(0,true);
+		if (_mouseLookScript.firstTimePickup) _mfdManager.CenterTabButtonClickSilent(0,true);
 		patchCounts[index]++;
 		if (patchCounts[patchCurrent] == 0) patchCurrent = index;
 
 		// Update UI text
 		for (int i = 0; i < 7; i++) {
 			patchCountTextObjects[i].text = patchCounts[i].ToString ();
-			if (i == index) patchCountTextObjects[i].color = Const.a.ssYellowText; // Yellow
-			else  patchCountTextObjects[i].color = Const.a.ssGreenText; // Green
+			if (i == index) patchCountTextObjects[i].color = _consts.ssYellowText; // Yellow
+			else  patchCountTextObjects[i].color = _consts.ssGreenText; // Green
 		}
-		MFDManager.a.SendInfoToItemTab(constIndex);
-		MFDManager.a.NotifyToCenterTab(0);
-		Const.sprint(Const.a.stringTable[constIndex + 326]
-					 + Const.a.stringTable[35]); //  added to patch inventory
+		_mfdManager.SendInfoToItemTab(constIndex);
+		_mfdManager.NotifyToCenterTab(0);
+		_consts.sprint(_consts.stringTable[constIndex + 326]
+					 + _consts.stringTable[35]); //  added to patch inventory
     }
 	//--- End Patches ---
 
@@ -1260,7 +1267,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		if (currentCyberItem <= 0) {
 			currentCyberItem = GetExistingCyberItemIndex(); // try one more time to be sure
 			if (currentCyberItem <= 0) {
-				Const.sprint(Const.a.stringTable[473],Const.a.player1); // Out of expendable softwares.
+				_consts.sprint(_consts.stringTable[473],_consts.Player); // Out of expendable softwares.
 				return;
 			}
 			// oh it was good, ok then moving on down...
@@ -1347,16 +1354,16 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			hasSoft[3] = false;
 			softs[3].SetActive(false); // turn the button off now that we are out
 		}
-		if (PlayerMovement.a.turboFinished > PauseScript.a.relativeTime) {
-			PlayerMovement.a.turboFinished += PlayerMovement.a.turboCyberTime; // effect stacks
+		if (_playerMovement.turboFinished > _pauseScript.relativeTime) {
+			_playerMovement.turboFinished += _playerMovement.turboCyberTime; // effect stacks
 		} else {
-			PlayerMovement.a.turboFinished = PlayerMovement.a.turboCyberTime + PauseScript.a.relativeTime;
+			_playerMovement.turboFinished = _playerMovement.turboCyberTime + _pauseScript.relativeTime;
 		}
 	}
 
 	public void UseDecoy() {
-		if (Const.a.decoyActive) {
-			Const.sprint(Const.a.stringTable[537],Const.a.player1);
+		if (_consts.decoyActive) {
+			_consts.sprint(_consts.stringTable[537],_consts.Player);
 			return;
 		}
 		if (softVersions[4] <= 0) {
@@ -1368,7 +1375,8 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			hasSoft[4] = false;
 			softs[4].SetActive(false); // turn the button off now that we are out
 		}
-		GameObject decoyObj = Instantiate(decoyPrefab,PlayerMovement.a.transform.position,MouseLookScript.a.transform.rotation) as GameObject;
+		GameObject decoyObj = GameBindings.InstantiatePrefab(decoyPrefab,_playerMovement.transform.position,
+			_mouseLookScript.transform.rotation);
 		if (decoyObj != null) {
 			decoyObj.transform.SetParent(CyberSpaceStaticContainer.transform,true);
 		}
@@ -1384,7 +1392,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			hasSoft[5] = false;
 			softs[5].SetActive(false); // turn the button off now that we are out
 		}
-		PlayerMovement.a.transform.position = MouseLookScript.a.cyberspaceRecallPoint; // pop back to cyber section start
+		_playerMovement.transform.position = _mouseLookScript.cyberspaceRecallPoint; // pop back to cyber section start
 	}
 
 	public bool AddSoftwareItem(SoftwareType type, int vers) {
@@ -1397,11 +1405,11 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 					isPulserNotDrill = false; // equip drill if we don't already have pulser
 				}
 				if (vers > softVersions[0]) softVersions[0] = vers;
-				else Const.sprint(Const.a.stringTable[46],Const.a.player1);
+				else _consts.sprint(_consts.stringTable[46],_consts.Player);
 				drillVersionText.text = softVersions[0].ToString();
 				hasSoft[0] = true;
-				Utils.PlayUIOneShotSavable(86); // frob_hardware
-				Const.sprint(Const.a.stringTable[444] + softVersions[0].ToString() + Const.a.stringTable[458],Const.a.player1);
+				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_consts.sprint(_consts.stringTable[444] + softVersions[0].ToString() + _consts.stringTable[458],_consts.Player);
 				return true;
 			case SoftwareType.Pulser:	
 				softs[1].SetActive(true);
@@ -1411,20 +1419,20 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 					isPulserNotDrill = true; // always equip pulser when first picking it up
 				}
 				if (vers > softVersions[1]) softVersions[1] = vers;
-				else Const.sprint(Const.a.stringTable[46],Const.a.player1);
+				else _consts.sprint(_consts.stringTable[46],_consts.Player);
 				pulserVersionText.text = softVersions[1].ToString();
 				hasSoft[1] = true;
-				Utils.PlayUIOneShotSavable(86); // frob_hardware
-				Const.sprint(Const.a.stringTable[445] + softVersions[1].ToString() + Const.a.stringTable[458],Const.a.player1);
+				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_consts.sprint(_consts.stringTable[445] + softVersions[1].ToString() + _consts.stringTable[458],_consts.Player);
 				return true;
 			case SoftwareType.CShield:	
 				softs[2].SetActive(true);
 				if (vers > softVersions[2]) softVersions[2] = vers;
-				else Const.sprint(Const.a.stringTable[46],Const.a.player1);
+				else _consts.sprint(_consts.stringTable[46],_consts.Player);
 				cshieldVersionText.text = softVersions[2].ToString();
 				hasSoft[2] = true;
-				Utils.PlayUIOneShotSavable(86); // frob_hardware
-				Const.sprint(Const.a.stringTable[446] + softVersions[2].ToString() + Const.a.stringTable[458],Const.a.player1);
+				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_consts.sprint(_consts.stringTable[446] + softVersions[2].ToString() + _consts.stringTable[458],_consts.Player);
 				return true;
 			case SoftwareType.Turbo:
 				if (currentCyberItem == -1f) currentCyberItem = 0;
@@ -1432,8 +1440,8 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				softVersions[3]++;
 				turboCountText.text = softVersions[3].ToString();
 				hasSoft[3] = true;
-				Utils.PlayUIOneShotSavable(86); // frob_hardware
-				Const.sprint(Const.a.stringTable[447],Const.a.player1);
+				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_consts.sprint(_consts.stringTable[447],_consts.Player);
 				return true;
 			case SoftwareType.Decoy:	
 				if (currentCyberItem == -1f) currentCyberItem = 1;
@@ -1441,8 +1449,8 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				softVersions[4]++;
 				decoyCountText.text = softVersions[4].ToString();
 				hasSoft[4] = true;
-				Utils.PlayUIOneShotSavable(86); // frob_hardware
-				Const.sprint(Const.a.stringTable[448],Const.a.player1);
+				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_consts.sprint(_consts.stringTable[448],_consts.Player);
 				return true;
 			case SoftwareType.Recall:	
 				if (currentCyberItem == -1f) currentCyberItem = 2;
@@ -1450,8 +1458,8 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				softVersions[5]++;
 				recallCountText.text = softVersions[5].ToString();
 				hasSoft[5] = true;
-				Utils.PlayUIOneShotSavable(86); // frob_hardware
-				Const.sprint(Const.a.stringTable[449],Const.a.player1);
+				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_consts.sprint(_consts.stringTable[449],_consts.Player);
 				return true;
 			case SoftwareType.Game:		
 				softs[6].SetActive(true);
@@ -1460,44 +1468,44 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				miniGameButton[vers].SetActive(true);
 				switch(vers) {
 					case 0: // Ping
-							Const.sprint(Const.a.stringTable[450],Const.a.player1);
+							_consts.sprint(_consts.stringTable[450],_consts.Player);
 							break;
 					case 1: // 15
-							Const.sprint(Const.a.stringTable[451],Const.a.player1);
+							_consts.sprint(_consts.stringTable[451],_consts.Player);
 							break;
 					case 2: // Wing 0
-							Const.sprint(Const.a.stringTable[452],Const.a.player1);
+							_consts.sprint(_consts.stringTable[452],_consts.Player);
 							break;
 					case 3: // Botbounce
-							Const.sprint(Const.a.stringTable[453],Const.a.player1);
+							_consts.sprint(_consts.stringTable[453],_consts.Player);
 							break;
 					case 4: // Eel Zapper
-							Const.sprint(Const.a.stringTable[454],Const.a.player1);
+							_consts.sprint(_consts.stringTable[454],_consts.Player);
 							break;
 					case 5: // Road
-							Const.sprint(Const.a.stringTable[455],Const.a.player1);
+							_consts.sprint(_consts.stringTable[455],_consts.Player);
 							break;
 					case 6: // TriopToe
-							Const.sprint(Const.a.stringTable[456],Const.a.player1);
+							_consts.sprint(_consts.stringTable[456],_consts.Player);
 							break;
 				}
-				Utils.PlayUIOneShotSavable(86); // frob_hardware
+				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
 				
 				return true;
 			case SoftwareType.Data:
 				hasNewData = true;
-				Utils.PlayUIOneShotSavable(87); // frob_item
-				Const.sprint(Const.a.stringTable[457],Const.a.player1);
+				Utils.PlayUIOneShotSavable(_consts,87); // frob_item
+				_consts.sprint(_consts.stringTable[457],_consts.Player);
 				hasLog[vers] = true;
 				return true;
 			case SoftwareType.Integrity:
 				//Debug.Log("Cyber integrity touched");
 				if (hm.cyberHealth >=255) return false;
-				Utils.PlayUIOneShotSavable(86); // frob_hardware
+				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
 				hm.cyberHealth += 77f;
 				if (hm.cyberHealth > 255f) hm.cyberHealth = 255f;
-				MFDManager.a.DrawTicks(true);
-				Const.sprint(Const.a.stringTable[459],Const.a.player1);
+				_mfdManager.DrawTicks(true);
+				_consts.sprint(_consts.stringTable[459],_consts.Player);
 				return true;
 			case SoftwareType.Keycard:
 				hasNewData = true;
@@ -1536,11 +1544,11 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		if (slot6 != -1) numweapons++;
 		if (slot7 != -1) numweapons++;
 
-		if (WeaponCurrent.a.weaponCurrent < 0) return;
-		if (WeaponCurrent.a.weaponCurrent > 7) return;
+		if (_weaponCurrent.weaponCurrent < 0) return;
+		if (_weaponCurrent.weaponCurrent > 7) return;
 
-		MFDManager.a.SetAmmoIcons(WeaponCurrent.a.weaponIndex,
-						wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]); 
+		_mfdManager.SetAmmoIcons(_weaponCurrent.weaponIndex,
+						wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]); 
 	}
 
 	public string GetTextForWeaponAmmo(int index) {
@@ -1550,9 +1558,9 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 36:
 			//Mark3 Assault Rifle
 			if (wepLoadedWithAlternate[index]) {
-				retval = WeaponCurrent.a.currentMagazineAmount2[index].ToString() + "pn | ";
+				retval = _weaponCurrent.currentMagazineAmount2[index].ToString() + "pn | ";
 			} else {
-				retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + "mg | ";
+				retval = _weaponCurrent.currentMagazineAmount[index].ToString() + "mg | ";
 			}
 
 			retval += wepAmmo[0].ToString() + "mg, " + wepAmmoSecondary[0].ToString() + "pn";
@@ -1560,17 +1568,17 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 37:
 			//ER-90 Blaster
 			if (currentEnergyWeaponHeat[index] > 80f) {
-				retval = Const.a.stringTable[14]; // OVERHEATED
+				retval = _consts.stringTable[14]; // OVERHEATED
 			} else {
-				retval = Const.a.stringTable[15]; // READY
+				retval = _consts.stringTable[15]; // READY
 			}
 			break;
 		case 38:
 			//SV-23 Dartgun
 			if (wepLoadedWithAlternate[index]) {
-				retval = WeaponCurrent.a.currentMagazineAmount2[index].ToString() + "tq | ";
+				retval = _weaponCurrent.currentMagazineAmount2[index].ToString() + "tq | ";
 			} else {
-				retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + "nd | ";
+				retval = _weaponCurrent.currentMagazineAmount[index].ToString() + "nd | ";
 			}
 
 			retval += wepAmmo[2].ToString() + "nd, " + wepAmmoSecondary[2].ToString() + "tq";
@@ -1578,9 +1586,9 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 39:
 			//AM-27 Flechette
 			if (wepLoadedWithAlternate[index]) {
-				retval = WeaponCurrent.a.currentMagazineAmount2[index].ToString() + "sp | ";
+				retval = _weaponCurrent.currentMagazineAmount2[index].ToString() + "sp | ";
 			} else {
-				retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + "hn | ";
+				retval = _weaponCurrent.currentMagazineAmount[index].ToString() + "hn | ";
 			}
 
 			retval += wepAmmo[3].ToString() + "hn, " + wepAmmoSecondary[3].ToString() + "sp";
@@ -1588,9 +1596,9 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 40:
 			//RW-45 Ion Beam
 			if (currentEnergyWeaponHeat[index] > 80f) {
-				retval = Const.a.stringTable[14]; // OVERHEATED
+				retval = _consts.stringTable[14]; // OVERHEATED
 			} else {
-				retval = Const.a.stringTable[15]; // READY
+				retval = _consts.stringTable[15]; // READY
 			}
 			break;
 		case 41:
@@ -1604,9 +1612,9 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 43:
 			//Magnum 2100
 			if (wepLoadedWithAlternate[index]) {
-				retval = WeaponCurrent.a.currentMagazineAmount2[index].ToString() + "sg | ";
+				retval = _weaponCurrent.currentMagazineAmount2[index].ToString() + "sg | ";
 			} else {
-				retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + "hw | ";
+				retval = _weaponCurrent.currentMagazineAmount[index].ToString() + "hw | ";
 			}
 
 			retval += wepAmmo[7].ToString() + "hw, " + wepAmmoSecondary[7].ToString() + "sg";
@@ -1614,9 +1622,9 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 44:
 			//SB-20 Magpulse
 			if (wepLoadedWithAlternate[index]) {
-				retval = WeaponCurrent.a.currentMagazineAmount2[index].ToString() + "su | ";
+				retval = _weaponCurrent.currentMagazineAmount2[index].ToString() + "su | ";
 			} else {
-				retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + "cr | ";
+				retval = _weaponCurrent.currentMagazineAmount[index].ToString() + "cr | ";
 			}
 
 			retval += wepAmmo[8].ToString() + "cr, " + wepAmmoSecondary[8].ToString() + "su";
@@ -1624,9 +1632,9 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 45:
 			//ML-41 Pistol
 			if (wepLoadedWithAlternate[index]) {
-				retval = WeaponCurrent.a.currentMagazineAmount2[index].ToString() + "tf | ";
+				retval = _weaponCurrent.currentMagazineAmount2[index].ToString() + "tf | ";
 			} else {
-				retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + "st | ";
+				retval = _weaponCurrent.currentMagazineAmount[index].ToString() + "st | ";
 			}
 
 			retval += wepAmmo[9].ToString() + "st, " + wepAmmoSecondary[9].ToString() + "tf";
@@ -1634,27 +1642,27 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 46:
 			//LG-XX Plasma Rifle
 			if (currentEnergyWeaponHeat[index] > 80f) {
-				retval = Const.a.stringTable[14]; // OVERHEATED
+				retval = _consts.stringTable[14]; // OVERHEATED
 			} else {
-				retval = Const.a.stringTable[15]; // READY
+				retval = _consts.stringTable[15]; // READY
 			}
 			break;
 		case 47:
 			//MM-76 Railgun
-			retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + "rl | ";
+			retval = _weaponCurrent.currentMagazineAmount[index].ToString() + "rl | ";
 			retval += wepAmmo[11].ToString() + "rl";
 			break;
 		case 48:
 			//DC-05 Riotgun
-			retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + "rb | ";
+			retval = _weaponCurrent.currentMagazineAmount[index].ToString() + "rb | ";
 			retval += wepAmmo[12].ToString() + "rb";
 			break;
 		case 49:
 			//RF-07 Skorpion
 			if (wepLoadedWithAlternate[index]) {
-				retval = WeaponCurrent.a.currentMagazineAmount2[index].ToString() + scorpLg + " | ";
+				retval = _weaponCurrent.currentMagazineAmount2[index].ToString() + scorpLg + " | ";
 			} else {
-				retval = WeaponCurrent.a.currentMagazineAmount[index].ToString() + scorpSmall + " | ";
+				retval = _weaponCurrent.currentMagazineAmount[index].ToString() + scorpSmall + " | ";
 			}
 
 			retval = wepAmmo[13].ToString() + scorpSmall + wepAmmoSecondary[13].ToString() + scorpLg;
@@ -1662,17 +1670,17 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		case 50:
 			//Sparq Beam
 			if (currentEnergyWeaponHeat[index] > 80f) {
-				retval = Const.a.stringTable[14]; // OVERHEATED
+				retval = _consts.stringTable[14]; // OVERHEATED
 			} else {
-				retval = Const.a.stringTable[15]; // READY
+				retval = _consts.stringTable[15]; // READY
 			}
 			break;
 		case 51:
 			//DH-07 Stungun
 			if (currentEnergyWeaponHeat[index] > 80f) {
-				retval = Const.a.stringTable[14]; // OVERHEATED
+				retval = _consts.stringTable[14]; // OVERHEATED
 			} else {
-				retval = Const.a.stringTable[15]; // READY
+				retval = _consts.stringTable[15]; // READY
 			}
 			break;
 		}
@@ -1693,64 +1701,64 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 	public void AddAmmoToInventory (int index, int constIndex, int amount, bool isSecondary) {
 		if (index < 0) return;
 
-		if (MouseLookScript.a.firstTimePickup) MFDManager.a.CenterTabButtonClickSilent (0,true);
+		if (_mouseLookScript.firstTimePickup) _mfdManager.CenterTabButtonClickSilent (0,true);
 		if (isSecondary) wepAmmoSecondary[index] += amount;
 		else			 wepAmmo[index]          += amount;
 
-		Const.sprint(Const.a.stringTable[constIndex + 326]
-					 + Const.a.stringTable[630]); // Item added to ammo
+		_consts.sprint(_consts.stringTable[constIndex + 326]
+					 + _consts.stringTable[630]); // Item added to ammo
 
-		MFDManager.a.NotifyToCenterTab(0);
-		MFDManager.a.SendInfoToItemTab(constIndex);
+		_mfdManager.NotifyToCenterTab(0);
+		_mfdManager.SendInfoToItemTab(constIndex);
 	}
 
     public bool AddWeaponToInventory(int index, int ammo1, int ammo2,
 									 bool loadedAlt) { // index = usableItem index
 		if (index < 0) return false;
 
-		MFDManager.a.OpenTab(0, true, TabMSG.Weapon, 0,Handedness.LH);
-		MFDManager.a.CenterTabButtonClickSilent (0,true); // Weapons are so important we always switch it.
+		_mfdManager.OpenTab(0, true, TabMSG.Weapon, 0,Handedness.LH);
+		_mfdManager.CenterTabButtonClickSilent (0,true); // Weapons are so important we always switch it.
         for (int i=0;i<7;i++) {
             if (weaponInventoryIndices[i] >= 0) continue;
 
 			weaponInventoryIndices[i] = index;
-			weaponButtonText[i].text = Const.a.stringTable[326 + index];
+			weaponButtonText[i].text = _consts.stringTable[326 + index];
 			int index16 = WeaponFire.Get16WeaponIndexFromConstIndex(index);
-			WeaponButton wepBut = MFDManager.a.wepbutMan.wepButtonsScripts[i];
+			WeaponButton wepBut = _mfdManager.wepbutMan.wepButtonsScripts[i];
 			wepBut.useableItemIndex = index;
 			float egSet = GetDefaultEnergySettingForWeaponFrom16Index(index16);
-			WeaponCurrent.a.weaponEnergySetting[i] = egSet;
+			_weaponCurrent.weaponEnergySetting[i] = egSet;
 			if (i == 0) {
-				WeaponCurrent.a.weaponCurrentPending = i;
-				WeaponCurrent.a.weaponIndexPending = index;
-				WeaponFire.a.StartWeaponDip(0.5f);
+				_weaponCurrent.weaponCurrentPending = i;
+				_weaponCurrent.weaponIndexPending = index;
+				_weaponFire.StartWeaponDip(0.5f);
 
 				// Pop it back to start to be sure
-				WeaponFire.a.reloadContainer.localPosition =
-					WeaponFire.a.reloadContainerHome;
+				_weaponFire.reloadContainer.localPosition =
+					_weaponFire.reloadContainerHome;
 
-				WeaponCurrent.a.justChangedWeap = true;
-				MFDManager.a.SendInfoToItemTab(index); // Notify item tab we
-				MFDManager.a.SendInfoToItemTab(index); // clicked on a weapon.
-				MFDManager.a.UpdateHUDAmmoCountsEither();
-				WeaponFire.a.CompleteWeaponChange();
+				_weaponCurrent.justChangedWeap = true;
+				_mfdManager.SendInfoToItemTab(index); // Notify item tab we
+				_mfdManager.SendInfoToItemTab(index); // clicked on a weapon.
+				_mfdManager.UpdateHUDAmmoCountsEither();
+				_weaponFire.CompleteWeaponChange();
 			}
 
 			if (loadedAlt && ammo2 > 0) {
-				WeaponCurrent.a.currentMagazineAmount2[i] = ammo2;
+				_weaponCurrent.currentMagazineAmount2[i] = ammo2;
 				if (ammo1 > 0) wepAmmo[index16] += ammo1;
 				wepLoadedWithAlternate[i] = true;
 			} else {
-				WeaponCurrent.a.currentMagazineAmount[i] = ammo1;
+				_weaponCurrent.currentMagazineAmount[i] = ammo1;
 				if (ammo2 > 0) wepAmmoSecondary[index16] += ammo2;
 				wepLoadedWithAlternate[i] = false;
 
 			}
 
-			Const.sprint(Const.a.stringTable[index + 326]
-						 + Const.a.stringTable[33]);
+			_consts.sprint(_consts.stringTable[index + 326]
+						 + _consts.stringTable[33]);
 
-			MFDManager.a.NotifyToCenterTab(0);
+			_mfdManager.NotifyToCenterTab(0);
 			return true;
         }
 		return false;
@@ -1826,7 +1834,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		return s1.ToString();
 	}
 
-	public static int Load(GameObject go, ref string[] entries, int index) {
+	public static int Load(Const consts,GameObject go, ref string[] entries, int index) {
 		Inventory inv = go.GetComponent<Inventory>();
 		int j;
 		for (j=0;j<7;j++) { inv.weaponInventoryIndices[j] = Utils.GetIntFromString(entries[index],"weaponInventoryIndices[" + j.ToString() + "]"); index++; }
@@ -1840,7 +1848,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			int dex = inv.weaponInventoryIndices[i];
 			if (dex < 0) continue;
 
-			inv.weaponButtonText[i].text = Const.a.stringTable[dex + 326];
+			inv.weaponButtonText[i].text = consts.stringTable[dex + 326];
 		}
 
 		inv.grenadeCurrent = Utils.GetIntFromString(entries[index],"grenadeCurrent"); index++;
@@ -1861,24 +1869,24 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 		inv.hardwareInvCurrent = Utils.GetIntFromString(entries[index],"hardwareInvCurrent"); index++;
 		inv.hardwareInvIndex = Utils.GetIntFromString(entries[index],"hardwareInvIndex"); index++;
 		for (j=0;j<13;j++) { inv.hardwareIsActive[j] = Utils.GetBoolFromString(entries[index],"hardwareIsActive[" + j.ToString() + "]"); index++; }
-        if (Inventory.a.hasHardware[1]) { // Explicitly check primary instance.
-			MouseLookScript.a.compassContainer.SetActive(true);
-			MouseLookScript.a.automapContainerLH.SetActive(true);
-			MouseLookScript.a.automapContainerRH.SetActive(true);
+        if (inv.hasHardware[1]) { // Explicitly check primary instance.
+			inv._mouseLookScript.compassContainer.SetActive(true);
+			inv._mouseLookScript.automapContainerLH.SetActive(true);
+			inv._mouseLookScript.automapContainerRH.SetActive(true);
 			if (inv.hardwareVersion[1] >= 2) {
-			    MouseLookScript.a.compassMidpoints.SetActive(true);
+			    inv._mouseLookScript.compassMidpoints.SetActive(true);
 			}
 
 			if (inv.hardwareVersion[1] >= 3) {
-				MouseLookScript.a.compassSmallTicks.SetActive(true);
-				MouseLookScript.a.compassLargeTicks.SetActive(true);
+				inv._mouseLookScript.compassSmallTicks.SetActive(true);
+				inv._mouseLookScript.compassLargeTicks.SetActive(true);
 			}
 		} else {
-			MouseLookScript.a.compassContainer.SetActive(false);
-			MouseLookScript.a.automapContainerLH.SetActive(false);
-			MouseLookScript.a.automapContainerRH.SetActive(false);
-			MouseLookScript.a.compassSmallTicks.SetActive(false);
-			MouseLookScript.a.compassLargeTicks.SetActive(false);
+			inv._mouseLookScript.compassContainer.SetActive(false);
+			inv._mouseLookScript.automapContainerLH.SetActive(false);
+			inv._mouseLookScript.automapContainerRH.SetActive(false);
+			inv._mouseLookScript.compassSmallTicks.SetActive(false);
+			inv._mouseLookScript.compassLargeTicks.SetActive(false);
 		}
 
 		
@@ -1902,7 +1910,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
     		
     		if (!inv.hasHardware[j]) {
 				if (button8Index >= 0 && button8Index < 8) {
-					MouseLookScript.a.hardwareButtons[button8Index].SetActive(false);
+					inv._mouseLookScript.hardwareButtons[button8Index].SetActive(false);
 					inv.hardwareButtonManager.SetVersionIconForButton(
 						inv.hardwareIsActive[j],
 						inv.hardwareVersionSetting[j],4
@@ -1914,7 +1922,7 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 				inv.hwButtons[j].SetActive(false);
 			} else {
 				if (button8Index >= 0 && button8Index < 8) {
-					MouseLookScript.a.hardwareButtons[button8Index].SetActive(true);
+					inv._mouseLookScript.hardwareButtons[button8Index].SetActive(true);
 					inv.hardwareButtonManager.SetVersionIconForButton(
 						inv.hardwareIsActive[j],
 						inv.hardwareVersionSetting[j],4
@@ -1971,15 +1979,15 @@ public class Inventory : MonoBehaviour, ISingletonInitializer {
 			int referenceIndex = genbut.useableItemIndex;
 			if (inv.generalInventoryIndexRef[i] > -1) {
 				inv.genButtonsText[i].text =
-					Const.a.stringTable[inv.generalInventoryIndexRef[i] + 326];
+					consts.stringTable[inv.generalInventoryIndexRef[i] + 326];
 			} else {
 				inv.genButtonsText[i].text = string.Empty;
 			}
 
 			if (i == inv.generalInvCurrent) {
-				inv.genButtonsText[i].color = Const.a.ssYellowText; // Yellow
+				inv.genButtonsText[i].color = consts.ssYellowText; // Yellow
 			} else {
-				inv.genButtonsText[i].color = Const.a.ssGreenText; // Green
+				inv.genButtonsText[i].color = consts.ssGreenText; // Green
 			}
 		}
 		inv.currentCyberItem = Utils.GetIntFromString(entries[index],"currentCyberItem"); index++;

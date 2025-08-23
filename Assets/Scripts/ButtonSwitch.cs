@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class ButtonSwitch : MonoBehaviour {
 	// Individually set values per prefab isntance within the scene
@@ -39,7 +40,14 @@ public class ButtonSwitch : MonoBehaviour {
 	[HideInInspector] public float tickFinished; // save
 	[HideInInspector] public bool alternateOn; // save
 	[HideInInspector] public string currentClipName; // save
-	private static StringBuilder s1 = new StringBuilder();
+
+	[Inject]
+	private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private PauseScript _pauseScript;
+
+	private static readonly StringBuilder s1 = new StringBuilder(100 * 1024);
 
 	public void Awake() {
 		if (awakeInitialized) return;
@@ -56,26 +64,26 @@ public class ButtonSwitch : MonoBehaviour {
 			anim.keepAnimatorStateOnDisable = true;
 		}
 		if (active) {
-		    tickFinished = PauseScript.a.relativeTime + 1.5f + Random.value;
+		    tickFinished = _pauseScript.relativeTime + 1.5f + Random.value;
 		}
 		
 		awakeInitialized = true;
 	}
 
 	public void Use (UseData ud) {
-	    if (LevelManager.a.superoverride || Const.a.difficultyMission == 0) {
+	    if (_levelManager.superoverride || _consts.difficultyMission == 0) {
 	        locked = false; // SHODAN can go anywhere!  Full security override!
-	    } else if (LevelManager.a.GetCurrentLevelSecurity()
+	    } else if (_levelManager.GetCurrentLevelSecurity()
 	               > securityThreshhold) {
 	                   
-			MFDManager.a.BlockedBySecurity(transform.position);
+			_mfdManager.BlockedBySecurity(transform.position);
 			return;
 		}
 
 		if (locked) {
-			Const.sprint(lockedMessageLingdex);
-			if (SFXLockedIndex >= 0 && SFXLockedIndex < Const.a.sounds.Length) {
-				Utils.PlayOneShotSavable(SFXSource,Const.a.sounds[SFXLockedIndex]);
+			_consts.sprint(lockedMessageLingdex);
+			if (SFXLockedIndex >= 0 && SFXLockedIndex < _consts.sounds.Length) {
+				Utils.PlayOneShotSavable(SFXSource,_consts.sounds[SFXLockedIndex]);
 			}
 			
 			return;
@@ -83,9 +91,9 @@ public class ButtonSwitch : MonoBehaviour {
 
         // Set playerCamera to owner of the input (always should be the camera)
 		player = ud.owner;
-		Utils.PlayOneShotSavable(SFXSource,Const.a.sounds[SFXIndex]);
-		Const.sprint(messageIndex);
-		if (delay > 0f) delayFinished = PauseScript.a.relativeTime + delay;
+		Utils.PlayOneShotSavable(SFXSource,_consts.sounds[SFXIndex]);
+		_consts.sprint(messageIndex);
+		if (delay > 0f) delayFinished = _pauseScript.relativeTime + delay;
 		else UseTargets();
 	}
 
@@ -102,14 +110,14 @@ public class ButtonSwitch : MonoBehaviour {
 		UseData ud = new UseData();
 		ud.owner = player;
 		ud.argvalue = argvalue;
-		Const.a.UseTargets(gameObject,ud,target);
+		_consts.UseTargets(gameObject,ud,target);
 		active = !active;
 		alternateOn = active;
 		if (changeMatOnActive) {
 			if (blinkWhenActive) {
 				ToggleMaterial ();
 				if (active)
-					tickFinished = PauseScript.a.relativeTime + tickTime;
+					tickFinished = _pauseScript.relativeTime + tickTime;
 			} else {
 				ToggleMaterial ();
 			}
@@ -152,9 +160,9 @@ public class ButtonSwitch : MonoBehaviour {
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused() || _pauseScript.MenuActive()) return;
 
-		if ((delayFinished < PauseScript.a.relativeTime)
+		if ((delayFinished < _pauseScript.relativeTime)
 		    && delayFinished != 0) {
 
 			delayFinished = 0;
@@ -164,13 +172,13 @@ public class ButtonSwitch : MonoBehaviour {
 		// blink the switch when active
 		if (blinkWhenActive) {
 			if (active) {
-				if (tickFinished < PauseScript.a.relativeTime) {
+				if (tickFinished < _pauseScript.relativeTime) {
 					if (mRenderer.isVisible) {
 						if (alternateOn) SetMaterialToAlternate();
 						else SetMaterialToNormal();
 					}
 					alternateOn = !alternateOn;
-					tickFinished = PauseScript.a.relativeTime + tickTime;
+					tickFinished = _pauseScript.relativeTime + tickTime;
 				}
 			}
 		}
@@ -203,9 +211,9 @@ public class ButtonSwitch : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(bs.alternateOn,"alternateOn"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(bs.delayFinished,"delayFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(bs._pauseScript,bs.delayFinished,"delayFinished"));
 	    s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(bs.tickFinished,"tickFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(bs._pauseScript,bs.tickFinished,"tickFinished"));
 		s1.Append(Utils.splitChar);
 		if (bs.animateModel) {
 			if (bs.anim == null) bs.anim = bs.gameObject.GetComponent<Animator>();
@@ -240,15 +248,15 @@ public class ButtonSwitch : MonoBehaviour {
 		bs.lockedMessageLingdex = Utils.GetIntFromString(entries[index],"lockedMessageLingdex"); index++;
 		bs.active = Utils.GetBoolFromString(entries[index],"active"); index++;
 		bs.alternateOn = Utils.GetBoolFromString(entries[index],"alternateOn"); index++;
-		bs.delayFinished = Utils.LoadRelativeTimeDifferential(entries[index],"delayFinished"); index++;
+		bs.delayFinished = Utils.LoadRelativeTimeDifferential(bs._pauseScript,entries[index],"delayFinished"); index++;
 		bs.delayFinished = 0;
 // 		if (bs.delayFinished >= 0.1f) {
-// 			bs.delayFinished = Mathf.Max(Mathf.Max(bs.delayFinished,PauseScript.a.relativeTime + bs.delay),Time.time + bs.delay);
+// 			bs.delayFinished = Mathf.Max(Mathf.Max(bs.delayFinished,_pauseScript.relativeTime + bs.delay),Time.time + bs.delay);
 // 		}
 		
-		bs.tickFinished = Utils.LoadRelativeTimeDifferential(entries[index],"tickFinished"); index++;
-		if ((bs.tickFinished - PauseScript.a.relativeTime) > tickTime) {
-			bs.tickFinished = PauseScript.a.relativeTime + tickTime;
+		bs.tickFinished = Utils.LoadRelativeTimeDifferential(bs._pauseScript,entries[index],"tickFinished"); index++;
+		if ((bs.tickFinished - bs._pauseScript.relativeTime) > tickTime) {
+			bs.tickFinished = bs._pauseScript.relativeTime + tickTime;
 		}
 
 		float animTime = Utils.GetFloatFromString(entries[index],"asi.normalizedTime"); index++;

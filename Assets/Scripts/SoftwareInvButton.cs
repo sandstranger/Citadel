@@ -1,74 +1,81 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class SoftwareInvButton : MonoBehaviour {
 	public int index = 0;
 
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GUIState _guiState;
+	[Inject] private Inventory _inventory;
+	[Inject] private MouseLookScript _mouseLookScript;
+
 	public void DoubleClick() {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		SoftInvClick();
 	}
 
     public void SoftInvClick() {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		switch(index) {
 			case 0:
 					// Drill
-					Inventory.a.pulserButtonText.Select(false);
-					Inventory.a.drillButtonText.Select(true);
-					Inventory.a.isPulserNotDrill = false;
-					Utils.PlayUIOneShotSavable(80); // changeweapon
+					_inventory.pulserButtonText.Select(false);
+					_inventory.drillButtonText.Select(true);
+					_inventory.isPulserNotDrill = false;
+					Utils.PlayUIOneShotSavable(_consts,80); // changeweapon
 					break;
 			case 1:
 					// Pulser
-					Inventory.a.pulserButtonText.Select(true);
-					Inventory.a.drillButtonText.Select(false);
-					Inventory.a.isPulserNotDrill = true;
-					Utils.PlayUIOneShotSavable(80); // changeweapon
+					_inventory.pulserButtonText.Select(true);
+					_inventory.drillButtonText.Select(false);
+					_inventory.isPulserNotDrill = true;
+					Utils.PlayUIOneShotSavable(_consts,80); // changeweapon
 					break;
 			case 2:
 					// CyberShield
-					if (MouseLookScript.a.inCyberSpace) {
-						Const.sprint(Const.a.stringTable[461],Const.a.player1);
+					if (_mouseLookScript.inCyberSpace) {
+						_consts.sprint(_consts.stringTable[461],_consts.Player);
 					} else {
-						Const.sprint(Const.a.stringTable[460],Const.a.player1);
+						_consts.sprint(_consts.stringTable[460],_consts.Player);
 					}
 					break;
 			case 3:
 					// Turbo
-					if (MouseLookScript.a.inCyberSpace) {
-						Inventory.a.UseTurbo();
-						GUIState.a.ClearOverButton();
+					if (_mouseLookScript.inCyberSpace) {
+						_inventory.UseTurbo();
+						_guiState.ClearOverButton();
 					} else {
-						Const.sprint(Const.a.stringTable[460],Const.a.player1);
+						_consts.sprint(_consts.stringTable[460],_consts.Player);
 					}
 					break;
 			case 4:
 					// Decoy
-					if (MouseLookScript.a.inCyberSpace) {
-						Inventory.a.UseDecoy();
-						GUIState.a.ClearOverButton();
+					if (_mouseLookScript.inCyberSpace) {
+						_inventory.UseDecoy();
+						_guiState.ClearOverButton();
 					} else {
-						Const.sprint(Const.a.stringTable[460],Const.a.player1);
+						_consts.sprint(_consts.stringTable[460],_consts.Player);
 					}
 					break;
 			case 5:
 					// Recall
-					if (MouseLookScript.a.inCyberSpace) {
-						Inventory.a.UseRecall();
-						GUIState.a.ClearOverButton();
+					if (_mouseLookScript.inCyberSpace) {
+						_inventory.UseRecall();
+						_guiState.ClearOverButton();
 					} else {
-						Const.sprint(Const.a.stringTable[460],Const.a.player1);
+						_consts.sprint(_consts.stringTable[460],_consts.Player);
 					}
 					break;
 			case 6:
 					// Games
-					if (MouseLookScript.a.inCyberSpace) {
-						Const.sprint(Const.a.stringTable[443],Const.a.player1);
+					if (_mouseLookScript.inCyberSpace) {
+						_consts.sprint(_consts.stringTable[443],_consts.Player);
 					} else {
-						MFDManager.a.OpenMinigames();
-						Const.sprint(Const.a.stringTable[309],Const.a.player1); // Trioptimum Funpack Module, don't play on company time!
+						_mfdManager.OpenMinigames();
+						_consts.sprint(_consts.stringTable[309],_consts.Player); // Trioptimum Funpack Module, don't play on company time!
 					}
 					break;
 		}

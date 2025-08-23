@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class WeaponCurrent : MonoBehaviour {
 	public GameObject ViewModelAssault;
@@ -34,23 +35,25 @@ public class WeaponCurrent : MonoBehaviour {
 													  // energy weapons no
 													  // energy, save
 	[HideInInspector] public bool redbull = false; // No energy usage, save
-	private static StringBuilder s1 = new StringBuilder();
-	
+	private static StringBuilder s1 = new StringBuilder(100);
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Inventory _inventory;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private WeaponFire _weaponFire;
+
 	public int weaponCurrentPending; // save
 	public int weaponIndexPending; // save
 
-	public static WeaponCurrent a;
-
 	void Start() {
-		a = this;
-		a.weaponCurrent = 0; // Current slot in the weapon inventory (7 slots)
-		a.weaponIndex = -1; // Current index to the weapon look-up tables
+		weaponCurrent = 0; // Current slot in the weapon inventory (7 slots)
+		weaponIndex = -1; // Current index to the weapon look-up tables
 
 		// Put energy settings to lowest energy level as default
 		for (int j=0;j<7;j++) {
-			a.weaponEnergySetting[j] = 0f;
-			a.currentMagazineAmount[j] = 0;
-			a.currentMagazineAmount2[j] = 0;
+			weaponEnergySetting[j] = 0f;
+			currentMagazineAmount[j] = 0;
+			currentMagazineAmount2[j] = 0;
 		}
 		weaponCurrentPending = -1;
 		weaponIndexPending = -1;
@@ -73,23 +76,23 @@ public class WeaponCurrent : MonoBehaviour {
 		Utils.Deactivate(ViewModelSkorpion);
 		Utils.Deactivate(ViewModelSparq);
 		Utils.Deactivate(ViewModelStungun);
-		Utils.Deactivate(MFDManager.a.energySliderLH);
-		Utils.Deactivate(MFDManager.a.energyHeatTicksLH);
-		Utils.Deactivate(MFDManager.a.overloadButtonLH);
-		Utils.Deactivate(MFDManager.a.unloadButtonLH);
-		Utils.Deactivate(MFDManager.a.loadNormalAmmoButtonLH);
-		Utils.Deactivate(MFDManager.a.loadAlternateAmmoButtonLH);
+		Utils.Deactivate(_mfdManager.energySliderLH);
+		Utils.Deactivate(_mfdManager.energyHeatTicksLH);
+		Utils.Deactivate(_mfdManager.overloadButtonLH);
+		Utils.Deactivate(_mfdManager.unloadButtonLH);
+		Utils.Deactivate(_mfdManager.loadNormalAmmoButtonLH);
+		Utils.Deactivate(_mfdManager.loadAlternateAmmoButtonLH);
 
-		Utils.Deactivate(MFDManager.a.energySliderRH);
-		Utils.Deactivate(MFDManager.a.energyHeatTicksRH);
-		Utils.Deactivate(MFDManager.a.overloadButtonRH);
-		Utils.Deactivate(MFDManager.a.unloadButtonRH);
-		Utils.Deactivate(MFDManager.a.loadNormalAmmoButtonRH);
-		Utils.Deactivate(MFDManager.a.loadAlternateAmmoButtonRH);
+		Utils.Deactivate(_mfdManager.energySliderRH);
+		Utils.Deactivate(_mfdManager.energyHeatTicksRH);
+		Utils.Deactivate(_mfdManager.overloadButtonRH);
+		Utils.Deactivate(_mfdManager.unloadButtonRH);
+		Utils.Deactivate(_mfdManager.loadNormalAmmoButtonRH);
+		Utils.Deactivate(_mfdManager.loadAlternateAmmoButtonRH);
 	}
 
 	public void RemoveWeapon(int weaponButton7Index) {
-		WeaponButtonsManager wepbutMan = MFDManager.a.wepbutMan;
+		WeaponButtonsManager wepbutMan = _mfdManager.wepbutMan;
 		WeaponButton wepbut = wepbutMan.wepButtonsScripts[0];
 		if (weaponButton7Index != weaponCurrent) {
 			if (weaponButton7Index > weaponCurrent) return; // No list shift.
@@ -99,21 +102,21 @@ public class WeaponCurrent : MonoBehaviour {
 		}
 
 		SetAllViewModelsDeactive();
-		WeaponFire.a.reloadFinished = 0;
-		int initialIndex = WeaponCurrent.a.weaponCurrent;
+		_weaponFire.reloadFinished = 0;
+		int initialIndex = weaponCurrent;
 		if (initialIndex < 0) initialIndex = 0;
 		if (initialIndex > 6) initialIndex = 0;
 		int nextIndex = initialIndex - 1; // add 1 to get slot above this
 		if (nextIndex < 0) nextIndex = 6; // wraparound to top
 		int countCheck = 0;
-		bool buttonNotValid = (Inventory.a.weaponInventoryIndices[nextIndex] == -1);
+		bool buttonNotValid = (_inventory.weaponInventoryIndices[nextIndex] == -1);
 		while (buttonNotValid) {
 			countCheck++;
 			if (countCheck > 13) return; // no weapons!  don't runaway loop
 
 			nextIndex--;
 			if (nextIndex < 0) nextIndex = 6;
-			buttonNotValid = (Inventory.a.weaponInventoryIndices[nextIndex] == -1);
+			buttonNotValid = (_inventory.weaponInventoryIndices[nextIndex] == -1);
 		}
 
 		wepbut = wepbutMan.wepButtonsScripts[nextIndex];
@@ -133,42 +136,42 @@ public class WeaponCurrent : MonoBehaviour {
 		justChangedWeap = true;
 		weaponCurrent = -1;
 		weaponIndex = -1;
-		WeaponFire.a.StartWeaponDip(0);
+		_weaponFire.StartWeaponDip(0);
 		currentMagazineAmount[weaponButton7Index] = 0; // Zero out ammo
 		currentMagazineAmount2[weaponButton7Index] = 0;
-		MFDManager.a.UpdateHUDAmmoCountsEither();
-		MFDManager.a.SetWepInfo(-1);
-		MFDManager.a.OpenTab(0, true, TabMSG.Weapon, 0,Handedness.LH);
+		_mfdManager.UpdateHUDAmmoCountsEither();
+		_mfdManager.SetWepInfo(-1);
+		_mfdManager.OpenTab(0, true, TabMSG.Weapon, 0,Handedness.LH);
 	}
 
 	public void WeaponChange(int useableItemIndex, int buttonIndex) {
-		if (WeaponFire.a.reloadFinished > PauseScript.a.relativeTime) return;
+		if (_weaponFire.reloadFinished > _pauseScript.relativeTime) return;
 		if (useableItemIndex == -1 || buttonIndex > 6 || buttonIndex < 0) {
-			MFDManager.a.SetAmmoIcons(-1,false); // Clear the ammo icons.
+			_mfdManager.SetAmmoIcons(-1,false); // Clear the ammo icons.
 			//Debug.Log("Early exit on WeaponChange() in WeaponCurrent.cs!");
 			return;
 		}
 
-		Utils.PlayUIOneShotSavable(80); // changeweapon
+		Utils.PlayUIOneShotSavable(_consts,80); // changeweapon
 		if (buttonIndex == weaponCurrent) return; // Already there!
 
 		int wep16index =  // Get index into the list of 16 weapons
 			  WeaponFire.Get16WeaponIndexFromConstIndex(useableItemIndex);
 
-		WeaponFire.a.StartWeaponDip(Const.a.reloadTime[wep16index]);
+		_weaponFire.StartWeaponDip(_consts.reloadTime[wep16index]);
 		weaponCurrentPending = buttonIndex;
 		weaponIndexPending = useableItemIndex;
-		MFDManager.a.SetWepInfo(-1);
-		MFDManager.a.UpdateHUDAmmoCountsEither();
+		_mfdManager.SetWepInfo(-1);
+		_mfdManager.UpdateHUDAmmoCountsEither();
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 
 		if (justChangedWeap) {
 			justChangedWeap = false;
-			MFDManager.a.SetAmmoIcons(-1,false); // Clear it.
+			_mfdManager.SetAmmoIcons(-1,false); // Clear it.
 			UpdateWeaponViewModels();
 		}
 
@@ -177,8 +180,8 @@ public class WeaponCurrent : MonoBehaviour {
 	}
 
 	public void UpdateWeaponViewModels() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 
 		int useableIndex = weaponIndex;
 		int setWep = weaponIndex;
@@ -187,27 +190,27 @@ public class WeaponCurrent : MonoBehaviour {
 			useableIndex = -1;
 		}
 
-		MFDManager.a.HideAmmoAndEnergyItems();
+		_mfdManager.HideAmmoAndEnergyItems();
 		SetAllViewModelsDeactive();
 		switch (setWep) {
 			case 36: // "LOAD MAGNESIUM", "LOAD PENETRATOR"
-				MFDManager.a.ShowAmmoItems(539,540);
+				_mfdManager.ShowAmmoItems(539,540);
 				Utils.Activate(ViewModelAssault);
 				break;
 			case 37:
-				MFDManager.a.ShowEnergyItems();
+				_mfdManager.ShowEnergyItems();
 				Utils.Activate(ViewModelBlaster);
 				break;
 			case 38: // "LOAD NEEDLE", "LOAD TRANQ"
-				MFDManager.a.ShowAmmoItems(541,542);
+				_mfdManager.ShowAmmoItems(541,542);
 				Utils.Activate(ViewModelDartgun);
 				break;
 			case 39: // "LOAD HORNET", "LOAD SPLINTER"
-				MFDManager.a.ShowAmmoItems(543,544);
+				_mfdManager.ShowAmmoItems(543,544);
 				Utils.Activate(ViewModelFlechette);
 				break;
 			case 40:
-				MFDManager.a.ShowEnergyItems();
+				_mfdManager.ShowEnergyItems();
 				Utils.Activate(ViewModelIon);
 				break;
 			case 41:
@@ -217,42 +220,42 @@ public class WeaponCurrent : MonoBehaviour {
 				Utils.Activate(ViewModelPipe);
 				break;
 			case 43: // "LOAD HOLLOW TIP", "LOAD HEAVY SLUG"
-				MFDManager.a.ShowAmmoItems(545,546);
+				_mfdManager.ShowAmmoItems(545,546);
 				Utils.Activate(ViewModelMagnum);
 				break;
 			case 44: // "LOAD CARTRIDGE"
-				MFDManager.a.ShowAmmoItems(547,-1);
+				_mfdManager.ShowAmmoItems(547,-1);
 				Utils.Activate(ViewModelMagpulse);
-				MFDManager.a.HideAlternateAmmoButton();
+				_mfdManager.HideAlternateAmmoButton();
 				break;
 			case 45: // "LOAD STANDARD", "LOAD TEFLON"
-				MFDManager.a.ShowAmmoItems(548,549);
+				_mfdManager.ShowAmmoItems(548,549);
 				Utils.Activate(ViewModelPistol);
 				break;
 			case 46:
-				MFDManager.a.ShowEnergyItems();
+				_mfdManager.ShowEnergyItems();
 				Utils.Activate(ViewModelPlasma);
 				break;
 			case 47: // "LOAD RAIL CLIP"
-				MFDManager.a.ShowAmmoItems(550,-1);
+				_mfdManager.ShowAmmoItems(550,-1);
 				Utils.Activate(ViewModelRailgun);
-				MFDManager.a.HideAlternateAmmoButton();
+				_mfdManager.HideAlternateAmmoButton();
 				break;
 			case 48:  // "LOAD RUBBER SLUG"
-				MFDManager.a.ShowAmmoItems(551,-1);
+				_mfdManager.ShowAmmoItems(551,-1);
 				Utils.Activate(ViewModelRiotgun);
-				MFDManager.a.HideAlternateAmmoButton();
+				_mfdManager.HideAlternateAmmoButton();
 				break;
 			case 49: // "LOAD SLAG", "LOAD LARGE SLAG"
-				MFDManager.a.ShowAmmoItems(552,553);
+				_mfdManager.ShowAmmoItems(552,553);
 				Utils.Activate(ViewModelSkorpion);
 				break;
 			case 50:
-				MFDManager.a.ShowEnergyItems();
+				_mfdManager.ShowEnergyItems();
 				Utils.Activate(ViewModelSparq);
 				break;
 			case 51:
-				MFDManager.a.ShowEnergyItems();
+				_mfdManager.ShowEnergyItems();
 				Utils.Activate(ViewModelStungun);
 				break;
 		}
@@ -262,37 +265,37 @@ public class WeaponCurrent : MonoBehaviour {
 		int wep16index = WeaponFire.Get16WeaponIndexFromConstIndex(weaponIndex);
 		if (wep16index < 0) return;
 		if (wep16index == 5 || wep16index == 6) {
-			Const.sprint(315);
+			_consts.sprint(315);
 			return; // Do nothing for pipe or rapier.
 		}
 
 		if (wep16index == 1 || wep16index == 4 || wep16index == 10 || wep16index == 14 || wep16index == 15) {
-			if (MFDManager.a.overloadButtonLH.activeInHierarchy) {
-				MFDManager.a.overloadButtonLH.GetComponent<EnergyOverloadButton>().OverloadButtonAction();
+			if (_mfdManager.overloadButtonLH.activeInHierarchy) {
+				_mfdManager.overloadButtonLH.GetComponent<EnergyOverloadButton>().OverloadButtonAction();
 			}
 
-			if (MFDManager.a.overloadButtonRH.activeInHierarchy) {
-				MFDManager.a.overloadButtonRH.GetComponent<EnergyOverloadButton>().OverloadButtonAction();
+			if (_mfdManager.overloadButtonRH.activeInHierarchy) {
+				_mfdManager.overloadButtonRH.GetComponent<EnergyOverloadButton>().OverloadButtonAction();
 			}
 		} else {
-			if (Inventory.a.wepLoadedWithAlternate[weaponCurrent]) {
-				if (Inventory.a.wepAmmo[wep16index] > 0) {
-				Inventory.a.wepLoadedWithAlternate[weaponCurrent] = false;
+			if (_inventory.wepLoadedWithAlternate[weaponCurrent]) {
+				if (_inventory.wepAmmo[wep16index] > 0) {
+				_inventory.wepLoadedWithAlternate[weaponCurrent] = false;
 				// Take bullets out of the clip, put them back into the ammo stockpile, then zero out the clip amount, did I say clip?  I mean magazine but whatever
-				Inventory.a.wepAmmoSecondary[wep16index] += currentMagazineAmount2[weaponCurrent];
+				_inventory.wepAmmoSecondary[wep16index] += currentMagazineAmount2[weaponCurrent];
 				currentMagazineAmount2[weaponCurrent] = 0;
 				LoadPrimaryAmmoType(false);
 				} else {
-					Const.sprint(535); //No more of ammo type to load.
+					_consts.sprint(535); //No more of ammo type to load.
 				}
 			} else {
-				if (Inventory.a.wepAmmoSecondary[wep16index] > 0) {
-					Inventory.a.wepLoadedWithAlternate[weaponCurrent] = true;
-					Inventory.a.wepAmmo[wep16index] += currentMagazineAmount[weaponCurrent];
+				if (_inventory.wepAmmoSecondary[wep16index] > 0) {
+					_inventory.wepLoadedWithAlternate[weaponCurrent] = true;
+					_inventory.wepAmmo[wep16index] += currentMagazineAmount[weaponCurrent];
 					currentMagazineAmount[weaponCurrent] = 0;
 					LoadSecondaryAmmoType(false);
 				} else {
-					Const.sprint(535); //No more of ammo type to load.
+					_consts.sprint(535); //No more of ammo type to load.
 				}
 			}
 		}
@@ -300,90 +303,90 @@ public class WeaponCurrent : MonoBehaviour {
 
 	public void LoadPrimaryAmmoType(bool isSilent) {
 		int wep16index = WeaponFire.Get16WeaponIndexFromConstIndex(weaponIndex);
-		if (!Inventory.a.wepLoadedWithAlternate[weaponCurrent]) { // Already loaded with normal.
-			if (currentMagazineAmount[weaponCurrent] == Const.a.magazinePitchCountForWeapon[wep16index]) {
-				Const.sprint(191); //Current weapon magazine already full.
+		if (!_inventory.wepLoadedWithAlternate[weaponCurrent]) { // Already loaded with normal.
+			if (currentMagazineAmount[weaponCurrent] == _consts.magazinePitchCountForWeapon[wep16index]) {
+				_consts.sprint(191); //Current weapon magazine already full.
 				return;
 			}
 			
-			if (currentMagazineAmount[weaponCurrent] == Inventory.a.wepAmmo[wep16index]) {
-				Const.sprint(535); // No more of ammo type to load
+			if (currentMagazineAmount[weaponCurrent] == _inventory.wepAmmo[wep16index]) {
+				_consts.sprint(535); // No more of ammo type to load
 				return;
 			}
 		}
 
 		Unload(true);
-		Inventory.a.wepLoadedWithAlternate[weaponCurrent] = false;
+		_inventory.wepLoadedWithAlternate[weaponCurrent] = false;
 
 		// Put bullets into the magazine
-		if (Inventory.a.wepAmmo[wep16index] >= Const.a.magazinePitchCountForWeapon[wep16index]) {
-			currentMagazineAmount[weaponCurrent] = Const.a.magazinePitchCountForWeapon[wep16index];
+		if (_inventory.wepAmmo[wep16index] >= _consts.magazinePitchCountForWeapon[wep16index]) {
+			currentMagazineAmount[weaponCurrent] = _consts.magazinePitchCountForWeapon[wep16index];
 		} else {
-			currentMagazineAmount[weaponCurrent] = Inventory.a.wepAmmo[wep16index];
+			currentMagazineAmount[weaponCurrent] = _inventory.wepAmmo[wep16index];
 		}
 
 		// Take bullets out of the ammo stockpile
-		Inventory.a.wepAmmo[wep16index] -= currentMagazineAmount[weaponCurrent];
+		_inventory.wepAmmo[wep16index] -= currentMagazineAmount[weaponCurrent];
 
 		if (!isSilent) {
 			if (wep16index == 0 || wep16index == 3) {
-				Utils.PlayUIOneShotSavable(248); // wlocknload
+				Utils.PlayUIOneShotSavable(_consts,248); // wlocknload
 			} else {
-				Utils.PlayUIOneShotSavable(260); // wreload
+				Utils.PlayUIOneShotSavable(_consts,260); // wreload
 			}
 		}
 
 		// Update the counter on the HUD
-		MFDManager.a.UpdateHUDAmmoCounts(currentMagazineAmount[weaponCurrent]);
-		WeaponFire.a.StartWeaponDip(Const.a.reloadTime[wep16index]);
+		_mfdManager.UpdateHUDAmmoCounts(currentMagazineAmount[weaponCurrent]);
+		_weaponFire.StartWeaponDip(_consts.reloadTime[wep16index]);
 
 		// Pop it back to start to be sure
-		WeaponFire.a.reloadContainer.localPosition =
-			WeaponFire.a.reloadContainerHome;
+		_weaponFire.reloadContainer.localPosition =
+			_weaponFire.reloadContainerHome;
 	}
 
 	public void LoadSecondaryAmmoType(bool isSilent) {
 		int wep16index = WeaponFire.Get16WeaponIndexFromConstIndex(weaponIndex);
-		if (Inventory.a.wepLoadedWithAlternate[weaponCurrent]) { // Already loaded with alternate
-			if (currentMagazineAmount2[weaponCurrent] == Const.a.magazinePitchCountForWeapon2[wep16index]) {
-				Const.sprint(191); //Current weapon magazine already full.
+		if (_inventory.wepLoadedWithAlternate[weaponCurrent]) { // Already loaded with alternate
+			if (currentMagazineAmount2[weaponCurrent] == _consts.magazinePitchCountForWeapon2[wep16index]) {
+				_consts.sprint(191); //Current weapon magazine already full.
 				return;
 			}
 			
-			if (currentMagazineAmount2[weaponCurrent] == Inventory.a.wepAmmoSecondary[wep16index]) {
-				Const.sprint(535); // No more of ammo type to load
+			if (currentMagazineAmount2[weaponCurrent] == _inventory.wepAmmoSecondary[wep16index]) {
+				_consts.sprint(535); // No more of ammo type to load
 				return;
 			}
 		}
 
 		Unload(true);
-		Inventory.a.wepLoadedWithAlternate[weaponCurrent] = true;
+		_inventory.wepLoadedWithAlternate[weaponCurrent] = true;
 
 		// Put bullets into the magazine
-		if (Inventory.a.wepAmmoSecondary[wep16index] >= Const.a.magazinePitchCountForWeapon2[wep16index]) {
-			currentMagazineAmount2[weaponCurrent] = Const.a.magazinePitchCountForWeapon2[wep16index];
+		if (_inventory.wepAmmoSecondary[wep16index] >= _consts.magazinePitchCountForWeapon2[wep16index]) {
+			currentMagazineAmount2[weaponCurrent] = _consts.magazinePitchCountForWeapon2[wep16index];
 		} else {
-			currentMagazineAmount2[weaponCurrent] = Inventory.a.wepAmmoSecondary[wep16index];
+			currentMagazineAmount2[weaponCurrent] = _inventory.wepAmmoSecondary[wep16index];
 		}
 
 		// Take bullets out of the ammo stockpile
-		Inventory.a.wepAmmoSecondary[wep16index] -= currentMagazineAmount2[weaponCurrent];
+		_inventory.wepAmmoSecondary[wep16index] -= currentMagazineAmount2[weaponCurrent];
 
 		if (!isSilent) {
 			if (wep16index == 0 || wep16index == 3) {
-				Utils.PlayUIOneShotSavable(248); // wlocknload
+				Utils.PlayUIOneShotSavable(_consts,248); // wlocknload
 			} else {
-				Utils.PlayUIOneShotSavable(260); // wreload
+				Utils.PlayUIOneShotSavable(_consts,260); // wreload
 			}
 		}
 
 		// Update the counter on the HUD
-		MFDManager.a.UpdateHUDAmmoCounts(currentMagazineAmount2[weaponCurrent]);
-		WeaponFire.a.StartWeaponDip(Const.a.reloadTime[wep16index]);
+		_mfdManager.UpdateHUDAmmoCounts(currentMagazineAmount2[weaponCurrent]);
+		_weaponFire.StartWeaponDip(_consts.reloadTime[wep16index]);
 
 		// Pop it back to start to be sure
-		WeaponFire.a.reloadContainer.localPosition =
-			WeaponFire.a.reloadContainerHome;
+		_weaponFire.reloadContainer.localPosition =
+			_weaponFire.reloadContainerHome;
 	}
 
 	public void Unload(bool isSilent) {
@@ -396,20 +399,20 @@ public class WeaponCurrent : MonoBehaviour {
 		if (wep16index == -1) return; // we don't have a weapon at all right now :)
 
 		// Take bullets out of the clip, put them back into the ammo stockpile, then zero out the clip amount, did I say clip?  I mean magazine but whatever
-		if (Inventory.a.wepLoadedWithAlternate[weaponCurrent]) {
-			Inventory.a.wepAmmoSecondary[wep16index] += currentMagazineAmount2[weaponCurrent];
+		if (_inventory.wepLoadedWithAlternate[weaponCurrent]) {
+			_inventory.wepAmmoSecondary[wep16index] += currentMagazineAmount2[weaponCurrent];
 			currentMagazineAmount2[weaponCurrent] = 0;
 
 			// Update the counter on the HUD
-			MFDManager.a.UpdateHUDAmmoCounts(currentMagazineAmount2[weaponCurrent]);
+			_mfdManager.UpdateHUDAmmoCounts(currentMagazineAmount2[weaponCurrent]);
 		} else {
-			Inventory.a.wepAmmo[wep16index] += currentMagazineAmount[weaponCurrent];
+			_inventory.wepAmmo[wep16index] += currentMagazineAmount[weaponCurrent];
 			currentMagazineAmount[weaponCurrent] = 0;
 
 			// Update the counter on the HUD
-			MFDManager.a.UpdateHUDAmmoCounts(currentMagazineAmount[weaponCurrent]);
+			_mfdManager.UpdateHUDAmmoCounts(currentMagazineAmount[weaponCurrent]);
 		}
-		if (!isSilent) Utils.PlayUIOneShotSavable(260); // wreload
+		if (!isSilent) Utils.PlayUIOneShotSavable(_consts,260); // wreload
 	}
 
 	public void ReloadSecret(bool isSilent) {
@@ -417,46 +420,46 @@ public class WeaponCurrent : MonoBehaviour {
 		if (wep16index < 0) return;
 
 		if (wep16index == 5 || wep16index == 6) {
-			Const.sprint(315); // Weapon does not use ammo.
+			_consts.sprint(315); // Weapon does not use ammo.
 			return; // do nothing for pipe or rapier
 		}
 
 		if (wep16index == 1 || wep16index == 4 || wep16index == 10 || wep16index == 14 || wep16index == 15) {
-			Const.sprint(538); // Weapon does not need reloaded.
+			_consts.sprint(538); // Weapon does not need reloaded.
 			return; // do nothing for energy weapons
 		}
 
 		if (weaponCurrent < 0) return;
 
-		if (Inventory.a.wepLoadedWithAlternate[weaponCurrent]) {
-			if (currentMagazineAmount2[weaponCurrent] == Const.a.magazinePitchCountForWeapon2[wep16index]) {
-				Const.sprint(191); //Current weapon magazine already full.
+		if (_inventory.wepLoadedWithAlternate[weaponCurrent]) {
+			if (currentMagazineAmount2[weaponCurrent] == _consts.magazinePitchCountForWeapon2[wep16index]) {
+				_consts.sprint(191); //Current weapon magazine already full.
 				return;
 			}
 
-			if (Inventory.a.wepAmmoSecondary[wep16index] <= 0) {
-				if (Inventory.a.wepAmmo[wep16index] <= 0) {
-					Const.sprint(305); //No more of any ammo type to load.
+			if (_inventory.wepAmmoSecondary[wep16index] <= 0) {
+				if (_inventory.wepAmmo[wep16index] <= 0) {
+					_consts.sprint(305); //No more of any ammo type to load.
 					return;
 				} else {
-					Const.sprint(192); //No more of current ammo type to load, loading with alternate.
+					_consts.sprint(192); //No more of current ammo type to load, loading with alternate.
 					LoadPrimaryAmmoType(isSilent);
 					return;
 				}
 			}
 			LoadSecondaryAmmoType(isSilent);
 		} else {
-			if (currentMagazineAmount[weaponCurrent] == Const.a.magazinePitchCountForWeapon[wep16index]) {
-				Const.sprint(191); //Current weapon magazine already full.
+			if (currentMagazineAmount[weaponCurrent] == _consts.magazinePitchCountForWeapon[wep16index]) {
+				_consts.sprint(191); //Current weapon magazine already full.
 				return;
 			}
 
-			if (Inventory.a.wepAmmo[wep16index] <= 0) {
-				if (Inventory.a.wepAmmoSecondary[wep16index] <= 0) {
-					Const.sprint(305); //No more of any ammo type to load.
+			if (_inventory.wepAmmo[wep16index] <= 0) {
+				if (_inventory.wepAmmoSecondary[wep16index] <= 0) {
+					_consts.sprint(305); //No more of any ammo type to load.
 					return;
 				} else {
-					Const.sprint(192); //No more of current ammo type to load, loading with alternate.
+					_consts.sprint(192); //No more of current ammo type to load, loading with alternate.
 					LoadSecondaryAmmoType(isSilent);
 					return;
 				}

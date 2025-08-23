@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Zenject;
 using UnityEngine.EventSystems;
 
 public class KeycodeButton : MonoBehaviour {
@@ -9,6 +10,9 @@ public class KeycodeButton : MonoBehaviour {
 	public int index;
 	private EventTrigger evenT;
 	private bool pointerEntered;
+
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GUIState _guiState;
 
 	void Awake() {
 		pointerEntered = false;
@@ -42,19 +46,19 @@ public class KeycodeButton : MonoBehaviour {
 	public void PtrEnter () {
 		if (pointerEntered) return;
 
-		GUIState.a.PtrHandler(true,true,ButtonType.Generic,gameObject);
+		_guiState.PtrHandler(true,true,ButtonType.Generic,gameObject);
 		pointerEntered = true;
 	}
 
 	public void PtrExit () {
 		if (!pointerEntered) return;
 
-		GUIState.a.ClearOverButton();
+		_guiState.ClearOverButton();
 		pointerEntered = false;
 	}
 
 	public void KeycodeButtonClick () {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		KeycodeButtonUse();
 	}
 

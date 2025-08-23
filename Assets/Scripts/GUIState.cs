@@ -9,17 +9,15 @@ using Citadel.Game;
 // Prevents shooting through the UI when using the UI on the HUD.
 // Handles data about what is under the cursor for different button
 // interactions such as right clicking as parsed by MouseLookScript.
-public class GUIState : MonoBehaviour, ISingletonInitializer {
+public class GUIState : MonoBehaviour {
 	[SerializeField] public bool isBlocking = false;
-	public static GUIState a;
 	public ButtonType overButtonType = ButtonType.None;
 	public bool overButton;
 	[HideInInspector] public GameObject currentButton;
 	private static readonly StringBuilder s1 = new(100 * 1024);
 
-	public void Initialize()
+	private void Awake()
 	{
-		a = this;
 		ClearOverButton();
 	}
 	

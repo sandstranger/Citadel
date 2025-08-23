@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Citadel.Game;
+using Citadel.SceneManagement;
+using Zenject;
 using UnityEngine;
 
 // CHEAT CODES you cheaty cheatface you!
@@ -13,22 +17,39 @@ using UnityEngine;
 // arrow or down arrow to change the entered text to the commands in memory.
 //
 // Does not support tab completion!  What do I look like a wizard?
-public static class ConsoleEmulator {
-	public static string[] lastCommand;
-	public static int consoleMemdex;
-	public static GameObject lastSpawnedGO;
+public sealed class ConsoleEmulator : SingletonHelper<ConsoleEmulator> {
+	public readonly string[] lastCommand = new string[7];
+	[HideInInspector]
+	public int consoleMemdex;
+	[HideInInspector]
+	public GameObject lastSpawnedGO;
 
-	public static void ConsoleUpdate() {
-        if (GetInput.a.Console()) PlayerMovement.a.ToggleConsole();
-		if (PlayerMovement.a.consoleActivated) {
+	[Inject]
+	private LevelManager _levelManager;
+	[Inject]
+	private Const _consts;
+	[Inject]
+	private Config _config;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GetInput _getInput;
+	[Inject] private Inventory _inventory;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private LevelEditor _levelEditor;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerMovement _playerMovement;
+	[Inject] private WeaponCurrent _weaponCurrent;
 
-			if (!String.IsNullOrEmpty(PlayerMovement.a.consoleentryText.text)) {
-				if (PlayerMovement.a.consoleplaceholderText.activeSelf) {
-                    PlayerMovement.a.consoleplaceholderText.SetActive(false);
+	public void ConsoleUpdate() {
+        if (_getInput.Console()) _playerMovement.ToggleConsole();
+		if (_playerMovement.consoleActivated) {
+
+			if (!String.IsNullOrEmpty(_playerMovement.consoleentryText.text)) {
+				if (_playerMovement.consoleplaceholderText.activeSelf) {
+                    _playerMovement.consoleplaceholderText.SetActive(false);
                 }
 			} else {
-				if (!PlayerMovement.a.consoleplaceholderText.activeSelf) {
-                    PlayerMovement.a.consoleplaceholderText.SetActive(true);
+				if (!_playerMovement.consoleplaceholderText.activeSelf) {
+                    _playerMovement.consoleplaceholderText.SetActive(true);
                 }
 			}
 
@@ -37,9 +58,9 @@ public static class ConsoleEmulator {
 			if ((Input.GetKeyUp(KeyCode.Return)
                   || Input.GetKeyUp(KeyCode.KeypadEnter)
 				  || Input.GetKeyDown(KeyCode.JoystickButton0))
-                && !PauseScript.a.mainMenu.activeSelf == true) {
+                && !_pauseScript.mainMenu.activeSelf == true) {
 
-          	    string enteredText = PlayerMovement.a.consoleinpFd.text;
+          	    string enteredText = _playerMovement.consoleinpFd.text;
                 ConsoleEntry(enteredText);
             }
 
@@ -47,63 +68,63 @@ public static class ConsoleEmulator {
 				Input.GetKeyDown(KeyCode.RightControl)) {
 
 				if (Input.GetKeyUp(KeyCode.U)) {
-					PlayerMovement.a.consoleinpFd.text = "";
+					_playerMovement.consoleinpFd.text = "";
 				}
 			}
 
 		} else {
-			if (PlayerMovement.a.consoleplaceholderText.activeSelf) {
-                PlayerMovement.a.consoleplaceholderText.SetActive(false);
+			if (_playerMovement.consoleplaceholderText.activeSelf) {
+                _playerMovement.consoleplaceholderText.SetActive(false);
             }
 		}
 	}
 
-    private static void SetToCommandMoreDistant() {
-		string val = PlayerMovement.a.lastCommand0;
+    private void SetToCommandMoreDistant() {
+		string val = _playerMovement.lastCommand0;
 		switch(consoleMemdex) {
-			case 0: val = PlayerMovement.a.lastCommand0; break;
-			case 1: val = PlayerMovement.a.lastCommand1; break;
-			case 2: val = PlayerMovement.a.lastCommand2; break;
-			case 3: val = PlayerMovement.a.lastCommand3; break;
-			case 4: val = PlayerMovement.a.lastCommand4; break;
-			case 5: val = PlayerMovement.a.lastCommand5; break;
-			case 6: val = PlayerMovement.a.lastCommand6; break;
+			case 0: val = _playerMovement.lastCommand0; break;
+			case 1: val = _playerMovement.lastCommand1; break;
+			case 2: val = _playerMovement.lastCommand2; break;
+			case 3: val = _playerMovement.lastCommand3; break;
+			case 4: val = _playerMovement.lastCommand4; break;
+			case 5: val = _playerMovement.lastCommand5; break;
+			case 6: val = _playerMovement.lastCommand6; break;
 		}
 
         if (string.IsNullOrWhiteSpace(val)) return;
 
-        PlayerMovement.a.consoleinpFd.text = val;
-		PlayerMovement.a.consoleinpFd.MoveTextEnd(false);
-		PlayerMovement.a.consoleinpFd.selectionAnchorPosition = PlayerMovement.a.consoleinpFd.caretPosition;
-		PlayerMovement.a.consoleinpFd.selectionFocusPosition = PlayerMovement.a.consoleinpFd.caretPosition;
+        _playerMovement.consoleinpFd.text = val;
+		_playerMovement.consoleinpFd.MoveTextEnd(false);
+		_playerMovement.consoleinpFd.selectionAnchorPosition = _playerMovement.consoleinpFd.caretPosition;
+		_playerMovement.consoleinpFd.selectionFocusPosition = _playerMovement.consoleinpFd.caretPosition;
         consoleMemdex++;
         if (consoleMemdex > 6) consoleMemdex = 6;
     }
 
-    private static void SetToCommandMoreRecent() {
+    private void SetToCommandMoreRecent() {
 		if (consoleMemdex <= 0) return;
 
-		string val = PlayerMovement.a.lastCommand0;
+		string val = _playerMovement.lastCommand0;
 		switch(consoleMemdex) {
-			case 0: val = PlayerMovement.a.lastCommand0; break;
-			case 1: val = PlayerMovement.a.lastCommand1; break;
-			case 2: val = PlayerMovement.a.lastCommand2; break;
-			case 3: val = PlayerMovement.a.lastCommand3; break;
-			case 4: val = PlayerMovement.a.lastCommand4; break;
-			case 5: val = PlayerMovement.a.lastCommand5; break;
-			case 6: val = PlayerMovement.a.lastCommand6; break;
+			case 0: val = _playerMovement.lastCommand0; break;
+			case 1: val = _playerMovement.lastCommand1; break;
+			case 2: val = _playerMovement.lastCommand2; break;
+			case 3: val = _playerMovement.lastCommand3; break;
+			case 4: val = _playerMovement.lastCommand4; break;
+			case 5: val = _playerMovement.lastCommand5; break;
+			case 6: val = _playerMovement.lastCommand6; break;
 		}
         if (string.IsNullOrWhiteSpace(val)) { consoleMemdex = 0; return; }
 
-        PlayerMovement.a.consoleinpFd.text = val;
-		PlayerMovement.a.consoleinpFd.MoveTextEnd(false);
-		PlayerMovement.a.consoleinpFd.selectionAnchorPosition = PlayerMovement.a.consoleinpFd.caretPosition;
-		PlayerMovement.a.consoleinpFd.selectionFocusPosition = PlayerMovement.a.consoleinpFd.caretPosition;
+        _playerMovement.consoleinpFd.text = val;
+		_playerMovement.consoleinpFd.MoveTextEnd(false);
+		_playerMovement.consoleinpFd.selectionAnchorPosition = _playerMovement.consoleinpFd.caretPosition;
+		_playerMovement.consoleinpFd.selectionFocusPosition = _playerMovement.consoleinpFd.caretPosition;
         consoleMemdex--;
         if (consoleMemdex < 0) consoleMemdex = 0;
     }
 
-    private static void ShiftLastCommand(string entry) {
+    private void ShiftLastCommand(string entry) {
         if (string.IsNullOrWhiteSpace(entry)) return; // Only remember real cmd.
 
         lastCommand[6] = lastCommand[5];
@@ -115,80 +136,80 @@ public static class ConsoleEmulator {
         lastCommand[0] = entry;
     }
 
-	public static void ConsoleEntryEnter() {
-		string enteredText = PlayerMovement.a.consoleinpFd.text;
+	public void ConsoleEntryEnter() {
+		string enteredText = _playerMovement.consoleinpFd.text;
 		if (String.IsNullOrEmpty(enteredText)) return;
 
 		ConsoleEntry(enteredText);
 	}
 
-	static void EnterNoclip() {
-		PlayerMovement.a.CheatNoclip = true;
-		PlayerMovement.a.grounded = false;
-		PlayerMovement.a.rbody.useGravity = false;
-		Utils.DisableCapsuleCollider(PlayerMovement.a.capsuleCollider);
-		Utils.DisableCapsuleCollider(PlayerMovement.a.leanCapsuleCollider);
-		Utils.DisableSphereCollider(PlayerMovement.a.cyberCollider);
-		Const.sprint("noclip " + Const.a.stringTable[1000]); // "ACTIVATED"
+	void EnterNoclip() {
+		_playerMovement.CheatNoclip = true;
+		_playerMovement.grounded = false;
+		_playerMovement.rbody.useGravity = false;
+		Utils.DisableCapsuleCollider(_playerMovement.capsuleCollider);
+		Utils.DisableCapsuleCollider(_playerMovement.leanCapsuleCollider);
+		Utils.DisableSphereCollider(_playerMovement.cyberCollider);
+		_consts.sprint("noclip " + _consts.stringTable[1000]); // "ACTIVATED"
 	}
 
-	static void ExitNoclip() {
-		PlayerMovement.a.CheatNoclip = false;
-		PlayerMovement.a.grounded = false;
-		if (PlayerMovement.a.inCyberSpace) {
-			Utils.EnableSphereCollider(PlayerMovement.a.cyberCollider);
+	void ExitNoclip() {
+		_playerMovement.CheatNoclip = false;
+		_playerMovement.grounded = false;
+		if (_playerMovement.inCyberSpace) {
+			Utils.EnableSphereCollider(_playerMovement.cyberCollider);
 		} else {
-			Utils.EnableCapsuleCollider(PlayerMovement.a.capsuleCollider);
-			Utils.EnableCapsuleCollider(PlayerMovement.a.leanCapsuleCollider);
+			Utils.EnableCapsuleCollider(_playerMovement.capsuleCollider);
+			Utils.EnableCapsuleCollider(_playerMovement.leanCapsuleCollider);
 		}
-		Const.sprint("noclip " + Const.a.stringTable[717]); // "DISABLED"
+		_consts.sprint("noclip " + _consts.stringTable[717]); // "DISABLED"
 	}
 
-    private static void ConsoleEntry(string entry) {
+    private void ConsoleEntry(string entry) {
         ShiftLastCommand(entry);
 		consoleMemdex = 0;
 		string ts = entry.ToLower(); // test string = lower case text
 		string tn = entry; // test number = number searching
         if (ts.Contains("noclip") || ts.Contains("idclip")
             || ts.Contains("no clip")) {
-			if (PlayerMovement.a.CheatNoclip) {
+			if (_playerMovement.CheatNoclip) {
 				ExitNoclip();
 			} else {
 				EnterNoclip();
 			}
         } else if (ts.Contains("editmode") || ts.Contains("edit mode")
 			 || ts.Contains("editor")) {
-			Const.a.editMode = !Const.a.editMode;
-			if (Const.a.editMode) {
-				Const.sprint(Const.a.stringTable[998]); // "Edit Mode activated! The current level can be shaped to your heart's content!"
+			_consts.editMode = !_consts.editMode;
+			if (_consts.editMode) {
+				_consts.sprint(_consts.stringTable[998]); // "Edit Mode activated! The current level can be shaped to your heart's content!"
 				EnterNoclip();
-				PlayerMovement.a.Notarget = true;
+				_playerMovement.Notarget = true;
 			}
 
-			if (!Const.a.editMode) {
-				Const.sprint(Const.a.stringTable[999]); // "Edit Mode deactivated, normal play"
-				LevelEditor.a.EditorExit();
+			if (!_consts.editMode) {
+				_consts.sprint(_consts.stringTable[999]); // "Edit Mode deactivated, normal play"
+				_levelEditor.EditorExit();
 				ExitNoclip();
-				PlayerMovement.a.Notarget = false;
+				_playerMovement.Notarget = false;
 			}
         } else if (ts.Contains("notarget") || ts.Contains("no target")) {
-			if (PlayerMovement.a.Notarget) {
-				PlayerMovement.a.Notarget = false;
-				Const.sprint("notarget " + Const.a.stringTable[717]); // "DISABLED"
+			if (_playerMovement.Notarget) {
+				_playerMovement.Notarget = false;
+				_consts.sprint("notarget " + _consts.stringTable[717]); // "DISABLED"
 			} else {
-				PlayerMovement.a.Notarget = true;
-				Const.sprint("notarget " + Const.a.stringTable[1000]); // "ACTIVATED"
+				_playerMovement.Notarget = true;
+				_consts.sprint("notarget " + _consts.stringTable[1000]); // "ACTIVATED"
 			}
         } else if (ts.Contains("god")
                    || (ts.Contains("power") && ts.Contains("overwhelming"))
                    || ts.Contains("whosyourdaddy")
                    || ts.Contains("iddqd")) {
-			if (PlayerMovement.a.hm.god) {
-				Const.sprint("god mode " + Const.a.stringTable[717]); // "DISABLED"
-				PlayerMovement.a.hm.god = false;
+			if (_playerMovement.hm.god) {
+				_consts.sprint("god mode " + _consts.stringTable[717]); // "DISABLED"
+				_playerMovement.hm.god = false;
 			} else {
-				Const.sprint("god mode " + Const.a.stringTable[1000]); // "ACTIVATED"
-				PlayerMovement.a.hm.god = true;
+				_consts.sprint("god mode " + _consts.stringTable[1000]); // "ACTIVATED"
+				_playerMovement.hm.god = true;
 			}
         } else if (ts.Contains("load") && (tn.Contains("0") || ts.Contains("loadr") || ts.Contains("load r")) && !ts.Contains("10") && !ts.Contains("arsenal")) CheatLoadLevel(0);
         else if (ts.Contains("load") && tn.Contains("1") && !ts.Contains("10") && !ts.Contains("11") && !ts.Contains("12")  && !ts.Contains("13") && !ts.Contains("g1") && !ts.Contains("arsenal"))  CheatLoadLevel(1);
@@ -207,228 +228,228 @@ public static class ConsoleEmulator {
         else if (ts.Contains("load") && ts.Contains("11") && !ts.Contains("arsenal")) CheatLoadLevel(11);
         else if (ts.Contains("load") && ts.Contains("12") && !ts.Contains("arsenal")) CheatLoadLevel(12);
 		else if (ts.Contains("load") && ts.Contains("g3") && !ts.Contains("arsenal")) {
-			Const.sprint(Const.a.stringTable[1001]); // "Gamma grove already jettisoned!  Those poor arrogant people."
+			_consts.sprint(_consts.stringTable[1001]); // "Gamma grove already jettisoned!  Those poor arrogant people."
 		} else if (ts.Contains("load") && ts.Contains("arsenal")) {
             if (ts.Contains("arsenalr") || ts.Contains("arsenal r") || ts.Contains("0"))
-                                        PlayerMovement.a.EnableCheatArsenal(0);
-            else if (ts.Contains("1"))  PlayerMovement.a.EnableCheatArsenal(1);
-            else if (ts.Contains("2"))  PlayerMovement.a.EnableCheatArsenal(2);
-            else if (ts.Contains("3"))  PlayerMovement.a.EnableCheatArsenal(3);
-            else if (ts.Contains("4"))  PlayerMovement.a.EnableCheatArsenal(4);
-            else if (ts.Contains("5"))  PlayerMovement.a.EnableCheatArsenal(5);
-            else if (ts.Contains("6"))  PlayerMovement.a.EnableCheatArsenal(6);
-            else if (ts.Contains("7"))  PlayerMovement.a.EnableCheatArsenal(7);
-            else if (ts.Contains("8"))  PlayerMovement.a.EnableCheatArsenal(8);
-            else if (ts.Contains("9"))  PlayerMovement.a.EnableCheatArsenal(9);
-            else if (ts.Contains("g1")) PlayerMovement.a.EnableCheatArsenal(10);
-            else if (ts.Contains("g2")) PlayerMovement.a.EnableCheatArsenal(11);
-            else if (ts.Contains("g4")) PlayerMovement.a.EnableCheatArsenal(12);
+                                        _playerMovement.EnableCheatArsenal(0);
+            else if (ts.Contains("1"))  _playerMovement.EnableCheatArsenal(1);
+            else if (ts.Contains("2"))  _playerMovement.EnableCheatArsenal(2);
+            else if (ts.Contains("3"))  _playerMovement.EnableCheatArsenal(3);
+            else if (ts.Contains("4"))  _playerMovement.EnableCheatArsenal(4);
+            else if (ts.Contains("5"))  _playerMovement.EnableCheatArsenal(5);
+            else if (ts.Contains("6"))  _playerMovement.EnableCheatArsenal(6);
+            else if (ts.Contains("7"))  _playerMovement.EnableCheatArsenal(7);
+            else if (ts.Contains("8"))  _playerMovement.EnableCheatArsenal(8);
+            else if (ts.Contains("9"))  _playerMovement.EnableCheatArsenal(9);
+            else if (ts.Contains("g1")) _playerMovement.EnableCheatArsenal(10);
+            else if (ts.Contains("g2")) _playerMovement.EnableCheatArsenal(11);
+            else if (ts.Contains("g4")) _playerMovement.EnableCheatArsenal(12);
             else if (ts.Contains("g3")) {
-                Const.sprint(Const.a.stringTable[1001]); // "Gamma grove already jettisoned!  Those poor arrogant people."
+                _consts.sprint(_consts.stringTable[1001]); // "Gamma grove already jettisoned!  Those poor arrogant people."
             }
         } else if (ts.Contains("bottomless") && ts.Contains("clip")) { // bottomlessclip
-			if (WeaponCurrent.a.bottomless) {
-				Const.sprint(Const.a.stringTable[1003]); // "Hose disconnected from interdimensional wormhole. Normal ammo operation restored."
-				WeaponCurrent.a.bottomless = false;
+			if (_weaponCurrent.bottomless) {
+				_consts.sprint(_consts.stringTable[1003]); // "Hose disconnected from interdimensional wormhole. Normal ammo operation restored."
+				_weaponCurrent.bottomless = false;
 			} else {
-				Const.sprint("bottomlessclip!  " + Const.a.stringTable[1002]); // "Bring it!"
-				WeaponCurrent.a.bottomless = true;
+				_consts.sprint("bottomlessclip!  " + _consts.stringTable[1002]); // "Bring it!"
+				_weaponCurrent.bottomless = true;
 			}
         }  else if (ts.Contains("nohud")) { // No HUD
-			if (Const.a.noHUD) {
+			if (_consts.noHUD) {
 				// Normal
-				Const.a.noHUD = false;
-				Const.sprint("HUD " + Const.a.stringTable[1000]); // "ACTIVATED"
-				if (MouseLookScript.a.inventoryMode) {
-					MouseLookScript.a.shootModeButton.SetActive(true);
+				_consts.noHUD = false;
+				_consts.sprint("HUD " + _consts.stringTable[1000]); // "ACTIVATED"
+				if (_mouseLookScript.inventoryMode) {
+					_mouseLookScript.shootModeButton.SetActive(true);
 				}
-				MFDManager.a.overallLeftMFD.SetActive(true);
-				MFDManager.a.overallRightMFD.SetActive(true);
-				MFDManager.a.overallCenterMFD.SetActive(true);
-				MFDManager.a.overallHardwareButtons.SetActive(true);
-				MFDManager.a.overallHealthTickPanel.SetActive(true);
-				if (!PlayerMovement.a.inCyberSpace) {
-					MFDManager.a.healthIndicator.SetActive(true);
+				_mfdManager.overallLeftMFD.SetActive(true);
+				_mfdManager.overallRightMFD.SetActive(true);
+				_mfdManager.overallCenterMFD.SetActive(true);
+				_mfdManager.overallHardwareButtons.SetActive(true);
+				_mfdManager.overallHealthTickPanel.SetActive(true);
+				if (!_playerMovement.inCyberSpace) {
+					_mfdManager.healthIndicator.SetActive(true);
 				} else {
-					MFDManager.a.cyberHealthIndicator.SetActive(true);
+					_mfdManager.cyberHealthIndicator.SetActive(true);
 				}
 
-				MFDManager.a.overallEnergyTickPanel.SetActive(true);
-				MFDManager.a.overallEnergyIndicator.SetActive(true);
-				MFDManager.a.overallEnergyDrainText.SetActive(true);
-				MFDManager.a.overallEnergyJPMText.SetActive(true);
-				MFDManager.a.overallTextWarnings.SetActive(true);
-				MFDManager.a.overallMissionTimerT.SetActive(true);
-				MFDManager.a.overallMissionTimer.SetActive(true);
-				if (PlayerMovement.a.inCyberSpace) {
-					MFDManager.a.cyberTimerT.SetActive(true);
-					MFDManager.a.cyberTimer.SetActive(true);
+				_mfdManager.overallEnergyTickPanel.SetActive(true);
+				_mfdManager.overallEnergyIndicator.SetActive(true);
+				_mfdManager.overallEnergyDrainText.SetActive(true);
+				_mfdManager.overallEnergyJPMText.SetActive(true);
+				_mfdManager.overallTextWarnings.SetActive(true);
+				_mfdManager.overallMissionTimerT.SetActive(true);
+				_mfdManager.overallMissionTimer.SetActive(true);
+				if (_playerMovement.inCyberSpace) {
+					_mfdManager.cyberTimerT.SetActive(true);
+					_mfdManager.cyberTimer.SetActive(true);
 				}
-				MFDManager.a.TabReset(true);
-				MFDManager.a.TabReset(false);
-				MFDManager.a.ReturnToLastTab(true);
-				MFDManager.a.ReturnToLastTab(false);
-				if (Inventory.a.hasHardware[1]) {
-					MouseLookScript.a.compassContainer.SetActive(true);
+				_mfdManager.TabReset(true);
+				_mfdManager.TabReset(false);
+				_mfdManager.ReturnToLastTab(true);
+				_mfdManager.ReturnToLastTab(false);
+				if (_inventory.hasHardware[1]) {
+					_mouseLookScript.compassContainer.SetActive(true);
 				}
 			} else {
 				// HUDless Screenshot mode!
-				Const.a.noHUD = true;
-				Const.sprint(Const.a.stringTable[1004]); // "No HUD! Enjoy the cinematic screenshot experience!"
-				MouseLookScript.a.shootModeButton.SetActive(false);
-				MFDManager.a.overallLeftMFD.SetActive(false);
-				MFDManager.a.overallRightMFD.SetActive(false);
-				MFDManager.a.overallCenterMFD.SetActive(false);
-				MFDManager.a.overallHardwareButtons.SetActive(false);
-				MFDManager.a.overallHealthTickPanel.SetActive(false);
-				MFDManager.a.healthIndicator.SetActive(false);
-				MFDManager.a.cyberHealthIndicator.SetActive(false);
-				MFDManager.a.overallEnergyTickPanel.SetActive(false);
-				MFDManager.a.overallEnergyIndicator.SetActive(false);
-				MFDManager.a.overallEnergyDrainText.SetActive(false);
-				MFDManager.a.overallEnergyJPMText.SetActive(false);
-				MFDManager.a.overallTextWarnings.SetActive(false);
-				MFDManager.a.overallMissionTimerT.SetActive(false);
-				MFDManager.a.overallMissionTimer.SetActive(false);
-				MFDManager.a.cyberTimerT.SetActive(false);
-				MFDManager.a.cyberTimer.SetActive(false);
-				MouseLookScript.a.compassContainer.SetActive(false);
+				_consts.noHUD = true;
+				_consts.sprint(_consts.stringTable[1004]); // "No HUD! Enjoy the cinematic screenshot experience!"
+				_mouseLookScript.shootModeButton.SetActive(false);
+				_mfdManager.overallLeftMFD.SetActive(false);
+				_mfdManager.overallRightMFD.SetActive(false);
+				_mfdManager.overallCenterMFD.SetActive(false);
+				_mfdManager.overallHardwareButtons.SetActive(false);
+				_mfdManager.overallHealthTickPanel.SetActive(false);
+				_mfdManager.healthIndicator.SetActive(false);
+				_mfdManager.cyberHealthIndicator.SetActive(false);
+				_mfdManager.overallEnergyTickPanel.SetActive(false);
+				_mfdManager.overallEnergyIndicator.SetActive(false);
+				_mfdManager.overallEnergyDrainText.SetActive(false);
+				_mfdManager.overallEnergyJPMText.SetActive(false);
+				_mfdManager.overallTextWarnings.SetActive(false);
+				_mfdManager.overallMissionTimerT.SetActive(false);
+				_mfdManager.overallMissionTimer.SetActive(false);
+				_mfdManager.cyberTimerT.SetActive(false);
+				_mfdManager.cyberTimer.SetActive(false);
+				_mouseLookScript.compassContainer.SetActive(false);
 			}	
         } else if (ts.Contains("ifeelthepower")
                    || (ts.Contains("i") && ts.Contains("feel")
                        && ts.Contains("the") && ts.Contains("power"))) {
-			if (WeaponCurrent.a.redbull) {
-				Const.sprint(Const.a.stringTable[1005]); // Energy usage normal
-				WeaponCurrent.a.redbull = false;
+			if (_weaponCurrent.redbull) {
+				_consts.sprint(_consts.stringTable[1005]); // Energy usage normal
+				_weaponCurrent.redbull = false;
 			} else {
-				Const.sprint(Const.a.stringTable[1006]); // "I feel the power! 0 energy consumption!"
-				WeaponCurrent.a.redbull = true; // Might not be wings, but hey.
+				_consts.sprint(_consts.stringTable[1006]); // "I feel the power! 0 energy consumption!"
+				_weaponCurrent.redbull = true; // Might not be wings, but hey.
 			}
         } else if (ts.Contains("show") && ts.Contains("fps")) { // showfps
-			Const.sprint(Const.a.stringTable[1007]); // "Toggling FPS counter for framerate (bottom right corner)..."
-			PlayerMovement.a.fpsCounter.SetActive(!PlayerMovement.a.fpsCounter.activeInHierarchy);
-			Inventory.a.hardwareButtonManager.bioMonitorContainer.SetActive(true);
+			_consts.sprint(_consts.stringTable[1007]); // "Toggling FPS counter for framerate (bottom right corner)..."
+			_playerMovement.fpsCounter.SetActive(!_playerMovement.fpsCounter.activeInHierarchy);
+			_inventory.hardwareButtonManager.bioMonitorContainer.SetActive(true);
         } else if (ts.Contains("show") && ts.Contains("location")) { // showlocation
-			Const.sprint(Const.a.stringTable[1008]); // "Toggling locationIndicator (bottom left corner)..."
-			PlayerMovement.a.locationIndicator.SetActive(!PlayerMovement.a.locationIndicator.activeInHierarchy);
+			_consts.sprint(_consts.stringTable[1008]); // "Toggling locationIndicator (bottom left corner)..."
+			_playerMovement.locationIndicator.SetActive(!_playerMovement.locationIndicator.activeInHierarchy);
 		} else if (ts.Contains("i") && ts.Contains("am") && ts.Contains("shodan")) { // iamshodan
-			if (LevelManager.a.superoverride) {
-				Const.sprint(Const.a.stringTable[1009]); // "SHODAN has regained control of security from you"
-				LevelManager.a.superoverride = false;
+			if (_levelManager.superoverride) {
+				_consts.sprint(_consts.stringTable[1009]); // "SHODAN has regained control of security from you"
+				_levelManager.superoverride = false;
 			} else {
-				Const.sprint(Const.a.stringTable[1010]); // "Full security override enabled!"
-				LevelManager.a.superoverride = true;
+				_consts.sprint(_consts.stringTable[1010]); // "Full security override enabled!"
+				_levelManager.superoverride = true;
 			}
 		} else if (entry == "dizzy") {
-			if (LevelManager.a.skyRotate.rotateSpeed < 0.9f) LevelManager.a.skyRotate.rotateSpeed = 1f;
-			else if (LevelManager.a.skyRotate.rotateSpeed < 1.9f) LevelManager.a.skyRotate.rotateSpeed = 2f;
-			else if (LevelManager.a.skyRotate.rotateSpeed < 4.9f) LevelManager.a.skyRotate.rotateSpeed = 5f;
-			else if (LevelManager.a.skyRotate.rotateSpeed < 9.9f) LevelManager.a.skyRotate.rotateSpeed = 10f;
-			else LevelManager.a.skyRotate.rotateSpeed = LevelManager.a.skyRotate.defaultSpeed;
+			if (_levelManager.skyRotate.rotateSpeed < 0.9f) _levelManager.skyRotate.rotateSpeed = 1f;
+			else if (_levelManager.skyRotate.rotateSpeed < 1.9f) _levelManager.skyRotate.rotateSpeed = 2f;
+			else if (_levelManager.skyRotate.rotateSpeed < 4.9f) _levelManager.skyRotate.rotateSpeed = 5f;
+			else if (_levelManager.skyRotate.rotateSpeed < 9.9f) _levelManager.skyRotate.rotateSpeed = 10f;
+			else _levelManager.skyRotate.rotateSpeed = _levelManager.skyRotate.defaultSpeed;
 		} else if (entry == "Mr. Bean") {
-			Const.sprint("Nice try, there are no go carts to slow down here");
+			_consts.sprint("Nice try, there are no go carts to slow down here");
 		} else if (entry == "Simon Foster") {
-			Const.sprint("Nice try, nothing to paint here");
+			_consts.sprint("Nice try, nothing to paint here");
 		} else if (entry == "Motherlode" || entry == "Rosebud" || entry == "Kaching" || entry == "money") {
-			Const.sprint("Nice try, there's no money here.");
+			_consts.sprint("Nice try, there's no money here.");
 		} else if (entry == "Richard Branson") {
-			Const.sprint("Nice try, there's no money here.  You do realize this isn't Rollercoaster Tycoon right?");
+			_consts.sprint("Nice try, there's no money here.  You do realize this isn't Rollercoaster Tycoon right?");
 		} else if (entry == "John Wardley") {
-			Const.sprint("WOW!");
+			_consts.sprint("WOW!");
 		} else if (entry == "John Mace") {
-			Const.sprint("Nice try, there's nothing to pay double for here");
+			_consts.sprint("Nice try, there's nothing to pay double for here");
 		} else if (entry == "Melanie Warn") {
-				Const.sprint("I feel happy!!!");
+				_consts.sprint("I feel happy!!!");
 		} else if (entry == "Damon Hill") {
-				Const.sprint("Nice try, there are no go carts to speed up here");
+				_consts.sprint("Nice try, there are no go carts to speed up here");
 		} else if (entry == "Michael Schumacher") {
-				Const.sprint("Nice try, there are no go carts to give ludicrous speed here");
+				_consts.sprint("Nice try, there are no go carts to give ludicrous speed here");
 		} else if (entry == "Tony Day") {
-				Const.sprint("Ok, now I want a hamburger");
+				_consts.sprint("Ok, now I want a hamburger");
 		} else if (entry == "Katie Brayshaw") {
-				Const.sprint("Hi there! Hello! Hey! Howdy!");
+				_consts.sprint("Hi there! Hello! Hey! Howdy!");
 		} else if (ts.Contains("sudo") || ts.Contains("admin")) {
-				Const.sprint("Super user access granted...ERROR: access restricted by SHODAN");
+				_consts.sprint("Super user access granted...ERROR: access restricted by SHODAN");
 		} else if (ts.Contains("git")) {
-				if (ts.Contains("pull") || ts.Contains("fetch")) Const.sprint("remote: Enumerating objects: 24601, done. Failed, could not connect with origin/triop.");
-				else if (ts.Contains("status")) Const.sprint("Your branch is up to date with origin/triop. Working directory clean.");
-				else if (ts.Contains("log")) Const.sprint("<Merge pull request #451 from SHODAN/NeuralLinkBugfix> 6 months ago...");
-				else if (ts.Contains("reflog")) Const.sprint("dc51440 HEAD0 -> master: commit: Establish neural connection ... ERROR: invalid ID `2-4601`");
-				else if (ts.Contains("merge")) Const.sprint("Failed, could not connect with origin/triop");
-				else if (ts.Contains("push")) Const.sprint("Could not find Username for 'triopttp://192.168.1.451'");
-				else if (ts.Contains("clone")) Const.sprint("Failed, connection blocked by SHODAN. Employee ID invalid.");
-				else if (ts.Contains("branch") || ts.Contains("-b")) Const.sprint("Created new branch " + ts.Split(' ').Last());
-				else if (ts.Contains("checkout")) Const.sprint("Branch name not recognized.  Contact your TriopBucket representative.");
-				else Const.sprint("Branch name not recognized.  Contact your TriopBucket representative.");
+				if (ts.Contains("pull") || ts.Contains("fetch")) _consts.sprint("remote: Enumerating objects: 24601, done. Failed, could not connect with origin/triop.");
+				else if (ts.Contains("status")) _consts.sprint("Your branch is up to date with origin/triop. Working directory clean.");
+				else if (ts.Contains("log")) _consts.sprint("<Merge pull request #451 from SHODAN/NeuralLinkBugfix> 6 months ago...");
+				else if (ts.Contains("reflog")) _consts.sprint("dc51440 HEAD0 -> master: commit: Establish neural connection ... ERROR: invalid ID `2-4601`");
+				else if (ts.Contains("merge")) _consts.sprint("Failed, could not connect with origin/triop");
+				else if (ts.Contains("push")) _consts.sprint("Could not find Username for 'triopttp://192.168.1.451'");
+				else if (ts.Contains("clone")) _consts.sprint("Failed, connection blocked by SHODAN. Employee ID invalid.");
+				else if (ts.Contains("branch") || ts.Contains("-b")) _consts.sprint("Created new branch " + ts.Split(' ').Last());
+				else if (ts.Contains("checkout")) _consts.sprint("Branch name not recognized.  Contact your TriopBucket representative.");
+				else _consts.sprint("Branch name not recognized.  Contact your TriopBucket representative.");
 		} else if (ts.Contains("restart")) {
-				Const.sprint("Yeah...better not");
+				_consts.sprint("Yeah...better not");
 		} else if (ts.Contains("quit") || ts.Contains("exit")) {
-				Const.sprint("Use the Pause Menu by hitting Escape and using the QUIT option via mouse or arrow keys + ENTER");
+				_consts.sprint("Use the Pause Menu by hitting Escape and using the QUIT option via mouse or arrow keys + ENTER");
 		} else if (ts.Contains("cd") || ts.Contains("./")) {
-				Const.sprint("Attempting to access directory... already at root");
+				_consts.sprint("Attempting to access directory... already at root");
 		} else if (ts.Contains("kill") || ts.Contains("kick") || ts.Contains("ban") || ts.Contains("destroy") || ts.Contains("attack") || ts.Contains("suicide") || ts.Contains("die")) {
-				Const.sprint(Const.a.stringTable[1011]); // "Player decides to become a cyborg."
-				DamageData dd = new DamageData();
-				dd.damage = PlayerMovement.a.hm.health + 1.0f;
-				dd.other = PlayerMovement.a.gameObject; // Player capsule
-				PlayerMovement.a.hm.TakeDamage(dd);
+				_consts.sprint(_consts.stringTable[1011]); // "Player decides to become a cyborg."
+				DamageData dd = new DamageData(_consts);
+				dd.damage = _playerMovement.hm.health + 1.0f;
+				dd.other = _playerMovement.gameObject; // Player capsule
+				_playerMovement.hm.TakeDamage(dd);
 		} else if (ts.Contains("justinbailey")) {
-				Const.sprint("Well, you don't have a suit already so...");
+				_consts.sprint("Well, you don't have a suit already so...");
 		} else if (ts.Contains("woodstock")) {
-				Const.sprint("How much wood could a woodchuck chuck...there's no wood in SPACE!");
+				_consts.sprint("How much wood could a woodchuck chuck...there's no wood in SPACE!");
 		} else if (ts.Contains("quarry")) {
-				Const.sprint("There's obsidian on levels 6 and 8 if you want to feel decadant, otherwise we are lacking in the stone department.");
+				_consts.sprint("There's obsidian on levels 6 and 8 if you want to feel decadant, otherwise we are lacking in the stone department.");
 		} else if (ts.Contains("help")) {
-				Const.sprint("There's no one to save you now Hacker!");
+				_consts.sprint("There's no one to save you now Hacker!");
 		} else if (ts.Contains("zelda")) {
-				Const.sprint("Too late, already been to level 1");
+				_consts.sprint("Too late, already been to level 1");
 		} else if (ts.Contains("allyourbasearebelongtous") || (ts.Contains("all") && ts.Contains("your") && ts.Contains("base"))) {
-				Const.sprint("ERROR: SHODAN has overriden your command, remove SHODAN first."); // This is not an easter egg if you run this after removing SHODAN!!
+				_consts.sprint("ERROR: SHODAN has overriden your command, remove SHODAN first."); // This is not an easter egg if you run this after removing SHODAN!!
 		} else if (ts.Contains("i") && ts.Contains("am") && ((ts.Contains("iron") && ts.Contains("man")) || ts.Contains("amazing") || ts.Contains("cool") || ts.Contains("best"))) {
-				Const.sprint("That's nice dear.");
+				_consts.sprint("That's nice dear.");
 		} else if ((ts.Contains("impulse") && tn.Contains("9")) || ts.Contains("idkfa")) {
-				Const.sprint("I can only hold 7 weapons!! Nice try dearies!");
+				_consts.sprint("I can only hold 7 weapons!! Nice try dearies!");
 		} else if (ts.Contains("summon_obj")) {
 			int val = Utils.GetIntFromStringAudLogText(ts.Split(' ').Last()); // That's a slow line to compute!
 			if (val < 438 && val >= 0) {
 				SpawnDynamicObject(val,LevelManager.currentLevel,true,-1);
 			}
         } else if (ts.Contains("undo")) {
-			if (lastSpawnedGO != null && Const.a.editMode) Utils.SafeDestroy(lastSpawnedGO);
-			if (!Const.a.editMode) Const.sprint("Cannot undo when not in Edit Mode");
+			if (lastSpawnedGO != null && _consts.editMode) Utils.SafeDestroy(lastSpawnedGO);
+			if (!_consts.editMode) _consts.sprint("Cannot undo when not in Edit Mode");
         } else if (ts.Contains("settargetfps") || ts.Contains("setfps")) {
 			int val = Utils.GetIntFromStringAudLogText(ts.Split(' ').Last()); // That's a slow line to compute!
 			if (val <= 200 && val > 10) {
-				Const.a.TARGET_FPS = val;
-				Config.SetVSync();
+				_consts.TARGET_FPS = val;
+				_config.SetVSync();
 			}
 			
-			Const.sprint("FPS] -> " + val.ToString());
+			_consts.sprint("FPS] -> " + val.ToString());
         } else if (ts.Contains("shake")) {
-			Const.a.Shake(true,-1,-1);
+			_consts.Shake(true,-1,-1);
         } else if (ts.Contains("tired") || ts.Contains("staminup")) {
-            if (PlayerMovement.a.FatigueCheat) {
-                Const.sprint(Const.a.stringTable[1012]); // "Fatigue returned to normal"
-                PlayerMovement.a.FatigueCheat = false;
+            if (_playerMovement.FatigueCheat) {
+                _consts.sprint(_consts.stringTable[1012]); // "Fatigue returned to normal"
+                _playerMovement.FatigueCheat = false;
             } else {
-                Const.sprint("Stamin-Up! " + Const.a.stringTable[1013]); // "Fatigue no longer affects you!"
-                PlayerMovement.a.FatigueCheat = true;
+                _consts.sprint("Stamin-Up! " + _consts.stringTable[1013]); // "Fatigue no longer affects you!"
+                _playerMovement.FatigueCheat = true;
             }
         } else {
-            Const.sprint(Const.a.stringTable[1014] + entry); // "Uknown command or function: "
+            _consts.sprint(_consts.stringTable[1014] + entry); // "Uknown command or function: "
         }
 
-        PlayerMovement.a.consoleinpFd.text = ""; // Reset console and hide it, command was entered.
-        PlayerMovement.a.ToggleConsole();
+        _playerMovement.consoleinpFd.text = ""; // Reset console and hide it, command was entered.
+        _playerMovement.ToggleConsole();
     }
 
-    public static void CheatLoadLevel(int lev) {
-		if (PauseScript.a.MenuActive()) {
-			Const.sprint(Const.a.stringTable[1015]); // "Cannot load levels via cheat while on the menu!"
+    public void CheatLoadLevel(int lev) {
+		if (_pauseScript.MenuActive()) {
+			_consts.sprint(_consts.stringTable[1015]); // "Cannot load levels via cheat while on the menu!"
 			return;
 		}
 
-        LevelManager.a.CheatLoadLevel(lev);
+        _levelManager.CheatLoadLevel(lev);
     }
 
 /*
@@ -743,7 +764,7 @@ Master Index
 303 chunk_stor1_7_slice45        223
 304 chunk_stor1_7d               224
 305 chunk_teleporter
-306 chunk_white                 Const.a.useableItemsFrobIcons
+306 chunk_white                 _consts.useableItemsFrobIcons
 307 item_paper_wad              0
 308 item_warecasing             1
 309 item_beaker                 2
@@ -1263,7 +1284,7 @@ public static bool ConstIndexIsHardware(int constdex) {
 }
 
 /*
-Generic Materials (Const.a.genericMaterials[])
+Generic Materials (_consts.genericMaterials[])
 0  col1                 Dark Gray            In hindsight, maybe I should have named these descriptively.
 1  col1_unlit           Dark Gray unlit
 2  col2                 Yellow
@@ -1365,7 +1386,7 @@ Generic Materials (Const.a.genericMaterials[])
 98 text_3dgoldunlit
 99 text_3dgoldunlitoverlay
 */
-	public static GameObject SpawnDynamicObject(int val, int lev, bool cheat,
+	public GameObject SpawnDynamicObject(int val, int lev, bool cheat,
 												GameObject forcedContainer,
 												int saveID) {
 		if (!ConstIndexInBounds(val)) {
@@ -1381,32 +1402,31 @@ Generic Materials (Const.a.genericMaterials[])
 					  + ", saveID: " + saveID.ToString());
 		}
 
-		if (LevelManager.a == null) { Debug.Log("No LevelManager"); return null; }
-		if (cheat && Inventory.a == null) { Debug.Log("No Inventory"); return null; }
-		if (cheat && Const.a == null) { Debug.Log("No Const"); return null; }
+		if (_levelManager == null) { Debug.Log("No LevelManager"); return null; }
+		if (cheat && _inventory == null) { Debug.Log("No Inventory"); return null; }
+		if (cheat && _consts == null) { Debug.Log("No Const"); return null; }
 
 		if (lev < 0 || lev > 13) lev = 1; // Fallback to Medical.
 		Vector3 spawnPos = Vector3.zero;
-		if (cheat) spawnPos = PlayerMovement.a.transform.position;
+		if (cheat) spawnPos = _playerMovement.transform.position;
 		GameObject go = null;
 		if (ConstIndexIsGeometry(val)) {
-			if (Const.a.editMode || !cheat) {
-				go = MonoBehaviour.Instantiate(Const.a.GetPrefab(val),spawnPos,
-									Const.a.quaternionIdentity) as GameObject;
+			if (_consts.editMode || !cheat) {
+				go = GameBindings.InstantiatePrefab(_consts.GetPrefab(val),spawnPos,
+									_consts.quaternionIdentity) as GameObject;
 			} else {
-				Const.sprint("Indices 0 through 306 (level geometry chunks) "
+				_consts.sprint("Indices 0 through 306 (level geometry chunks) "
 							 + "not possible when not on edit mode!");
 			}
 		} else {
-			go = MonoBehaviour.Instantiate(Const.a.GetPrefab(val),spawnPos,
-									Const.a.quaternionIdentity) as GameObject;
+			go = GameBindings.InstantiatePrefab(_consts.GetPrefab(val),spawnPos, _consts.quaternionIdentity) as GameObject;
 		}
 
 		if (go != null) {
 			if (forcedContainer != null) {
 				go.transform.SetParent(forcedContainer.transform);
 			} else {
-				Level levS = LevelManager.a.levelScripts[lev];
+				Level levS = _levelManager.levelScripts[lev];
 				
 				GameObject parGO = levS.dynamicObjectsContainer;
 				if (ConstIndexIsNPC(val)) {
@@ -1422,9 +1442,9 @@ Generic Materials (Const.a.genericMaterials[])
 			
 			if (cheat && ConstIndexIsHardware(val)) { // Hardware
 				UseableObjectUse uo = go.GetComponent<UseableObjectUse>();
-				int dex14 = Inventory.a.hardware14fromConstdex(uo.useableItemIndex);
-				if (Inventory.a.hasHardware[dex14]) {
-					uo.customIndex = (Inventory.a.hardwareVersion[dex14] + 1);
+				int dex14 = _inventory.hardware14fromConstdex(uo.useableItemIndex);
+				if (_inventory.hasHardware[dex14]) {
+					uo.customIndex = (_inventory.hardwareVersion[dex14] + 1);
 				}
 			}
 		} else {
@@ -1441,8 +1461,8 @@ Generic Materials (Const.a.genericMaterials[])
 				SaveObject so = SaveLoad.GetPrefabSaveObject(go);
 				if (so != null) {
 					if (saveID <= -1) {
-						so.SaveID = Const.a.nextFreeSaveID;
-						Const.a.nextFreeSaveID++;
+						so.SaveID = _consts.nextFreeSaveID;
+						_consts.nextFreeSaveID++;
 					} else {
 						so.SaveID = saveID;
 					}
@@ -1452,17 +1472,17 @@ Generic Materials (Const.a.genericMaterials[])
 		return go;
 	}
 
-	public static GameObject SpawnDynamicObject(int val, int lev, bool cheat,
+	public GameObject SpawnDynamicObject(int val, int lev, bool cheat,
 												int saveID) {
 		return SpawnDynamicObject(val, lev, cheat, null, saveID);
 	}
 
-	public static GameObject SpawnDynamicObject(int val, int saveID) {
+	public GameObject SpawnDynamicObject(int val, int saveID) {
 		return SpawnDynamicObject(val,LevelManager.currentLevel,false,null,
 								  saveID);
 	}
 	
-	public static GameObject SpawnDynamicObject(int val) {
+	public GameObject SpawnDynamicObject(int val) {
 		return SpawnDynamicObject(val,LevelManager.currentLevel,false,null,-1);
 	}
 }

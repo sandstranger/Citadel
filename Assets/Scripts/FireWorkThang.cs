@@ -1,3 +1,4 @@
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,12 +16,14 @@ public class FireWorkThang : MonoBehaviour {
     private bool waitAtFull;
     private bool waitAtMin;
 
+    [Inject] private PauseScript _pauseScript;
+
     void Awake() {
         img = GetComponent<Image>();
     }
 
     void OnEnable() {
-        tickFinished = PauseScript.a.relativeTime;
+        tickFinished = _pauseScript.relativeTime;
         curScale = Random.Range(minScale,maxScale);
         if (changeFracPerSecond < 0.001f) changeFracPerSecond = 0.5f; // 2 secs
         waitAtFull = false;
@@ -32,18 +35,18 @@ public class FireWorkThang : MonoBehaviour {
     }
 
     void Update() {
-        if (PauseScript.a.Paused()) return;
-        if (PauseScript.a.MenuActive()) return;
-        if (tickFinished >= PauseScript.a.relativeTime) return;
+        if (_pauseScript.Paused()) return;
+        if (_pauseScript.MenuActive()) return;
+        if (tickFinished >= _pauseScript.relativeTime) return;
 
         float delta = (1f / 60f);
-        tickFinished = PauseScript.a.relativeTime + delta;
+        tickFinished = _pauseScript.relativeTime + delta;
         if (waitAtFull) {
             waitAtFull = false;
             waitAtMin = false;
             curScale = minScale;
             waitAtMin = true;
-            tickFinished = PauseScript.a.relativeTime
+            tickFinished = _pauseScript.relativeTime
                            + Random.Range(waitTimeMinMin,waitTimeMinMax);
         } else if (waitAtMin) {
             waitAtMin = false;
@@ -56,7 +59,7 @@ public class FireWorkThang : MonoBehaviour {
         if (curScale > maxScale) {
             curScale = maxScale;
             waitAtFull = true;
-            tickFinished = PauseScript.a.relativeTime + waitTimeFull;
+            tickFinished = _pauseScript.relativeTime + waitTimeFull;
         }
 
         transform.localScale = new Vector3(curScale,curScale,curScale);

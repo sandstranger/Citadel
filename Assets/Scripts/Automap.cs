@@ -3,8 +3,9 @@ using UnityEngine.UI;
 using System.Text;
 using System.Collections;
 using Citadel.Game;
+using Zenject;
 
-public class Automap : MonoBehaviour, ISingletonInitializer {
+public class Automap : MonoBehaviour {
 	public Camera automapCamera;
 	public GameObject automapCanvasGO;
 	public GameObject automapContainerLH;
@@ -97,19 +98,19 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 	private RectTransform[] automapFoWTilesRects;
 	private Vector2[] automapFoWTilesRectsPos;
 	private bool initialized = false;
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100);
 
-	public static Automap a;
-
-	public void Initialize() {
-		a = this;
-		initialized = false;
-		inSideView = false;
-	}
+	[Inject] 
+	private LevelManager _levelManager;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Inventory _inventory;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerMovement _playerMovement;
 
 	void Start() {
 		automapExplored = new bool[4096];
-		automapUpdateFinished = PauseScript.a.relativeTime;
+		automapUpdateFinished = _pauseScript.relativeTime;
 		AutomapZoomAdjust();
 		icoZAdj = 0f;
 		automapCameraTransform = automapCamera.transform;
@@ -162,15 +163,11 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 		//automapLevelHomePositions[12] = new Vector2(  99.50f, 416.90f); // G4
 		//automapLevelHomePositions[13] = new Vector2(   0.00f,   0.00f);
 		initialized = true;
-
-		if (LevelManager.a != null)
-			SetAutomapExploredReference(LevelManager.currentLevel);
-		else
-			SetAutomapExploredReference(1);
+		SetAutomapExploredReference(LevelManager.currentLevel);
 	}
 
 	public void UpdateAutomap(Vector3 playerPosition) {
-		if (PlayerMovement.a.inCyberSpace) return;
+		if (_playerMovement.inCyberSpace) return;
 		if (!initialized) Start();
 
 		if (inSideView) {
@@ -187,13 +184,13 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 			Utils.DisableCamera(automapCamera);
 		}
 
-		if (Inventory.a.NavUnitVersion() < 2) {
+		if (_inventory.NavUnitVersion() < 2) {
 			Utils.Deactivate(poolContainerAutomapBotOverlays);
 		} else {
 			Utils.Activate(poolContainerAutomapBotOverlays);
 		}
 
-		if (Inventory.a.NavUnitVersion() < 3) {
+		if (_inventory.NavUnitVersion() < 3) {
 			Utils.Deactivate(poolContainerAutomapCyborgOverlays);
 			Utils.Deactivate(poolContainerAutomapMutantOverlays);
 		} else {
@@ -201,7 +198,7 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 			Utils.Activate(poolContainerAutomapMutantOverlays);
 		}
 
-// 		if (automapUpdateFinished < PauseScript.a.relativeTime) {
+// 		if (automapUpdateFinished < _pauseScript.relativeTime) {
 			Utils.EnableImage(automapBaseImage);
 			if (LevelManager.currentLevel >= 0) {
 				Utils.AssignImageOverride(automapBaseImage,
@@ -235,7 +232,7 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 
 			if (inFullMap) {
 				Utils.EnableImage(automapFullPlayerIcon);
-				SetLinkedOverlayPos(automapFullPlayerIcon,1f,PlayerMovement.a.gameObject);
+				SetLinkedOverlayPos(automapFullPlayerIcon,1f,_playerMovement.gameObject);
 				automapFullPlayerIcon.rectTransform.anchoredPosition = new Vector3(1024f - automapFullPlayerIcon.rectTransform.anchoredPosition.x + 512f - 2048f + 57f - 10.0839f,
 																				   1024f - automapFullPlayerIcon.rectTransform.anchoredPosition.y - 512f - 168.8f + 68.404f,
 																				   -0.03544822f);
@@ -251,7 +248,7 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 
 			// Update player icon rotation.
 			// Rotation is adjusted for player view and direction vs UI space.
-			icoZAdj = (PlayerMovement.a.transform.eulerAngles.y * (-1) + 90);
+			icoZAdj = (_playerMovement.transform.eulerAngles.y * (-1) + 90);
 
 			float zLH = automapNormalPlayerIconLH.localRotation.z;
 			float zRH = automapNormalPlayerIconRH.localRotation.z;
@@ -270,8 +267,8 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 			}
 
 			updateTime = 0.2f;
-			if (Inventory.a.NavUnitVersion() > 1) updateTime = 0.1f;
-			if (Inventory.a.NavUnitVersion() > 2) {
+			if (_inventory.NavUnitVersion() > 1) updateTime = 0.1f;
+			if (_inventory.NavUnitVersion() > 2) {
 				updateTime = 0.05f;
 
 				// Display hazards
@@ -289,7 +286,7 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 				// since it updates it anyways.
 			}
 
-			if (automapUpdateFinished < PauseScript.a.relativeTime) {
+			if (automapUpdateFinished < _pauseScript.relativeTime) {
 				float radiusSquared = automapFoWRadius * automapFoWRadius;
 				Vector2 plyrPos = tempVec2b;
 				// Update explored tiles
@@ -318,9 +315,9 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 						}
 					//}
 				}
-				automapUpdateFinished = PauseScript.a.relativeTime + updateTime;
+				automapUpdateFinished = _pauseScript.relativeTime + updateTime;
 			}
-// 			automapUpdateFinished = PauseScript.a.relativeTime + updateTime;
+// 			automapUpdateFinished = _pauseScript.relativeTime + updateTime;
 // 		}
 
 		SetAutomapActiveState();
@@ -339,7 +336,7 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 	}
 
 	void SetAutomapActiveState() {
-		if (Inventory.a.hasHardware[1]) {
+		if (_inventory.hasHardware[1]) {
 			if (AutoMapDisplayActive()) {
 				ActivateAutomapUI();
 			} else {
@@ -420,9 +417,9 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void AutomapZoomOut() {
-		if (Inventory.a.NavUnitVersion() < 2) {
+		if (_inventory.NavUnitVersion() < 2) {
 			// Map hardware version doesn't support zoom.
-			Const.sprint(Const.a.stringTable[465],Const.a.player1);
+			_consts.sprint(_consts.stringTable[465],_consts.Player);
 			return;
 		}
 
@@ -431,16 +428,16 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 			currentAutomapZoomLevel = 2;
 
 			// zoom at max
-			Const.sprint(Const.a.stringTable[316],Const.a.player1);
+			_consts.sprint(_consts.stringTable[316],_consts.Player);
 			return;
 		}
 		AutomapZoomAdjust();
 	}
 
 	public void AutomapZoomIn() {
-		if (Inventory.a.NavUnitVersion() < 2) {
+		if (_inventory.NavUnitVersion() < 2) {
 			// Map hardware version doesn't support zoom.
-			Const.sprint(Const.a.stringTable[465],Const.a.player1);
+			_consts.sprint(_consts.stringTable[465],_consts.Player);
 			return;
 		}
 
@@ -449,7 +446,7 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 			currentAutomapZoomLevel = 0;
 
 			// zoom at min
-			Const.sprint(Const.a.stringTable[317],Const.a.player1);
+			_consts.sprint(_consts.stringTable[317],_consts.Player);
 			return;
 		}
 		AutomapZoomAdjust();
@@ -476,8 +473,8 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void AutomapGoSide() {
-		automapSideButtonTextLH.text = Const.a.stringTable[887];
-		automapSideButtonTextRH.text = Const.a.stringTable[887];
+		automapSideButtonTextLH.text = _consts.stringTable[887];
+		automapSideButtonTextRH.text = _consts.stringTable[887];
 		automapInnerCircleLH.gameObject.SetActive(false);
 		automapInnerCircleRH.gameObject.SetActive(false);
 		automapOuterCircleLH.gameObject.SetActive(false);
@@ -493,8 +490,8 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 	}
 
 	public void AutomapGoTop() {
-		automapSideButtonTextLH.text = Const.a.stringTable[888];
-		automapSideButtonTextRH.text = Const.a.stringTable[888];
+		automapSideButtonTextLH.text = _consts.stringTable[888];
+		automapSideButtonTextRH.text = _consts.stringTable[888];
 		automapInnerCircleLH.gameObject.SetActive(true);
 		automapInnerCircleRH.gameObject.SetActive(true);
 		automapOuterCircleLH.gameObject.SetActive(true);
@@ -510,15 +507,15 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 	public void AutomapGoFull() {
 		if (inSideView) {
 			AutomapGoTop();
-			UpdateAutomap(PlayerMovement.a.transform.localPosition);
+			UpdateAutomap(_playerMovement.transform.localPosition);
 		}
 		Utils.Activate(automapFull);
 		inFullMap = true;
-		MFDManager.a.AutomapGoFull();
+		_mfdManager.AutomapGoFull();
 	}
 
 	public void CloseFullmap() {
-		if (automapFull.activeInHierarchy) MFDManager.a.CloseFullmap();
+		if (automapFull.activeInHierarchy) _mfdManager.CloseFullmap();
 		Utils.Deactivate(automapFull);
 		inFullMap = false;
 		if (inSideView) AutomapGoSide();
@@ -547,11 +544,11 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 		return retval;
 	}
 
-	public static void TurnOnLinkedOverlay(Image over, float health, GameObject go,
+	public static void TurnOnLinkedOverlay(Inventory inventory,Image over, float health, GameObject go,
 									bool isNPC) {
 		if (over == null) return;
 
-		bool navVersionFine = Inventory.a != null ? Inventory.a.NavUnitVersion() > 1 : false;
+		bool navVersionFine = inventory.NavUnitVersion() > 1;
 		if (health > 0 && ((isNPC && navVersionFine) || !isNPC)) {
 			Utils.EnableImage(over); // Enable on automap.
 			Utils.Activate(over.gameObject);
@@ -582,6 +579,7 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 
 	public static string Save(GameObject go) {
 		Automap amp = go.GetComponent<Automap>();
+		var pauseScript = amp._pauseScript;
 		int j = 0;
 		s1.Clear();
 		for (j=0;j<4096;j++) { s1.Append(Utils.BoolToString(amp.automapExploredR[j],"automapExploredR[" + j.ToString() + "]")); s1.Append(Utils.splitChar); } // bool
@@ -599,7 +597,7 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 		for (j=0;j<4096;j++) { s1.Append(Utils.BoolToString(amp.automapExploredG4[j],"automapExploredG4[" + j.ToString() + "]")); s1.Append(Utils.splitChar); } // bool
 		s1.Append(Utils.UintToString(amp.currentAutomapZoomLevel,"currentAutomapZoomLevel"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(amp.automapUpdateFinished,"automapUpdateFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,amp.automapUpdateFinished,"automapUpdateFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(amp.inSideView,"inSideView"));
 		return s1.ToString();
@@ -621,14 +619,13 @@ public class Automap : MonoBehaviour, ISingletonInitializer {
 		for (j=0;j<4096;j++) { amp.automapExploredG1[j] = Utils.GetBoolFromString(entries[index],"automapExploredG1[" + j.ToString() + "]"); index++; }
 		for (j=0;j<4096;j++) { amp.automapExploredG2[j] = Utils.GetBoolFromString(entries[index],"automapExploredG2[" + j.ToString() + "]"); index++; }
 		for (j=0;j<4096;j++) { amp.automapExploredG4[j] = Utils.GetBoolFromString(entries[index],"automapExploredG4[" + j.ToString() + "]"); index++; }
-		if (LevelManager.a != null) amp.SetAutomapExploredReference(LevelManager.currentLevel);
-		else amp.SetAutomapExploredReference(1);
+		amp.SetAutomapExploredReference(LevelManager.currentLevel);
 
 		amp.currentAutomapZoomLevel = Utils.GetIntFromString(entries[index],"currentAutomapZoomLevel"); index++;
 		if (amp.currentAutomapZoomLevel < 0) amp.currentAutomapZoomLevel = 0;
 		if (amp.currentAutomapZoomLevel > 2) amp.currentAutomapZoomLevel = 2;
 		amp.AutomapZoomAdjust();
-		amp.automapUpdateFinished = Utils.LoadRelativeTimeDifferential(entries[index],"automapUpdateFinished"); index++;
+		amp.automapUpdateFinished = Utils.LoadRelativeTimeDifferential(amp._pauseScript,entries[index],"automapUpdateFinished"); index++;
 		amp.inSideView =  Utils.GetBoolFromString(entries[index],"inSideView");
 		return index;
 	}

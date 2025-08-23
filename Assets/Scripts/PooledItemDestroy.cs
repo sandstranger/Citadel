@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using Zenject;
 
 public class PooledItemDestroy : MonoBehaviour {
 	public float itemLifeTime = 3.00f;
@@ -8,8 +9,10 @@ public class PooledItemDestroy : MonoBehaviour {
 	private bool doneYet = false;
 	private float timerFinished = 9999999f;
 
+	[Inject] private PauseScript _pauseScript;
+
 	void OnEnable () {
-		timerFinished = PauseScript.a.relativeTime + itemLifeTime;
+		timerFinished = _pauseScript.relativeTime + itemLifeTime;
 	}
 
 	private void OnDisable()
@@ -23,7 +26,7 @@ public class PooledItemDestroy : MonoBehaviour {
 	void Update() {
 		if (onlyOnce && doneYet) return;
 
-		if (timerFinished < PauseScript.a.relativeTime) {
+		if (timerFinished < _pauseScript.relativeTime) {
 			timerFinished = 9999999f;
 			if (onlyOnce) doneYet = true;
 			gameObject.SetActive(false);

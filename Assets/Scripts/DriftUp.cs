@@ -1,3 +1,4 @@
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,8 @@ public class DriftUp : MonoBehaviour {
     public float endFade = 0f;
 
     private float tickFinished;
+    
+    [Inject] private PauseScript _pauseScript;
 
     void OnEnable() {
         transform.position = new Vector3(transform.position.x,
@@ -22,16 +25,16 @@ public class DriftUp : MonoBehaviour {
             img.color = new Color(img.color.r,img.color.g,img.color.b,startFade);
         }
 
-        tickFinished = PauseScript.a.relativeTime;
+        tickFinished = _pauseScript.relativeTime;
     }
 
     void Update() {
-        if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
-		if (tickFinished >= PauseScript.a.relativeTime) return;
+        if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
+		if (tickFinished >= _pauseScript.relativeTime) return;
 
         float delta = (1f / 60f);
-		tickFinished = PauseScript.a.relativeTime + delta;
+		tickFinished = _pauseScript.relativeTime + delta;
 		float drift = transform.localPosition.y;
         drift += rate;
         if (drift > endY) drift = endY;

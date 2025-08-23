@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Zenject;
 
 public class TickIndicatorAnimation : MonoBehaviour {
 	public Sprite[] indicatorImages;
@@ -9,6 +10,10 @@ public class TickIndicatorAnimation : MonoBehaviour {
 	private float nextthink;
 	private Image indicator;
 	private int tick;
+	
+	[Inject] private PlayerEnergy _playerEnergy;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
 
 	void Start () {
 		tick = 0;
@@ -17,14 +22,14 @@ public class TickIndicatorAnimation : MonoBehaviour {
 
 	void Update() {
 		if (!gameObject.activeSelf) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.MenuActive()) return;
 
-		if (nextthink < PauseScript.a.relativeTime) {
+		if (nextthink < _pauseScript.relativeTime) {
 			if (healthIndicator) {
-				if (PlayerHealth.a.hm.health > 176) {
+				if (_playerHealth.hm.health > 176) {
 					if (indicator.overrideSprite != indicatorImages[0]) indicator.overrideSprite = indicatorImages[0];
 				} else {
-					if (PlayerHealth.a.hm.health > 88) {
+					if (_playerHealth.hm.health > 88) {
 						if (indicator.overrideSprite != indicatorImages[1]) indicator.overrideSprite = indicatorImages[1];
 					} else {
 						switch (tick) {
@@ -37,10 +42,10 @@ public class TickIndicatorAnimation : MonoBehaviour {
 					}
 				}
 			} else {
-				if (PlayerEnergy.a.energy > 176) {
+				if (_playerEnergy.energy > 176) {
 					if (indicator.overrideSprite != indicatorImages[0]) indicator.overrideSprite = indicatorImages[0];
 				} else {
-					if (PlayerEnergy.a.energy > 88) {
+					if (_playerEnergy.energy > 88) {
 						if (indicator.overrideSprite != indicatorImages[1]) indicator.overrideSprite = indicatorImages[1];
 					} else {
 						switch (tick) {
@@ -55,7 +60,7 @@ public class TickIndicatorAnimation : MonoBehaviour {
 			}
 			tick++;
 			if (tick > 5) tick = 0;
-			nextthink = PauseScript.a.relativeTime + thinkTime;
+			nextthink = _pauseScript.relativeTime + thinkTime;
 		}
 	}
 }

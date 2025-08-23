@@ -1,6 +1,4 @@
 using System;
-using Citadel.Extensions;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Citadel.SceneManagement
@@ -11,6 +9,7 @@ namespace Citadel.SceneManagement
         
         public static event Action<string> OnStartLoadScene;
         public static event Action<string> OnSceneLoaded;
+        public static event Action<string> OnActiveSceneChanged; 
 
         public static string LoadedSceneName => SceneManager.GetActiveScene().name;
         
@@ -34,6 +33,7 @@ namespace Citadel.SceneManagement
         static ScenesLoader()
         {
             SceneManager.sceneLoaded += (scene, _) => OnSceneLoaded?.Invoke(scene.name);
+            SceneManager.activeSceneChanged += (_,scene ) => OnActiveSceneChanged?.Invoke(scene.name);
         }
         
         public static void LoadScene(string sceneName)

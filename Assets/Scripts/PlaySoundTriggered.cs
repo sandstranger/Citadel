@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class PlaySoundTriggered : MonoBehaviour {
@@ -16,12 +17,14 @@ public class PlaySoundTriggered : MonoBehaviour {
 	private bool justPaused;
 	private ParticleSystem psys;
 
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
 
     void Start() {
 		if (SFX == null) SFX = GetComponent<AudioSource>();
 		SFX.playOnAwake = false;
 		SFX.loop = false;
-		if (SFXClip > 0) SFX.clip = Const.a.sounds[SFXClip];
+		if (SFXClip > 0) SFX.clip = _consts.sounds[SFXClip];
 		else Debug.Log("Unassigned clip index on PlaySoundTriggered at " + transform.position.ToString() + " for " + gameObject.name);
 		if (playEverywhere) {
 			SFX.spatialBlend = 0.0f;
@@ -48,14 +51,14 @@ public class PlaySoundTriggered : MonoBehaviour {
 		if (SFX == null) SFX = GetComponent<AudioSource>();
 		if (loopingAmbient) {
 			if (SFX != null) SFX.loop = true;
-			if (SFX != null) SFX.clip = Const.a.sounds[SFXClip];
+			if (SFX != null) SFX.clip = _consts.sounds[SFXClip];
 			if (SFX != null) SFX.Play();
 		}
 	}
 
 	void Update() {
 		if (currentlyPlaying) {
-			if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) {
+			if (_pauseScript.Paused() || _pauseScript.MenuActive()) {
 				if (SFX != null) SFX.Pause();
 				justPaused = true;
 			} else {
@@ -66,11 +69,11 @@ public class PlaySoundTriggered : MonoBehaviour {
 			}
 		}
 
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			if (playSoundOnParticleEmit){
 				int count = psys.particleCount;
 				if (count > numparticles && (count == burstemittcnt1 || count == burstemittcnt2)) {
-					Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXClip]);
+					Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXClip]);
 				}
 				numparticles = count;
 			}
@@ -79,7 +82,7 @@ public class PlaySoundTriggered : MonoBehaviour {
 
     public void PlaySoundEffect() {
 		if (SFX != null) SFX.loop = false;
-		Utils.PlayOneShotSavable(SFX,Const.a.sounds[SFXClip]);
+		Utils.PlayOneShotSavable(SFX,_consts.sounds[SFXClip]);
 	}
 	
 	public void StopSoundEffect() {

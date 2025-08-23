@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,9 +12,12 @@ public class CyberTimer : MonoBehaviour {
 	[HideInInspector]
 	public float timerFinished; // save
 
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake() {
 		t = 60f * 10f;
-		timerFinished = PauseScript.a.relativeTime + 1f;
+		timerFinished = _pauseScript.relativeTime + 1f;
 	}
 
     public void Reset(int diff) {
@@ -26,14 +30,14 @@ public class CyberTimer : MonoBehaviour {
     }
 
     void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
-			if (t <= 0) MouseLookScript.a.ExitCyberspace();
-			if (timerFinished < PauseScript.a.relativeTime) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
+			if (t <= 0) _mouseLookScript.ExitCyberspace();
+			if (timerFinished < _pauseScript.relativeTime) {
 				t -= 1f;
 				minutes = Mathf.Floor(t/60f);
 				seconds = t - (minutes*60);
 				text.text = (minutes.ToString("00") + ":" + seconds.ToString("00"));
-				timerFinished = PauseScript.a.relativeTime + 1f;
+				timerFinished = _pauseScript.relativeTime + 1f;
 			}
 		}
     }

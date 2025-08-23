@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Text;
 using Citadel.Game;
+using Zenject;
 
-public class WeaponFire : MonoBehaviour, ISingletonInitializer {
+public class WeaponFire : MonoBehaviour {
 	// External references, required
     public GameObject impactEffect;
 	public GameObject noDamageIndicator;
@@ -81,34 +82,45 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
     private float heatTickTime = 0.50f;
 	private Rigidbody playercapRbody;
 	private float wepYRot;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
+
+	[Inject] private LevelManager _levelManager;
+	[Inject] private ConsoleEmulator _consoleEmulator;
+	[Inject] private PlayerEnergy _playerEnergy;
+	[Inject] private BiomonitorGraphSystem _biomonitorGraphSystem;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Automap _automap;
+	[Inject] private GUIState _guiState;
+	[Inject] private PlayerPatch _playerPatch;
+	[Inject] private GetInput _getInput;
+	[Inject] private Inventory _inventory;
+	[Inject] private MouseCursor _mouseCursor;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private Music _music;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
+	[Inject] private PlayerMovement _playerMovement;
+	[Inject] private WeaponCurrent _weaponCurrent;
 
 	// Not needed on Const as this only exists in one unique place on player.
 	private float[] driftForWeapon = new float[16]{5f,0f,15f,50f,0f,0f,0f,8f,
 												   3f,3f,3f,12f,10f,30f,0f,3f};
 
-	// Singleton instance
-	public static WeaponFire a;
-
-	public void Initialize()
-	{
-		a = this;
-	}
-
     void Start() {
-        damageData = new DamageData();
+        damageData = new DamageData(_consts);
         tempHit = new RaycastHit();
         tempVec = new Vector3(0f, 0f, 0f);
-        heatTickFinished = PauseScript.a.relativeTime + heatTickTime;
+        heatTickFinished = _pauseScript.relativeTime + heatTickTime;
 		reloadContainerHome = reloadContainer.localPosition;
 
-		// Set less than 30s before PauseScript.a.relativeTime to guarantee we
+		// Set less than 30s before _pauseScript.relativeTime to guarantee we
 		// don't immediately play action music.
-		justFired = (PauseScript.a.relativeTime - 31f);
+		justFired = (_pauseScript.relativeTime - 31f);
 
-		energySliderClickedTime = PauseScript.a.relativeTime;
+		energySliderClickedTime = _pauseScript.relativeTime;
 		playercapRbody = playerCapsule.GetComponent<Rigidbody>();
-		cyberWeaponAttackFinished = PauseScript.a.relativeTime;
+		cyberWeaponAttackFinished = _pauseScript.relativeTime;
 		wepYRot = 0f;
 		sparqSetting = 50f;
 		ionSetting = 100f;
@@ -116,39 +128,39 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		plasmaSetting = 40f;
 		stungunSetting = 20f;
 		reloadLerpValue = 0;
-		reloadFinished = PauseScript.a.relativeTime;
-		lerpStartTime = PauseScript.a.relativeTime;
+		reloadFinished = _pauseScript.relativeTime;
+		lerpStartTime = _pauseScript.relativeTime;
 		fogFac = 0;
     }
 
     void GetWeaponData(int index) {
         if (index < 0) return;
-		if (WeaponCurrent.a.weaponCurrent < 0) return;
+		if (_weaponCurrent.weaponCurrent < 0) return;
 
-        if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
+        if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
 			// Alternate (2)
-            damageData.damage = Const.a.damagePerHitForWeapon2[index];
+            damageData.damage = _consts.damagePerHitForWeapon2[index];
             damageData.delayBetweenShots = 
-				Const.a.delayBetweenShotsForWeapon2[index];
+				_consts.delayBetweenShotsForWeapon2[index];
 
-            damageData.penetration = Const.a.penetrationForWeapon2[index];
-            damageData.offense = Const.a.offenseForWeapon2[index];
+            damageData.penetration = _consts.penetrationForWeapon2[index];
+            damageData.offense = _consts.offenseForWeapon2[index];
         } else {
 			// Normal
-            damageData.damage = Const.a.damagePerHitForWeapon[index];
+            damageData.damage = _consts.damagePerHitForWeapon[index];
             damageData.delayBetweenShots =
-				Const.a.delayBetweenShotsForWeapon[index];
+				_consts.delayBetweenShotsForWeapon[index];
 
-            damageData.penetration = Const.a.penetrationForWeapon[index];
-            damageData.offense = Const.a.offenseForWeapon[index];
+            damageData.penetration = _consts.penetrationForWeapon[index];
+            damageData.offense = _consts.offenseForWeapon[index];
         }
 
-        damageData.damageOverload = Const.a.damageOverloadForWeapon[index];
-        damageData.energyDrainLow = Const.a.energyDrainLowForWeapon[index];
-        damageData.energyDrainHi = Const.a.energyDrainHiForWeapon[index];
-        damageData.energyDrainOver = Const.a.energyDrainOverloadForWeapon[index];
-        damageData.attackType = Const.a.attackTypeForWeapon[index];
-        damageData.berserkActive = (Utils.CheckFlags(PlayerPatch.a.patchActive,PlayerPatch.PATCH_BERSERK));
+        damageData.damageOverload = _consts.damageOverloadForWeapon[index];
+        damageData.energyDrainLow = _consts.energyDrainLowForWeapon[index];
+        damageData.energyDrainHi = _consts.energyDrainHiForWeapon[index];
+        damageData.energyDrainOver = _consts.energyDrainOverloadForWeapon[index];
+        damageData.attackType = _consts.attackTypeForWeapon[index];
+        damageData.berserkActive = (Utils.CheckFlags(_playerPatch.patchActive,PlayerPatch.PATCH_BERSERK));
     }
 
     public static int Get16WeaponIndexFromConstIndex(int index) {
@@ -174,49 +186,49 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
     }
 
     bool CurrentWeaponUsesEnergy () {
-        if (WeaponCurrent.a.weaponIndex == 37 || WeaponCurrent.a.weaponIndex == 40 ||
-			WeaponCurrent.a.weaponIndex == 46 || WeaponCurrent.a.weaponIndex == 50 ||
-			WeaponCurrent.a.weaponIndex == 51)
+        if (_weaponCurrent.weaponIndex == 37 || _weaponCurrent.weaponIndex == 40 ||
+			_weaponCurrent.weaponIndex == 46 || _weaponCurrent.weaponIndex == 50 ||
+			_weaponCurrent.weaponIndex == 51)
 			return true;
         return false;
     }
 
     bool WeaponsHaveAnyHeat() {
-		if (WeaponCurrent.a.redbull) return false;
-		if (Inventory.a.currentEnergyWeaponHeat[0] > 0f) return true;
-		if (Inventory.a.currentEnergyWeaponHeat[1] > 0f) return true;
-		if (Inventory.a.currentEnergyWeaponHeat[2] > 0f) return true;
-		if (Inventory.a.currentEnergyWeaponHeat[3] > 0f) return true;
-		if (Inventory.a.currentEnergyWeaponHeat[4] > 0f) return true;
-		if (Inventory.a.currentEnergyWeaponHeat[5] > 0f) return true;
-		if (Inventory.a.currentEnergyWeaponHeat[6] > 0f) return true;
+		if (_weaponCurrent.redbull) return false;
+		if (_inventory.currentEnergyWeaponHeat[0] > 0f) return true;
+		if (_inventory.currentEnergyWeaponHeat[1] > 0f) return true;
+		if (_inventory.currentEnergyWeaponHeat[2] > 0f) return true;
+		if (_inventory.currentEnergyWeaponHeat[3] > 0f) return true;
+		if (_inventory.currentEnergyWeaponHeat[4] > 0f) return true;
+		if (_inventory.currentEnergyWeaponHeat[5] > 0f) return true;
+		if (_inventory.currentEnergyWeaponHeat[6] > 0f) return true;
         return false;
     }
 
     void HeatBleedOff() {
-        if (heatTickFinished < PauseScript.a.relativeTime) {
+        if (heatTickFinished < _pauseScript.relativeTime) {
 			fogFac--;
 			if (fogFac < 0) fogFac = 0;
 			if (WeaponsHaveAnyHeat() || CurrentWeaponUsesEnergy()) {
-				Inventory.a.currentEnergyWeaponHeat[0] -= 10f; if (Inventory.a.currentEnergyWeaponHeat[0] <= 0f) Inventory.a.currentEnergyWeaponHeat[0] = 0f;
-				Inventory.a.currentEnergyWeaponHeat[1] -= 10f; if (Inventory.a.currentEnergyWeaponHeat[1] <= 0f) Inventory.a.currentEnergyWeaponHeat[1] = 0f;
-				Inventory.a.currentEnergyWeaponHeat[2] -= 10f; if (Inventory.a.currentEnergyWeaponHeat[2] <= 0f) Inventory.a.currentEnergyWeaponHeat[2] = 0f;
-				Inventory.a.currentEnergyWeaponHeat[3] -= 10f; if (Inventory.a.currentEnergyWeaponHeat[3] <= 0f) Inventory.a.currentEnergyWeaponHeat[3] = 0f;
-				Inventory.a.currentEnergyWeaponHeat[4] -= 10f; if (Inventory.a.currentEnergyWeaponHeat[4] <= 0f) Inventory.a.currentEnergyWeaponHeat[4] = 0f;
-				Inventory.a.currentEnergyWeaponHeat[5] -= 10f; if (Inventory.a.currentEnergyWeaponHeat[5] <= 0f) Inventory.a.currentEnergyWeaponHeat[5] = 0f;
-				Inventory.a.currentEnergyWeaponHeat[6] -= 10f; if (Inventory.a.currentEnergyWeaponHeat[6] <= 0f) Inventory.a.currentEnergyWeaponHeat[6] = 0f;
-				if (CurrentWeaponUsesEnergy()) energheatMgr.HeatBleed(Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent]); // update hud heat ticks if current weapon uses energy
+				_inventory.currentEnergyWeaponHeat[0] -= 10f; if (_inventory.currentEnergyWeaponHeat[0] <= 0f) _inventory.currentEnergyWeaponHeat[0] = 0f;
+				_inventory.currentEnergyWeaponHeat[1] -= 10f; if (_inventory.currentEnergyWeaponHeat[1] <= 0f) _inventory.currentEnergyWeaponHeat[1] = 0f;
+				_inventory.currentEnergyWeaponHeat[2] -= 10f; if (_inventory.currentEnergyWeaponHeat[2] <= 0f) _inventory.currentEnergyWeaponHeat[2] = 0f;
+				_inventory.currentEnergyWeaponHeat[3] -= 10f; if (_inventory.currentEnergyWeaponHeat[3] <= 0f) _inventory.currentEnergyWeaponHeat[3] = 0f;
+				_inventory.currentEnergyWeaponHeat[4] -= 10f; if (_inventory.currentEnergyWeaponHeat[4] <= 0f) _inventory.currentEnergyWeaponHeat[4] = 0f;
+				_inventory.currentEnergyWeaponHeat[5] -= 10f; if (_inventory.currentEnergyWeaponHeat[5] <= 0f) _inventory.currentEnergyWeaponHeat[5] = 0f;
+				_inventory.currentEnergyWeaponHeat[6] -= 10f; if (_inventory.currentEnergyWeaponHeat[6] <= 0f) _inventory.currentEnergyWeaponHeat[6] = 0f;
+				if (CurrentWeaponUsesEnergy()) energheatMgr.HeatBleed(_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent]); // update hud heat ticks if current weapon uses energy
 			}
 			
-            heatTickFinished = PauseScript.a.relativeTime + heatTickTime;
+            heatTickFinished = _pauseScript.relativeTime + heatTickTime;
         }
     }
 
 	public void Recoil (int i) {
-		float strength = Const.a.recoilForWeapon[i];
+		float strength = _consts.recoilForWeapon[i];
 		//Debug.Log("Recoil from gun index: "+i.ToString()+" with strength of " +strength.ToString());
 		if (strength <= 0f) return;
-		if (PlayerMovement.a.fatigue > 80) strength = strength * 2f;
+		if (_playerMovement.fatigue > 80) strength = strength * 2f;
 		strength = strength * 0.25f;
 		Vector3 wepJoltPosition = new Vector3(reloadContainer.localPosition.x - (strength * 0.5f * Random.Range(-1f,1f)), reloadContainer.localPosition.y, (reloadContainerHome.z - strength));
 		if (wepJoltPosition.x > 999f) wepJoltPosition.x = 0;
@@ -253,13 +265,13 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 
 	void UpdateWeaponReloadDip() {
 		// Move weapon transform up/down for reload "animation" & weapon swap.
-		int i = Get16WeaponIndexFromConstIndex(WeaponCurrent.a.weaponIndex);
+		int i = Get16WeaponIndexFromConstIndex(_weaponCurrent.weaponIndex);
 		if (i < 0 || i > 15) i = 0;
-		if (reloadFinished > PauseScript.a.relativeTime) {
-			float elapsed = (PauseScript.a.relativeTime - lerpStartTime);
+		if (reloadFinished > _pauseScript.relativeTime) {
+			float elapsed = (_pauseScript.relativeTime - lerpStartTime);
 
 			// Percent towards goal time total (both halves of the action).
-			reloadLerpValue = (elapsed/(reloadFinished-lerpStartTime));//Const.a.reloadTime[i]);
+			reloadLerpValue = (elapsed/(reloadFinished-lerpStartTime));//_consts.reloadTime[i]);
 			if (reloadLerpValue >= 0.5f) { // Flip back to lerp up.
 				lerpUp = 1;
 				WeaponLerpGetTargetUp();
@@ -286,8 +298,8 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 	}
 
     void Update() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 
 		// Slowly cool off any weapons that have been heated from firing
 		HeatBleedOff();
@@ -303,42 +315,42 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
     }
 
 	public void CompleteWeaponChange() {
-		if (WeaponCurrent.a.weaponCurrentPending == -1) return;
+		if (_weaponCurrent.weaponCurrentPending == -1) return;
 
 		// Set current weapon 7 slot
-		WeaponCurrent.a.weaponCurrent = WeaponCurrent.a.weaponCurrentPending;
+		_weaponCurrent.weaponCurrent = _weaponCurrent.weaponCurrentPending;
         if (CurrentWeaponUsesEnergy()) {
 			// Update hud heat ticks if current weapon uses energy
-			int iC = WeaponCurrent.a.weaponCurrent;
-			energheatMgr.HeatBleed(Inventory.a.currentEnergyWeaponHeat[iC]);
+			int iC = _weaponCurrent.weaponCurrent;
+			energheatMgr.HeatBleed(_inventory.currentEnergyWeaponHeat[iC]);
 		}
 
 		// Set current weapon inventory lookup index
-		WeaponCurrent.a.weaponIndex = WeaponCurrent.a.weaponIndexPending;
+		_weaponCurrent.weaponIndex = _weaponCurrent.weaponIndexPending;
 
 		// Reset pending indices now that transition is done
-		WeaponCurrent.a.weaponCurrentPending = -1;
-		WeaponCurrent.a.weaponIndexPending = -1;
+		_weaponCurrent.weaponCurrentPending = -1;
+		_weaponCurrent.weaponIndexPending = -1;
 
 		// Update the ammo icons.
-		int ind = WeaponCurrent.a.weaponIndex;
+		int ind = _weaponCurrent.weaponIndex;
 		bool alt = false;
-		if (ind >= 0 && ind < 16) alt = Inventory.a.wepLoadedWithAlternate[ind];
-		MFDManager.a.SetAmmoIcons(ind,alt);
-		MFDManager.a.SetWepInfo(WeaponCurrent.a.weaponIndex);
-		WeaponCurrent.a.UpdateWeaponViewModels();
+		if (ind >= 0 && ind < 16) alt = _inventory.wepLoadedWithAlternate[ind];
+		_mfdManager.SetAmmoIcons(ind,alt);
+		_mfdManager.SetWepInfo(_weaponCurrent.weaponIndex);
+		_weaponCurrent.UpdateWeaponViewModels();
 	}
 
 	public void StartWeaponDip(float delay) {
 		if (delay < 0) delay = 0;
-		reloadFinished = PauseScript.a.relativeTime + delay;
-		lerpStartTime = PauseScript.a.relativeTime;
+		reloadFinished = _pauseScript.relativeTime + delay;
+		lerpStartTime = _pauseScript.relativeTime;
 	}
 
 	void RotateViewWeapon() {
-		if (MouseLookScript.a.inventoryMode) {
+		if (_mouseLookScript.inventoryMode) {
 			float screenHalf = (Screen.width/2f);
-			float cursorX = MouseCursor.a.drawTexture.center.x;
+			float cursorX = _mouseCursor.drawTexture.center.x;
 			float distFromCenter = (cursorX - screenHalf);
 			float percentRotated = (distFromCenter / screenHalf);
 			wepYRot = percentRotated * inventoryModeViewRotateMax;
@@ -350,38 +362,38 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 
 	void CheckAttackInput() {
 		// Check for other things that must capture and override clicks
-		if (GetInput.a.Attack()) {
-			if (MouseLookScript.a.vmailActive) {
-				Inventory.a.DeactivateVMail();
-				MouseLookScript.a.vmailActive = false;
-				waitTilNextFire = PauseScript.a.relativeTime + 0.8f;
+		if (_getInput.Attack()) {
+			if (_mouseLookScript.vmailActive) {
+				_inventory.DeactivateVMail();
+				_mouseLookScript.vmailActive = false;
+				waitTilNextFire = _pauseScript.relativeTime + 0.8f;
 				return;
 			}
 
-			if (MouseLookScript.a.inCyberSpace) {
+			if (_mouseLookScript.inCyberSpace) {
 				FireCyberWeapon();
 				return;
 			}
 
-			if (MouseLookScript.a.holdingObject
-				&& !MFDManager.a.mouseClickHeldOverGUI) { // !Just clicked
-				if (!GUIState.a.isBlocking) {
+			if (_mouseLookScript.holdingObject
+				&& !_mfdManager.mouseClickHeldOverGUI) { // !Just clicked
+				if (!_guiState.isBlocking) {
 					// Drop it
-					MouseLookScript.a.DropHeldItem ();
+					_mouseLookScript.DropHeldItem ();
 					return;
 				} else {
-					MouseLookScript.a.AddItemToInventory(MouseLookScript.a.heldObjectIndex,MouseLookScript.a.heldObjectCustomIndex);
-					MouseLookScript.a.ResetHeldItem();
+					_mouseLookScript.AddItemToInventory(_mouseLookScript.heldObjectIndex,_mouseLookScript.heldObjectCustomIndex);
+					_mouseLookScript.ResetHeldItem();
 					return;
 				}
 			}
 		}
 
-		int wepdex = Get16WeaponIndexFromConstIndex(WeaponCurrent.a.weaponIndex);
+		int wepdex = Get16WeaponIndexFromConstIndex(_weaponCurrent.weaponIndex);
 		if (wepdex == -1) return; // No weapon.
-		if (GUIState.a.isBlocking) return;
-		if (MouseLookScript.a.holdingObject) return;
-		if (MFDManager.a.mouseClickHeldOverGUI) return;
+		if (_guiState.isBlocking) return;
+		if (_mouseLookScript.holdingObject) return;
+		if (_mfdManager.mouseClickHeldOverGUI) return;
 
 		StartNormalAttack(wepdex);
 	}
@@ -390,10 +402,10 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		if (wep16Index < 0 || wep16Index > 15) return;
 
 		GetWeaponData(wep16Index);
-		if (GetInput.a.Attack()
-			&& waitTilNextFire < PauseScript.a.relativeTime
-			&& (PauseScript.a.relativeTime - energySliderClickedTime) > 0.1f
-			&& reloadFinished < PauseScript.a.relativeTime) {
+		if (_getInput.Attack()
+			&& waitTilNextFire < _pauseScript.relativeTime
+			&& (_pauseScript.relativeTime - energySliderClickedTime) > 0.1f
+			&& reloadFinished < _pauseScript.relativeTime) {
 
 			StartCoroutine(CheckUIStateAndAttack(wep16Index));
 		}
@@ -402,15 +414,15 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 	IEnumerator CheckUIStateAndAttack(int wepdex) {
 		yield return null; // Ensure next frame
 
-		if (GUIState.a.isBlocking) yield break;
-		if (MouseLookScript.a.holdingObject) yield break;
-		if (MFDManager.a.mouseClickHeldOverGUI) yield break;
-		if (reloadFinished >= PauseScript.a.relativeTime) yield break;
-		if (waitTilNextFire >= PauseScript.a.relativeTime) yield break;
+		if (_guiState.isBlocking) yield break;
+		if (_mouseLookScript.holdingObject) yield break;
+		if (_mfdManager.mouseClickHeldOverGUI) yield break;
+		if (reloadFinished >= _pauseScript.relativeTime) yield break;
+		if (waitTilNextFire >= _pauseScript.relativeTime) yield break;
 		if (wepdex < 0 || wepdex > 15) yield break;
-		if (Automap.a.inFullMap) yield break;
+		if (_automap.inFullMap) yield break;
 
-		justFired = PauseScript.a.relativeTime; // set justFired so that Music.cs can see it and play corresponding music in a little bit from now or keep playing action music
+		justFired = _pauseScript.relativeTime; // set justFired so that Music.cs can see it and play corresponding music in a little bit from now or keep playing action music
 		// Check weapon type and check ammo before firing
 		switch (wepdex) {
 			case 1: goto case 15;
@@ -426,39 +438,39 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 			case 15: 
 				// Energy weapons so check energy level
 				// Even if we have only 1 energy, we still fire with all we've got up to the energy level setting of course
-				if (PlayerEnergy.a.energy > 0
-					|| WeaponCurrent.a.bottomless
-					|| WeaponCurrent.a.redbull) {
-					if (Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] > overheatedPercent
-						&& !WeaponCurrent.a.bottomless
-						&& !WeaponCurrent.a.redbull) {
-						Utils.PlayUIOneShotSavable(238); // noammo
-						waitTilNextFire = PauseScript.a.relativeTime + 0.8f;
-						Const.sprint(11);
+				if (_playerEnergy.energy > 0
+					|| _weaponCurrent.bottomless
+					|| _weaponCurrent.redbull) {
+					if (_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] > overheatedPercent
+						&& !_weaponCurrent.bottomless
+						&& !_weaponCurrent.redbull) {
+						Utils.PlayUIOneShotSavable(_consts,238); // noammo
+						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
+						_consts.sprint(11);
 					} else {
 						FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
 					}
 				} else {
-					Const.sprint(207); // Not enough energy to fire weapon.
+					_consts.sprint(207); // Not enough energy to fire weapon.
 				}
 				break;
 			default:
 				// Uses normal ammo, check versus alternate or normal to see if we have ammo then fire
-				if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
-					if (WeaponCurrent.a.currentMagazineAmount2[WeaponCurrent.a.weaponCurrent] > 0
-						|| WeaponCurrent.a.bottomless) {
+				if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
+					if (_weaponCurrent.currentMagazineAmount2[_weaponCurrent.weaponCurrent] > 0
+						|| _weaponCurrent.bottomless) {
 						FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
 					} else {
-						Utils.PlayUIOneShotSavable(238); // noammo
-						waitTilNextFire = PauseScript.a.relativeTime + 0.8f;
+						Utils.PlayUIOneShotSavable(_consts,238); // noammo
+						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
 					}
 				} else {
-					if (WeaponCurrent.a.currentMagazineAmount[WeaponCurrent.a.weaponCurrent] > 0
-						|| WeaponCurrent.a.bottomless) {
+					if (_weaponCurrent.currentMagazineAmount[_weaponCurrent.weaponCurrent] > 0
+						|| _weaponCurrent.bottomless) {
 						FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
 					} else {
-						Utils.PlayUIOneShotSavable(238); // noammo
-						waitTilNextFire = PauseScript.a.relativeTime + 0.8f;
+						Utils.PlayUIOneShotSavable(_consts,238); // noammo
+						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
 					}
 				}
 				break;
@@ -466,95 +478,95 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 	}
 
 	void CheckReloadInput() {
-		if (reloadFinished >= PauseScript.a.relativeTime) return;
-		if (!GetInput.a.Reload()) return;
+		if (reloadFinished >= _pauseScript.relativeTime) return;
+		if (!_getInput.Reload()) return;
 
-		if (Const.a.InputQuickReloadWeapons) {
+		if (_consts.InputQuickReloadWeapons) {
 			// Press reload once, to do both unload then reload
-			WeaponCurrent.a.Reload();
+			_weaponCurrent.Reload();
 			return;
 		}
 
-		if (WeaponCurrent.a.weaponCurrent < 0) return;
+		if (_weaponCurrent.weaponCurrent < 0) return;
 
 		// First press reload to unload, then press again to load
-		int wep16index = WeaponFire.Get16WeaponIndexFromConstIndex(WeaponCurrent.a.weaponIndex);
+		int wep16index = WeaponFire.Get16WeaponIndexFromConstIndex(_weaponCurrent.weaponIndex);
 		if (wep16index < 0) return;
 
-		if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
-			if (WeaponCurrent.a.currentMagazineAmount2[WeaponCurrent.a.weaponCurrent] <= 0
-				|| Inventory.a.wepAmmoSecondary[wep16index] <= 0) { // True for no wepAmmoSecondary causes Reload to run and display no ammo message.
-				WeaponCurrent.a.Reload();
+		if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
+			if (_weaponCurrent.currentMagazineAmount2[_weaponCurrent.weaponCurrent] <= 0
+				|| _inventory.wepAmmoSecondary[wep16index] <= 0) { // True for no wepAmmoSecondary causes Reload to run and display no ammo message.
+				_weaponCurrent.Reload();
 				// Debug.Log("Reload step");
 			} else {
-				WeaponCurrent.a.Unload(false);
+				_weaponCurrent.Unload(false);
 				// Debug.Log("Unload step");
 			}
 		} else {
-			if (WeaponCurrent.a.currentMagazineAmount[WeaponCurrent.a.weaponCurrent] <= 0
-				|| Inventory.a.wepAmmo[wep16index] <= 0) { // True for no wepAmmo causes Reload to run and display no ammo message.
-				WeaponCurrent.a.Reload();
+			if (_weaponCurrent.currentMagazineAmount[_weaponCurrent.weaponCurrent] <= 0
+				|| _inventory.wepAmmo[wep16index] <= 0) { // True for no wepAmmo causes Reload to run and display no ammo message.
+				_weaponCurrent.Reload();
 				// Debug.Log("Reload step");
 			} else {
-				WeaponCurrent.a.Unload(false);
+				_weaponCurrent.Unload(false);
 				// Debug.Log("Unload step");
 			}
 		}
 	}
 
 	void CheckAmmoChangeInput() {
-		if (reloadFinished >= PauseScript.a.relativeTime) return;
-		if (!GetInput.a.ChangeAmmoType()) return;
+		if (reloadFinished >= _pauseScript.relativeTime) return;
+		if (!_getInput.ChangeAmmoType()) return;
 
-		WeaponCurrent.a.ChangeAmmoType();
-// 		if (Const.a.InputQuickReloadWeapons) {
+		_weaponCurrent.ChangeAmmoType();
+// 		if (_consts.InputQuickReloadWeapons) {
 // 			// Press change ammo type button once, to both unload then reload.
-// 			WeaponCurrent.a.ChangeAmmoType();
+// 			_weaponCurrent.ChangeAmmoType();
 // 		} else {
 // 			// First press ammo type button to unload, then again to load.
-// 			int wep16index = WeaponFire.Get16WeaponIndexFromConstIndex(WeaponCurrent.a.weaponIndex);
+// 			int wep16index = WeaponFire.Get16WeaponIndexFromConstIndex(_weaponCurrent.weaponIndex);
 // 			if (wep16index < 0) return;
 // 
 // 			int ammoAvailable = 0;
-// 			if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
-// 				ammoAvailable = Inventory.a.wepAmmoSecondary[wep16index];
+// 			if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
+// 				ammoAvailable = _inventory.wepAmmoSecondary[wep16index];
 // 			} else {
-// 				ammoAvailable = Inventory.a.wepAmmo[wep16index];
+// 				ammoAvailable = _inventory.wepAmmo[wep16index];
 // 			}
 // 
-// 			if (ammoAvailable <= 0) WeaponCurrent.a.ChangeAmmoType();
+// 			if (ammoAvailable <= 0) _weaponCurrent.ChangeAmmoType();
 // 			else {
-// 				if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
-// 									WeaponCurrent.a.Unload(false);
+// 				if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
+// 									_weaponCurrent.Unload(false);
 // 
 // 				} else if () {
 // 					
-// 						WeaponCurrent.a.Unload(false);
+// 						_weaponCurrent.Unload(false);
 // 				}
 // 				} else {
-// 					WeaponCurrent.a.ChangeAmmoType();
+// 					_weaponCurrent.ChangeAmmoType();
 // 				}
 // 			}
 // 		}
 	}
 
 	public void FireCyberWeapon() {
-		if (cyberWeaponAttackFinished < PauseScript.a.relativeTime) {
-			if (Inventory.a.isPulserNotDrill) {
-				if (Inventory.a.hasSoft[1]) {
+		if (cyberWeaponAttackFinished < _pauseScript.relativeTime) {
+			if (_inventory.isPulserNotDrill) {
+				if (_inventory.hasSoft[1]) {
 					// Fire pulser
-					Const.a.shotsFired++;
-					if (Inventory.a.hasSoft[1]) FireCyberBeachball(true,railgunShotForce,492);
-					Utils.PlayUIOneShotSavable(258); // wpulser
-					cyberWeaponAttackFinished = PauseScript.a.relativeTime + 0.08f;
+					_consts.shotsFired++;
+					if (_inventory.hasSoft[1]) FireCyberBeachball(true,railgunShotForce,492);
+					Utils.PlayUIOneShotSavable(_consts,258); // wpulser
+					cyberWeaponAttackFinished = _pauseScript.relativeTime + 0.08f;
 				}
 			} else {
-				if (Inventory.a.hasSoft[0]) {
+				if (_inventory.hasSoft[0]) {
 					// Fire I.C.E. drill
-					Const.a.shotsFired++;
-					if (Inventory.a.hasSoft[0]) FireCyberBeachball(false,plasmaShotForce,495);
-					Utils.PlayUIOneShotSavable(241); // wdrill baby drill
-					cyberWeaponAttackFinished = PauseScript.a.relativeTime + 0.5f;
+					_consts.shotsFired++;
+					if (_inventory.hasSoft[0]) FireCyberBeachball(false,plasmaShotForce,495);
+					Utils.PlayUIOneShotSavable(_consts,241); // wdrill baby drill
+					cyberWeaponAttackFinished = _pauseScript.relativeTime + 0.5f;
 				}
 			}
 		}
@@ -563,12 +575,12 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 	void FireCyberBeachball(bool isPulser, float shoveForce, int prefabID) {
         // Create and hurl a beachball-like object.  On the developer commentary they said that the projectiles act
         // like a beachball for collisions with enemies, but act like a baseball for walls/floor to prevent hitting corners
-        GameObject beachball = ConsoleEmulator.SpawnDynamicObject(prefabID,-1);
+        GameObject beachball = _consoleEmulator.SpawnDynamicObject(prefabID,-1);
         if (beachball != null) {
-			damageData.damage = 10f * Inventory.a.softVersions[0];
+			damageData.damage = 10f * _inventory.softVersions[0];
 			if (isPulser) {
 				// Cyberspace enemies don't have much health.
-				damageData.damage = 1f + (0.25f * Inventory.a.softVersions[1]);
+				damageData.damage = 1f + (0.25f * _inventory.softVersions[1]);
 			}
 
             damageData.owner = playerCapsule;
@@ -577,74 +589,74 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
             beachball.GetComponent<ProjectileEffectImpact>().dd = damageData;
             beachball.GetComponent<ProjectileEffectImpact>().host = playerCapsule;
             beachball.transform.position = playerCamera.transform.position;
-			MouseLookScript.a.SetCameraFocusPoint();
-            tempVec = MouseLookScript.a.cameraFocusPoint - playerCamera.transform.position;
+			_mouseLookScript.SetCameraFocusPoint();
+            tempVec = _mouseLookScript.cameraFocusPoint - playerCamera.transform.position;
             beachball.transform.forward = tempVec.normalized;
             beachball.SetActive(true);
             Vector3 shove = beachball.transform.forward * shoveForce;
-            beachball.GetComponent<Rigidbody>().linearVelocity = Const.a.vectorZero; // prevent random variation from the last shot's velocity
+            beachball.GetComponent<Rigidbody>().linearVelocity = _consts.vectorZero; // prevent random variation from the last shot's velocity
             beachball.GetComponent<Rigidbody>().AddForce(shove, ForceMode.Impulse);
         }
 	}
 
-    // index is used to get recoil down at the bottom and pass along ref for damageData, otherwise the cases use WeaponCurrent.a.weaponIndex
+    // index is used to get recoil down at the bottom and pass along ref for damageData, otherwise the cases use _weaponCurrent.weaponIndex
     void FireWeapon(int index, bool isSilent) {
-		PlayerHealth.a.makingNoise = true;
-		PlayerHealth.a.noiseFinished = PauseScript.a.relativeTime + 0.5f;
+		_playerHealth.makingNoise = true;
+		_playerHealth.noiseFinished = _pauseScript.relativeTime + 0.5f;
 		GameObject smoke = null;
-        switch (WeaponCurrent.a.weaponIndex) {
+        switch (_weaponCurrent.weaponIndex) {
             case 36:
                 //Mark3 Assault Rifle
-                if (!isSilent) Utils.PlayUIOneShotSavable(251); // wmarksman
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,251); // wmarksman
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashMK3.SetActive(true);
-				smoke = Instantiate(muzSmokeMK3,muzFlashMK3.transform.position,Const.a.quaternionIdentity) as GameObject;
+				smoke = GameBindings.InstantiatePrefab(muzSmokeMK3,muzFlashMK3.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;
                 break;
             case 37:
                 //ER-90 Blaster
-				blasterSetting = WeaponCurrent.a.weaponEnergySetting[WeaponCurrent.a.weaponCurrent];
+				blasterSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Blaster fired with energy setting of " + blasterSetting.ToString());
-				if (!isSilent) Utils.PlayUIOneShotSavable(239); // wblaster
+				if (!isSilent) Utils.PlayUIOneShotSavable(_consts,239); // wblaster
 				if (DidRayHit(index)) HitScanFire(index);
 				muzFlashBlaster.SetActive(true);
                 if (overloadEnabled) {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f;
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
                 } else {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] += blasterSetting;
-					if (Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] > 100f) Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f; // cap it
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] += blasterSetting;
+					if (_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] > 100f) _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f; // cap it
                 }
                 break;
             case 38:
                 //SV-23 Dartgun
-                if (!isSilent) Utils.PlayUIOneShotSavable(240); // wdartgun
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,240); // wdartgun
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashDartgun.SetActive(true);
                 break;
             case 39:
                 //AM-27 Flechette
-                if (!isSilent) Utils.PlayUIOneShotSavable(243); // wflechette
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,243); // wflechette
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashFlechette.SetActive(true);
-				smoke = Instantiate(muzSmokeFlechette,muzFlashFlechette.transform.position,Const.a.quaternionIdentity) as GameObject;
+				smoke = GameBindings.InstantiatePrefab(muzSmokeFlechette,muzFlashFlechette.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 1;
 				break;
             case 40:
                 //RW-45 Ion Beam
-				ionSetting = WeaponCurrent.a.weaponEnergySetting[WeaponCurrent.a.weaponCurrent];
+				ionSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Ion rifle fired with energy setting of " + ionSetting.ToString());
-                if (!isSilent) Utils.PlayUIOneShotSavable(245); // wion
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,245); // wion
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashIonBeam.SetActive(true);
                 if (overloadEnabled) {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f;
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
                 } else {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] += ionSetting;
-					if (Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] > 100f) Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f; // cap it
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] += ionSetting;
+					if (_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] > 100f) _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f; // cap it
                 }
                 break;
             case 41:
@@ -657,98 +669,98 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
                 break;
             case 43:
                 //Magnum 2100
-                if (!isSilent) Utils.PlayUIOneShotSavable(249); // wmagnum
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,249); // wmagnum
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashMagnum.SetActive(true);
-				smoke = Instantiate(muzSmokeMagnum,muzFlashMagnum.transform.position,Const.a.quaternionIdentity) as GameObject;
+				smoke = GameBindings.InstantiatePrefab(muzSmokeMagnum,muzFlashMagnum.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 3;
                 break;
             case 44:
                 //SB-20 Magpulse
-                if (!isSilent) Utils.PlayUIOneShotSavable(250); // wmagpulse
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,250); // wmagpulse
                 FireMagpulse(index);
 				muzFlashMagpulse.SetActive(true);
                 break;
             case 45:
                 //ML-41 Pistol
-                if (!isSilent) Utils.PlayUIOneShotSavable(255); // wpistol
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,255); // wpistol
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashPistol.SetActive(true);
-				smoke = Instantiate(muzSmokePistol,muzFlashPistol.transform.position,Const.a.quaternionIdentity) as GameObject;
+				smoke = GameBindings.InstantiatePrefab(muzSmokePistol,muzFlashPistol.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 1;
                 break;
             case 46:
                 //LG-XX Plasma Rifle
-				plasmaSetting = WeaponCurrent.a.weaponEnergySetting[WeaponCurrent.a.weaponCurrent];
+				plasmaSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Plasma rifle fired with energy setting of " + plasmaSetting.ToString());
-                if (!isSilent) Utils.PlayUIOneShotSavable(257); // wplasma
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,257); // wplasma
                 FirePlasma(index);
 				muzFlashPlasma.SetActive(true);
                 if (overloadEnabled) {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f;
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
                 } else {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] += plasmaSetting;
-					if (Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] > 100f) Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f; // cap it
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] += plasmaSetting;
+					if (_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] > 100f) _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f; // cap it
                 }
                 break;
             case 47:
                 //MM-76 Railgun
-                if (!isSilent) Utils.PlayUIOneShotSavable(259); // wrailgun
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,259); // wrailgun
                 FireRailgun(index);
 				muzFlashRailgun.SetActive(true);
-				smoke = Instantiate(muzSmokeRailgun,muzFlashRailgun.transform.position,Const.a.quaternionIdentity) as GameObject;
+				smoke = GameBindings.InstantiatePrefab(muzSmokeRailgun,muzFlashRailgun.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;
                 break;
             case 48:
                 //DC-05 Riotgun
-                if (!isSilent) Utils.PlayUIOneShotSavable(262); // wriotgun
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,262); // wriotgun
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashRiotgun.SetActive(true);
-				smoke = Instantiate(muzSmokeRiotgun,muzFlashRiotgun.transform.position,Const.a.quaternionIdentity) as GameObject;
+				smoke = GameBindings.InstantiatePrefab(muzSmokeRiotgun,muzFlashRiotgun.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 4;
                 break;
             case 49:
                 //RF-07 Skorpion
-                if (!isSilent) Utils.PlayUIOneShotSavable(263); // wskorpion
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,263); // wskorpion
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashSkorpion.SetActive(true);
-				smoke = Instantiate(muzSmokeSkorpion,muzFlashSkorpion.transform.position,Const.a.quaternionIdentity) as GameObject;
+				smoke = GameBindings.InstantiatePrefab(muzSmokeSkorpion,muzFlashSkorpion.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;
                 break;
             case 50:
                 //Sparq Beam
-				sparqSetting = WeaponCurrent.a.weaponEnergySetting[WeaponCurrent.a.weaponCurrent];
-                if (!isSilent) Utils.PlayUIOneShotSavable(264); // wsparq
+				sparqSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,264); // wsparq
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashSparq.SetActive(true);
                 if (overloadEnabled) {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f;
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
                 } else {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] += sparqSetting;
-					if (Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] > 100f) Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f; // cap it
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] += sparqSetting;
+					if (_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] > 100f) _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f; // cap it
                 }
                 break;
             case 51:
                 //DH-07 Stungun
-				stungunSetting = WeaponCurrent.a.weaponEnergySetting[WeaponCurrent.a.weaponCurrent];
-                if (!isSilent) Utils.PlayUIOneShotSavable(265); // wstungun
+				stungunSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
+                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,265); // wstungun
                 FireStungun(index);
 				muzFlashStungun.SetActive(true);
                 if (overloadEnabled) {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f;
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
                 } else {
-                    Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] += stungunSetting;
-					if (Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] > 100f) Inventory.a.currentEnergyWeaponHeat[WeaponCurrent.a.weaponCurrent] = 100f; // cap it
+                    _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] += stungunSetting;
+					if (_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] > 100f) _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f; // cap it
                 }
                 break;
         }
@@ -757,7 +769,7 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
         // no weapons subtract more than 1 at a time in a shot except for energy weapons, subtracting 1
         // Check weapon type before subtracting ammo or energy
         if (index == 5 || index == 6) {
-            // Melee don't count towards Const.a.shotsFired
+            // Melee don't count towards _consts.shotsFired
             // Pipe or Laser Rapier
             // ammo is already 0, do nothing.  This is here to prevent subtracting ammo on the first slot of .wepAmmo[index] on the last else clause below
         } else {
@@ -765,51 +777,47 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
             if (index == 1 || index == 4 || index == 10 || index == 14 || index == 15) {
                 if (overloadEnabled) {
                     energoverButton.OverloadFired();
-                    if (!WeaponCurrent.a.bottomless && !WeaponCurrent.a.redbull) {
-						PlayerEnergy.a.TakeEnergy(Const.a.energyDrainOverloadForWeapon[index]); //take large amount
-						if (BiomonitorGraphSystem.a != null) {
-							BiomonitorGraphSystem.a.EnergyPulse(Const.a.energyDrainOverloadForWeapon[index]);
-						}
+                    if (!_weaponCurrent.bottomless && !_weaponCurrent.redbull) {
+						_playerEnergy.TakeEnergy(_consts.energyDrainOverloadForWeapon[index]); //take large amount
+						_biomonitorGraphSystem.EnergyPulse(_consts.energyDrainOverloadForWeapon[index]);
 					}
                 } else {
-                    float takeEnerg = (WeaponCurrent.a.weaponEnergySetting[WeaponCurrent.a.weaponCurrent] / 100f) * (Const.a.energyDrainHiForWeapon[index] - Const.a.energyDrainLowForWeapon[index]);
-                    if (!WeaponCurrent.a.bottomless && !WeaponCurrent.a.redbull) {
-						PlayerEnergy.a.TakeEnergy(takeEnerg);
-						if (BiomonitorGraphSystem.a != null) {
-							BiomonitorGraphSystem.a.EnergyPulse(takeEnerg);
-						}
+                    float takeEnerg = (_weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent] / 100f) * (_consts.energyDrainHiForWeapon[index] - _consts.energyDrainLowForWeapon[index]);
+                    if (!_weaponCurrent.bottomless && !_weaponCurrent.redbull) {
+						_playerEnergy.TakeEnergy(takeEnerg);
+						_biomonitorGraphSystem.EnergyPulse(takeEnerg);
 					}
                 }
             } else {
-                if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
-                    if (!WeaponCurrent.a.bottomless) WeaponCurrent.a.currentMagazineAmount2[WeaponCurrent.a.weaponCurrent]--; // Take ammo away
+                if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
+                    if (!_weaponCurrent.bottomless) _weaponCurrent.currentMagazineAmount2[_weaponCurrent.weaponCurrent]--; // Take ammo away
                 } else {
-                    if (!WeaponCurrent.a.bottomless) WeaponCurrent.a.currentMagazineAmount[WeaponCurrent.a.weaponCurrent]--; // Take ammo away
+                    if (!_weaponCurrent.bottomless) _weaponCurrent.currentMagazineAmount[_weaponCurrent.weaponCurrent]--; // Take ammo away
                 }
             }
             
-            Const.a.shotsFired++;
+            _consts.shotsFired++;
         }
 
 		Recoil(index);
-        if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]
+        if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]
 			|| overloadEnabled) {
 
             overloadEnabled = false;
-            waitTilNextFire = PauseScript.a.relativeTime
-							  + Const.a.delayBetweenShotsForWeapon2[index];
+            waitTilNextFire = _pauseScript.relativeTime
+							  + _consts.delayBetweenShotsForWeapon2[index];
         } else {
-            waitTilNextFire = PauseScript.a.relativeTime
-							  + Const.a.delayBetweenShotsForWeapon[index];
+            waitTilNextFire = _pauseScript.relativeTime
+							  + _consts.delayBetweenShotsForWeapon[index];
         }
 
-		Inventory.a.UpdateAmmoText();
+		_inventory.UpdateAmmoText();
     }
 
     bool DidRayHit(int wep16Index) {
 		tempHM = null;
         tempHit = new RaycastHit();
-		tempVec = MouseCursor.a.GetCursorScreenPointForRay();
+		tempVec = _mouseCursor.GetCursorScreenPointForRay();
 		tempVec.x += UnityEngine.Random.Range(-driftForWeapon[wep16Index],
 											  driftForWeapon[wep16Index]);
 
@@ -817,7 +825,7 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 											  driftForWeapon[wep16Index]);
 
         if (Physics.Raycast(playerCamera.ScreenPointToRay(tempVec),out tempHit,
-							fireDistance,Const.a.layerMaskPlayerAttack)) {
+							fireDistance,_consts.layerMaskPlayerAttack)) {
 
 			tempHM = Utils.GetMainHealthManager(tempHit);
             return true;
@@ -840,27 +848,27 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 
 		// Add bullethole
 		tempVec = tempHit.normal * 0.16f;
-		GameObject holetype = Const.a.GetPrefab(522);
+		GameObject holetype = _consts.GetPrefab(522);
 		switch(wep16index) {
-			case 0:  holetype = Const.a.GetPrefab(518); break;
-			case 1:  holetype = Const.a.GetPrefab(520); break;
-			case 2:  holetype = Const.a.GetPrefab(522); break;
-			case 3:  holetype = Const.a.GetPrefab(521); break;
-			case 4:  holetype = Const.a.GetPrefab(519); break;
-			case 5:  holetype = Const.a.GetPrefab(520); break;
-			case 6:  holetype = Const.a.GetPrefab(522); break;
-			case 7:  holetype = Const.a.GetPrefab(518); break;
-			case 8:  holetype = Const.a.GetPrefab(519); break;
-			case 9:  holetype = Const.a.GetPrefab(521); break;
-			case 10: holetype = Const.a.GetPrefab(519); break;
-			case 11: holetype = Const.a.GetPrefab(519); break;
-			case 12: holetype = Const.a.GetPrefab(523); break;
-			case 13: holetype = Const.a.GetPrefab(518); break;
-			case 14: holetype = Const.a.GetPrefab(520); break;
-			case 15: holetype = Const.a.GetPrefab(520); break;
+			case 0:  holetype = _consts.GetPrefab(518); break;
+			case 1:  holetype = _consts.GetPrefab(520); break;
+			case 2:  holetype = _consts.GetPrefab(522); break;
+			case 3:  holetype = _consts.GetPrefab(521); break;
+			case 4:  holetype = _consts.GetPrefab(519); break;
+			case 5:  holetype = _consts.GetPrefab(520); break;
+			case 6:  holetype = _consts.GetPrefab(522); break;
+			case 7:  holetype = _consts.GetPrefab(518); break;
+			case 8:  holetype = _consts.GetPrefab(519); break;
+			case 9:  holetype = _consts.GetPrefab(521); break;
+			case 10: holetype = _consts.GetPrefab(519); break;
+			case 11: holetype = _consts.GetPrefab(519); break;
+			case 12: holetype = _consts.GetPrefab(523); break;
+			case 13: holetype = _consts.GetPrefab(518); break;
+			case 14: holetype = _consts.GetPrefab(520); break;
+			case 15: holetype = _consts.GetPrefab(520); break;
 		}
 
-		GameObject impactMark = (GameObject)Instantiate(holetype,
+		GameObject impactMark = GameBindings.InstantiatePrefab(holetype,
 			(tempHit.point + tempVec),
 			Quaternion.LookRotation(tempHit.normal*-1,Vector3.up),
 			hitGO.transform);
@@ -868,14 +876,14 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		Quaternion roll = impactMark.transform.localRotation;
 		roll *= Quaternion.Euler(0f,0f,Random.Range(0,3) * 90f);
 		impactMark.transform.localRotation = roll;
-		GameObject dynamicObjectsContainer = LevelManager.a.GetCurrentDynamicContainer();
+		GameObject dynamicObjectsContainer = _levelManager.GetCurrentDynamicContainer();
 		impactMark.transform.parent = dynamicObjectsContainer.transform;
 	}
 
     void CreateStandardImpactEffects() {
         // Determine blood type of hit target and spawn corresponding blood particle effect from the Const.Pool
         if (tempHM != null) {
-            GameObject impact = Const.a.GetImpactType(tempHM);
+            GameObject impact = _consts.GetImpactType(tempHM);
             if (impact != null) {
                 tempVec = tempHit.normal * hitOffset;
 				impact.transform.SetPositionAndRotation(tempHit.point + tempVec,Quaternion.FromToRotation(Vector3.up, tempHit.normal));
@@ -883,7 +891,7 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
             }
         } else {
             // Allow for skipping adding sparks after special override impact effects per attack functions below
-			GameObject impact = Const.a.GetObjectFromPool(PoolType.SparksSmall); //Didn't hit an object with a HealthManager script, use sparks
+			GameObject impact = _consts.GetObjectFromPool(PoolType.SparksSmall); //Didn't hit an object with a HealthManager script, use sparks
 			if (impact != null) {
 				tempVec = tempHit.normal * hitOffset;
 				impact.transform.SetPositionAndRotation(tempHit.point + tempVec,Quaternion.FromToRotation(Vector3.up, tempHit.normal));
@@ -900,7 +908,7 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 			impactConstdex = 740; // Yellow laser for ion
         }
 
-        GameObject impact = ConsoleEmulator.SpawnDynamicObject(impactConstdex);
+        GameObject impact = _consoleEmulator.SpawnDynamicObject(impactConstdex);
 		impact.transform.SetPositionAndRotation(tempHit.point,Quaternion.FromToRotation(Vector3.up, tempHit.normal));
 		impact.SetActive(true);
     }
@@ -910,8 +918,8 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
         if (wep16index == 1) laserIndex = 406;  //Red laser for blaster
         else  if (wep16index == 4) laserIndex = 407; // Yellow laser for ion
 
-		GameObject dynamicObjectsContainer = LevelManager.a.GetCurrentDynamicContainer();
-		GameObject lasertracer = Instantiate(Const.a.GetPrefab(laserIndex),transform.position,Const.a.quaternionIdentity) as GameObject;
+		GameObject dynamicObjectsContainer = _levelManager.GetCurrentDynamicContainer();
+		GameObject lasertracer = GameBindings.InstantiatePrefab(_consts.GetPrefab(laserIndex),transform.position,_consts.quaternionIdentity) as GameObject;
 
 		// Temporary object only, no need to save or mark as instantiated.
 		if (lasertracer != null) {
@@ -924,23 +932,23 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		}
     }
 
-	// dmg_min is Const.a.damagePerHitForWeapon[wep16Index], dmg_max is Const.a.damagePerHitForWeapon2[wep16Index]
+	// dmg_min is _consts.damagePerHitForWeapon[wep16Index], dmg_max is _consts.damagePerHitForWeapon2[wep16Index]
 	float DamageForPower(int wep16Index) {
 	    float retval, dmg_min, dmg_max, ener_min, ener_max;
 
         // overload overrides current setting and uses overload damage
         if (overloadEnabled) {
-            retval = Const.a.damageOverloadForWeapon[wep16Index];
+            retval = _consts.damageOverloadForWeapon[wep16Index];
             return retval;
         }
 
-		dmg_min = Const.a.damagePerHitForWeapon[wep16Index];
-		dmg_max = Const.a.damagePerHitForWeapon2[wep16Index];
-        ener_min = Const.a.energyDrainLowForWeapon[wep16Index];
-        ener_max = Const.a.energyDrainHiForWeapon[wep16Index];
+		dmg_min = _consts.damagePerHitForWeapon[wep16Index];
+		dmg_max = _consts.damagePerHitForWeapon2[wep16Index];
+        ener_min = _consts.energyDrainLowForWeapon[wep16Index];
+        ener_max = _consts.energyDrainHiForWeapon[wep16Index];
 		// Calculates damage based on min and max values and applies a curve of the slopes based on the linear plotting of the slope from min at min to max at max...that makes sense right?
 		// Right then, the beautifully ugly formula:
-		retval = ((WeaponCurrent.a.weaponEnergySetting[WeaponCurrent.a.weaponCurrent]/100f)*((dmg_max/ener_max)-(dmg_min/ener_min)) + 3f) * (((WeaponCurrent.a.weaponEnergySetting[WeaponCurrent.a.weaponCurrent])/100f)*(ener_max-ener_min) + ener_min);
+		retval = ((_weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent]/100f)*((dmg_max/ener_max)-(dmg_min/ener_min)) + 3f) * (((_weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent])/100f)*(ener_max-ener_min) + ener_min);
 		//Debug.Log("returning DamageForPower of " + retval.ToString() + ", for wep16Index of " + wep16Index.ToString());
 		return retval;
 		// You gotta love maths!  There is a spreadsheet for this (.ods LibreOffice file format, found with src code) that shows the calculations to make this dmg curve. 
@@ -949,16 +957,16 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 	// TargetID Instance
 	public void CreateTargetIDInstance(float dmgFinal, HealthManager hm, float tranq) {
 		 if (hm == null || !hm.isNPC || hm.health <= 0f) return;
-		if (!Inventory.a.hasHardware[4] && tranq <= 0f && dmgFinal > 0f) return;
+		if (!_inventory.hasHardware[4] && tranq <= 0f && dmgFinal > 0f) return;
 		if (hm.linkedTargetID != null) return; // Let SendDamageReceive handle updates
 
-		float linkDistForTargID = TargetID.GetTargetIDTetherRange();
-		bool showHealth = Inventory.a.hasHardware[4] && Inventory.a.hardwareVersion[4] > 2;
-		bool showRange = Inventory.a.hasHardware[4];
-		bool showAttitude = Inventory.a.hasHardware[4] && Inventory.a.hardwareVersion[4] > 1;
-		bool showName = Inventory.a.hasHardware[4] && Inventory.a.hardwareVersion[4] > 1;
+		float linkDistForTargID = TargetID.GetTargetIDTetherRange(_inventory);
+		bool showHealth = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 2;
+		bool showRange = _inventory.hasHardware[4];
+		bool showAttitude = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1;
+		bool showName = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1;
 
-		GameObject idFrame = Instantiate(Const.a.GetPrefab(736), hm.transform.position, Const.a.quaternionIdentity) as GameObject;
+		GameObject idFrame = GameBindings.InstantiatePrefab(_consts.GetPrefab(736), hm.transform.position, _consts.quaternionIdentity) as GameObject;
 		if (idFrame == null) return;
 
 		TargetID tid = idFrame.GetComponent<TargetID>();
@@ -968,18 +976,18 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		tid.linkedHM = hm;
 		hm.linkedTargetID = tid;
 
-		if (!Inventory.a.hasHardware[4] || tranq > 0f || dmgFinal == 0f) {
-			tid.currentText = tranq > 0f ? Const.a.stringTable[536] : (dmgFinal == 0f ? Const.a.stringTable[511] : "");
+		if (!_inventory.hasHardware[4] || tranq > 0f || dmgFinal == 0f) {
+			tid.currentText = tranq > 0f ? _consts.stringTable[536] : (dmgFinal == 0f ? _consts.stringTable[511] : "");
 			tid.lifetime += tranq;
-			tid.damageTimeFinished = Mathf.Max(PauseScript.a.relativeTime + tranq,tid.damageTimeFinished + tranq);
-			tid.lifetimeFinished = PauseScript.a.relativeTime + tid.lifetime;
+			tid.damageTimeFinished = Mathf.Max(_pauseScript.relativeTime + tranq,tid.damageTimeFinished + tranq);
+			tid.lifetimeFinished = _pauseScript.relativeTime + tid.lifetime;
 		} else {
 			tid.currentText = ""; // Set by SendDamageReceive
 			tid.lifetime = 9999999f;
-			tid.lifetimeFinished = PauseScript.a.relativeTime + tid.lifetime;
+			tid.lifetimeFinished = _pauseScript.relativeTime + tid.lifetime;
 			tid.damageTime = 2.5f;
 			if (tranq > 2.5f) tid.damageTime = tranq;
-			tid.damageTimeFinished = PauseScript.a.relativeTime + tid.damageTime;
+			tid.damageTimeFinished = _pauseScript.relativeTime + tid.damageTime;
 		}
 
 		// Center on what we just shot
@@ -1075,7 +1083,7 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
             CreateStandardImpactEffects(); // standard blood spurts/robot sparks
 
 			// the only exception
-			if (wep16Index == 2 && Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
+			if (wep16Index == 2 && _inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
 				damageData.attackType = AttackType.Tranq; // tranquilize the untranquil....yes
 			}
         }
@@ -1100,23 +1108,23 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 			}
         }
         damageData.hit = tempHit;
-		damageData.attacknormal = MouseCursor.a.GetCursorScreenPointForRay();
+		damageData.attacknormal = _mouseCursor.GetCursorScreenPointForRay();
         damageData.attacknormal = playerCamera.ScreenPointToRay(damageData.attacknormal).direction;
-        if (Inventory.a.wepLoadedWithAlternate[WeaponCurrent.a.weaponCurrent]) {
-            damageData.damage = Const.a.damagePerHitForWeapon2[wep16Index];
-			damageData.offense = Const.a.offenseForWeapon2[wep16Index];
-			damageData.penetration = Const.a.penetrationForWeapon2[wep16Index];
+        if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
+            damageData.damage = _consts.damagePerHitForWeapon2[wep16Index];
+			damageData.offense = _consts.offenseForWeapon2[wep16Index];
+			damageData.penetration = _consts.penetrationForWeapon2[wep16Index];
         } else {
 			if (CurrentWeaponUsesEnergy()) {
                 damageData.damage = DamageForPower(wep16Index);
 			} else {
-				damageData.damage = Const.a.damagePerHitForWeapon[wep16Index];
+				damageData.damage = _consts.damagePerHitForWeapon[wep16Index];
 			}
-			damageData.offense = Const.a.offenseForWeapon[wep16Index];
-			damageData.penetration = Const.a.penetrationForWeapon[wep16Index];
+			damageData.offense = _consts.offenseForWeapon[wep16Index];
+			damageData.penetration = _consts.penetrationForWeapon[wep16Index];
         }
         
-		if (damageData.attackType != AttackType.Tranq) damageData.attackType = Const.a.attackTypeForWeapon[wep16Index]; // If check to handle exception setting it above
+		if (damageData.attackType != AttackType.Tranq) damageData.attackType = _consts.attackTypeForWeapon[wep16Index]; // If check to handle exception setting it above
         damageData.damage = DamageData.GetDamageTakeAmount(damageData);
         damageData.owner = playerCapsule;
 		damageData.impactVelocity = 80f;
@@ -1138,7 +1146,7 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 									   damageData.attacknormal,
 									   damageData.hit.point);
 			}
-			if (tempHM.isNPC && !tempHM.aic.asleep) Music.a.inCombat = true;
+			if (tempHM.isNPC && !tempHM.aic.asleep) _music.inCombat = true;
 		}
 
 		if (dmgFinal < 0f) dmgFinal = 0f; // Less would = blank.
@@ -1168,19 +1176,19 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		damageData.other = targ;
 		damageData.isOtherNPC = false;
 		if (targ.CompareTag("NPC")) damageData.isOtherNPC = true;
-		damageData.attacknormal = MouseCursor.a.GetCursorScreenPointForRay();
+		damageData.attacknormal = _mouseCursor.GetCursorScreenPointForRay();
 		damageData.attacknormal =
 			playerCamera.ScreenPointToRay(damageData.attacknormal).direction;
-		damageData.damage = Const.a.damagePerHitForWeapon[index16]; 
+		damageData.damage = _consts.damagePerHitForWeapon[index16]; 
 		damageData.damage = DamageData.GetDamageTakeAmount(damageData);
-		damageData.offense = Const.a.offenseForWeapon[index16];
-		damageData.penetration = Const.a.penetrationForWeapon[index16];
+		damageData.offense = _consts.offenseForWeapon[index16];
+		damageData.penetration = _consts.penetrationForWeapon[index16];
 		damageData.owner = playerCapsule;
 		if (isRapier) {
 			damageData.attackType = AttackType.MeleeEnergy;
-			if (PlayerEnergy.a.energy < 4f) {
+			if (_playerEnergy.energy < 4f) {
 				// Half pipe
-				damageData.damage = Const.a.damagePerHitForWeapon[6] / 2f;
+				damageData.damage = _consts.damagePerHitForWeapon[6] / 2f;
 			}
 		} else {
 			damageData.attackType = AttackType.Melee;
@@ -1210,23 +1218,23 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 				}
 				
 				if (prefID != null && !isRapier) {
-					FootStepType fstep = PlayerMovement.a.GetFootstepTypeForPrefab(prefID.constIndex);
-					AudioClip stcp = PlayerMovement.a.JumpLandSound(fstep);
-					Utils.PlayTempAudio(transform.position,stcp,1f);
-					Utils.PlayTempAudio(transform.position,hit,0.65f);	
+					FootStepType fstep = _playerMovement.GetFootstepTypeForPrefab(prefID.constIndex);
+					AudioClip stcp = _playerMovement.JumpLandSound(fstep);
+					Utils.PlayTempAudio(_consts,transform.position,stcp,1f);
+					Utils.PlayTempAudio(_consts,transform.position,hit,0.65f);	
 				} else {
-					Utils.PlayTempAudio(transform.position,hit,1f);	
+					Utils.PlayTempAudio(_consts,transform.position,hit,1f);	
 				}
 
-				PlayerHealth.a.makingNoise = true;
-				PlayerHealth.a.noiseFinished = PauseScript.a.relativeTime+0.5f;
+				_playerHealth.makingNoise = true;
+				_playerHealth.noiseFinished = _pauseScript.relativeTime+0.5f;
 			}
 			yield break;
 		}
 
 		damageData.impactVelocity = 80f + damageData.damage;
 		if (!damageData.isOtherNPC || index16 == 12) {
-			if (!isRapier || (isRapier && PlayerEnergy.a.energy >= 4f)) {
+			if (!isRapier || (isRapier && _playerEnergy.energy >= 4f)) {
 				Utils.ApplyImpactForce(targ, damageData.impactVelocity,
 					damageData.attacknormal,damageData.hit.point);
 			}
@@ -1235,36 +1243,34 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		float dmgFinal = tempHM.TakeDamage(damageData);
 		if (dmgFinal < 0f) dmgFinal = 0f; // Less would = blank.
 		CreateTargetIDInstance(dmgFinal,tempHM,-1f);
-		if (tempHM.isNPC && !tempHM.aic.asleep) Music.a.inCombat = true;
+		if (tempHM.isNPC && !tempHM.aic.asleep) _music.inCombat = true;
 		if (!silent) {
-			PlayerHealth.a.makingNoise = true;
-			PlayerHealth.a.noiseFinished = PauseScript.a.relativeTime + 0.5f;
+			_playerHealth.makingNoise = true;
+			_playerHealth.noiseFinished = _pauseScript.relativeTime + 0.5f;
 			if ((tempHM.bloodType == BloodType.Red)
 				|| (tempHM.bloodType == BloodType.Yellow)
 				|| (tempHM.bloodType == BloodType.Green)) {
-				Utils.PlayUIOneShotSavable(hitflesh);
-			} else if (isRapier && PlayerEnergy.a.energy < 4f) {
-				Utils.PlayUIOneShotSavable(67);
+				Utils.PlayUIOneShotSavable(_mfdManager,hitflesh);
+			} else if (isRapier && _playerEnergy.energy < 4f) {
+				Utils.PlayUIOneShotSavable(_consts,67);
 			} else {
-				Utils.PlayUIOneShotSavable(hit);
+				Utils.PlayUIOneShotSavable(_mfdManager,hit);
 			}
 		}
 
 		if (isRapier) {
-			PlayerEnergy.a.TakeEnergy(3.666f); // 3 hits per tick.
-			if (BiomonitorGraphSystem.a != null) {
-				BiomonitorGraphSystem.a.EnergyPulse(3.666f);
-			}
+			_playerEnergy.TakeEnergy(3.666f); // 3 hits per tick.
+			_biomonitorGraphSystem.EnergyPulse(3.666f);
 		}
 	}
 
 	// These are a bit silly.
     void FireRapier(int i16, bool sil) {
-		FireMelee(i16,true,sil,Const.a.sounds[246],Const.a.sounds[247],Const.a.sounds[246],true); // wlaserrapier_hit, wlaserrapier_swing, wlaserrapier_hit
+		FireMelee(i16,true,sil,_consts.sounds[246],_consts.sounds[247],_consts.sounds[246],true); // wlaserrapier_hit, wlaserrapier_swing, wlaserrapier_hit
 	}
 
     void FirePipe(int i16, bool sil) {
-		FireMelee(i16,false,sil,Const.a.sounds[253],Const.a.sounds[254],Const.a.sounds[252],false); // wpipe_hit, wpipe_swing, wpipe_dmg
+		FireMelee(i16,false,sil,_consts.sounds[253],_consts.sounds[254],_consts.sounds[252],false); // wpipe_hit, wpipe_swing, wpipe_dmg
 	}
 
 	void FireMelee(int index16, bool isRapier, bool silent, AudioClip hit,
@@ -1296,10 +1302,10 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		// Check all objects we can hurt have HealthManager, that they are in
 		// meleescanDistance range, that they are within player facing angle by
 		// 60° (±30°)	
-		for (int i=0;i<Const.a.healthObjectsRegistration.Length;i++) {
-			if (Const.a.healthObjectsRegistration[i] == null) continue;
+		for (int i=0;i<_consts.healthObjectsRegistration.Length;i++) {
+			if (_consts.healthObjectsRegistration[i] == null) continue;
 
-			HealthManager hm = Const.a.healthObjectsRegistration[i];
+			HealthManager hm = _consts.healthObjectsRegistration[i];
 			// Don't hurt deactive objects, like you know, corpse on
 			// living entities...at least don't do it again please.
 			if (hm == null) continue;
@@ -1312,8 +1318,8 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 				continue;
 			}
 
-			MouseLookScript.a.SetCameraFocusPoint();
-			tempVec = MouseLookScript.a.cameraFocusPoint
+			_mouseLookScript.SetCameraFocusPoint();
+			tempVec = _mouseLookScript.cameraFocusPoint
 						- playerCamera.transform.position;
 
 			tempVec = tempVec.normalized;
@@ -1336,7 +1342,7 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		}
 
 		// Swing and a miss, steeeerike!!
-		if (!silent) Utils.PlayUIOneShotSavable(miss);
+		if (!silent) Utils.PlayUIOneShotSavable(_mfdManager,miss);
 		if (rapier) {
 			if (rapieranim != null) rapieranim.Play("Attack2");
 		} else {
@@ -1356,42 +1362,43 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		// commentary they said that the projectiles act like a beachball for
 		// collisions with enemies, but act like a baseball for walls/floor to
 		// prevent hitting corners.
-        GameObject beachball = ConsoleEmulator.SpawnDynamicObject(prefabID,1);
+        GameObject beachball = _consoleEmulator.SpawnDynamicObject(prefabID,1);
         if (beachball != null) {
 			if (CurrentWeaponUsesEnergy()) {
                 damageData.damage = DamageForPower(index16);
 			} else {
-				damageData.damage = Const.a.damagePerHitForWeapon[index16];
+				damageData.damage = _consts.damagePerHitForWeapon[index16];
 			}
             damageData.owner = playerCapsule;
-            damageData.attackType = Const.a.attackTypeForWeapon[index16];
-			damageData.offense = Const.a.offenseForWeapon[index16];
-			damageData.penetration = Const.a.penetrationForWeapon[index16];
+            damageData.attackType = _consts.attackTypeForWeapon[index16];
+			damageData.offense = _consts.offenseForWeapon[index16];
+			damageData.penetration = _consts.penetrationForWeapon[index16];
             beachball.GetComponent<ProjectileEffectImpact>().dd = damageData;
             beachball.GetComponent<ProjectileEffectImpact>().host = playerCapsule;
             beachball.transform.position = playerCamera.transform.position;
-			MouseLookScript.a.SetCameraFocusPoint();
-            tempVec = MouseLookScript.a.cameraFocusPoint - playerCamera.transform.position;
+			_mouseLookScript.SetCameraFocusPoint();
+            tempVec = _mouseLookScript.cameraFocusPoint - playerCamera.transform.position;
             beachball.transform.forward = tempVec.normalized;
             beachball.SetActive(true);
             Vector3 shove = beachball.transform.forward * shoveForce;
 
 			// Force starting with zero pior to adding impulse force.
-            beachball.GetComponent<Rigidbody>().linearVelocity = Const.a.vectorZero;
+            beachball.GetComponent<Rigidbody>().linearVelocity = _consts.vectorZero;
             beachball.GetComponent<Rigidbody>().AddForce(shove,ForceMode.Impulse);
         }
 	}
 
     public Vector3 ScreenPointToDirectionVector() {
-        Vector3 retval = Const.a.vectorZero;
+        Vector3 retval = _consts.vectorZero;
         retval = playerCamera.transform.forward;
         return retval;
     }
 
 	public static string Save(GameObject go) {
 		WeaponFire wf = go.GetComponent<WeaponFire>();
+		var pauseScript = wf._pauseScript;
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(wf.waitTilNextFire,"waitTilNextFire"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.waitTilNextFire,"waitTilNextFire"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(wf.overloadEnabled,"overloadEnabled"));
 		s1.Append(Utils.splitChar);
@@ -1409,15 +1416,15 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(wf.reloadLerpValue,"reloadLerpValue"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(wf.reloadFinished,"reloadFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.reloadFinished,"reloadFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(wf.lerpStartTime,"lerpStartTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.lerpStartTime,"lerpStartTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(wf.justFired,"justFired"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.justFired,"justFired"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(wf.energySliderClickedTime,"energySliderClickedTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.energySliderClickedTime,"energySliderClickedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(wf.cyberWeaponAttackFinished,"cyberWeaponAttackFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.cyberWeaponAttackFinished,"cyberWeaponAttackFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.SaveTransform(wf.reloadContainer.transform));
 		s1.Append(Utils.splitChar);
@@ -1427,7 +1434,8 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		WeaponFire wf = go.GetComponent<WeaponFire>();
-		wf.waitTilNextFire = Utils.LoadRelativeTimeDifferential(entries[index],"waitTilNextFire"); index++;
+		var pauseScript = wf._pauseScript;
+		wf.waitTilNextFire = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"waitTilNextFire"); index++;
 		wf.overloadEnabled = Utils.GetBoolFromString(entries[index],"overloadEnabled"); index++;
 		wf.sparqSetting = Utils.GetFloatFromString(entries[index],"sparqSetting"); index++;
 		wf.ionSetting = Utils.GetFloatFromString(entries[index],"ionSetting"); index++;
@@ -1436,11 +1444,11 @@ public class WeaponFire : MonoBehaviour, ISingletonInitializer {
 		wf.stungunSetting = Utils.GetFloatFromString(entries[index],"stungunSetting"); index++;
 		wf.recoiling = Utils.GetBoolFromString(entries[index],"recoiling"); index++;
 		wf.reloadLerpValue = Utils.GetFloatFromString(entries[index],"reloadLerpValue"); index++;
-		wf.reloadFinished = Utils.LoadRelativeTimeDifferential(entries[index],"reloadFinished"); index++;
-		wf.lerpStartTime = Utils.LoadRelativeTimeDifferential(entries[index],"lerpStartTime"); index++;
-		wf.justFired = Utils.LoadRelativeTimeDifferential(entries[index],"justFired"); index++;
-		wf.energySliderClickedTime = Utils.LoadRelativeTimeDifferential(entries[index],"energySliderClickedTime"); index++;
-		wf.cyberWeaponAttackFinished = Utils.LoadRelativeTimeDifferential(entries[index],"cyberWeaponAttackFinished"); index++;
+		wf.reloadFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"reloadFinished"); index++;
+		wf.lerpStartTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"lerpStartTime"); index++;
+		wf.justFired = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"justFired"); index++;
+		wf.energySliderClickedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"energySliderClickedTime"); index++;
+		wf.cyberWeaponAttackFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"cyberWeaponAttackFinished"); index++;
 		index = Utils.LoadTransform(wf.reloadContainer.transform,ref entries,index);
 		wf.targetY = Utils.GetFloatFromString(entries[index],"targetY"); index++;
 		return index;

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class AIMeleeDamageCollider : MonoBehaviour {
@@ -12,6 +13,9 @@ public class AIMeleeDamageCollider : MonoBehaviour {
     private BoxCollider boxCollider;
     private SphereCollider sphereCollider;
     private CapsuleCollider capCollider;
+
+    [Inject] private Const _consts;
+    [Inject] private PauseScript _pauseScript;
 
 	public void MeleeColliderSetup (int ind, int colCount, float impact,
 									GameObject sourceOwner) {
@@ -33,7 +37,7 @@ public class AIMeleeDamageCollider : MonoBehaviour {
 
 	void OnTriggerEnter (Collider other) {
 		if (other == null) return;
-		if (ownerAIC.meleeDamageFinished >= PauseScript.a.relativeTime) return;
+		if (ownerAIC.meleeDamageFinished >= _pauseScript.relativeTime) return;
         if (!(other.CompareTag("Player") || other.CompareTag("NPC"))) return;
 		if (ownerAIC == null) {
 			Debug.Log("BUG: AIMeleeDamageCollider on but no AIC assigned!");
@@ -46,8 +50,8 @@ public class AIMeleeDamageCollider : MonoBehaviour {
 		HealthManager hm = Utils.GetMainHealthManager(other.gameObject);
 		if (hm == null) return;
 
-		ownerAIC.meleeDamageFinished = PauseScript.a.relativeTime + Const.a.timeToActualAttack1ForNPC[index];
-		DamageData ddNPC = DamageData.SetNPCData(index,1,ownedBy);
+		ownerAIC.meleeDamageFinished = _pauseScript.relativeTime + _consts.timeToActualAttack1ForNPC[index];
+		DamageData ddNPC = DamageData.SetNPCData(_consts,index,1,ownedBy);
 		ddNPC.other = other.gameObject;
 		ddNPC.attacknormal = Vector3.Normalize(other.transform.position - transform.position);
 		ddNPC.damage = 11f;

@@ -2,12 +2,16 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
+using Zenject;
 
 public class UIPointerMask : MonoBehaviour {
 	private BoxCollider boxCol;
 	private RectTransform rect;
 	private EventTrigger evenT;
 	private bool pointerEntered;
+
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GUIState _guiState;
 
 	void Awake () {
 		// Create box collider for cursor entry detection.
@@ -53,14 +57,14 @@ public class UIPointerMask : MonoBehaviour {
 	public void PtrEnter () {
 		if (pointerEntered) return;
 
-		GUIState.a.isBlocking = true;
+		_guiState.isBlocking = true;
 		pointerEntered = true;
 	}
 	
 	public void PtrExit () {
 		if (!pointerEntered) return;
 
-		GUIState.a.isBlocking = false;
+		_guiState.isBlocking = false;
 		pointerEntered = false;
 	}
 
@@ -72,7 +76,7 @@ public class UIPointerMask : MonoBehaviour {
 			return;
 		}
 
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		Debug.Log("Mask click");
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class DelayedSpawn : MonoBehaviour {
@@ -13,8 +14,10 @@ public class DelayedSpawn : MonoBehaviour {
 	[HideInInspector] public bool active; // save
 	private static StringBuilder s1 = new StringBuilder();
 
+	[Inject] private PauseScript _pauseScript;
+
 	void OnEnable() {
-		if (PauseScript.a != null) timerFinished = PauseScript.a.relativeTime + delay;
+		if (_pauseScript != null) timerFinished = _pauseScript.relativeTime + delay;
         else timerFinished = delay;
 
 		active = true;
@@ -22,7 +25,7 @@ public class DelayedSpawn : MonoBehaviour {
 
 	void Update() {
 		if (!active) return;
-		if (timerFinished >= PauseScript.a.relativeTime) return;
+		if (timerFinished >= _pauseScript.relativeTime) return;
 
 		active = false; // Once only, unless we do self after the list.
 		for (int i=0;i<objectsToSpawn.Length;i++) {
@@ -51,7 +54,7 @@ public class DelayedSpawn : MonoBehaviour {
 		s1.Clear();
 		s1.Append(Utils.FloatToString(ds.delay,"delay"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(ds.timerFinished,"timerFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(ds._pauseScript,ds.timerFinished,"timerFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(ds.active,"active"));
 		s1.Append(Utils.splitChar);
@@ -86,7 +89,7 @@ public class DelayedSpawn : MonoBehaviour {
 		}
 
 		ds.delay = Utils.GetFloatFromString(entries[index],"delay"); index++;
-		ds.timerFinished = Utils.LoadRelativeTimeDifferential(entries[index],"timerFinished"); index++;
+		ds.timerFinished = Utils.LoadRelativeTimeDifferential(ds._pauseScript,entries[index],"timerFinished"); index++;
 		ds.active = Utils.GetBoolFromString(entries[index],"active"); index++;
 		ds.despawnInstead = Utils.GetBoolFromString(entries[index],"despawnInstead"); index++;
 		ds.doSelfAfterList = Utils.GetBoolFromString(entries[index],"doSelfAfterList"); index++;

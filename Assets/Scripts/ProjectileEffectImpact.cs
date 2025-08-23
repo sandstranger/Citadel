@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class ProjectileEffectImpact : MonoBehaviour {
     public PoolType impactType;
@@ -10,7 +11,10 @@ public class ProjectileEffectImpact : MonoBehaviour {
     [SerializeField] public int hitCountBeforeRemoval = 1;
     private Vector3 tempVec;
     [HideInInspector] public int numHits;
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100);
+	[Inject] private Const _consts;
+	[Inject] private Music _music;
+	[Inject] private WeaponFire _weaponFire;
 
     private void OnEnable() {
         numHits = 0; // Reset when pulled from pool.
@@ -21,7 +25,7 @@ public class ProjectileEffectImpact : MonoBehaviour {
         if (other.gameObject == host) return;
 
 		numHits++;
-		float stunAmount = 3f + ((WeaponFire.a.stungunSetting / 100f) * 7f); // Const.a.damagePerHitForWeapon[wep16Index] vs Const.a.damagePerHitForWeapon2[wep16Index] for Stungun.
+		float stunAmount = 3f + ((_weaponFire.stungunSetting / 100f) * 7f); // _consts.damagePerHitForWeapon[wep16Index] vs _consts.damagePerHitForWeapon2[wep16Index] for Stungun.
 		stunAmount = Mathf.Clamp(stunAmount, 3f, 10f);
 		dd.other = other.gameObject;
 		dd.isOtherNPC = false;
@@ -38,15 +42,15 @@ public class ProjectileEffectImpact : MonoBehaviour {
 		// Most already was when launched by AIController or WeaponFire.
 		dd.damage = DamageData.GetDamageTakeAmount(dd);
 		if (impactType == PoolType.RailgunImpacts) {
-			Utils.ApplyImpactForceSphere(dd,transform.position,3.2f,1f);
-			WeaponFire.a.fogFac += 4;
+			Utils.ApplyImpactForceSphere(_consts,dd,transform.position,3.2f,1f);
+			_weaponFire.fogFac += 4;
 		}
 
 		GameObject hitGO = other.contacts[0].otherCollider.gameObject;
 		HealthManager hm = Utils.GetMainHealthManager(hitGO);
 		if (hm != null) {
 			// Get an impact effect
-			GameObject impact = Const.a.GetObjectFromPool(impactType); 
+			GameObject impact = _consts.GetObjectFromPool(impactType); 
 			Vector3 hitPos = other.contacts[0].point; 
 			if (impact != null) {
 				impact.transform.position = hitPos;
@@ -78,7 +82,7 @@ public class ProjectileEffectImpact : MonoBehaviour {
 				float tranq = -1f;
 				if (dd.isOtherNPC || hm.isNPC) {
 					if (hm.aic != null) {
-						if (!hm.aic.asleep) Music.a.inCombat = true;
+						if (!hm.aic.asleep) _music.inCombat = true;
 						if (dd.attackType == AttackType.Tranq) {
 							tranq = hm.aic.Tranquilize(stunAmount,true);
 						}
@@ -86,13 +90,13 @@ public class ProjectileEffectImpact : MonoBehaviour {
 				}
 
 				if (dmgFinal < 0f) dmgFinal = 0f; // Less would = blank.
-				WeaponFire.a.CreateTargetIDInstance(dmgFinal,hm,tranq);
+				_weaponFire.CreateTargetIDInstance(dmgFinal,hm,tranq);
 			}
 		}
 
 		if (numHits >= hitCountBeforeRemoval) {
 			// Get an impact effect
-			GameObject impact = Const.a.GetObjectFromPool(impactType); 
+			GameObject impact = _consts.GetObjectFromPool(impactType); 
 			Vector3 hitPos = other.contacts[0].point; 
 			if (impact != null) {
 				impact.transform.position = hitPos;

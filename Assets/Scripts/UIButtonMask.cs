@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
+using Zenject;
 
 public class UIButtonMask : MonoBehaviour {
 	public ButtonType overButtonType = ButtonType.Generic;  // default to generic button
@@ -21,7 +22,14 @@ public class UIButtonMask : MonoBehaviour {
 	private bool pointerEntered;
 	private float tapFinished;
 
-	void Start() { // Start for the PauseScript.a and MouseScript.a references.
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GUIState _guiState;
+	[Inject] private MouseCursor _mouseCursor;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+
+	void Start() { // Start for the _pauseScript and MouseScript.a references.
 		rect = GetComponent<RectTransform>(); // Create box collider for entry
 											  // detection.
 
@@ -33,7 +41,7 @@ public class UIButtonMask : MonoBehaviour {
 		if (width < 0) width = Mathf.Abs(width);
 		if (height < 0) height = Mathf.Abs(height);
 		boxCol.size = new Vector3(width,height,1f);
-		MouseCursor.a.RegisterRaycastRect(gameObject,
+		_mouseCursor.RegisterRaycastRect(gameObject,
 										  GetComponent<RectTransform>());
 		pointerEntered = false;
 		evenT = GetComponent<EventTrigger>();
@@ -64,7 +72,7 @@ public class UIButtonMask : MonoBehaviour {
 
 		if (doubleClickEnabled) {
 			doubleClickTime = Const.doubleClickTime;
-			dbclickFinished = PauseScript.a.relativeTime;
+			dbclickFinished = _pauseScript.relativeTime;
 			doubleClickTicks = 0;
 			GetComponent<Button>().onClick.AddListener(() => { UiButtonMaskClick(); });
 		}
@@ -80,19 +88,19 @@ public class UIButtonMask : MonoBehaviour {
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 
 		if (Input.touchCount <= 0
 			&& (Application.platform == RuntimePlatform.Android)) {
 
 			justHeld = false;
 			held = false;
-			GUIState.a.ClearOverButton();
+			_guiState.ClearOverButton();
 			doubleClickTicks = 0;
 			if (toolTipLingdex >= 0) {
-				MouseCursor.a.toolTip = string.Empty;
-				MouseCursor.a.toolTipHasText = false;
+				_mouseCursor.toolTip = string.Empty;
+				_mouseCursor.toolTipHasText = false;
 			}
 			pointerEntered = false;
 		}
@@ -100,7 +108,7 @@ public class UIButtonMask : MonoBehaviour {
 		if (tapFinished < Time.time) justHeld = false;
 
 		if (doubleClickEnabled) {
-			if (dbclickFinished < PauseScript.a.relativeTime) {
+			if (dbclickFinished < _pauseScript.relativeTime) {
 				doubleClickTicks--;
 				if (doubleClickTicks < 0) doubleClickTicks = 0;
 			}
@@ -136,14 +144,14 @@ public class UIButtonMask : MonoBehaviour {
 		if (ignoreOverButton) return;
 		if (pointerEntered) return;
 
-		GUIState.a.PtrHandler(true,true,overButtonType,gameObject);
-        MouseLookScript.a.currentButton = gameObject;
+		_guiState.PtrHandler(true,true,overButtonType,gameObject);
+        _mouseLookScript.currentButton = gameObject;
 		doubleClickTicks = 0;
 
 		if (toolTipLingdex >= 0) {
-			MouseCursor.a.toolTip = Const.a.stringTable[toolTipLingdex];
-			MouseCursor.a.toolTipHasText = true;
-			MouseCursor.a.toolTipType = toolTipType;
+			_mouseCursor.toolTip = _consts.stringTable[toolTipLingdex];
+			_mouseCursor.toolTipHasText = true;
+			_mouseCursor.toolTipType = toolTipType;
 		}
 		pointerEntered = true;
     }
@@ -152,11 +160,11 @@ public class UIButtonMask : MonoBehaviour {
 		if (ignoreOverButton) return;
 		if (!pointerEntered) return;
 
-		GUIState.a.ClearOverButton();
+		_guiState.ClearOverButton();
 		doubleClickTicks = 0;
 		if (toolTipLingdex >= 0) {
-			MouseCursor.a.toolTip = string.Empty;
-			MouseCursor.a.toolTipHasText = false;
+			_mouseCursor.toolTip = string.Empty;
+			_mouseCursor.toolTipHasText = false;
 		}
 		pointerEntered = false;
 		justHeld = false;
@@ -170,9 +178,9 @@ public class UIButtonMask : MonoBehaviour {
 			return;
 		}
 
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		doubleClickTicks++;
-		dbclickFinished = PauseScript.a.relativeTime + doubleClickTime;
+		dbclickFinished = _pauseScript.relativeTime + doubleClickTime;
 		if (doubleClickTicks == 1) {
 			Debug.Log("Double button click");
 			gameObject.SendMessage("DoubleClick");

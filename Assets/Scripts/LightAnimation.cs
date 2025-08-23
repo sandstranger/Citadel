@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Runtime.InteropServices;
 using System.Text;
+using Zenject;
 
 public class LightAnimation : MonoBehaviour {
 	[Tooltip("Set minimum intensity of light animations")]
@@ -27,16 +29,19 @@ public class LightAnimation : MonoBehaviour {
 	private float differenceInIntensity;
 	[HideInInspector] public float lerpValue; //save
 	private GameObject segiEmitter;
-	private static StringBuilder s1 = new StringBuilder();
+	private static StringBuilder s1 = new StringBuilder(100);
 	private bool initialized = false;
 
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
+	
 	public void Start () {
 		if (initialized) return;
 
 		if (minIntensity < 0.01f) minIntensity = 0.01f;
 		animLight = GetComponent<Light>();
 		animLight.intensity = maxIntensity;
-		if (segiEmitter == null) segiEmitter = Utils.CreateSEGIEmitter(gameObject,LevelManager.currentLevel,0,animLight);
+		if (segiEmitter == null) segiEmitter = Utils.CreateSEGIEmitter(_consts,gameObject,LevelManager.currentLevel,0,animLight);
 		EnableSEGIEmitter();
 		animLight.intensity = minIntensity;
 		ScaleSEGIEmitter();
@@ -45,8 +50,8 @@ public class LightAnimation : MonoBehaviour {
 		differenceInIntensity = (maxIntensity - minIntensity);
 		if (intervalSteps.Length != 0) {
 			stepTime = intervalSteps[currentStep];
-			lerpTime = PauseScript.a.relativeTime + stepTime;
-			lerpStartTime = PauseScript.a.relativeTime;
+			lerpTime = _pauseScript.relativeTime + stepTime;
+			lerpStartTime = _pauseScript.relativeTime;
 		} else {
 			noSteps = true;
 			animLight.intensity = maxIntensity;
@@ -99,12 +104,12 @@ public class LightAnimation : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			if (lightOn) {
 				if (!noSteps) {
 					if (lerpUp) {
 						// Going from minIntensity to maxIntensity
-						if (lerpTime < PauseScript.a.relativeTime) {
+						if (lerpTime < _pauseScript.relativeTime) {
 							if (animLight.intensity != maxIntensity) {
 								animLight.intensity = maxIntensity;
 								ScaleSEGIEmitter();
@@ -116,15 +121,15 @@ public class LightAnimation : MonoBehaviour {
 								currentStep = 0;
 
 							stepTime = intervalSteps[currentStep];
-							lerpTime = PauseScript.a.relativeTime + stepTime;
-							lerpStartTime = PauseScript.a.relativeTime;
+							lerpTime = _pauseScript.relativeTime + stepTime;
+							lerpStartTime = _pauseScript.relativeTime;
 							if (lerpTime == 0f)
 								lerpTime = 0.1f;
 						} else {
 							if (lerpOn) {
 								if (currentStep < intervalStepisLerping.Length) {
 									if (intervalStepisLerping[currentStep]) {
-										lerpValue = (PauseScript.a.relativeTime - lerpStartTime)/(lerpTime - lerpStartTime); // percent towards goal time
+										lerpValue = (_pauseScript.relativeTime - lerpStartTime)/(lerpTime - lerpStartTime); // percent towards goal time
 										lerpValue = minIntensity + (differenceInIntensity * (lerpValue));
 										if (animLight.intensity != lerpValue) {
 											animLight.intensity = lerpValue;
@@ -136,7 +141,7 @@ public class LightAnimation : MonoBehaviour {
 						}
 					} else {
 						// Going from maxIntensity to minIntensity
-						if (lerpTime < PauseScript.a.relativeTime) {
+						if (lerpTime < _pauseScript.relativeTime) {
 							if (animLight.intensity != minIntensity) {
 								animLight.intensity = minIntensity;
 								ScaleSEGIEmitter();
@@ -148,8 +153,8 @@ public class LightAnimation : MonoBehaviour {
 								currentStep = 0;
 							
 							stepTime = intervalSteps[currentStep];
-							lerpTime = PauseScript.a.relativeTime + stepTime;
-							lerpStartTime = PauseScript.a.relativeTime;
+							lerpTime = _pauseScript.relativeTime + stepTime;
+							lerpStartTime = _pauseScript.relativeTime;
 							if (lerpTime == 0f)
 								lerpTime = 0.1f;
 						} else {
@@ -159,7 +164,7 @@ public class LightAnimation : MonoBehaviour {
 
 								if (currentStep < intervalStepisLerping.Length) {
 									if (intervalStepisLerping[currentStep]) {
-										lerpValue = (PauseScript.a.relativeTime - lerpStartTime)/(lerpTime - lerpStartTime); // percent towards goal time
+										lerpValue = (_pauseScript.relativeTime - lerpStartTime)/(lerpTime - lerpStartTime); // percent towards goal time
 										lerpValue = minIntensity + (differenceInIntensity * (1-lerpValue));
 										if (animLight.intensity != lerpValue) {
 											animLight.intensity = lerpValue;
@@ -201,11 +206,11 @@ public class LightAnimation : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(la.lerpValue,"lerpValue")); // %
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(la.lerpTime,"lerpTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(la._pauseScript,la.lerpTime,"lerpTime"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(la.stepTime,"stepTime")); // Not a timer, current time amount
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(la.lerpStartTime,"lerpStartTime"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(la._pauseScript,la.lerpStartTime,"lerpStartTime"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(la.animLight.enabled,"light.enabled"));
 		return s1.ToString();
@@ -230,9 +235,9 @@ public class LightAnimation : MonoBehaviour {
 		la.lerpOn = Utils.GetBoolFromString(entries[index],"lerpOn"); index++;
 		la.currentStep = Utils.GetIntFromString(entries[index],"currentStep"); index++;
 		la.lerpValue = Utils.GetFloatFromString(entries[index],"lerpValue"); index++; // %
-		la.lerpTime = Utils.LoadRelativeTimeDifferential(entries[index],"lerpTime"); index++;
+		la.lerpTime = Utils.LoadRelativeTimeDifferential(la._pauseScript,entries[index],"lerpTime"); index++;
 		la.stepTime = Utils.GetFloatFromString(entries[index],"stepTime"); index++; // Not a timer, current time amount
-		la.lerpStartTime = Utils.LoadRelativeTimeDifferential(entries[index],"lerpStartTime"); index++;
+		la.lerpStartTime = Utils.LoadRelativeTimeDifferential(la._pauseScript,entries[index],"lerpStartTime"); index++;
 		la.animLight.enabled = Utils.GetBoolFromString(entries[index],"light.enabled"); index++;
 		la.EnableSEGIEmitter();
 		la.ScaleSEGIEmitter();

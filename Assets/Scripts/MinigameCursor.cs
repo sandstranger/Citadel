@@ -1,5 +1,5 @@
+using Zenject;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MinigameCursor : MonoBehaviour {
     public bool mouseOverPanel;
@@ -17,11 +17,7 @@ public class MinigameCursor : MonoBehaviour {
     private bool overX;
     private bool overY;
 
-    public static MinigameCursor a;
-
-    void Awake() {
-        a = this;
-    }
+    [Inject] private MouseCursor _mouseCursor;
 
     void Start() {
         deltaX = xmax - xmin;
@@ -29,7 +25,7 @@ public class MinigameCursor : MonoBehaviour {
     }
 
     void Update() {
-        minigameMouseX = MouseCursor.a.cursorPosition.x / Screen.width;
+        minigameMouseX = _mouseCursor.cursorPosition.x / Screen.width;
         overX = false;
         if (minigameMouseX < xmin) minigameMouseX = xmin;
         else if (minigameMouseX > xmax) minigameMouseX = xmax;
@@ -37,7 +33,7 @@ public class MinigameCursor : MonoBehaviour {
 
         minigameMouseX = (minigameMouseX - xmin) / deltaX;
 
-        minigameMouseY = MouseCursor.a.cursorPosition.y / Screen.height;
+        minigameMouseY = _mouseCursor.cursorPosition.y / Screen.height;
         overY = false;
         if (minigameMouseY < ymin) minigameMouseY = ymin;
         else if (minigameMouseY > ymax) minigameMouseY = ymax;

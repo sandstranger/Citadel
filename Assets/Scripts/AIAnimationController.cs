@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class AIAnimationController : MonoBehaviour {
@@ -32,12 +33,15 @@ public class AIAnimationController : MonoBehaviour {
 	private float loadedSetSpeed;
 	private bool initialized = false;
 	private bool doneDidDead = false;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
+
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
 
 	public void Start () {
 	    if (initialized) return;
 	    
-	    animSwapFinished = PauseScript.a.relativeTime;
+	    animSwapFinished = _pauseScript.relativeTime;
 		anim = GetComponent<Animator>();
 		smR = GetComponentInChildren<SkinnedMeshRenderer>(true);
 		if (smR != null) checkVisWithSMR = true;
@@ -68,7 +72,7 @@ public class AIAnimationController : MonoBehaviour {
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused() || PauseScript.a.MenuActive()) {
+		if (_pauseScript.Paused() || _pauseScript.MenuActive()) {
 			if (!pauseStateUpdated) {
 				if (anim.speed != 0) anim.speed = 0;
 				pauseStateUpdated = true;
@@ -95,7 +99,7 @@ public class AIAnimationController : MonoBehaviour {
 			return;
 		}
 		
-		if (aic.currentState == AIState.Run && aic.tranquilizeFinished >= PauseScript.a.relativeTime) {
+		if (aic.currentState == AIState.Run && aic.tranquilizeFinished >= _pauseScript.relativeTime) {
 			Idle();
 			return;
 		}
@@ -115,7 +119,7 @@ public class AIAnimationController : MonoBehaviour {
 	}
 
 	void Idle () {
-		if (aic.asleep || aic.tranquilizeFinished >= PauseScript.a.relativeTime) {
+		if (aic.asleep || aic.tranquilizeFinished >= _pauseScript.relativeTime) {
 			if (anim.speed > 0) anim.speed = 0;
 		} else {
 			if (anim.speed != 1f) anim.speed = 1f;
@@ -150,8 +154,8 @@ public class AIAnimationController : MonoBehaviour {
 			}
 		} else {
 			 // Prevent flickering by using a delay timer.
-			if (animSwapFinished < PauseScript.a.relativeTime) {
-				animSwapFinished = PauseScript.a.relativeTime + 0.5f;
+			if (animSwapFinished < _pauseScript.relativeTime) {
+				animSwapFinished = _pauseScript.relativeTime + 0.5f;
 				anim.Play("Idle");
 				clipName = "Idle";
 			}
@@ -256,7 +260,7 @@ public class AIAnimationController : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aiac.dying,"dying"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aiac.animSwapFinished,"animSwapFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(aiac._pauseScript,aiac.animSwapFinished,"animSwapFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aiac.useDeadAnimForDeath,"useDeadAnimForDeath"));
 		s1.Append(Utils.splitChar);
@@ -275,13 +279,13 @@ public class AIAnimationController : MonoBehaviour {
 		return s1.ToString();
 	}
 
-	public static int Load(GameObject go, ref string[] entries, int index) {
+	public static int Load(Const consts,GameObject go, ref string[] entries, int index) {
 		AIAnimationController aiac = go.GetComponentInChildren<AIAnimationController>(true);
 
 		if (aiac == null) {
 			AIController aic = go.GetComponentInChildren<AIController>(true);
 			if (aic == null) {
-				if (Const.a.moveTypeForNPC[aic.index] != AIMoveType.Cyber
+				if (consts.moveTypeForNPC[aic.index] != AIMoveType.Cyber
 					&& aic.index != 20 && aic.index != 0) {
 					
 					Debug.LogError("AIAnimationController.Load failure, aiac == "
@@ -300,7 +304,7 @@ public class AIAnimationController : MonoBehaviour {
         aiac.clipName = Utils.LoadString(entries[index],"clipName"); index++;
 		aiac.currentClipPercentage = Utils.GetFloatFromString(entries[index],"currentClipPercentage"); index++;
 		aiac.dying = Utils.GetBoolFromString(entries[index],"dying"); index++;
-		aiac.animSwapFinished = Utils.LoadRelativeTimeDifferential(entries[index],"animSwapFinished"); index++;
+		aiac.animSwapFinished = Utils.LoadRelativeTimeDifferential(aiac._pauseScript,entries[index],"animSwapFinished"); index++;
 		aiac.useDeadAnimForDeath = Utils.GetBoolFromString(entries[index],"useDeadAnimForDeath"); index++;
 		aiac.playDeathAnim = Utils.GetBoolFromString(entries[index],"playDeathAnim"); index++;
 		aiac.playDyingAnim = Utils.GetBoolFromString(entries[index],"playDyingAnim"); index++;

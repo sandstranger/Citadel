@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Zenject;
 
 public class PauseRigidbody : MonoBehaviour {
 	[HideInInspector] public Rigidbody rbody;
@@ -9,6 +10,9 @@ public class PauseRigidbody : MonoBehaviour {
 	public CollisionDetectionMode previouscolDetMode;
 	public bool previousSet = false;
 
+	[Inject] private Const _consts;
+	[Inject] private PauseScript _pauseScript;
+	
 	void Awake() {
 		Initialize();
 	}
@@ -16,7 +20,7 @@ public class PauseRigidbody : MonoBehaviour {
 	void Initialize() {
 		if (rbody == null) rbody = GetComponent<Rigidbody>();
 		if (rbody == null) rbody = gameObject.AddComponent<Rigidbody>();
-		if (!Const.a.prb.Contains(this)) Const.a.prb.Add(this);
+		if (!_consts.prb.Contains(this)) _consts.prb.Add(this);
 		if (rbody.isKinematic && rbody.collisionDetectionMode != CollisionDetectionMode.ContinuousSpeculative) Debug.Log(gameObject.name + " has isKinematic true on initialize when not using ContinuousSpeculative!");
 		SetPreviousValues();
 	}
@@ -33,7 +37,7 @@ public class PauseRigidbody : MonoBehaviour {
 
 	void OnEnable() {
 		if (rbody == null) Initialize();
-		if (PauseScript.a.MenuActive()) Pause();
+		if (_pauseScript.MenuActive()) Pause();
 	}
 		
 	public void Pause() {

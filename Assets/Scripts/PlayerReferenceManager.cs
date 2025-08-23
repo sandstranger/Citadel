@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using Citadel.Game;
+using Citadel.SceneManagement;
+using Zenject;
 using UnityEngine;
 
-public class PlayerReferenceManager : MonoBehaviour, ISingletonInitializer {
+public class PlayerReferenceManager : SingletonHelper<PlayerReferenceManager> {
 	// External references, required
 	public GameObject playerCapsule;
 	public GameObject playerCapsuleHardwareLantern;
@@ -20,41 +22,22 @@ public class PlayerReferenceManager : MonoBehaviour, ISingletonInitializer {
 	public GameObject playerRadiationTreatmentFlash;
 	public GameObject playerMFDManager;
 
-	public static PlayerReferenceManager a;
-
-	public void Initialize()
-	{
-		if (a == null)
-		{
-			a = this;
-			DontDestroyOnLoad(this);
-		}
-		else if (Const.StartingNewGame)
-		{
-			DestroyImmediate(a.gameObject);
-			a = this;
-			DontDestroyOnLoad(this);
-		}
-		else
-		{
-			DestroyImmediate(this.gameObject);
-			return;
-		}
-
-		foreach (var initializer in GetComponentsInChildren<ISingletonInitializer>())
-		{
-			if (initializer is not PlayerReferenceManager)
-			{
-				initializer.Initialize();
-			}
-		}
-	}
-
+	[SerializeField] 
+	private PlayerHealth _playerHealth;
+	[SerializeField]
+	private HealthManager _healthManager;
+	[Inject]
+	private BiomonitorGraphSystem _biomonitorGraphSystem;
+	[Inject] private Const _consts;
+	
+	public PlayerHealth PlayerHealth => _playerHealth;
+	public HealthManager HealthManager => _healthManager;
+	
 	public static string SavePlayerData(GameObject plyr, PrefabIdentifier prefID) {
 		PlayerReferenceManager PRman = plyr.GetComponent<PlayerReferenceManager>();
         StringBuilder s1 = new StringBuilder();
         s1.Clear();
-		s1.Append("Hacker");//s1.Append(Const.a.playerName);
+		s1.Append("Hacker");//s1.Append(_consts.playerName);
         s1.Append(Utils.splitChar); s1.Append(PlayerHealth.Save(PRman.playerCapsule));
         s1.Append(Utils.splitChar); s1.Append(PlayerEnergy.Save(PRman.playerCapsule));
         s1.Append(Utils.splitChar); s1.Append(PlayerMovement.Save(PRman.playerCapsule));
@@ -70,29 +53,25 @@ public class PlayerReferenceManager : MonoBehaviour, ISingletonInitializer {
 		return s1.ToString();
 	}
 
-	public static int LoadPlayerDataToPlayer(GameObject currentPlayer,
+	public static int LoadPlayerDataToPlayer(Const @const,GameObject currentPlayer,
 											 ref string[] entries,int index,
 						   					 PrefabIdentifier prefID, int levID) {
 		
 		PlayerReferenceManager PRman = currentPlayer.GetComponent<PlayerReferenceManager>();
-		Const.a.playerName = entries[index]; index++;
+		@const.playerName = entries[index]; index++;
 		index = PlayerHealth.Load(PRman.playerCapsule,ref entries,index);
 		index = PlayerEnergy.Load(PRman.playerCapsule,ref entries,index);
-		index = PlayerMovement.Load(PRman.playerCapsule,ref entries,index);
+		index = PlayerMovement.Load(@const,PRman.playerCapsule,ref entries,index);
 		index = PlayerPatch.Load(PRman.playerCapsule,ref entries,index);
 		index = MouseLookScript.Load(PRman.playerCapsuleMainCamera,ref entries,index);
 		index = HealthManager.Load(PRman.playerCapsule,ref entries,index,prefID,levID);
 		index = GUIState.Load(PRman.playerCanvas,ref entries,index);
-		index = Inventory.Load(PRman.playerInventory,ref entries,index);
+		index = Inventory.Load(@const,PRman.playerInventory,ref entries,index);
 		index = WeaponCurrent.Load(PRman.playerInventory,ref entries,index);
 		index = WeaponFire.Load(PRman.playerCapsuleMainCamera,ref entries,index);
 		index = MFDManager.Load(PRman.playerMFDManager,ref entries,index);
 		index = Automap.Load(PRman.playerMFDManager,ref entries,index);
-		if (BiomonitorGraphSystem.a != null) { // Might not have ran Awake() if
-											   // player has not acquired yet.
-			BiomonitorGraphSystem.a.ClearGraphs();
-		}
-
+		PRman._biomonitorGraphSystem.ClearGraphs();
 		return index;
 	}
 }

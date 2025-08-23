@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using Zenject;
 
 public class LogContentsButtonsManager : MonoBehaviour {
 	public GameObject[] LogButtons;
@@ -10,6 +11,10 @@ public class LogContentsButtonsManager : MonoBehaviour {
 	public int[] retrievedIndices;
 	/*[DTValidator.Optional] */public MultiMediaLogButton[] logRefButtons; //DT optional because it's empty until initialized below during Start
 
+	[Inject] private Const _consts;
+	[Inject] private Inventory _inventory;
+	[Inject] private PauseScript _pauseScript;
+	
 	void Start() {
 		InitializeLogsFromLevelIntoFolder();
 	}
@@ -23,11 +28,11 @@ public class LogContentsButtonsManager : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) {
 			for (int i=0; i<15; i++) {
 				LogButtonsText[i].text = logNames[i];
 				logRefButtons[i].logReferenceIndex = retrievedIndices[i];
-				if (Inventory.a.hasLog[retrievedIndices[i]]) {
+				if (_inventory.hasLog[retrievedIndices[i]]) {
 					LogButtons[i].SetActive(true);
 				} else {
 					LogButtons[i].SetActive(false);
@@ -40,8 +45,8 @@ public class LogContentsButtonsManager : MonoBehaviour {
 		string[] retval = {"","","","","","","","","","","","","","",""};
 		int indexingVal = 0;
 		for (int i=0;i<134;i++) {
-			if ((Const.a.audioLogLevelFound[i] == index)) {
-				retval[indexingVal] = Const.a.audiologNames[i];
+			if ((_consts.audioLogLevelFound[i] == index)) {
+				retval[indexingVal] = _consts.audiologNames[i];
 				retrievedIndices[indexingVal] = i;
 				indexingVal++;
 				if (indexingVal > 14)

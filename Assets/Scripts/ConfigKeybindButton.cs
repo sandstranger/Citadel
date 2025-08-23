@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,7 +14,12 @@ public class ConfigKeybindButton : MonoBehaviour {
 	private bool firstFrame;
 	private Text selfText;
 
-	void Start() { // Wait for Const.a. to initialize.
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+	[Inject] private GetInput _getInput;
+	[Inject] private MainMenuHandler _mainMenuHandler;
+
+	void Start() { // Wait for _consts. to initialize.
 		Initialize();
 	}
 
@@ -40,7 +46,7 @@ public class ConfigKeybindButton : MonoBehaviour {
 	}
 
 	public void KeybindButtonClick() {
-		if (MainMenuHandler.a.PresetConfirmDialog.activeSelf) return;
+		if (_mainMenuHandler.PresetConfirmDialog.activeSelf) return;
 
 		if (!enterMode) {
 			self.GetComponentInChildren<Text>(true).text = "...";
@@ -49,13 +55,13 @@ public class ConfigKeybindButton : MonoBehaviour {
 	}
 
 	void CheckAndHandleConflicts(int checkVal) {
-		for (int i=0;i<Const.a.InputCodeSettings.Length;i++) {
+		for (int i=0;i<_consts.InputCodeSettings.Length;i++) {
 			if (i == index) continue; // We already know this one is us.
 
-			if (Const.a.InputCodeSettings[i] == checkVal) {
-				Const.a.InputCodeSettings[i] = 109;
-				Const.sprint(Const.a.stringTable[1018] // "Found and unbound conflict with "
-							 + Const.a.InputCodes[i],Const.a.player1);
+			if (_consts.InputCodeSettings[i] == checkVal) {
+				_consts.InputCodeSettings[i] = 109;
+				_consts.sprint(_consts.stringTable[1018] // "Found and unbound conflict with "
+							 + _consts.InputCodes[i],_consts.Player);
 				break;
 			}
 		}
@@ -73,17 +79,17 @@ public class ConfigKeybindButton : MonoBehaviour {
 				if (i == 139) {
 					if (Input.GetKeyDown(KeyCode.CapsLock)) goodkey = true;
 				} else if (i == 153) {
-					if (GetInput.a.MouseWheelUp()) goodkey = true;
+					if (_getInput.MouseWheelUp()) goodkey = true;
 				} else if (i == 154) {
-					if (GetInput.a.MouseWheelDn()) goodkey = true;
+					if (_getInput.MouseWheelDn()) goodkey = true;
 				} else {
-					if (Input.GetKeyUp(Const.a.InputValues[i])) goodkey = true;
+					if (Input.GetKeyUp(_consts.InputValues[i])) goodkey = true;
 				}
 
 				if (goodkey) {
-					selfText.text = Const.a.InputConfigNames[i];
-					Const.a.InputCodeSettings[index] = i;
-					Config.WriteConfig();
+					selfText.text = _consts.InputConfigNames[i];
+					_consts.InputCodeSettings[index] = i;
+					_config.WriteConfig();
 					enterMode = false;
 					firstFrame = true;
 					CheckAndHandleConflicts(i);
@@ -97,9 +103,9 @@ public class ConfigKeybindButton : MonoBehaviour {
 
 	public void UpdateText() { // Called by Start also.
 		if (selfText != null) {
-			selfText.text = Const.a.InputConfigNames[Const.a.InputCodeSettings[index]];
-			if (Const.a.InputCodeSettings[index] == 109) selfText.color = Const.a.ssRedText;
-			else selfText.color = Const.a.ssGreenText;
+			selfText.text = _consts.InputConfigNames[_consts.InputCodeSettings[index]];
+			if (_consts.InputCodeSettings[index] == 109) selfText.color = _consts.ssRedText;
+			else selfText.color = _consts.ssGreenText;
 		}
 	}
 }

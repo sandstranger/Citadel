@@ -10,13 +10,13 @@ public class ConfigurationMenuVideoApply : MonoBehaviour {
 #if !UNITY_ANDROID		
 		int x = Screen.resolutions[resolutionPicker.value].width;
 		int y = Screen.resolutions[resolutionPicker.value].height;
-		Const.sprint(Const.a.stringTable[1016] + x.ToString() + ", "
-				     + y.ToString() + ", " + Const.a.stringTable[1017] + ": "
-				     + Const.a.GraphicsFullscreen.ToString());
+		_consts.sprint(_consts.stringTable[1016] + x.ToString() + ", "
+				     + y.ToString() + ", " + _consts.stringTable[1017] + ": "
+				     + _consts.GraphicsFullscreen.ToString());
 		Screen.SetResolution(x,y,true);
-		Screen.fullScreen = Const.a.GraphicsFullscreen;
-		Const.a.GraphicsResWidth = Screen.resolutions[resolutionPicker.value].width;
-		Const.a.GraphicsResHeight = Screen.resolutions[resolutionPicker.value].height;
+		Screen.fullScreen = _consts.GraphicsFullscreen;
+		_consts.GraphicsResWidth = Screen.resolutions[resolutionPicker.value].width;
+		_consts.GraphicsResHeight = Screen.resolutions[resolutionPicker.value].height;
 		Config.WriteConfig();
 #endif
 	}

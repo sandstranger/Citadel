@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class QuestBitRelay : MonoBehaviour {
@@ -34,424 +35,428 @@ public class QuestBitRelay : MonoBehaviour {
 	public string targetIfFalse;
 	public string argvalue;
 	public string argvalueIfFalse;
+
+	[Inject] private Const _consts;
+	[Inject] private LevelManager _levelManager;
+	[Inject] private QuestLogNotesManager _questLogNotesManager;
 	
     public void EnableBits() {
 		if (RobotSpawnDeactivated) {
-			Const.a.questData.RobotSpawnDeactivated = true;
+			_consts.questData.RobotSpawnDeactivated = true;
 			Debug.Log("Bit set RobotSpawnDeactivated: "
-					  + Const.a.questData.RobotSpawnDeactivated.ToString());
+					  + _consts.questData.RobotSpawnDeactivated.ToString());
 		}
 
 		if (IsotopeInstalled) {
-			Const.a.questData.IsotopeInstalled = true;
+			_consts.questData.IsotopeInstalled = true;
 			Debug.Log("Bit set IsotopeInstalled: "
-					  + Const.a.questData.IsotopeInstalled.ToString());
+					  + _consts.questData.IsotopeInstalled.ToString());
 		}
 
 		if (ShieldActivated) {
-			Const.a.questData.ShieldActivated = true;
-			LevelManager.a.exterior_shield.SetActive(true);
+			_consts.questData.ShieldActivated = true;
+			_levelManager.exterior_shield.SetActive(true);
 			Debug.Log("Bit set ShieldActivated: "
-					  + Const.a.questData.ShieldActivated.ToString());
+					  + _consts.questData.ShieldActivated.ToString());
 
-			QuestLogNotesManager.a.notes[8].SetActive(true);
-			QuestLogNotesManager.a.checkBoxes[8].isOn = 
-				Const.a.questData.ShieldActivated;
+			_questLogNotesManager.notes[8].SetActive(true);
+			_questLogNotesManager.checkBoxes[8].isOn = 
+				_consts.questData.ShieldActivated;
 
-			QuestLogNotesManager.a.labels[8].text = Const.a.stringTable[560];
+			_questLogNotesManager.labels[8].text = _consts.stringTable[560];
 		}
 
 		if (LaserSafetyOverriden) {
-			Const.a.questData.LaserSafetyOverriden = true;
+			_consts.questData.LaserSafetyOverriden = true;
 			Debug.Log("Bit set LaserSafetyOverriden: "
-					  + Const.a.questData.LaserSafetyOverriden.ToString());
+					  + _consts.questData.LaserSafetyOverriden.ToString());
 
-			QuestLogNotesManager.a.notes[7].SetActive(true);
-			QuestLogNotesManager.a.checkBoxes[7].isOn =
-				Const.a.questData.LaserSafetyOverriden;
+			_questLogNotesManager.notes[7].SetActive(true);
+			_questLogNotesManager.checkBoxes[7].isOn =
+				_consts.questData.LaserSafetyOverriden;
 
-			QuestLogNotesManager.a.labels[7].text = Const.a.stringTable[559];
+			_questLogNotesManager.labels[7].text = _consts.stringTable[559];
 		}
 		if (LaserDestroyed) { 
-			Const.a.questData.LaserDestroyed = true;
+			_consts.questData.LaserDestroyed = true;
 			Debug.Log("Bit set LaserDestroyed: "
-					  + Const.a.questData.LaserDestroyed.ToString());
+					  + _consts.questData.LaserDestroyed.ToString());
 
 			if (AutoSplitterData.missionSplitID == 1) {
 				AutoSplitterData.missionSplitID++;
 			}
 
-			QuestLogNotesManager.a.notes[9].SetActive(true);
-			QuestLogNotesManager.a.checkBoxes[9].isOn =
-				Const.a.questData.LaserDestroyed;
+			_questLogNotesManager.notes[9].SetActive(true);
+			_questLogNotesManager.checkBoxes[9].isOn =
+				_consts.questData.LaserDestroyed;
 
-			QuestLogNotesManager.a.labels[9].text = Const.a.stringTable[561];
+			_questLogNotesManager.labels[9].text = _consts.stringTable[561];
 		}
 
 		if (BetaGroveCyberUnlocked) {
-			Const.a.questData.BetaGroveCyberUnlocked = true;
+			_consts.questData.BetaGroveCyberUnlocked = true;
 			Debug.Log("Bit set BetaGroveCyberUnlocked: "
-					  + Const.a.questData.BetaGroveCyberUnlocked.ToString());
+					  + _consts.questData.BetaGroveCyberUnlocked.ToString());
 			
-			QuestLogNotesManager.a.notes[12].SetActive(true);
+			_questLogNotesManager.notes[12].SetActive(true);
 		}
 
 		if (GroveAlphaJettisonEnabled) {
-			Const.a.questData.GroveAlphaJettisonEnabled = true;
+			_consts.questData.GroveAlphaJettisonEnabled = true;
 			Debug.Log("Bit set GroveAlphaJettisonEnabled: "
-					  + Const.a.questData.GroveAlphaJettisonEnabled.ToString());
+					  + _consts.questData.GroveAlphaJettisonEnabled.ToString());
 			
-			QuestLogNotesManager.a.notes[12].SetActive(true);
+			_questLogNotesManager.notes[12].SetActive(true);
 		}
 
 		if (GroveBetaJettisonEnabled) {
-			Const.a.questData.GroveBetaJettisonEnabled = true;
+			_consts.questData.GroveBetaJettisonEnabled = true;
 			Debug.Log("Bit set GroveBetaJettisonEnabled: "
-					  + Const.a.questData.GroveBetaJettisonEnabled.ToString());
+					  + _consts.questData.GroveBetaJettisonEnabled.ToString());
 			
-			QuestLogNotesManager.a.notes[12].SetActive(true);
+			_questLogNotesManager.notes[12].SetActive(true);
 		}
 
 		if (GroveDeltaJettisonEnabled) {
-			Const.a.questData.GroveDeltaJettisonEnabled = true;
+			_consts.questData.GroveDeltaJettisonEnabled = true;
 			Debug.Log("Bit set GroveDeltaJettisonEnabled: "
-					  + Const.a.questData.GroveDeltaJettisonEnabled.ToString());
+					  + _consts.questData.GroveDeltaJettisonEnabled.ToString());
 			
-			QuestLogNotesManager.a.notes[12].SetActive(true);
+			_questLogNotesManager.notes[12].SetActive(true);
 		}
 
 		if (MasterJettisonBroken) {
-			Const.a.questData.MasterJettisonBroken = true;
+			_consts.questData.MasterJettisonBroken = true;
 			Debug.Log("Bit set MasterJettisonBroken: "
-					  + Const.a.questData.MasterJettisonBroken.ToString());
+					  + _consts.questData.MasterJettisonBroken.ToString());
 
 			if (AutoSplitterData.missionSplitID == 2) {
 				AutoSplitterData.missionSplitID++;
 			}
 
-			QuestLogNotesManager.a.notes[12].SetActive(true);
-			QuestLogNotesManager.a.notes[11].SetActive(true);
-			QuestLogNotesManager.a.labels[11].text =
-				Const.a.stringTable[563];// Set:Diagnose and repair broken relay
+			_questLogNotesManager.notes[12].SetActive(true);
+			_questLogNotesManager.notes[11].SetActive(true);
+			_questLogNotesManager.labels[11].text =
+				_consts.stringTable[563];// Set:Diagnose and repair broken relay
 		}
 		if (Relay428Fixed) {
-			Const.a.questData.Relay428Fixed = true;
+			_consts.questData.Relay428Fixed = true;
 			Debug.Log("Bit set Relay428Fixed: "
-					  + Const.a.questData.Relay428Fixed.ToString());
+					  + _consts.questData.Relay428Fixed.ToString());
 
-			QuestLogNotesManager.a.notes[11].SetActive(true);
-			QuestLogNotesManager.a.checkBoxes[11].isOn =
-				Const.a.questData.Relay428Fixed;
+			_questLogNotesManager.notes[11].SetActive(true);
+			_questLogNotesManager.checkBoxes[11].isOn =
+				_consts.questData.Relay428Fixed;
 
-			QuestLogNotesManager.a.labels[11].text =
-				Const.a.stringTable[563]; // Set:Diagnose and repair broken relay
+			_questLogNotesManager.labels[11].text =
+				_consts.stringTable[563]; // Set:Diagnose and repair broken relay
 
 			// Add:: 428.
-			QuestLogNotesManager.a.labels[11].text += Const.a.stringTable[564];
+			_questLogNotesManager.labels[11].text += _consts.stringTable[564];
 		}
 		if (MasterJettisonEnabled) {
-			Const.a.questData.MasterJettisonEnabled = true;
+			_consts.questData.MasterJettisonEnabled = true;
 			Debug.Log("Bit set MasterJettisonEnabled: "
-					  + Const.a.questData.MasterJettisonEnabled.ToString());
+					  + _consts.questData.MasterJettisonEnabled.ToString());
 
 			if (AutoSplitterData.missionSplitID == 3) {
 				AutoSplitterData.missionSplitID++;
 			}
 
-			QuestLogNotesManager.a.notes[10].SetActive(true);
-			QuestLogNotesManager.a.checkBoxes[10].isOn =
-				Const.a.questData.MasterJettisonEnabled;
+			_questLogNotesManager.notes[10].SetActive(true);
+			_questLogNotesManager.checkBoxes[10].isOn =
+				_consts.questData.MasterJettisonEnabled;
 
-			QuestLogNotesManager.a.labels[10].text = Const.a.stringTable[562];
+			_questLogNotesManager.labels[10].text = _consts.stringTable[562];
 		}
 		if (BetaGroveJettisoned) {
-			Const.a.questData.BetaGroveJettisoned = true;
+			_consts.questData.BetaGroveJettisoned = true;
 			Debug.Log("Bit set BetaGroveJettisoned: "
-					  + Const.a.questData.BetaGroveJettisoned.ToString());
+					  + _consts.questData.BetaGroveJettisoned.ToString());
 
 			if (AutoSplitterData.missionSplitID == 4) { 
 				AutoSplitterData.missionSplitID++;
 			}
 
-			QuestLogNotesManager.a.notes[12].SetActive(true);
-			QuestLogNotesManager.a.checkBoxes[12].isOn =
-				Const.a.questData.BetaGroveJettisoned;
+			_questLogNotesManager.notes[12].SetActive(true);
+			_questLogNotesManager.checkBoxes[12].isOn =
+				_consts.questData.BetaGroveJettisoned;
 
-			QuestLogNotesManager.a.labels[12].text = Const.a.stringTable[565];
-			QuestLogNotesManager.a.notes[13].SetActive(true);
-			QuestLogNotesManager.a.labels[13].text = Const.a.stringTable[566];
+			_questLogNotesManager.labels[12].text = _consts.stringTable[565];
+			_questLogNotesManager.notes[13].SetActive(true);
+			_questLogNotesManager.labels[13].text = _consts.stringTable[566];
 		}
 		if (AntennaNorthDestroyed) {
-			Const.a.questData.AntennaNorthDestroyed = true;
+			_consts.questData.AntennaNorthDestroyed = true;
 			Debug.Log("Bit set AntennaNorthDestroyed: "
-					  + Const.a.questData.AntennaNorthDestroyed.ToString());
+					  + _consts.questData.AntennaNorthDestroyed.ToString());
 			
-			QuestLogNotesManager.a.notes[13].SetActive(true);
+			_questLogNotesManager.notes[13].SetActive(true);
 		}
 
 		if (AntennaSouthDestroyed) {
-			Const.a.questData.AntennaSouthDestroyed = true;
+			_consts.questData.AntennaSouthDestroyed = true;
 			Debug.Log("Bit set AntennaSouthDestroyed: "
-					  + Const.a.questData.AntennaSouthDestroyed.ToString());
+					  + _consts.questData.AntennaSouthDestroyed.ToString());
 			
-			QuestLogNotesManager.a.notes[13].SetActive(true);
+			_questLogNotesManager.notes[13].SetActive(true);
 		}
 
 		if (AntennaEastDestroyed) {
-			Const.a.questData.AntennaEastDestroyed = true;
+			_consts.questData.AntennaEastDestroyed = true;
 			Debug.Log("Bit set AntennaEastDestroyed: "
-					  + Const.a.questData.AntennaEastDestroyed.ToString());
+					  + _consts.questData.AntennaEastDestroyed.ToString());
 			
-			QuestLogNotesManager.a.notes[13].SetActive(true);
+			_questLogNotesManager.notes[13].SetActive(true);
 		}
 
 		if (AntennaWestDestroyed) {
-			Const.a.questData.AntennaWestDestroyed = true;
+			_consts.questData.AntennaWestDestroyed = true;
 			Debug.Log("Bit set AntennaWestDestroyed: "
-					  + Const.a.questData.AntennaWestDestroyed.ToString());
+					  + _consts.questData.AntennaWestDestroyed.ToString());
 			
-			QuestLogNotesManager.a.notes[13].SetActive(true);
+			_questLogNotesManager.notes[13].SetActive(true);
 		}
 
 		if (SelfDestructActivated) {
-			Const.a.questData.SelfDestructActivated = true;
+			_consts.questData.SelfDestructActivated = true;
 			Debug.Log("Bit set SelfDestructActivated: "
-					  + Const.a.questData.SelfDestructActivated.ToString());
+					  + _consts.questData.SelfDestructActivated.ToString());
 
-			QuestLogNotesManager.a.notes[0].SetActive(true);
-			QuestLogNotesManager.a.notes[1].SetActive(true);
-			QuestLogNotesManager.a.notes[2].SetActive(true);
-			QuestLogNotesManager.a.notes[3].SetActive(true);
-			QuestLogNotesManager.a.notes[4].SetActive(true);
-			QuestLogNotesManager.a.notes[5].SetActive(true);
-			QuestLogNotesManager.a.notes[6].SetActive(true);
-			QuestLogNotesManager.a.notes[7].SetActive(true);
-			QuestLogNotesManager.a.notes[8].SetActive(true);
-			QuestLogNotesManager.a.notes[9].SetActive(true);
-			QuestLogNotesManager.a.notes[10].SetActive(true);
-			QuestLogNotesManager.a.notes[11].SetActive(true);
-			QuestLogNotesManager.a.notes[12].SetActive(true);
-			QuestLogNotesManager.a.notes[13].SetActive(true);
-			QuestLogNotesManager.a.notes[14].SetActive(true); // Self destruct
-			QuestLogNotesManager.a.notes[15].SetActive(true); // Escape pod
-			QuestLogNotesManager.a.notes[16].SetActive(true); // Access the bridge
-			QuestLogNotesManager.a.checkBoxes[14].isOn =
-				Const.a.questData.SelfDestructActivated;
+			_questLogNotesManager.notes[0].SetActive(true);
+			_questLogNotesManager.notes[1].SetActive(true);
+			_questLogNotesManager.notes[2].SetActive(true);
+			_questLogNotesManager.notes[3].SetActive(true);
+			_questLogNotesManager.notes[4].SetActive(true);
+			_questLogNotesManager.notes[5].SetActive(true);
+			_questLogNotesManager.notes[6].SetActive(true);
+			_questLogNotesManager.notes[7].SetActive(true);
+			_questLogNotesManager.notes[8].SetActive(true);
+			_questLogNotesManager.notes[9].SetActive(true);
+			_questLogNotesManager.notes[10].SetActive(true);
+			_questLogNotesManager.notes[11].SetActive(true);
+			_questLogNotesManager.notes[12].SetActive(true);
+			_questLogNotesManager.notes[13].SetActive(true);
+			_questLogNotesManager.notes[14].SetActive(true); // Self destruct
+			_questLogNotesManager.notes[15].SetActive(true); // Escape pod
+			_questLogNotesManager.notes[16].SetActive(true); // Access the bridge
+			_questLogNotesManager.checkBoxes[14].isOn =
+				_consts.questData.SelfDestructActivated;
 
 			// Set:Engage reactor self-destruct.
-			QuestLogNotesManager.a.labels[14].text = Const.a.stringTable[567];
+			_questLogNotesManager.labels[14].text = _consts.stringTable[567];
 
 			// Set:Escape on escape pod.
-			QuestLogNotesManager.a.labels[15].text = Const.a.stringTable[568];
+			_questLogNotesManager.labels[15].text = _consts.stringTable[568];
 		}
 
 		if (BridgeSeparated) {
-			Const.a.questData.BridgeSeparated = true;
+			_consts.questData.BridgeSeparated = true;
 			Debug.Log("Bit set BridgeSeparated: "
-					  + Const.a.questData.BridgeSeparated.ToString());
+					  + _consts.questData.BridgeSeparated.ToString());
 
-			QuestLogNotesManager.a.notes[0].SetActive(true);
-			QuestLogNotesManager.a.notes[1].SetActive(true);
-			QuestLogNotesManager.a.notes[2].SetActive(true);
-			QuestLogNotesManager.a.notes[3].SetActive(true);
-			QuestLogNotesManager.a.notes[4].SetActive(true);
-			QuestLogNotesManager.a.notes[5].SetActive(true);
-			QuestLogNotesManager.a.notes[6].SetActive(true);
-			QuestLogNotesManager.a.notes[7].SetActive(true);
-			QuestLogNotesManager.a.notes[8].SetActive(true);
-			QuestLogNotesManager.a.notes[9].SetActive(true);
-			QuestLogNotesManager.a.notes[10].SetActive(true);
-			QuestLogNotesManager.a.notes[11].SetActive(true);
-			QuestLogNotesManager.a.notes[12].SetActive(true);
-			QuestLogNotesManager.a.notes[13].SetActive(true);
-			QuestLogNotesManager.a.notes[14].SetActive(true); // Self destruct
-			QuestLogNotesManager.a.checkBoxes[14].isOn =
-				Const.a.questData.SelfDestructActivated;
+			_questLogNotesManager.notes[0].SetActive(true);
+			_questLogNotesManager.notes[1].SetActive(true);
+			_questLogNotesManager.notes[2].SetActive(true);
+			_questLogNotesManager.notes[3].SetActive(true);
+			_questLogNotesManager.notes[4].SetActive(true);
+			_questLogNotesManager.notes[5].SetActive(true);
+			_questLogNotesManager.notes[6].SetActive(true);
+			_questLogNotesManager.notes[7].SetActive(true);
+			_questLogNotesManager.notes[8].SetActive(true);
+			_questLogNotesManager.notes[9].SetActive(true);
+			_questLogNotesManager.notes[10].SetActive(true);
+			_questLogNotesManager.notes[11].SetActive(true);
+			_questLogNotesManager.notes[12].SetActive(true);
+			_questLogNotesManager.notes[13].SetActive(true);
+			_questLogNotesManager.notes[14].SetActive(true); // Self destruct
+			_questLogNotesManager.checkBoxes[14].isOn =
+				_consts.questData.SelfDestructActivated;
 
 			// Set:Engage reactor self-destruct.
-			QuestLogNotesManager.a.labels[14].text = Const.a.stringTable[567];
-			QuestLogNotesManager.a.notes[16].SetActive(true);
-			QuestLogNotesManager.a.notes[17].SetActive(true);
-			QuestLogNotesManager.a.checkBoxes[16].isOn = true;
+			_questLogNotesManager.labels[14].text = _consts.stringTable[567];
+			_questLogNotesManager.notes[16].SetActive(true);
+			_questLogNotesManager.notes[17].SetActive(true);
+			_questLogNotesManager.checkBoxes[16].isOn = true;
 
 			// Set:Access the bridge.
-			QuestLogNotesManager.a.labels[16].text = Const.a.stringTable[569];
+			_questLogNotesManager.labels[16].text = _consts.stringTable[569];
 
 			// Set:Destroy SHODAN.
-			QuestLogNotesManager.a.labels[17].text = Const.a.stringTable[570];
+			_questLogNotesManager.labels[17].text = _consts.stringTable[570];
 		}
 		if (IsolinearChipsetInstalled) {
-			Const.a.questData.IsolinearChipsetInstalled = true;
+			_consts.questData.IsolinearChipsetInstalled = true;
 			Debug.Log("Bit set IsolinearChipsetInstalled: "
-					  + Const.a.questData.IsolinearChipsetInstalled.ToString());
+					  + _consts.questData.IsolinearChipsetInstalled.ToString());
 		}
 	}
 
 	public void DisableBits() {
 		if (RobotSpawnDeactivated) {
-			Const.a.questData.RobotSpawnDeactivated = false;
+			_consts.questData.RobotSpawnDeactivated = false;
 		}
 
-		if (IsotopeInstalled) Const.a.questData.IsotopeInstalled = false;
+		if (IsotopeInstalled) _consts.questData.IsotopeInstalled = false;
 		if (ShieldActivated) {
-			Const.a.questData.ShieldActivated = false;
-			LevelManager.a.exterior_shield.SetActive(false);
+			_consts.questData.ShieldActivated = false;
+			_levelManager.exterior_shield.SetActive(false);
 			Debug.Log("Bit unset ShieldActivated: "
-					  + Const.a.questData.ShieldActivated.ToString());
+					  + _consts.questData.ShieldActivated.ToString());
 
-			QuestLogNotesManager.a.checkBoxes[8].isOn =
-				Const.a.questData.ShieldActivated;
+			_questLogNotesManager.checkBoxes[8].isOn =
+				_consts.questData.ShieldActivated;
 		}
 		if (LaserSafetyOverriden) {
-			Const.a.questData.LaserSafetyOverriden = false;
-			QuestLogNotesManager.a.checkBoxes[7].isOn = Const.a.questData.LaserSafetyOverriden;
+			_consts.questData.LaserSafetyOverriden = false;
+			_questLogNotesManager.checkBoxes[7].isOn = _consts.questData.LaserSafetyOverriden;
 		}
 		if (LaserDestroyed) {
-			Const.a.questData.LaserDestroyed = false;
-			QuestLogNotesManager.a.checkBoxes[9].isOn = Const.a.questData.LaserDestroyed;
+			_consts.questData.LaserDestroyed = false;
+			_questLogNotesManager.checkBoxes[9].isOn = _consts.questData.LaserDestroyed;
 		}
-		if (BetaGroveCyberUnlocked) Const.a.questData.BetaGroveCyberUnlocked = false;
-		if (GroveAlphaJettisonEnabled) Const.a.questData.GroveAlphaJettisonEnabled = false;
-		if (GroveBetaJettisonEnabled) Const.a.questData.GroveBetaJettisonEnabled = false;
-		if (GroveDeltaJettisonEnabled) Const.a.questData.GroveDeltaJettisonEnabled = false;
-		if (MasterJettisonBroken) Const.a.questData.MasterJettisonBroken = false;
+		if (BetaGroveCyberUnlocked) _consts.questData.BetaGroveCyberUnlocked = false;
+		if (GroveAlphaJettisonEnabled) _consts.questData.GroveAlphaJettisonEnabled = false;
+		if (GroveBetaJettisonEnabled) _consts.questData.GroveBetaJettisonEnabled = false;
+		if (GroveDeltaJettisonEnabled) _consts.questData.GroveDeltaJettisonEnabled = false;
+		if (MasterJettisonBroken) _consts.questData.MasterJettisonBroken = false;
 		if (Relay428Fixed) {
-			Const.a.questData.Relay428Fixed = false;
-			QuestLogNotesManager.a.checkBoxes[11].isOn = Const.a.questData.Relay428Fixed;
+			_consts.questData.Relay428Fixed = false;
+			_questLogNotesManager.checkBoxes[11].isOn = _consts.questData.Relay428Fixed;
 		}
 		if (MasterJettisonEnabled) {
-			Const.a.questData.MasterJettisonEnabled = false;
-			QuestLogNotesManager.a.checkBoxes[10].isOn = Const.a.questData.MasterJettisonEnabled;
+			_consts.questData.MasterJettisonEnabled = false;
+			_questLogNotesManager.checkBoxes[10].isOn = _consts.questData.MasterJettisonEnabled;
 		}
 		if (BetaGroveJettisoned) {
-			Const.a.questData.BetaGroveJettisoned = false;
-			QuestLogNotesManager.a.checkBoxes[12].isOn = Const.a.questData.BetaGroveJettisoned;
+			_consts.questData.BetaGroveJettisoned = false;
+			_questLogNotesManager.checkBoxes[12].isOn = _consts.questData.BetaGroveJettisoned;
 		}
-		if (AntennaNorthDestroyed) Const.a.questData.AntennaNorthDestroyed = false;
-		if (AntennaSouthDestroyed) Const.a.questData.AntennaSouthDestroyed = false;
-		if (AntennaEastDestroyed) Const.a.questData.AntennaEastDestroyed = false;
-		if (AntennaWestDestroyed) Const.a.questData.AntennaWestDestroyed = false;
+		if (AntennaNorthDestroyed) _consts.questData.AntennaNorthDestroyed = false;
+		if (AntennaSouthDestroyed) _consts.questData.AntennaSouthDestroyed = false;
+		if (AntennaEastDestroyed) _consts.questData.AntennaEastDestroyed = false;
+		if (AntennaWestDestroyed) _consts.questData.AntennaWestDestroyed = false;
 		if (SelfDestructActivated) {
-			Const.a.questData.SelfDestructActivated = false;
-			QuestLogNotesManager.a.checkBoxes[14].isOn = Const.a.questData.SelfDestructActivated;
+			_consts.questData.SelfDestructActivated = false;
+			_questLogNotesManager.checkBoxes[14].isOn = _consts.questData.SelfDestructActivated;
 		}
-		if (BridgeSeparated) Const.a.questData.BridgeSeparated = false;
-		if (IsolinearChipsetInstalled) Const.a.questData.IsolinearChipsetInstalled = false;
+		if (BridgeSeparated) _consts.questData.BridgeSeparated = false;
+		if (IsolinearChipsetInstalled) _consts.questData.IsolinearChipsetInstalled = false;
 	}
 
     public void ToggleBits() {
-		if (RobotSpawnDeactivated) Const.a.questData.RobotSpawnDeactivated = !Const.a.questData.RobotSpawnDeactivated;
-		if (IsotopeInstalled) Const.a.questData.IsotopeInstalled = !Const.a.questData.IsotopeInstalled;
+		if (RobotSpawnDeactivated) _consts.questData.RobotSpawnDeactivated = !_consts.questData.RobotSpawnDeactivated;
+		if (IsotopeInstalled) _consts.questData.IsotopeInstalled = !_consts.questData.IsotopeInstalled;
 		if (ShieldActivated) {
-			Const.a.questData.ShieldActivated = !Const.a.questData.ShieldActivated;
-			LevelManager.a.exterior_shield.SetActive(Const.a.questData.ShieldActivated);
-			QuestLogNotesManager.a.checkBoxes[8].isOn = Const.a.questData.ShieldActivated;
-			if (Const.a.questData.ShieldActivated) {
-				QuestLogNotesManager.a.notes[8].SetActive(true);
-				QuestLogNotesManager.a.labels[8].text = Const.a.stringTable[560];
+			_consts.questData.ShieldActivated = !_consts.questData.ShieldActivated;
+			_levelManager.exterior_shield.SetActive(_consts.questData.ShieldActivated);
+			_questLogNotesManager.checkBoxes[8].isOn = _consts.questData.ShieldActivated;
+			if (_consts.questData.ShieldActivated) {
+				_questLogNotesManager.notes[8].SetActive(true);
+				_questLogNotesManager.labels[8].text = _consts.stringTable[560];
 			}
 		}
 		if (LaserSafetyOverriden) {
-			Const.a.questData.LaserSafetyOverriden = !Const.a.questData.LaserSafetyOverriden;
-			QuestLogNotesManager.a.checkBoxes[7].isOn = Const.a.questData.LaserSafetyOverriden;
-			if (Const.a.questData.LaserSafetyOverriden) {
-				QuestLogNotesManager.a.notes[7].SetActive(true);
-				QuestLogNotesManager.a.labels[7].text = Const.a.stringTable[559];
+			_consts.questData.LaserSafetyOverriden = !_consts.questData.LaserSafetyOverriden;
+			_questLogNotesManager.checkBoxes[7].isOn = _consts.questData.LaserSafetyOverriden;
+			if (_consts.questData.LaserSafetyOverriden) {
+				_questLogNotesManager.notes[7].SetActive(true);
+				_questLogNotesManager.labels[7].text = _consts.stringTable[559];
 			}
 		}
 		if (LaserDestroyed) {
-			Const.a.questData.LaserDestroyed = !Const.a.questData.LaserDestroyed;
+			_consts.questData.LaserDestroyed = !_consts.questData.LaserDestroyed;
 			if (AutoSplitterData.missionSplitID == 1) { AutoSplitterData.missionSplitID++; }
-			QuestLogNotesManager.a.checkBoxes[9].isOn = Const.a.questData.LaserDestroyed;
-			if (Const.a.questData.LaserDestroyed) {
-				QuestLogNotesManager.a.notes[9].SetActive(true);
-				QuestLogNotesManager.a.labels[9].text = Const.a.stringTable[561];
+			_questLogNotesManager.checkBoxes[9].isOn = _consts.questData.LaserDestroyed;
+			if (_consts.questData.LaserDestroyed) {
+				_questLogNotesManager.notes[9].SetActive(true);
+				_questLogNotesManager.labels[9].text = _consts.stringTable[561];
 			}
 		}
-		if (BetaGroveCyberUnlocked) Const.a.questData.BetaGroveCyberUnlocked = !Const.a.questData.BetaGroveCyberUnlocked;
-		if (GroveAlphaJettisonEnabled) Const.a.questData.GroveAlphaJettisonEnabled = !Const.a.questData.GroveAlphaJettisonEnabled;
-		if (GroveBetaJettisonEnabled) Const.a.questData.GroveBetaJettisonEnabled = !Const.a.questData.GroveBetaJettisonEnabled;
-		if (GroveDeltaJettisonEnabled) Const.a.questData.GroveDeltaJettisonEnabled = !Const.a.questData.GroveDeltaJettisonEnabled;
+		if (BetaGroveCyberUnlocked) _consts.questData.BetaGroveCyberUnlocked = !_consts.questData.BetaGroveCyberUnlocked;
+		if (GroveAlphaJettisonEnabled) _consts.questData.GroveAlphaJettisonEnabled = !_consts.questData.GroveAlphaJettisonEnabled;
+		if (GroveBetaJettisonEnabled) _consts.questData.GroveBetaJettisonEnabled = !_consts.questData.GroveBetaJettisonEnabled;
+		if (GroveDeltaJettisonEnabled) _consts.questData.GroveDeltaJettisonEnabled = !_consts.questData.GroveDeltaJettisonEnabled;
 		if (MasterJettisonBroken) {
-			Const.a.questData.MasterJettisonBroken = !Const.a.questData.MasterJettisonBroken;
-			if (Const.a.questData.MasterJettisonBroken) {
-				QuestLogNotesManager.a.notes[11].SetActive(true); // Diagnose and repair broken relay
-				QuestLogNotesManager.a.labels[11].text = Const.a.stringTable[563];// Set:Diagnose and repair broken relay
+			_consts.questData.MasterJettisonBroken = !_consts.questData.MasterJettisonBroken;
+			if (_consts.questData.MasterJettisonBroken) {
+				_questLogNotesManager.notes[11].SetActive(true); // Diagnose and repair broken relay
+				_questLogNotesManager.labels[11].text = _consts.stringTable[563];// Set:Diagnose and repair broken relay
 			}
 		}
 		if (Relay428Fixed) {
-			Const.a.questData.Relay428Fixed = !Const.a.questData.Relay428Fixed;
-			QuestLogNotesManager.a.checkBoxes[11].isOn = Const.a.questData.Relay428Fixed;
-			if (Const.a.questData.Relay428Fixed) {
-				QuestLogNotesManager.a.notes[11].SetActive(true);
-				QuestLogNotesManager.a.labels[11].text = Const.a.stringTable[563]; // Set:Diagnose and repair broken relay
-				QuestLogNotesManager.a.labels[11].text += Const.a.stringTable[564]; // Add:: 428.
+			_consts.questData.Relay428Fixed = !_consts.questData.Relay428Fixed;
+			_questLogNotesManager.checkBoxes[11].isOn = _consts.questData.Relay428Fixed;
+			if (_consts.questData.Relay428Fixed) {
+				_questLogNotesManager.notes[11].SetActive(true);
+				_questLogNotesManager.labels[11].text = _consts.stringTable[563]; // Set:Diagnose and repair broken relay
+				_questLogNotesManager.labels[11].text += _consts.stringTable[564]; // Add:: 428.
 			}
 		}
 		if (MasterJettisonEnabled) {
-			Const.a.questData.MasterJettisonEnabled = !Const.a.questData.MasterJettisonEnabled;
-			QuestLogNotesManager.a.checkBoxes[10].isOn = Const.a.questData.MasterJettisonEnabled;
-			if (Const.a.questData.MasterJettisonEnabled) {
-				QuestLogNotesManager.a.notes[10].SetActive(true);
-				QuestLogNotesManager.a.labels[10].text = Const.a.stringTable[562];
+			_consts.questData.MasterJettisonEnabled = !_consts.questData.MasterJettisonEnabled;
+			_questLogNotesManager.checkBoxes[10].isOn = _consts.questData.MasterJettisonEnabled;
+			if (_consts.questData.MasterJettisonEnabled) {
+				_questLogNotesManager.notes[10].SetActive(true);
+				_questLogNotesManager.labels[10].text = _consts.stringTable[562];
 			}
 		}
 		if (BetaGroveJettisoned) {
-			Const.a.questData.BetaGroveJettisoned = !Const.a.questData.BetaGroveJettisoned;
-			QuestLogNotesManager.a.checkBoxes[12].isOn = Const.a.questData.BetaGroveJettisoned;
-			if (Const.a.questData.BetaGroveJettisoned ) {
-				QuestLogNotesManager.a.notes[12].SetActive(true);
-				QuestLogNotesManager.a.labels[12].text = Const.a.stringTable[565];
-				QuestLogNotesManager.a.notes[13].SetActive(true);
-				QuestLogNotesManager.a.labels[13].text = Const.a.stringTable[566];
+			_consts.questData.BetaGroveJettisoned = !_consts.questData.BetaGroveJettisoned;
+			_questLogNotesManager.checkBoxes[12].isOn = _consts.questData.BetaGroveJettisoned;
+			if (_consts.questData.BetaGroveJettisoned ) {
+				_questLogNotesManager.notes[12].SetActive(true);
+				_questLogNotesManager.labels[12].text = _consts.stringTable[565];
+				_questLogNotesManager.notes[13].SetActive(true);
+				_questLogNotesManager.labels[13].text = _consts.stringTable[566];
 			}
 		}
-		if (AntennaNorthDestroyed) Const.a.questData.AntennaNorthDestroyed = !Const.a.questData.AntennaNorthDestroyed;
-		if (AntennaSouthDestroyed) Const.a.questData.AntennaSouthDestroyed = !Const.a.questData.AntennaSouthDestroyed;
-		if (AntennaEastDestroyed) Const.a.questData.AntennaEastDestroyed = !Const.a.questData.AntennaEastDestroyed;
-		if (AntennaWestDestroyed) Const.a.questData.AntennaWestDestroyed = !Const.a.questData.AntennaWestDestroyed;
+		if (AntennaNorthDestroyed) _consts.questData.AntennaNorthDestroyed = !_consts.questData.AntennaNorthDestroyed;
+		if (AntennaSouthDestroyed) _consts.questData.AntennaSouthDestroyed = !_consts.questData.AntennaSouthDestroyed;
+		if (AntennaEastDestroyed) _consts.questData.AntennaEastDestroyed = !_consts.questData.AntennaEastDestroyed;
+		if (AntennaWestDestroyed) _consts.questData.AntennaWestDestroyed = !_consts.questData.AntennaWestDestroyed;
 		if (SelfDestructActivated) {
-			Const.a.questData.SelfDestructActivated = !Const.a.questData.SelfDestructActivated;
-			if (Const.a.questData.SelfDestructActivated) {
-				QuestLogNotesManager.a.notes[14].SetActive(true);
-				QuestLogNotesManager.a.notes[15].SetActive(true); // Escape pod
-				QuestLogNotesManager.a.labels[14].text = Const.a.stringTable[567];// Set:Engage reactor self-destruct.
-				QuestLogNotesManager.a.labels[15].text = Const.a.stringTable[568];// Set:Escape on escape pod.
+			_consts.questData.SelfDestructActivated = !_consts.questData.SelfDestructActivated;
+			if (_consts.questData.SelfDestructActivated) {
+				_questLogNotesManager.notes[14].SetActive(true);
+				_questLogNotesManager.notes[15].SetActive(true); // Escape pod
+				_questLogNotesManager.labels[14].text = _consts.stringTable[567];// Set:Engage reactor self-destruct.
+				_questLogNotesManager.labels[15].text = _consts.stringTable[568];// Set:Escape on escape pod.
 			}
 		}
 		if (BridgeSeparated) {
-			Const.a.questData.BridgeSeparated = !Const.a.questData.BridgeSeparated;
-			if (Const.a.questData.BridgeSeparated) {
-				QuestLogNotesManager.a.notes[16].SetActive(true);
-				QuestLogNotesManager.a.notes[17].SetActive(true);
-				QuestLogNotesManager.a.checkBoxes[16].isOn = true;
-				QuestLogNotesManager.a.labels[16].text = Const.a.stringTable[569]; // Set:Access the bridge.
-				QuestLogNotesManager.a.labels[17].text = Const.a.stringTable[570]; // Set:Destroy SHODAN.
+			_consts.questData.BridgeSeparated = !_consts.questData.BridgeSeparated;
+			if (_consts.questData.BridgeSeparated) {
+				_questLogNotesManager.notes[16].SetActive(true);
+				_questLogNotesManager.notes[17].SetActive(true);
+				_questLogNotesManager.checkBoxes[16].isOn = true;
+				_questLogNotesManager.labels[16].text = _consts.stringTable[569]; // Set:Access the bridge.
+				_questLogNotesManager.labels[17].text = _consts.stringTable[570]; // Set:Destroy SHODAN.
 			}
 		}
-		if (IsolinearChipsetInstalled) Const.a.questData.IsolinearChipsetInstalled = !Const.a.questData.IsolinearChipsetInstalled;
+		if (IsolinearChipsetInstalled) _consts.questData.IsolinearChipsetInstalled = !_consts.questData.IsolinearChipsetInstalled;
 	}
 
 	public void TestBits(bool testIfTrue, UseData ud, TargetIO tio) {
-		if (RobotSpawnDeactivated && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.RobotSpawnDeactivated, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (IsotopeInstalled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.IsotopeInstalled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (ShieldActivated && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.ShieldActivated, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (LaserSafetyOverriden && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.LaserSafetyOverriden, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (LaserDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.LaserDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (BetaGroveCyberUnlocked && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.BetaGroveCyberUnlocked, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (GroveAlphaJettisonEnabled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.GroveAlphaJettisonEnabled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (GroveBetaJettisonEnabled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.GroveBetaJettisonEnabled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (GroveDeltaJettisonEnabled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.GroveDeltaJettisonEnabled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (MasterJettisonBroken && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.MasterJettisonBroken, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (Relay428Fixed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.Relay428Fixed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (MasterJettisonEnabled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.MasterJettisonEnabled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (BetaGroveJettisoned && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.BetaGroveJettisoned, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (AntennaNorthDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.AntennaNorthDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (AntennaSouthDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.AntennaSouthDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (AntennaEastDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.AntennaEastDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (AntennaWestDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.AntennaWestDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (SelfDestructActivated && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.SelfDestructActivated, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (BridgeSeparated && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.BridgeSeparated, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
-		if (IsolinearChipsetInstalled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) Const.a.questData.TargetOnGatePassed(Const.a.questData.IsolinearChipsetInstalled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (RobotSpawnDeactivated && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.RobotSpawnDeactivated, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (IsotopeInstalled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.IsotopeInstalled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (ShieldActivated && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.ShieldActivated, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (LaserSafetyOverriden && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.LaserSafetyOverriden, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (LaserDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.LaserDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (BetaGroveCyberUnlocked && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.BetaGroveCyberUnlocked, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (GroveAlphaJettisonEnabled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.GroveAlphaJettisonEnabled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (GroveBetaJettisonEnabled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.GroveBetaJettisonEnabled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (GroveDeltaJettisonEnabled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.GroveDeltaJettisonEnabled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (MasterJettisonBroken && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.MasterJettisonBroken, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (Relay428Fixed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.Relay428Fixed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (MasterJettisonEnabled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.MasterJettisonEnabled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (BetaGroveJettisoned && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.BetaGroveJettisoned, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (AntennaNorthDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.AntennaNorthDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (AntennaSouthDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.AntennaSouthDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (AntennaEastDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.AntennaEastDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (AntennaWestDestroyed && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.AntennaWestDestroyed, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (SelfDestructActivated && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.SelfDestructActivated, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (BridgeSeparated && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.BridgeSeparated, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
+		if (IsolinearChipsetInstalled && (!string.IsNullOrWhiteSpace(target) || !string.IsNullOrWhiteSpace(targetIfFalse))) _consts.questData.TargetOnGatePassed(_consts.questData.IsolinearChipsetInstalled, testIfTrue, ud, tio, target, argvalue, targetIfFalse, argvalueIfFalse);
 	}
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Citadel.SceneManagement;
+using Zenject;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -56,24 +57,37 @@ public class LevelManager : MonoBehaviour
 	private static readonly StringBuilder s1 = new(200*1024);
 	private GameObject _dummyGameObject;
 
+	[Inject]
+	private ConsoleEmulator _consoleEmulator;
+	[Inject] 
+	private PlayerReferenceManager _playerReference;
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private Automap _automap;
+	[Inject] private GUIState _guiState;
+	[Inject] private Inventory _inventory;
+	[Inject] private Music _music;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
+	[Inject] private PlayerMovement _playerMovement;
+	[Inject] private DynamicCulling _dynamicCulling;
+	[Inject] private QuestLogNotesManager _questLogNotesManager;
+
 	public static bool LoadLevelAfterSceneChanges { get; private set; }
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
 	public static SaveableObjectStringsStorage StaticObjectsSaveStrings { get; } = new();
 	public static SaveableObjectStringsStorage DynamicObjectsSavestrings { get; } = new();
 	public static int currentLevel = NewGameLevelIndex;
-	// Singleton instance
-	public static LevelManager a;
-
 	public static bool UseDynamicLevelsLoading => ScenesLoader.LoadedSceneName == ScenesLoader.DynamicLevelsSceneName;
 
 	void Awake () {
 		_dummyGameObject = new("dummy_gameobject");
-		a = this;
 		if (currentLevel < 0) {
-			if (Const.a == null) return;
-			if (Const.a.player1CapsuleMainCameragGO == null) return;
+			if (_consts == null) return;
+			if (_consts.player1CapsuleMainCameragGO == null) return;
 
-			Camera cam = Const.a.player1CapsuleMainCameragGO.GetComponent<Camera>();
+			Camera cam = _consts.player1CapsuleMainCameragGO.GetComponent<Camera>();
 			if (cam == null) return;
 
 			cam.useOcclusionCulling = false; // For debug whiteroom
@@ -164,13 +178,13 @@ public class LevelManager : MonoBehaviour
 		if (on == 1) Debug.Log("SkyVisible passed a 1, sky + sunlight");
 		if (on == 0) Debug.Log("SkyVisible passed a 0, sunlight only");
 		if (on == -1) Debug.Log("SkyVisible passed a -1, nope");
-		sun.SetActive(Const.a.GraphicsShadowMode >= 1 && on >= 0); // on == 0 is for Sunlight only!
+		sun.SetActive(_consts.GraphicsShadowMode >= 1 && on >= 0); // on == 0 is for Sunlight only!
 		sunSprite.SetActive(on > 0 && showSaturnForLevel[currentLevel]);
-		if (Const.a == null) return;
-		if (Const.a.questData == null) return;
+		if (_consts == null) return;
+		if (_consts.questData == null) return;
 		
 		exterior_shield.SetActive(on > 0 && showExteriorForLevel[currentLevel]
-								  && Const.a.questData.ShieldActivated);
+								  && _consts.questData.ShieldActivated);
 	}
 
 	public void CyborgConversionToggleForCurrentLevel() {
@@ -205,7 +219,7 @@ public class LevelManager : MonoBehaviour
 			}
 
 			if (currentLevel >= 0 || currentLevel < 13) {
-				Transform plyr = PlayerReferenceManager.a.playerCapsule.transform;
+				Transform plyr = _playerReference.playerCapsule.transform;
 				Vector3 spot = ressurectionLocation[currentLevel].position;
 				plyr.position = transform.TransformPoint(spot);
 			}
@@ -214,9 +228,9 @@ public class LevelManager : MonoBehaviour
 		// Activate death screen and readouts for
 		// "BRAIN ACTIVITY SATISFACTORY..."            ya debatable right
 		// etc. etc.
-		PlayerReferenceManager.a.playerDeathRessurectEffect.SetActive(true);
-		Music.a.PlayTrack(currentLevel,TrackType.Revive,MusicType.Override);
-		PlayerMovement.a.ressurectingFinished = PauseScript.a.relativeTime + 3f;
+		_playerReference.playerDeathRessurectEffect.SetActive(true);
+		_music.PlayTrack(currentLevel,TrackType.Revive,MusicType.Override);
+		_playerMovement.ressurectingFinished = _pauseScript.relativeTime + 3f;
 		return true;
 	}
 
@@ -245,7 +259,7 @@ public class LevelManager : MonoBehaviour
 		LoadLevelGeometry(levnum);
 		LoadStaticObjects(levnum);
 		LoadLevelDynamicObjects(levnum);
-		Music.a.LoadLevelMusic(levnum);
+		_music.LoadLevelMusic(levnum);
 		levelDataLoaded[levnum] = true;
 		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + SaveLoad.numLightsWithShadows.ToString());
 	}
@@ -260,7 +274,7 @@ public class LevelManager : MonoBehaviour
 
 		if (currentLevel == levnum && !changeSceneForced)
 		{
-			Const.sprint(Const.a.stringTable[9]);
+			_consts.sprint(_consts.stringTable[9]);
 			return;
 		}
 
@@ -291,11 +305,11 @@ public class LevelManager : MonoBehaviour
 		if (!LevNumInBounds(levnum)) { Debug.LogWarning("levnum out of bounds"); return; }
 
 		// NOTE: Check this first since the button for the current level has a null destination.  This is fine and expected.
-		if (currentLevel == levnum && !loadLevelForced) { Const.sprint(Const.a.stringTable[9]); return; } //Already there
+		if (currentLevel == levnum && !loadLevelForced) { _consts.sprint(_consts.stringTable[9]); return; } //Already there
 
-		MFDManager.a.TurnOffElevatorPad();
+		_mfdManager.TurnOffElevatorPad();
 // 		Debug.Log("Cleared GUI Over Button state from clicking on elevator button in MFD side pane");
-		GUIState.a.ClearOverButton();
+		_guiState.ClearOverButton();
 		if (targetPosition.x == 0 && targetPosition.y == 0 && targetPosition.z == 0) {
 			switch(levnum) {
 				case 0:  targetPosition = elevatorTargetDestinations[25].transform.position; break;
@@ -314,10 +328,10 @@ public class LevelManager : MonoBehaviour
 			}
 		}
 
-		if (QuestLogNotesManager.a != null) QuestLogNotesManager.a.NotifyLevelChange(levnum);
+		if (_questLogNotesManager != null) _questLogNotesManager.NotifyLevelChange(levnum);
  
 		// Return to level from cyberspace.
-		PlayerReferenceManager.a.playerCapsule.transform.position = targetPosition;
+		_playerReference.playerCapsule.transform.position = targetPosition;
 		currentLevel = levnum; // Set current level to be the new level
 		DisableAllNonOccupiedLevelsExcept(currentLevel);
 		DynamicCulling.camPositions = new Dictionary<GameObject, Vector3>();
@@ -331,7 +345,7 @@ public class LevelManager : MonoBehaviour
 		
 		PostLoadLevelSetupSystems();
 		if (currentLevel != 13) {
-			DynamicCulling.a.Cull_Init();
+			_dynamicCulling.Cull_Init();
 			System.GC.Collect();
 			System.GC.WaitForPendingFinalizers();
 			StartCoroutine(DelayedCull());
@@ -340,7 +354,7 @@ public class LevelManager : MonoBehaviour
 	
 	public IEnumerator DelayedCull() {
 		yield return new WaitForSeconds(0.5f);
-		DynamicCulling.a.CullCore(); // For Level 10, visible screen with camera view can't update until cams awake.
+		_dynamicCulling.CullCore(); // For Level 10, visible screen with camera view can't update until cams awake.
 	}
 
 	public void LoadLevelFromSave(int levnum) {
@@ -355,20 +369,20 @@ public class LevelManager : MonoBehaviour
 	}
 
 	private void PostLoadLevelSetupSystems() {
-		Music.a.inCombat = false;
-		Music.a.SFXMain.Stop();
-		Music.a.SFXOverlay.Stop();
-		Music.a.levelEntry = true;
-		PlayerHealth.a.radiationArea = false;
-		PlayerMovement.a.ladderState = 0;
+		_music.inCombat = false;
+		_music.SFXMain.Stop();
+		_music.SFXOverlay.Stop();
+		_music.levelEntry = true;
+		_playerHealth.radiationArea = false;
+		_playerMovement.ladderState = 0;
 		LoadLevelData(currentLevel);
-		Automap.a.SetAutomapExploredReference(currentLevel);
-		Automap.a.automapBaseImage.overrideSprite = Automap.a.automapsBaseImages[currentLevel];
-		Const.a.ClearActiveAutomapOverlays(); // After other levels turned off.
-		Const.a.ResetPauseLists();
+		_automap.SetAutomapExploredReference(currentLevel);
+		_automap.automapBaseImage.overrideSprite = _automap.automapsBaseImages[currentLevel];
+		_consts.ClearActiveAutomapOverlays(); // After other levels turned off.
+		_consts.ResetPauseLists();
 		SetSkyVisible(1);
-		Config.SetLanguage(); // Update all translatable text.
-		Const.a.ClearPrefabs();
+		_config.SetLanguage(); // Update all translatable text.
+		_consts.ClearPrefabs();
 		System.GC.Collect();
 		System.GC.WaitForPendingFinalizers();
 		Resources.UnloadUnusedAssets();
@@ -517,7 +531,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public int GetCurrentLevelSecurity() {
-		if (Const.a.difficultyMission < 1) return 0;
+		if (_consts.difficultyMission < 1) return 0;
 		if (!LevNumInBounds(currentLevel)) return 0;
 		if (superoverride) return 0; // tee hee we are SHODAN, no security blocks in place
 		return levelSecurity[currentLevel];
@@ -548,11 +562,11 @@ public class LevelManager : MonoBehaviour
 		if ((levelLargeNodeDestroyedCount[currentLevel] == levelLargeNodeCount[currentLevel]) && (levelSmallNodeDestroyedCount[currentLevel] == levelSmallNodeCount[currentLevel]) && (levelCameraDestroyedCount[currentLevel] == levelCameraCount[currentLevel])) {
 			levelSecurity[currentLevel] = 0;
 		}
-		Const.sprint(Const.a.stringTable[306] + levelSecurity[currentLevel].ToString() + Const.a.stringTable[307]);
+		_consts.sprint(_consts.stringTable[306] + levelSecurity[currentLevel].ToString() + _consts.stringTable[307]);
 
 		// Notify quest log if all nodes were destroyed
 		if (levelLargeNodeDestroyedCount[currentLevel] == levelLargeNodeCount[currentLevel]) {
-			if (QuestLogNotesManager.a != null) QuestLogNotesManager.a.NodesDestroyed(currentLevel);
+			if (_questLogNotesManager != null) _questLogNotesManager.NodesDestroyed(currentLevel);
 		}
 	}
 
@@ -615,7 +629,7 @@ public class LevelManager : MonoBehaviour
 
 				string[] entries = readline.Split(splitter);
 				
-				go = SaveLoad.LoadPrefab(ref entries,lineNum,curlevel);
+				go = SaveLoad.LoadPrefab(_consts,_consoleEmulator,this,ref entries,lineNum,curlevel);
 				if (go != null) parent = go.transform;
 				else parent = null;
 				
@@ -699,7 +713,7 @@ public class LevelManager : MonoBehaviour
 				if (readline == null) break;
 				
 				string[] entries = readline.Split(splitter);
-				SaveLoad.LoadPrefab(ref entries,lineNum,curlevel);
+				SaveLoad.LoadPrefab(_consts,_consoleEmulator,this,ref entries,lineNum,curlevel);
 				lineNum++;
 			} while (!sf.EndOfStream);
 			sf.Close();
@@ -717,7 +731,7 @@ public class LevelManager : MonoBehaviour
 
 			DynamicObjectsSavestrings[curlevel].Clear(); // Empty list.
 			for (int i=0;i<allDynamicObjects.Count;i++) {
-				DynamicObjectsSavestrings[curlevel].Add(SaveObject.Save(allDynamicObjects[i]));
+				DynamicObjectsSavestrings[curlevel].Add(SaveObject.Save(this,allDynamicObjects[i]));
 			}
 		}
 		
@@ -767,7 +781,7 @@ public class LevelManager : MonoBehaviour
 			entries = DynamicObjectsSavestrings[curlevel][i].Split(splitter);
 			if (entries.Length <= 1) continue;
 			
-			dynGO = SaveLoad.LoadPrefab(ref entries,0,curlevel);
+			dynGO = SaveLoad.LoadPrefab(_consts,_consoleEmulator,this,ref entries,0,curlevel);
 			if (dynGO == null) continue;
 
 			int constIndex = Utils.GetIntFromString(entries[0],"constIndex");
@@ -802,41 +816,39 @@ public class LevelManager : MonoBehaviour
 
 	public void CheatLoadLevel(int ind) {
 		if (ind == 10) {
-			LoadLevel(10,PlayerMovement.a.cheatG1Spawn.position);
+			LoadLevel(10,_playerMovement.cheatG1Spawn.position);
 		} else if (ind == 11) {
-			LoadLevel(11,PlayerMovement.a.cheatG2Spawn.position);
+			LoadLevel(11,_playerMovement.cheatG2Spawn.position);
 		} else if (ind == 12) {
-			LoadLevel(12,PlayerMovement.a.cheatG4Spawn.position);
+			LoadLevel(12,_playerMovement.cheatG4Spawn.position);
 		} else {
 			LoadLevel(ind,ressurectionLocation[ind].position);
 		}
 	}
 
-	public static string Save(GameObject go) {
+	public string Save() {
 		int i=0;
-		LevelManager lvm = go.GetComponent<LevelManager>();
 		s1.Clear();
 		s1.Append(Utils.UintToString(LevelManager.currentLevel,"currentLevel"));
 		s1.Append(Utils.splitChar);
-		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(LevelManager.a.levelSecurity[i],"levelSecurity["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
-		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(LevelManager.a.levelCameraDestroyedCount[i],"levelCameraDestroyedCount["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
-		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(LevelManager.a.levelSmallNodeDestroyedCount[i],"levelSmallNodeDestroyedCount["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
-		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(LevelManager.a.levelLargeNodeDestroyedCount[i],"levelLargeNodeDestroyedCount["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
-		for (i=0;i<13;i++) { s1.Append(Utils.BoolToString(LevelManager.a.ressurectionActive[i],"ressurectionActive["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
-		s1.Append(Utils.BoolToString(LevelManager.a.ressurectionActive[13],"ressurectionActive[13]"));
+		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(levelSecurity[i],"levelSecurity["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
+		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(levelCameraDestroyedCount[i],"levelCameraDestroyedCount["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
+		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(levelSmallNodeDestroyedCount[i],"levelSmallNodeDestroyedCount["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
+		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(levelLargeNodeDestroyedCount[i],"levelLargeNodeDestroyedCount["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
+		for (i=0;i<13;i++) { s1.Append(Utils.BoolToString(ressurectionActive[i],"ressurectionActive["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
+		s1.Append(Utils.BoolToString(ressurectionActive[13],"ressurectionActive[13]"));
 		return s1.ToString();
 	}
 
-	public static int Load(GameObject go, ref string[] entries, int index) {
-		LevelManager lvm = go.GetComponent<LevelManager>();
+	public int Load(ref string[] entries, int index) {
 		int i = 0;
 		int levelNum = Utils.GetIntFromString(entries[index],"currentLevel"); index++;
-		LevelManager.a.LoadLevelFromSave(levelNum);
-		for (i=0;i<14;i++) { LevelManager.a.levelSecurity[i] = Utils.GetIntFromString(entries[index],"levelSecurity[" + i.ToString() + "]"); index++; }
-		for (i=0;i<14;i++) { LevelManager.a.levelCameraDestroyedCount[i] = Utils.GetIntFromString(entries[index],"levelCameraDestroyedCount[" + i.ToString() + "]"); index++; }
-		for (i=0;i<14;i++) { LevelManager.a.levelSmallNodeDestroyedCount[i] = Utils.GetIntFromString(entries[index],"levelSmallNodeDestroyedCount[" + i.ToString() + "]"); index++; }
-		for (i=0;i<14;i++) { LevelManager.a.levelLargeNodeDestroyedCount[i] = Utils.GetIntFromString(entries[index],"levelLargeNodeDestroyedCount[" + i.ToString() + "]"); index++; }
-		for (i=0;i<14;i++) { LevelManager.a.ressurectionActive[i] = Utils.GetBoolFromString(entries[index],"ressurectionActive[" + i.ToString() + "]"); index++; }
+		LoadLevelFromSave(levelNum);
+		for (i=0;i<14;i++) {levelSecurity[i] = Utils.GetIntFromString(entries[index],"levelSecurity[" + i.ToString() + "]"); index++; }
+		for (i=0;i<14;i++) { levelCameraDestroyedCount[i] = Utils.GetIntFromString(entries[index],"levelCameraDestroyedCount[" + i.ToString() + "]"); index++; }
+		for (i=0;i<14;i++) { levelSmallNodeDestroyedCount[i] = Utils.GetIntFromString(entries[index],"levelSmallNodeDestroyedCount[" + i.ToString() + "]"); index++; }
+		for (i=0;i<14;i++) { levelLargeNodeDestroyedCount[i] = Utils.GetIntFromString(entries[index],"levelLargeNodeDestroyedCount[" + i.ToString() + "]"); index++; }
+		for (i=0;i<14;i++) { ressurectionActive[i] = Utils.GetBoolFromString(entries[index],"ressurectionActive[" + i.ToString() + "]"); index++; }
 		return index;
 	}
 
@@ -865,9 +877,9 @@ public class LevelManager : MonoBehaviour
 			
 			if (isNpc)
 			{
-				var instGO = ConsoleEmulator.SpawnDynamicObject(constIndex,levNum,false,contnr,savID);
+				var instGO = _consoleEmulator.SpawnDynamicObject(constIndex,levNum,false,contnr,savID);
 				PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-				SaveObject.Load(instGO,ref entries,0,prefID); // Load NPC.
+				SaveObject.Load(_consts,this,instGO,ref entries,0,prefID); // Load NPC.
 			}
 			else
 			{
@@ -889,7 +901,7 @@ public class LevelManager : MonoBehaviour
 					if (currentSaveObjectInScene.SaveID == savID && currentSaveObjectInScene.SaveID != 0)
 					{
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene, true);
-						SaveObject.Load(currentGameObjectInScene, ref entries, i, prefID);
+						SaveObject.Load(_consts,this,currentGameObjectInScene, ref entries, i, prefID);
 						alreadyCheckedThisInstantiableGameObjectInScene[i] = true; // Huge time saver right here!
 						break;
 					}
@@ -902,7 +914,7 @@ public class LevelManager : MonoBehaviour
 			npcsm[i]?.RepopulateChildList();
 		}
 			
-		if (Inventory.a.hasHardware[1]) {
+		if (_inventory.hasHardware[1]) {
 			// Go through all HealthManagers in the game and initialize the
 			// linked overlays now for Automap.  Done after instantiation.
 			List<GameObject> hmGOs = new List<GameObject>();
@@ -943,6 +955,7 @@ public class LevelManager : MonoBehaviour
 		
 		var currentLevelData = levelScripts[currentLevel];
 		var saveStringsStorage = StaticObjectsSaveStrings[currentLevel];
+		saveStringsStorage.Clear();
 
 		SaveObjects(currentLevelData.staticObjectsSaveable);
 		SaveObjects(currentLevelData.NPCsSaveableInstantiated);
@@ -953,7 +966,7 @@ public class LevelManager : MonoBehaviour
 		{
 			foreach (var saveObject in parent.GetComponentsInChildren<SaveObject>(true))
 			{
-				saveStringsStorage.Add(SaveObject.Save(saveObject.gameObject));
+				saveStringsStorage.Add(SaveObject.Save(this,saveObject.gameObject));
 			}
 		}
 	}

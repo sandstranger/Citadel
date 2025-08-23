@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 
 public class CameraView : MonoBehaviour {
@@ -19,6 +20,9 @@ public class CameraView : MonoBehaviour {
 	private MeshRenderer mR; // These are the screens showing the feed
 	private MeshRenderer mR2;
 	private MeshRenderer mR3;
+
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private DynamicCulling _dynamicCulling;
 
 	void Start () {
 		cam = GetComponent<Camera>();
@@ -51,20 +55,19 @@ public class CameraView : MonoBehaviour {
 	}
 
 	void OnEnable() {
-		DynamicCulling.AddCameraPosition(this);
+		_dynamicCulling.AddCameraPosition(this);
 		if (cam != null) cam.Render();
 	}
 	
 	void OnDisable() {
-		DynamicCulling.RemoveCameraPosition(this);
-		
+		_dynamicCulling.RemoveCameraPosition(this);
 	}
 	
 	public bool IsVisible() {
-		Vector2Int cellPos = DynamicCulling.a.PosToCellCoords(transform.position);
-		if (DynamicCulling.a.XYPairInBounds(cellPos.x,cellPos.y)) {
-			if (DynamicCulling.a.cullEnabled) {
-				if (!DynamicCulling.a.GetPlayerCell().visible) return false;
+		Vector2Int cellPos = _dynamicCulling.PosToCellCoords(transform.position);
+		if (_dynamicCulling.XYPairInBounds(cellPos.x,cellPos.y)) {
+			if (_dynamicCulling.cullEnabled) {
+				if (!_dynamicCulling.GetPlayerCell().visible) return false;
 			}
 		}
 		if (mR == null) return false;
@@ -72,7 +75,7 @@ public class CameraView : MonoBehaviour {
 	}
 
 	void Update() {
-		if (!PauseScript.a.paused && !PauseScript.a.MenuActive()) {
+		if (!_pauseScript.paused && !_pauseScript.MenuActive()) {
 			if (!IsVisible()) return;
 
 			if (tickFinished < Time.time) {

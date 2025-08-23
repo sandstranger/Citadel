@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -26,6 +27,8 @@ public class StartMenuButtonHighlight : MonoBehaviour {
 
 	private EventTrigger evenT;
 	private bool pointerEntered;
+
+	[Inject] private PlayerMovement _playerMovement;
 
 	void Awake() {
 		pointerEntered = false;
@@ -60,7 +63,7 @@ public class StartMenuButtonHighlight : MonoBehaviour {
 
 	void OnEnable() {
 		pointerEntered = false;
-		if (darkenInCyberspace && PlayerMovement.a.inCyberSpace) {
+		if (darkenInCyberspace && _playerMovement.inCyberSpace) {
 			if (textshadow != null) {
 				textshadow.effectColor = darkenedshadow;
 			}
@@ -83,7 +86,7 @@ public class StartMenuButtonHighlight : MonoBehaviour {
 	}
 
 	public void DeHighlight() {
-		if (darkenInCyberspace && PlayerMovement.a.inCyberSpace) return;
+		if (darkenInCyberspace && _playerMovement.inCyberSpace) return;
 
 		if (textshadow != null) {
 			textshadow.effectColor = darkshadow;
@@ -93,7 +96,7 @@ public class StartMenuButtonHighlight : MonoBehaviour {
 	}
 
 	public void Highlight () {
-		if (darkenInCyberspace && PlayerMovement.a.inCyberSpace) return;
+		if (darkenInCyberspace && _playerMovement.inCyberSpace) return;
 
 		if (textshadow != null) {
 			textshadow.effectColor = litshadow;
@@ -103,7 +106,7 @@ public class StartMenuButtonHighlight : MonoBehaviour {
 	}
 
 	public void CursorHighlight () {
-		if (darkenInCyberspace && PlayerMovement.a.inCyberSpace) return;
+		if (darkenInCyberspace && _playerMovement.inCyberSpace) return;
 		if (pointerEntered) return;
 
 		Highlight();
@@ -112,7 +115,7 @@ public class StartMenuButtonHighlight : MonoBehaviour {
 	}
 
 	public void CursorDeHighlight () {
-		if (darkenInCyberspace && PlayerMovement.a.inCyberSpace) return;
+		if (darkenInCyberspace && _playerMovement.inCyberSpace) return;
 		if (!pointerEntered) return;
 
 		DeHighlight();

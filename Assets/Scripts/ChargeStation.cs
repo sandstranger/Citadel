@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 public class ChargeStation : MonoBehaviour {
 	// Externally modified per prefab instance
@@ -16,46 +17,54 @@ public class ChargeStation : MonoBehaviour {
 
 	// Internal references
 	[HideInInspector] public float nextthink; // save, stores the time after which this will be usable again.  Soem charge stations must recharge.
-	private static StringBuilder s1 = new StringBuilder();
-	
+	private static readonly StringBuilder s1 = new StringBuilder(100 * 1024);
+
+	[Inject] 
+	private LevelManager _levelManager;
+	[Inject] private PlayerEnergy _playerEnergy;
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private PauseScript _pauseScript;
+	[Inject] private PlayerHealth _playerHealth;
+
 	void Awake() {
-		nextthink = PauseScript.a.relativeTime;
+		nextthink = _pauseScript.relativeTime;
 	}
 
 	public void Use (UseData ud) {
-		if (LevelManager.a.GetCurrentLevelSecurity() > minSecurityLevel) { 
-			MFDManager.a.BlockedBySecurity (transform.position);
+		if (_levelManager.GetCurrentLevelSecurity() > minSecurityLevel) { 
+			_mfdManager.BlockedBySecurity (transform.position);
 			return;
 		}
 		
-		if (nextthink < PauseScript.a.relativeTime) {
-			if (PlayerEnergy.a.energy >= PlayerEnergy.a.maxenergy) {
-				Const.sprint(303);
+		if (nextthink < _pauseScript.relativeTime) {
+			if (_playerEnergy.energy >= _playerEnergy.maxenergy) {
+				_consts.sprint(303);
 				return;
 			} else {
-				PlayerEnergy.a.GiveEnergy(amount, EnergyType.ChargeStation);
-				MFDManager.a.energySurge.SetActive(true);
+				_playerEnergy.GiveEnergy(amount, EnergyType.ChargeStation);
+				_mfdManager.energySurge.SetActive(true);
 			}
 
 			if (damageOnUse > 0f) {
-				DamageData dd = new DamageData();
+				DamageData dd = new DamageData(_consts);
 
 				// Don't ever kill the player from this, way too cheap.
-				dd.damage = Mathf.Min(damageOnUse,PlayerHealth.a.hm.health - 1);
+				dd.damage = Mathf.Min(damageOnUse,_playerHealth.hm.health - 1);
 
 				// No impact force here, it's a zap.  Ouch, it zapped me...that
 				// really hurt Chargie, that hurt my finger, owhow, OW! ow,
 				// hahahow ow! OWW!  Chargie zapped my finger (it helps if you
 				// use a British accent and refer to Charlie Bit My Finger).
-				if (dd.damage > 0) PlayerHealth.a.hm.TakeDamage(dd);
+				if (dd.damage > 0) _playerHealth.hm.TakeDamage(dd);
 			}
 
-			Const.sprint(usedMsgLingdex);
-			if (requireReset) nextthink = PauseScript.a.relativeTime + resetTime;
+			_consts.sprint(usedMsgLingdex);
+			if (requireReset) nextthink = _pauseScript.relativeTime + resetTime;
 			ud.argvalue = argvalue;
-			Const.a.UseTargets(gameObject,ud,target);
+			_consts.UseTargets(gameObject,ud,target);
 		} else {
-			Const.sprint(rechargeMsgLingdex);
+			_consts.sprint(rechargeMsgLingdex);
 		}
 	}
 
@@ -66,7 +75,7 @@ public class ChargeStation : MonoBehaviour {
 	public static string Save(GameObject go) {
 		ChargeStation chg = go.GetComponent<ChargeStation>();
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(chg.nextthink,"nextthink")); // float - time before recharged
+		s1.Append(Utils.SaveRelativeTimeDifferential(chg._pauseScript,chg.nextthink,"nextthink")); // float - time before recharged
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(chg.amount,"amount"));
 		s1.Append(Utils.splitChar);
@@ -105,7 +114,7 @@ public class ChargeStation : MonoBehaviour {
 			return index + 12;
 		}
 
-		chg.nextthink = Utils.LoadRelativeTimeDifferential(entries[index],"nextthink"); index++; // float - time before recharged
+		chg.nextthink = Utils.LoadRelativeTimeDifferential(chg._pauseScript,entries[index],"nextthink"); index++; // float - time before recharged
 		chg.amount  = Utils.GetFloatFromString(entries[index],"amount"); index++;
 		chg.resetTime  = Utils.GetFloatFromString(entries[index],"resetTime"); index++;
 		chg.requireReset  = Utils.GetBoolFromString(entries[index],"requireReset"); index++;

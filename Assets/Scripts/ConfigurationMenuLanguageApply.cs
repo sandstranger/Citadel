@@ -1,12 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ConfigurationMenuLanguageApply : MonoBehaviour {
 	private Dropdown picker;
 
-	void Start() { // Wait for Const.a. to initialize.
+	[Inject] private Const _consts;
+	[Inject] private Config _config;
+
+	void Start() { // Wait for _consts. to initialize.
 		Initialize();
 	}
 
@@ -18,17 +22,17 @@ public class ConfigurationMenuLanguageApply : MonoBehaviour {
 		if (picker == null) picker = GetComponent<Dropdown>();
 		if (picker == null) Debug.Log("BUG: ConfigurationMenuLanguageApply missing component for picker.");
 
-		picker.value = Const.a.AudioLanguage;
+		picker.value = _consts.AudioLanguage;
 	}
 
 	public void OnDropdownSelect () {
 		Debug.Log("Language select");
 		if (picker != null)
-			Const.a.AudioLanguage = picker.value;
+			_consts.AudioLanguage = picker.value;
 		else
-			Const.a.AudioLanguage = 0; // Default to English
+			_consts.AudioLanguage = 0; // Default to English
 
-		Config.WriteConfig();
-		Config.SetLanguage();
+		_config.WriteConfig();
+		_config.SetLanguage();
 	}
 }

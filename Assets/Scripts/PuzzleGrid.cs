@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,6 +54,11 @@ public class PuzzleGrid : MonoBehaviour {
 	private string argvalue;
 	private bool[] checkedCells;
 
+	[Inject] private Const _consts;
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private MouseLookScript _mouseLookScript;
+	[Inject] private PauseScript _pauseScript;
+
 	void Awake () {
 		puzzleSolved = false;
 		EvaluatePuzzle();
@@ -97,21 +103,21 @@ public class PuzzleGrid : MonoBehaviour {
 		EvaluatePuzzle();
 		UpdateCellImages();
 
-		if (udSender.mainIndex == 54 || Const.a.difficultyPuzzle == 0) {
+		if (udSender.mainIndex == 54 || _consts.difficultyPuzzle == 0) {
 			PuzzleSolved(true);
 		}
 	}
 
 	void Update() {
-		if (!PauseScript.a.Paused() && !PauseScript.a.MenuActive()) UpdateCellImages();
+		if (!_pauseScript.Paused() && !_pauseScript.MenuActive()) UpdateCellImages();
 	}
 
 	public void OnGridCellClick (int index) {
-		MFDManager.a.mouseClickHeldOverGUI = true;
+		_mfdManager.mouseClickHeldOverGUI = true;
 		if (puzzleSolved) return;
 
 		if (cellType[index] == PuzzleCellType.Standard) {
-			if (Const.a.difficultyPuzzle == 1) {
+			if (_consts.difficultyPuzzle == 1) {
 				King(index); // Easy puzzle difficulty.  Chose King instead of Pawn to help speed up the puzzle by the antenna trap on Level 7
 			} else {
 				switch (gridType) {
@@ -131,11 +137,11 @@ public class PuzzleGrid : MonoBehaviour {
 	}
 
 	public void OnGridCellHover (int index) {
-		if (MouseLookScript.a.geniusActive) {
+		if (_mouseLookScript.geniusActive) {
 			if (puzzleSolved) return;
 
 			if (cellType[index] == PuzzleCellType.Standard) {
-				if (Const.a.difficultyPuzzle == 1) {
+				if (_consts.difficultyPuzzle == 1) {
 					HoverKing(index); // Easy puzzle difficulty.  Chose King instead of Pawn to help speed up the puzzle by the antenna trap on Level 7
 				} else {
 					switch (gridType) {
@@ -425,7 +431,7 @@ public class PuzzleGrid : MonoBehaviour {
 
 		puzzleSolved = true;
 		outputNode.overrideSprite = nodeOn;
-		Utils.PlayUIOneShotSavable(46);
+		Utils.PlayUIOneShotSavable(_consts,46);
 		puzzleGP.puzzleSolved = true;
 		puzzleGP.UseTargets(udSender.owner);
 		progressBar.value = 100f;
@@ -437,10 +443,10 @@ public class PuzzleGrid : MonoBehaviour {
 				}
 			}
 			UpdateCellImages();
-			MouseLookScript.a.ResetHeldItem();
+			_mouseLookScript.ResetHeldItem();
 		}
 		
-		Const.a.UseTargets(null,udSender,target);
+		_consts.UseTargets(null,udSender,target);
 	}
 
 	int ReturnCellAbove(int index) {

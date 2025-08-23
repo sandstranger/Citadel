@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Text;
+using Zenject;
 
 // Add this script to anything that should be able to be targetted
 public class TargetIO : MonoBehaviour {
@@ -66,7 +67,12 @@ public class TargetIO : MonoBehaviour {
 
 	private UseData tempUD;
 	private bool startInitialized = false;
-	private static StringBuilder s1 = new StringBuilder();
+	[Inject] private LevelManager _levelManager;
+	[Inject] private PlayerReferenceManager _playerReference;
+	[Inject] private Const _consts;
+	[Inject] private Inventory _inventory;
+
+	private static readonly StringBuilder s1 = new StringBuilder(100 *500);
 
 	private void Start() {
 		RemoteStart(this.gameObject,"self Start()");
@@ -74,7 +80,7 @@ public class TargetIO : MonoBehaviour {
 	
 	public void RemoteStart(GameObject sender,string sourcefunc) {
 		if (!string.IsNullOrEmpty(targetname)) {
-			Const.a.AddToTargetRegister(this,gameObject); // Always, since on load we need to refill register.
+			_consts.AddToTargetRegister(this,gameObject); // Always, since on load we need to refill register.
 		}
 		
 		Initialize();
@@ -107,7 +113,7 @@ public class TargetIO : MonoBehaviour {
 		startInitialized = true;
 	}
 
-	// Comes from Const.a.UseTargets - already checked that target matched
+	// Comes from _consts.UseTargets - already checked that target matched
 	// targetname of this interaction.
 	public void Targetted(UseData ud) {
 		tempUD = ud; // prevent overwrites in the stack
@@ -162,7 +168,7 @@ public class TargetIO : MonoBehaviour {
 				if (!dr.locked
 					&& (dr.requiredAccessCard == AccessCardType.None
 					    || dr.accessCardUsedByPlayer
-					    || Inventory.a.HasAccessCard(dr.requiredAccessCard))) {
+					    || _inventory.HasAccessCard(dr.requiredAccessCard))) {
 					
 					dr.ForceOpen();
 				}
@@ -307,7 +313,7 @@ public class TargetIO : MonoBehaviour {
 		}
 
 		if (tempUD.cyborgConversionToggle) {
-			LevelManager.a.CyborgConversionToggleForCurrentLevel();
+			_levelManager.CyborgConversionToggleForCurrentLevel();
 			CyborgConversionToggle cctog = GetComponent<CyborgConversionToggle>();
 			if (cctog != null) cctog.PlayVoxMessage();
 		}
@@ -352,14 +358,12 @@ public class TargetIO : MonoBehaviour {
 
 		if (tempUD.sendSprintMessage) {
 			TriggeredSprintMessage tsm = GetComponent<TriggeredSprintMessage>();
-			if (tsm != null) Const.sprint(tsm.messageToDisplay);
+			if (tsm != null) _consts.sprint(tsm.messageToDisplay);
 		}
 
 		if (tempUD.radiationTreatment) {
-			if (PlayerReferenceManager.a != null) {
-				PlayerReferenceManager.a.playerRadiationTreatmentFlash.SetActive(true);
-				PlayerHealth.a.radiated = 0;
-			}
+			_playerReference.playerRadiationTreatmentFlash.SetActive(true);
+			_playerReference.PlayerHealth.radiated = 0;
 		}
 
 		if (tempUD.startFlashingMaterials) {

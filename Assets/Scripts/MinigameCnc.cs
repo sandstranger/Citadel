@@ -46,16 +46,16 @@ public class MinigameCnc : MonoBehaviour {/*
         ball.localPosition = new Vector3(0f,0f,0f);
         computerPaddle.localPosition = new Vector3(0f,100f,0f);
         ballDir = GetNewBallDirection();
-        ballResetFinished = PauseScript.a.relativeTime + 2.5f;
+        ballResetFinished = _pauseScript.relativeTime + 2.5f;
     }
 
     void Update() {
-        if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
-        if (frameFinished >= PauseScript.a.relativeTime) return;
+        if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
+        if (frameFinished >= _pauseScript.relativeTime) return;
         if (gameOver.activeInHierarchy) return;
 
-        frameFinished = PauseScript.a.relativeTime + (1f/30f); // 30fps, it's a potato.
+        frameFinished = _pauseScript.relativeTime + (1f/30f); // 30fps, it's a potato.
         UnitsUpdate();
         UpdateCashText();
     }
@@ -81,8 +81,8 @@ public class MinigameCnc : MonoBehaviour {/*
                 return;
             }
 
-            computerPaddleImg.color = Const.a.ssGreenText;
-            playerPaddleImg.color = Const.a.ssRedText;
+            computerPaddleImg.color = _consts.ssGreenText;
+            playerPaddleImg.color = _consts.ssRedText;
             Utils.Activate(computerPizzaz);
             ResetBall();
             return;
@@ -100,8 +100,8 @@ public class MinigameCnc : MonoBehaviour {/*
             }
 
             UpdateScoreText();
-            playerPaddleImg.color = Const.a.ssGreenText;
-            computerPaddleImg.color = Const.a.ssRedText;
+            playerPaddleImg.color = _consts.ssGreenText;
+            computerPaddleImg.color = _consts.ssRedText;
             Utils.Activate(playerPizzaz);
             ResetBall();
             return;
@@ -140,7 +140,7 @@ public class MinigameCnc : MonoBehaviour {/*
                              playerPaddle.localPosition.x - paddleWidthH) {
 
                         ballDir.x *= -1f;
-                        playerPaddleImg.color = Const.a.ssYellowText;
+                        playerPaddleImg.color = _consts.ssYellowText;
                     }
 
                     float add = playerVel * 0.75f;
@@ -178,7 +178,7 @@ public class MinigameCnc : MonoBehaviour {/*
                              playerPaddle.localPosition.x - paddleWidthH) {
 
                         ballDir.x *= -1f;
-                        computerPaddleImg.color = Const.a.ssYellowText;
+                        computerPaddleImg.color = _consts.ssYellowText;
                     }
 
                     float add = computerVel * 0.75f;
@@ -206,7 +206,7 @@ public class MinigameCnc : MonoBehaviour {/*
     private void PlayerPaddleUpdate() {
         playerPaddleImg.color = Color.Lerp(playerPaddleImg.color,Color.white,3f);
         x = playerPaddle.localPosition.x;
-        playerVel = (MinigameCursor.a.minigameMouseX - x) / 48f;
+        playerVel = (_miniGameCursor.minigameMouseX - x) / 48f;
         playerVel = Mathf.Clamp(playerVel,-1f,1f);
         x += playerVel * playerRate;
         if (x < (-128f + paddleWidthH)) {

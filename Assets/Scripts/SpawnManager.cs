@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Zenject;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour {
@@ -18,22 +19,27 @@ public class SpawnManager : MonoBehaviour {
 	public float delayFinished; // save
 	public bool alertEnemiesOnAwake;
 	public bool countOnlySameIndex = false; // Not one of us.
-	
-	private static StringBuilder s1 = new StringBuilder();
+
+	[Inject] private Const _consts;
+	[Inject] private LevelManager _levelManager;
+	[Inject] private ConsoleEmulator _consoleEmulator;
+	[Inject] private PauseScript _pauseScript;
+
+	private static readonly StringBuilder s1 = new(100 * 500);
 
 	void Start() {
-		delayFinished = PauseScript.a.relativeTime;
-		if (Const.a.difficultyCombat == 1) {
+		delayFinished = _pauseScript.relativeTime;
+		if (_consts.difficultyCombat == 1) {
 			numberToSpawn = (int) Mathf.Floor(numberToSpawn*0.5f);
 			if (numberToSpawn < 1) numberToSpawn = 1;
 		}
 
-		if (Const.a.difficultyCombat == 3) {
+		if (_consts.difficultyCombat == 3) {
 			numberToSpawn = (int) Mathf.Floor(numberToSpawn*1.5f);
 			if (numberToSpawn < 1) numberToSpawn = 1;
 		}
 
-		if (Const.a.difficultyCombat > 3) {
+		if (_consts.difficultyCombat > 3) {
 			numberToSpawn = (int) Mathf.Floor(numberToSpawn*5f); // Hehe :)
 		}
 	}
@@ -41,17 +47,17 @@ public class SpawnManager : MonoBehaviour {
 	public void Activate(bool alertEnemies) {
 		alertEnemiesOnAwake = alertEnemies;
 		active = true;
-		delayFinished = PauseScript.a.relativeTime;
+		delayFinished = _pauseScript.relativeTime;
 	}
 
 	void Update() {
-		if (PauseScript.a.Paused()) return;
-		if (PauseScript.a.MenuActive()) return;
+		if (_pauseScript.Paused()) return;
+		if (_pauseScript.MenuActive()) return;
 		if (!active) return;
 
-		if (LevelManager.a.npcsm[LevelManager.currentLevel] == null) return;
+		if (_levelManager.npcsm[LevelManager.currentLevel] == null) return;
 
-		NPCSubManager subM = LevelManager.a.npcsm[LevelManager.currentLevel];
+		NPCSubManager subM = _levelManager.npcsm[LevelManager.currentLevel];
 		int numNPCs = subM.childrenNPCsAICs.Length;		
 		if (numNPCs > 300) return;
 
@@ -68,28 +74,28 @@ public class SpawnManager : MonoBehaviour {
 		if (numberActive != count) numberActive = count;
 
 		if (numberActive >= numberToSpawn) return;
-		if (delayFinished >= PauseScript.a.relativeTime) return; // Not yet.
+		if (delayFinished >= _pauseScript.relativeTime) return; // Not yet.
 
-		delayFinished = PauseScript.a.relativeTime
+		delayFinished = _pauseScript.relativeTime
 						+ Random.Range(minDelayBetweenSpawns,
 									   maxDelayBetweenSpawns);
 
 		Spawn(index); // spawn then wait randomized amount of time
 		count++;
 		if (count >= numberToSpawn) {
-			delayFinished = PauseScript.a.relativeTime + allSpawnedResetDelay;
+			delayFinished = _pauseScript.relativeTime + allSpawnedResetDelay;
 		}
 	}
 
 	void Spawn(int index) {
-		if (Const.a.difficultyCombat == 0) return; // Not on combat diff 0
+		if (_consts.difficultyCombat == 0) return; // Not on combat diff 0
 
 		Debug.Log("Spawning new enemy " + index.ToString());
-		dynamicObjectsContainer = LevelManager.a.GetCurrentDynamicContainer();
+		dynamicObjectsContainer = _levelManager.GetCurrentDynamicContainer();
 		Vector3 spot = GetRandomLocation();
 		if (spot.x == 0 && spot.y == 0 && spot.z == 0) return;
 
-		GameObject instGO = ConsoleEmulator.SpawnDynamicObject(
+		GameObject instGO = _consoleEmulator.SpawnDynamicObject(
 			index,LevelManager.currentLevel,false,null,-1
 		);
 
@@ -105,7 +111,7 @@ public class SpawnManager : MonoBehaviour {
 				return;
 			}
 
-			aic.SetEnemy(Const.a.player1Capsule,Const.a.player1TargettingPos);
+			aic.SetEnemy(_consts.player1Capsule,_consts.player1TargettingPos);
 		}
 	}
 
@@ -123,8 +129,8 @@ public class SpawnManager : MonoBehaviour {
 		RaycastHit hit = new RaycastHit();
 		if (Physics.CapsuleCast(spot + new Vector3(0,0.52f,0),
 								spot + new Vector3(0,-0.52f,0),0.48f,
-								Const.a.vectorZero,out hit,0.02f,
-								Const.a.layerMaskNPCCollision)) {
+								_consts.vectorZero,out hit,0.02f,
+								_consts.layerMaskNPCCollision)) {
 			return false;
 		} else {
 			return true;
@@ -132,11 +138,11 @@ public class SpawnManager : MonoBehaviour {
 	}
 
 	bool AreaHidden(Vector3 spot) {
-		Vector3 plyPos = Const.a.player1Capsule.transform.position;
+		Vector3 plyPos = _consts.player1Capsule.transform.position;
 		float range = 50f;
 		if (Vector3.Distance(plyPos,spot) > range) return true;
 
-		int mask = Const.a.layerMaskNPCAttack;
+		int mask = _consts.layerMaskNPCAttack;
 		Vector3 ray = (plyPos - spot).normalized;
 		RaycastHit tempHit;
 		if (Physics.Raycast(spot,ray,out tempHit,range,mask)) {
@@ -152,7 +158,7 @@ public class SpawnManager : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(sm.numberActive,"numberActive"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(sm.delayFinished,"delayFinished"));
+		s1.Append(Utils.SaveRelativeTimeDifferential(sm._pauseScript,sm.delayFinished,"delayFinished"));
 		return s1.ToString();
 	}
 
@@ -166,7 +172,7 @@ public class SpawnManager : MonoBehaviour {
 		// goodness gracious!)
 		sm.active = Utils.GetBoolFromString(entries[index],"SpawnManager.active"); index++;
 		sm.numberActive = Utils.GetIntFromString(entries[index],"numberActive"); index++;
-		sm.delayFinished = Utils.LoadRelativeTimeDifferential(entries[index],"delayFinished"); index++;
+		sm.delayFinished = Utils.LoadRelativeTimeDifferential(sm._pauseScript,entries[index],"delayFinished"); index++;
 		return index;
 	}
 }

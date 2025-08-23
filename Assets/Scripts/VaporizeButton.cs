@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -11,6 +12,11 @@ public class VaporizeButton : MonoBehaviour {
 	public Text ict;
 	private EventTrigger evenT;
 	private bool pointerEntered;
+
+	[Inject] private MFDManager _mfdManager;
+	[Inject] private GUIState _guiState;
+	[Inject] private Inventory _inventory;
+	[Inject] private MouseLookScript _mouseLookScript;
 
 	void Awake() {
 		pointerEntered = false;
@@ -50,54 +56,54 @@ public class VaporizeButton : MonoBehaviour {
 	public void PtrEnter () {
 		if (pointerEntered) return;
 
-		GUIState.a.PtrHandler(true,true,ButtonType.Generic,gameObject);
-		MouseLookScript.a.currentButton = gameObject;
+		_guiState.PtrHandler(true,true,ButtonType.Generic,gameObject);
+		_mouseLookScript.currentButton = gameObject;
 		pointerEntered = true;
 	}
 
 	public void PtrExit () {
 		if (!pointerEntered) return;
 
-		GUIState.a.ClearOverButton();
+		_guiState.ClearOverButton();
 		pointerEntered = false;
 	}
 
 	public void OnVaporizeClick() {
-		MFDManager.a.mouseClickHeldOverGUI = true;
-		if (Inventory.a == null) return;
-		if (Inventory.a.generalInvCurrent == 0) return; // Access Cards index.
+		_mfdManager.mouseClickHeldOverGUI = true;
+		if (_inventory == null) return;
+		if (_inventory.generalInvCurrent == 0) return; // Access Cards index.
 
-		int cur = Inventory.a.generalInvCurrent;
-		Inventory.a.generalInventoryIndexRef[cur] = -1; // Remove item
-		Inventory.a.generalInvCurrent -= 1;
-		if (Inventory.a.generalInvCurrent < 0) {
-			Inventory.a.generalInvCurrent = 0; // Bound to lowest, but only
+		int cur = _inventory.generalInvCurrent;
+		_inventory.generalInventoryIndexRef[cur] = -1; // Remove item
+		_inventory.generalInvCurrent -= 1;
+		if (_inventory.generalInvCurrent < 0) {
+			_inventory.generalInvCurrent = 0; // Bound to lowest, but only
 		}									   // since it is Access Cards.
 
 
-		cur = Inventory.a.generalInvCurrent;
-		if (Inventory.a.generalInventoryIndexRef[cur] < 0) {
+		cur = _inventory.generalInvCurrent;
+		if (_inventory.generalInventoryIndexRef[cur] < 0) {
 			for (int i=13; i >= 0; i--) {
-				if (Inventory.a.generalInventoryIndexRef[i] >= 0) {
-					Inventory.a.generalInvCurrent = i;
+				if (_inventory.generalInventoryIndexRef[i] >= 0) {
+					_inventory.generalInvCurrent = i;
 					break; // Found last item in inventory.
 				}
 			}
 		}
 
-		cur = Inventory.a.generalInvCurrent;
-		int indexRef = Inventory.a.generalInventoryIndexRef[cur];
-		if (Inventory.a.generalInvCurrent == 0) {
-			if (Inventory.a.HasAnyAccessCards()) {
-				MFDManager.a.SendInfoToItemTab(indexRef);
+		cur = _inventory.generalInvCurrent;
+		int indexRef = _inventory.generalInventoryIndexRef[cur];
+		if (_inventory.generalInvCurrent == 0) {
+			if (_inventory.HasAnyAccessCards()) {
+				_mfdManager.SendInfoToItemTab(indexRef);
 			} else {
 				// If no access cards, reset item tab to show nothing.
-				MFDManager.a.SendInfoToItemTab(-1);
+				_mfdManager.SendInfoToItemTab(-1);
 				PtrExit();
 			}
 		} else {
-			GeneralInvButton genbut = Inventory.a.genButtons[cur].GetComponent<GeneralInvButton>();
-			MFDManager.a.SendInfoToItemTab(indexRef,genbut.customIndex);
+			GeneralInvButton genbut = _inventory.genButtons[cur].GetComponent<GeneralInvButton>();
+			_mfdManager.SendInfoToItemTab(indexRef,genbut.customIndex);
 		}
 	}
 }

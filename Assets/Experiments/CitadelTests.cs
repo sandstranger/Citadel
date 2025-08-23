@@ -183,7 +183,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<allStaticObjects.Count;i++) {				
-				sw.Write(SaveLoad.SavePrefab(allStaticObjects[i]));
+			//	sw.Write(SaveLoad.SavePrefab(allStaticObjects[i]));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();
