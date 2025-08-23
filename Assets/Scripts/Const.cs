@@ -1399,7 +1399,6 @@ CreateBlackTexture:
 		string basePath = Utils.GetAppropriateDataPath();
 		string sPath;
 		sPath = Utils.SafePathCombine(basePath,sName);
-		Debug.Log(sPath);
 		StreamWriter sw = new StreamWriter(sPath,false,Encoding.ASCII);
 		if (sw != null) {
 			using (sw) {

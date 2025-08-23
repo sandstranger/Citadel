@@ -264,13 +264,15 @@ public class LevelManager : MonoBehaviour
 			return;
 		}
 
-		if (UseDynamicLevelsLoading && !Const.StartingNewGame)
+		var useDynamicLevelsLoading = UseDynamicLevelsLoading;
+		
+		if (useDynamicLevelsLoading && !Const.StartingNewGame)
 		{
 			LoadLevel(levnum, targetPosition ?? Vector3.zero, changeSceneForced);
 			return;
 		}
 
-		if (!Const.StartingNewGame && !UseDynamicLevelsLoading)
+		if (!Const.StartingNewGame && !useDynamicLevelsLoading)
 		{
 			LoadLevelAfterSceneChanges = true;
 			UnloadLevelDynamicObjects(currentLevel, true);
@@ -314,7 +316,6 @@ public class LevelManager : MonoBehaviour
 
 		if (QuestLogNotesManager.a != null) QuestLogNotesManager.a.NotifyLevelChange(levnum);
  
-		StaticObjectsSaveStrings[levnum].Clear();
 		// Return to level from cyberspace.
 		PlayerReferenceManager.a.playerCapsule.transform.position = targetPosition;
 		currentLevel = levnum; // Set current level to be the new level
