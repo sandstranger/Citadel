@@ -1,0 +1,39 @@
+{
+    "name": "Zenject",
+    "rootNamespace": "",
+    "references": [
+        "Unity.Addressables",
+        "Unity.ResourceManager",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.uielements",
+            "expression": "1.0.0",
+            "define": "USE_UI_ELEMENTS_MODULE"
+        },
+        {
+            "name": "com.unity.ui",
+            "expression": "1.0.0",
+            "define": "USE_UI_ELEMENTS_PACKAGE"
+        },
+        {
+            "name": "com.unity.addressables",
+            "expression": "0.0.0",
+            "define": "EXTENJECT_INCLUDE_ADDRESSABLE_BINDINGS"
+        },
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "0.0.0",
+            "define": "UNITASK_PLUGIN"
+        }
+    ],
+    "noEngineReferences": false
+}
