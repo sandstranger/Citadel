@@ -43,7 +43,7 @@ public class PauseScript : MonoBehaviour, ISingletonInitializer {
 		ScenesLoader.OnStartLoadScene -= OnStartLoadScene;
 	}
 
-	private void OnStartLoadScene(Scene scene)
+	private void OnStartLoadScene(string sceneName)
 	{
 		_ambientRegistry.Clear();
 	}

@@ -26,7 +26,7 @@ public class PoolPopulateByCopy : MonoBehaviour {
 		ScenesLoader.OnStartLoadScene -= DisableAllChilds;
 	}
 
-	private void DisableAllChilds(Scene scene)
+	private void DisableAllChilds(string sceneName)
 	{
 		foreach (var child in _childs)
 		{

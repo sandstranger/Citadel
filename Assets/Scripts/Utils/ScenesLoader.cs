@@ -1,20 +1,20 @@
 using System;
-using System.Collections.Generic;
 using Citadel.Extensions;
-using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace Citadel.SceneManagement
 {
     internal static class ScenesLoader
     {
-        public static event Action <Scene> OnStartLoadScene;
-        public static event Action<Scene> OnSceneLoaded;
-
         public const string DynamicLevelsSceneName = "CitadelScene";
         
-        private static readonly List<string> _levelScenesNames = new()
-        {
+        public static event Action<string> OnStartLoadScene;
+        public static event Action<string> OnSceneLoaded;
+
+        public static string LoadedSceneName => SceneManager.GetActiveScene().name;
+        
+        private static readonly string[] _levelScenesNames = {
             "0-ReactorLevelScene",
             "1-MedicalLevelScene",
             "2-ScienceLevelScene",
@@ -31,17 +31,20 @@ namespace Citadel.SceneManagement
             "13-CyberspaceLevelScene"
         };
 
-        public static async void LoadScene(string sceneName)
+        static ScenesLoader()
         {
-            var sceneToLoad = SceneManager.GetSceneByName(sceneName);
-            OnStartLoadScene?.Invoke(sceneToLoad);
-            await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single).ToTask();
-            OnSceneLoaded?.Invoke(sceneToLoad);
+            SceneManager.sceneLoaded += (scene, _) => OnSceneLoaded?.Invoke(scene.name);
+        }
+        
+        public static void LoadScene(string sceneName)
+        {
+            OnStartLoadScene?.Invoke(sceneName);
+            SceneManager.LoadScene(sceneName);
         }
 
         public static void LoadLevel(int level)
         {
-            if (level < _levelScenesNames.Count)
+            if (level < _levelScenesNames.Length)
             {
                 LoadScene(_levelScenesNames[level]);
             }

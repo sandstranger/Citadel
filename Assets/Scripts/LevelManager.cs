@@ -53,21 +53,21 @@ public class LevelManager : MonoBehaviour
 	private bool[] levelDataLoaded;
 	private int getValreadInt;
 	private float getValreadFloat;
-	private static StringBuilder s1 = new StringBuilder();
+	private static readonly StringBuilder s1 = new(200*1024);
 	private GameObject _dummyGameObject;
 
+	public static bool LoadLevelAfterSceneChanges { get; private set; }
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
-	public static readonly List<string>[] DynamicObjectsSavestrings = new List<string>[14];
+	public static SaveableObjectStringsStorage StaticObjectsSaveStrings { get; } = new();
+	public static SaveableObjectStringsStorage DynamicObjectsSavestrings { get; } = new();
 	public static int currentLevel = NewGameLevelIndex;
 	// Singleton instance
 	public static LevelManager a;
-	
+
+	public static bool UseDynamicLevelsLoading => ScenesLoader.LoadedSceneName == ScenesLoader.DynamicLevelsSceneName;
+
 	void Awake () {
 		_dummyGameObject = new("dummy_gameobject");
-		if (a == null)
-		{
-			LoadDynamicObjectsSavestrings();
-		}
 		a = this;
 		if (currentLevel < 0) {
 			if (Const.a == null) return;
@@ -89,7 +89,17 @@ public class LevelManager : MonoBehaviour
 		Time.timeScale = Const.defaultTimeScale;
 		levelDataLoaded = new bool[MaxLevelsCount];
 		for (int i=0;i<MaxLevelsCount;i++) levelDataLoaded[i] = false;
-//		LoadLevelData(currentLevel);
+
+		if (Const.StartingNewGame)
+		{
+			StaticObjectsSaveStrings.ResetSaveStrings();
+			LoadDynamicObjectsSavestrings();
+		}
+
+		if (UseDynamicLevelsLoading)
+		{
+			LoadLevelData(currentLevel);
+		}
 	}
 
 	public bool LevelExists(int levelID)
@@ -106,18 +116,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public static void ResetSaveStrings() {
-		int strcount = DynamicObjectsSavestrings.Length;
-		if (strcount > 0) {
-			for (int i=strcount - 1;i>=0;i--) {
-				if (DynamicObjectsSavestrings[i] != null) {
-					DynamicObjectsSavestrings[i].Clear();
-				}
-				else
-				{
-					DynamicObjectsSavestrings[i] = new List<string>();
-				}
-			}
-		}
+		DynamicObjectsSavestrings.ResetSaveStrings();
 	}
 	
 	// Used in a couple places, bit slow to return list but it's only part of
@@ -147,7 +146,7 @@ public class LevelManager : MonoBehaviour
 
 	private static void LoadDynamicObjectsSavestrings() {
 		ResetSaveStrings();		
-		for (int i=0;i<14;i++) {			
+		for (int i=0;i<MaxLevelsCount;i++) {			
 			List<string> readFileList = ReadDynamicObjectFileList(i);
 			for (int j=0;j<readFileList.Count;j++) {
 				DynamicObjectsSavestrings[i].Add(readFileList[j]);
@@ -226,8 +225,8 @@ public class LevelManager : MonoBehaviour
 		if (!LevNumIsNonCyber(levnum)) return; // In a test or editor space.
 		if (!levelDataLoaded[levnum]) return; // Already cleared.
 
-	//	UnloadLevelLights(levnum);
-	//	UnloadLevelGeometry(levnum);
+		UnloadLevelLights(levnum);
+		UnloadLevelGeometry(levnum);
  		UnloadLevelDynamicObjects(levnum,true);
 		levelDataLoaded[levnum] = false;
 		SaveLoad.numLightsWithShadows = 0;
@@ -242,15 +241,16 @@ public class LevelManager : MonoBehaviour
 		if (levelDataLoaded[levnum]) return; // Already loaded.
 
 // 		Debug.Log("Loading level data for " + levnum.ToString());
-	//	LoadLevelLights(levnum);
-	//	LoadLevelGeometry(levnum);
+		LoadLevelLights(levnum);
+		LoadLevelGeometry(levnum);
+		LoadStaticObjects(levnum);
 		LoadLevelDynamicObjects(levnum);
 		Music.a.LoadLevelMusic(levnum);
 		levelDataLoaded[levnum] = true;
 		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + SaveLoad.numLightsWithShadows.ToString());
 	}
 
-	public static void ChangeGameScene(int levnum, Vector3? targetPosition = null, bool changeSceneForced = false)
+	public void ChangeGameScene(int levnum, Vector3? targetPosition = null, bool changeSceneForced = false)
 	{
 		if (!LevNumInBounds(levnum))
 		{
@@ -264,13 +264,28 @@ public class LevelManager : MonoBehaviour
 			return;
 		}
 
+		if (UseDynamicLevelsLoading && !Const.StartingNewGame)
+		{
+			LoadLevel(levnum, targetPosition ?? Vector3.zero, changeSceneForced);
+			return;
+		}
+
+		if (!Const.StartingNewGame && !UseDynamicLevelsLoading)
+		{
+			LoadLevelAfterSceneChanges = true;
+			UnloadLevelDynamicObjects(currentLevel, true);
+			SaveStaticObjects();
+		}
+
 		TargetPosition = targetPosition ?? Vector3.zero;
 		currentLevel = levnum;
 		ObjectContainmentSystem.ClearLists();
 		ScenesLoader.LoadLevel(levnum);
 	}
 	
-	public void LoadLevel(int levnum, Vector3 targetPosition, bool loadLevelForced = false) {
+	public void LoadLevel(int levnum, Vector3 targetPosition, bool loadLevelForced = false)
+	{
+		LoadLevelAfterSceneChanges = false;
 		if (!LevNumInBounds(levnum)) { Debug.LogWarning("levnum out of bounds"); return; }
 
 		// NOTE: Check this first since the button for the current level has a null destination.  This is fine and expected.
@@ -299,6 +314,7 @@ public class LevelManager : MonoBehaviour
 
 		if (QuestLogNotesManager.a != null) QuestLogNotesManager.a.NotifyLevelChange(levnum);
  
+		StaticObjectsSaveStrings[levnum].Clear();
 		// Return to level from cyberspace.
 		PlayerReferenceManager.a.playerCapsule.transform.position = targetPosition;
 		currentLevel = levnum; // Set current level to be the new level
@@ -554,10 +570,11 @@ public class LevelManager : MonoBehaviour
 	}
 	
 	public void UnloadLevelGeometry(int curlevel) {
-		return;
-		if (curlevel > (geometryContainers.Length - 1)) return;
-		if (curlevel < 0) return;
-
+		if (curlevel > (geometryContainers.Length - 1) || curlevel < 0 || !UseDynamicLevelsLoading)
+		{
+			return;
+		}
+		
 		List<GameObject> deleteMes = new List<GameObject>();
 		Transform parent = geometryContainers[curlevel].transform;
 		int children = parent.childCount;
@@ -568,9 +585,11 @@ public class LevelManager : MonoBehaviour
 	}
 	
 	public void LoadLevelGeometry(int curlevel) {
-		return;
-		if (curlevel > (geometryContainers.Length - 1)) return;
-		if (curlevel < 0) return;
+
+		if (curlevel > (geometryContainers.Length - 1) || curlevel < 0 || !UseDynamicLevelsLoading)
+		{
+			return;
+		}
 		
 		string gName = "CitadelScene_geometry_level"+curlevel.ToString()+".txt";
 		StreamReader sf = Utils.ReadStreamingAsset(gName);
@@ -624,11 +643,11 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public void UnloadLevelLights(int curlevel) {
-		return;
-		if (curlevel > 12) return;
-		if (curlevel > (lightContainers.Length - 1)) return;
-		if (curlevel < 0) return;
-
+		if (curlevel > 12 || curlevel > (lightContainers.Length - 1) || curlevel < 0 || !UseDynamicLevelsLoading)
+		{
+			return;
+		}
+		
 		Component[] compArray = 
 		  lightContainers[curlevel].GetComponentsInChildren(typeof(Light),true);
 
@@ -656,10 +675,11 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public void LoadLevelLights(int curlevel) {
-		return;
-		if (curlevel > 12) return;
-		if (curlevel > (lightContainers.Length - 1)) return;
-		if (curlevel < 0) return;
+
+		if (curlevel > 12 || curlevel > (lightContainers.Length - 1) || curlevel < 0 || !UseDynamicLevelsLoading)
+		{
+			return;
+		}
 
 		string lName = "CitadelScene_lights_level"+curlevel.ToString()+".txt";
 		StreamReader sf = Utils.ReadStreamingAsset(lName);
@@ -698,9 +718,6 @@ public class LevelManager : MonoBehaviour
 			for (int i=0;i<allDynamicObjects.Count;i++) {
 				DynamicObjectsSavestrings[curlevel].Add(SaveObject.Save(allDynamicObjects[i]));
 			}
-			
-			allDynamicObjects.Clear();
-			allDynamicObjects = null;
 		}
 		
 		// Iterate over all gameobjects at first level within.
@@ -821,6 +838,124 @@ public class LevelManager : MonoBehaviour
 		for (i=0;i<14;i++) { LevelManager.a.ressurectionActive[i] = Utils.GetBoolFromString(entries[index],"ressurectionActive[" + i.ToString() + "]"); index++; }
 		return index;
 	}
+
+	private void LoadStaticObjects(int levNum)
+	{
+		var staticObjectsStrings = StaticObjectsSaveStrings[levNum];
+		
+		if (UseDynamicLevelsLoading || staticObjectsStrings.Count == 0)
+		{
+			return;
+		}
+
+		UnloadLevelNPCs(currentLevel);
+		
+		var splitter = Convert.ToChar(SaveLoad.splitChar);
+		GameObject contnr = GetRequestedLevelNPCContainer(levNum);
+		var saveableObjects = Utils.FindAllSaveObjectsGOs();
+		bool[] alreadyCheckedThisInstantiableGameObjectInScene = new bool[saveableObjects.Count];
+		
+		foreach (var saveString in staticObjectsStrings)
+		{
+			var entries = saveString.Split(splitter);
+			int constIndex = Utils.GetIntFromString(entries[0],"constIndex");
+			var savID = Utils.GetIntFromString(entries[2],"SaveID");
+			bool isNpc = ConsoleEmulator.ConstIndexIsNPC(constIndex);
+			
+			if (isNpc)
+			{
+				var instGO = ConsoleEmulator.SpawnDynamicObject(constIndex,levNum,false,contnr,savID);
+				PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
+				SaveObject.Load(instGO,ref entries,0,prefID); // Load NPC.
+			}
+			else
+			{
+				for (var i = 0; i < (saveableObjects.Count); i++)
+				{
+					var currentGameObjectInScene = saveableObjects[i];
+
+					if (alreadyCheckedThisInstantiableGameObjectInScene[i] || currentGameObjectInScene == null)
+					{
+						continue;
+					}
+	
+					var currentSaveObjectInScene = SaveLoad.GetPrefabSaveObject(currentGameObjectInScene);
+					if (!currentSaveObjectInScene.instantiated)
+					{
+						alreadyCheckedThisInstantiableGameObjectInScene[i] = true; // Huge time saver right here!
+					}
+
+					if (currentSaveObjectInScene.SaveID == savID && currentSaveObjectInScene.SaveID != 0)
+					{
+						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene, true);
+						SaveObject.Load(currentGameObjectInScene, ref entries, i, prefID);
+						alreadyCheckedThisInstantiableGameObjectInScene[i] = true; // Huge time saver right here!
+						break;
+					}
+				}
+			}
+		}
+		
+		// LOAD 8.  Repopulate registries as needed that were on Awake.
+		for (var i = 0; i < npcsm.Length; i++ ) {
+			npcsm[i]?.RepopulateChildList();
+		}
+			
+		if (Inventory.a.hasHardware[1]) {
+			// Go through all HealthManagers in the game and initialize the
+			// linked overlays now for Automap.  Done after instantiation.
+			List<GameObject> hmGOs = new List<GameObject>();
+			List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();				
+			// Find all HealthManager components.
+			bool includeInactive = true;
+			for (var i=0;i<allParents.Count;i++) {
+				Component[] compArray =
+					allParents[i].GetComponentsInChildren(
+						typeof(HealthManager),includeInactive);
+
+				// Add all gameObject with a HealthManager components.
+				for (var k=0;k<compArray.Length;k++) hmGOs.Add(compArray[k].gameObject);
+			}
+
+			for (var i=0;i<hmGOs.Count;i++) {
+				if (hmGOs[i] == null) continue;
+
+				HealthManager hm = hmGOs[i].GetComponent<HealthManager>();
+				if (hm == null) continue;
+
+				if ((hm.isNPC || hm.isSecCamera)) {
+					hm.Awake(); // Set up slots.
+					hm.Start(); // Setup overlay.
+				}
+			}
+		}
+		
+		staticObjectsStrings.Clear();
+	}
+	
+	private void SaveStaticObjects()
+	{
+		if (UseDynamicLevelsLoading)
+		{
+			return;
+		}
+		
+		var currentLevelData = levelScripts[currentLevel];
+		var saveStringsStorage = StaticObjectsSaveStrings[currentLevel];
+
+		SaveObjects(currentLevelData.staticObjectsSaveable);
+		SaveObjects(currentLevelData.NPCsSaveableInstantiated);
+		SaveObjects(currentLevelData.doorsStaticSaveable);
+		SaveObjects(currentLevelData.lightsStaticSaveable);
+		
+		void SaveObjects(GameObject parent)
+		{
+			foreach (var saveObject in parent.GetComponentsInChildren<SaveObject>(true))
+			{
+				saveStringsStorage.Add(SaveObject.Save(saveObject.gameObject));
+			}
+		}
+	}
 	
 	void OnDestroy() {
 		levels = null;
@@ -842,5 +977,45 @@ public class LevelManager : MonoBehaviour
 		rtxEmissive = null;
 		sphereMesh = null;
 		pipe_maint2_3_coolant = null;
+	}
+	
+	public sealed class SaveableObjectStringsStorage : IReadOnlyList<List<string>>
+	{
+		private readonly List<string>[] _objectsSaveStrings = new List<string>[MaxLevelsCount];
+
+		public List<string> this[int index] => _objectsSaveStrings[index];
+
+		public int Count =>_objectsSaveStrings.Length;
+
+		public SaveableObjectStringsStorage()
+		{
+			ResetSaveStrings();
+		}
+
+		public void ResetSaveStrings() 
+		{
+			for (var i = 0; i < _objectsSaveStrings.Length; ++i)
+			{
+				if (_objectsSaveStrings[i] != null)
+				{
+					_objectsSaveStrings[i].Clear();
+				}
+				else
+				{
+					_objectsSaveStrings[i] = new List<string>();
+				}
+			}
+		}
+
+		public IEnumerator<List<string>> GetEnumerator()
+		{
+			IReadOnlyList<List<string>> ienumarable = _objectsSaveStrings;
+			return ienumarable.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 	}
 }

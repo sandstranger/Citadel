@@ -216,12 +216,37 @@ public class Const : MonoBehaviour
 	public GameObject loadingScreen;
 	public GameObject mainMenuInit; // Used to force mainMenuOn before Start().
 	public StatusBarTextDecay statusBar;
-   
+
+	private static int _difficultyCombat = 2;
+	public static int _difficultyMission = 2;
+	public static int _difficultyPuzzle = 2;
+	public static int _difficultyCyber = 2;
+	
 	//Config constants
-	public int difficultyCombat;
-	public int difficultyMission;
-	public int difficultyPuzzle;
-	public int difficultyCyber;
+	public int difficultyCombat
+	{
+		get => _difficultyCombat;
+		set => _difficultyCombat = value;
+	}
+
+	public int difficultyMission
+	{
+		get => _difficultyMission;
+		set => _difficultyMission = value;
+	}
+
+	public int difficultyPuzzle
+	{
+		get => _difficultyPuzzle;
+		set => _difficultyPuzzle = value;
+	}
+
+	public int difficultyCyber
+	{
+		get => _difficultyCyber;
+		set => _difficultyPuzzle = value;
+	}
+
 	[HideInInspector] public string playerName;
 	public AudioSource mainmenuMusic;
 	[HideInInspector] public int GraphicsResWidth;
@@ -361,9 +386,9 @@ public class Const : MonoBehaviour
 	[HideInInspector] public Vector3 vectorZero;
 	[HideInInspector] public Vector3 vectorOne;
 	[HideInInspector] public int numberOfRaycastsThisFrame = 0;
-	[HideInInspector] public const int maxRaycastsPerFrame = 20;
-	[HideInInspector] public const float raycastTick = 0.2f;
-	[HideInInspector] public const float aiTickTime = 0.1f;
+	public const int maxRaycastsPerFrame = 20;
+	public const float raycastTick = 0.2f;
+	public const float aiTickTime = 0.1f;
 	
 	// Credit stats
 	[HideInInspector] public int kills = 0;
@@ -664,20 +689,21 @@ public class Const : MonoBehaviour
 		}
 	}
 
-	private void OnSceneLoaded(Scene scene)
+	private void OnSceneLoaded(string sceneName)
 	{
 		ResetPauseLists();
 		
 		if (StartingNewGame)
 		{
 			StartingNewGame = false;
+			LevelManager.currentLevel = LevelManager.NewGameLevelIndex;
 			GoIntoGame();
 		}
 		else if (_saveFileIndex.HasValue)
 		{
 			StartCoroutine(LoadRoutine(_saveFileIndex.Value,false));
 		}
-		else
+		else if (LevelManager.LoadLevelAfterSceneChanges)
 		{
 			LevelManager.a.LoadLevel(LevelManager.currentLevel, LevelManager.TargetPosition, loadLevelForced: true);
 		}
@@ -1278,19 +1304,6 @@ CreateBlackTexture:
         return GetObjectFromPool(PoolType.SparksSmall);
 	}
 
-	void FindAllSaveObjectsGOs(ref List<GameObject> gos) {
-		List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
-		for (int i=0;i<allParents.Count;i++) {
-			Component[] compArray = allParents[i].GetComponentsInChildren(typeof(SaveObject),true); // find all SaveObject components, including inactive (hence the true here at the end)
-			for (int k=0;k<compArray.Length;k++) {
-				gos.Add(compArray[k].gameObject); //add the gameObject associated with all SaveObject components in the scene
-			}
-		}
-		
-		allParents.Clear();
-		allParents = null;
-	}
-
 	// Wrapper function to enable Save to be a coroutine so we can display
 	// progress.  We don't though, currently we just haul off and get it with
 	// top speed, no pausing momentarily to draw any progress bar since it is
@@ -1315,7 +1328,7 @@ CreateBlackTexture:
 
 		// All saveable classes
 		List<GameObject> saveableGameObjects = new List<GameObject>();
-		FindAllSaveObjectsGOs(ref saveableGameObjects);
+		saveableGameObjects.AddRange(Utils.FindAllSaveObjectsGOs());
 		//UnityEngine.Debug.Log("Found "
 		//					  + saveableGameObjects.Count.ToString()
 		//					  + " total saveables for save.");
@@ -1371,13 +1384,16 @@ CreateBlackTexture:
 			saveData.Add(SaveObject.Save(saveableGameObjects[i])); // <<< THIS IS IT <<<
 		}
 		
-		for (i=0;i<14;i++) {
-			int dyncount = LevelManager.DynamicObjectsSavestrings[i].Count;
-			for (j=0;j<dyncount;j++) {
-				saveData.Add(LevelManager.DynamicObjectsSavestrings[i][j]);
-			}
+		foreach (var dynamicObjectsSaveList in LevelManager.DynamicObjectsSavestrings)
+		{
+			saveData.AddRange(dynamicObjectsSaveList);
 		}
-
+		
+		foreach (var staticObjectsSaveList in LevelManager.StaticObjectsSaveStrings)
+		{
+			saveData.AddRange(staticObjectsSaveList);
+		}
+		
 		// Write to file
 		string sName = "sav" + saveFileIndex.ToString() + ".txt";
 		string basePath = Utils.GetAppropriateDataPath();
@@ -1425,7 +1441,7 @@ CreateBlackTexture:
 		WriteDatForIntroPlayed(false);
 		StartingNewGame = true;
 		loadingScreen.SetActive(true);
-		LevelManager.ChangeGameScene(LevelManager.NewGameLevelIndex, changeSceneForced: true);
+		LevelManager.a.ChangeGameScene(LevelManager.NewGameLevelIndex, changeSceneForced: true);
 	}
 
 	// Going into the game removes the helper GameObjects for these reasons:
@@ -1512,11 +1528,17 @@ CreateBlackTexture:
 		_saveFileIndex = saveFileIndex;
 		WriteDatForIntroPlayed(introNotPlayed); // reset
 
+		if (LevelManager.UseDynamicLevelsLoading)
+		{
+			StartCoroutine(LoadRoutine(_saveFileIndex.Value,false));
+			return;
+		}
+		
 		var levelIndexFromSave = ReadLevelIndexFromSave(saveFileIndex);
 
 		if (levelIndexFromSave != LevelManager.currentLevel)
 		{
-			LevelManager.ChangeGameScene(levelIndexFromSave);
+			LevelManager.a.ChangeGameScene(levelIndexFromSave);
 		}
 		else
 		{
@@ -1553,6 +1575,8 @@ CreateBlackTexture:
 		}
 		
 		LevelManager.ResetSaveStrings();
+		LevelManager.StaticObjectsSaveStrings.ResetSaveStrings();
+		
 		for (i=0;i<LevelManager.MaxLevelsCount;i++) {
 
 			if (LevelManager.a.levelScripts[i] == null)
@@ -1573,6 +1597,7 @@ CreateBlackTexture:
 		string[] entries = Array.Empty<string>();
 											 // on individual lines.
 		List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
+		allParents.Add(player1);
 		var readFileList = ReadSave(saveFileIndex);
 		if (readFileList.Count > 0) {
 			loadPercentText.text = "Load Quest Data...     ";
@@ -1640,7 +1665,7 @@ CreateBlackTexture:
 			// - func_wall has its SaveObject on first child
 			// - se_corpse_eaten has its SearchableItem on first child
 			saveableGameObjectsInScene.Clear();
-			FindAllSaveObjectsGOs(ref saveableGameObjectsInScene); // ref to avoid boxing.
+			saveableGameObjectsInScene.AddRange(Utils.FindAllSaveObjectsGOs());
 			//UnityEngine.Debug.Log("Found " 
 			//					  + saveableGameObjectsInScene.Count.ToString()
 			//					  + " total static saveables remaining in "
@@ -1667,16 +1692,21 @@ CreateBlackTexture:
 			yield return null;
 			loadUpdateTimer.Start(); // For loading update
 			float perc = 0f;
-			for (i = 3; i < numSaveFileLines; i++) {
+			for (i = 3; i < numSaveFileLines; i++)
+			{
 				if (saveFile_Line_IsInstantiated[i]) continue; // Skip instantiables.
-
+				bool wasLoaded = false;
 				alreadyLoadedLineFromSaveFile[i] = true;
+
 				for (j=0;j<(saveableGameObjectsInScene.Count);j++) {
-					if (alreadyCheckedThisSaveableGameObjectInScene[j]) continue; // skip checking this and doing GetComponent
-					if (saveableGameObjectsInScene[j] == null) continue;
+					if (alreadyCheckedThisSaveableGameObjectInScene[j] || saveableGameObjectsInScene[j] == null)
+					{
+						continue;
+					} // skip checking this and doing GetComponent
 
 					currentGameObjectInScene = saveableGameObjectsInScene[j];
 					currentSaveObjectInScene = SaveLoad.GetPrefabSaveObject(currentGameObjectInScene);
+
 					if (!currentSaveObjectInScene.instantiated) alreadyCheckedThisInstantiableGameObjectInScene[j] = true; // Huge time saver right here!
 
 					// Static Objects all have unique ID.
@@ -1693,13 +1723,23 @@ CreateBlackTexture:
 												  + "to load to dynamic object "
 												  + saveableGameObjectsInScene[j].name);
 						}
-
+						
+						
 						entries = readFileList[i].Split(Utils.splitCharChar);
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
 						SaveObject.Load(currentGameObjectInScene,ref entries,i,prefID);
+						wasLoaded = true;
 						alreadyCheckedThisSaveableGameObjectInScene[j] = true; // Huge time saver right here!
 						break;
 					}
+				}
+
+				const string levelIdName = "levelID";
+				if (!wasLoaded && !LevelManager.UseDynamicLevelsLoading && readFileList[i].Contains(levelIdName))
+				{
+					var line = readFileList[i];
+					var entryToParse = line.Split(Utils.splitCharChar).First(entry => entry.Contains(levelIdName));
+					LevelManager.StaticObjectsSaveStrings[Utils.GetIntFromString(entryToParse,levelIdName)].Add(line);
 				}
 
 				perc = (float)i/(float)numSaveablesFromSavefile*100f;
@@ -1770,7 +1810,15 @@ CreateBlackTexture:
 					// savestrings lists were empty, safe to spawn dynamics now.
 					savID = Utils.GetIntFromString(entries[2],"SaveID");
 					bool isNpc = ConsoleEmulator.ConstIndexIsNPC(constdex);
-					if (isNpc && LevelManager.a.LevelExists(levID)) {
+					bool isDynamicObject = ConsoleEmulator.ConstIndexIsDynamicObject(constdex);
+					bool levelExists = LevelManager.a.LevelExists(levID);
+					bool saveObjectToStaticStrings = !isDynamicObject && !levelExists && i < (readFileList.Count - 1);
+
+					if (saveObjectToStaticStrings)
+					{
+						LevelManager.StaticObjectsSaveStrings[levID].Add(readFileList[i]);
+					}
+					else if (isNpc && levelExists) {
 						contnr = LevelManager.a.GetRequestedLevelNPCContainer(levID);
 						instGO = ConsoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
@@ -1783,7 +1831,7 @@ CreateBlackTexture:
 							PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
 							SaveObject.Load(instGO,ref entries,i,prefID); // Load NPC.
 						} else {
-							if (levID < LevelManager.DynamicObjectsSavestrings.Length && levID >= 0) { // levID < 14
+							if (levID < LevelManager.DynamicObjectsSavestrings.Count && levID >= 0) { // levID < 14
 								if (i < (readFileList.Count - 1) && readFileList.Count > 0 && i >= 0) {
 									LevelManager.DynamicObjectsSavestrings[levID].Add(readFileList[i]);
 								}

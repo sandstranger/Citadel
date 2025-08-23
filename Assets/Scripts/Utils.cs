@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Globalization;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
@@ -9,6 +10,7 @@ using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 #if UNITY_EDITOR
 	using UnityEditor;
@@ -757,7 +759,8 @@ public class Utils {
 
 	public static int GetIntFromString(string val, string name) {
 		int colonIndex = GetColonIndex(val);
-		if (!StringEquals(val,name,colonIndex)) {
+		if (!StringEquals(val,name,colonIndex))
+		{
 			UnityEngine.Debug.LogError("BUG: Attempting to parse " + val
 						               + " when wanting int named " + name
 						               + ", returning 0 as fallback on "
@@ -1909,6 +1912,11 @@ public class Utils {
 		return (count27 == 2 && count65 == 2);
 	}
 
+	public static IReadOnlyList<GameObject> FindAllSaveObjectsGOs()
+	{
+		return GameObject.FindObjectsOfType<SaveObject>(true).Select(saveObject => saveObject.gameObject).ToList();
+	}
+	
 	private static void InitializeBetterStreamingassets()
 	{
 		if (!_betterStreamingAssetsInitialized)

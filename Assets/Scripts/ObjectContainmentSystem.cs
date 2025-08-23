@@ -13,8 +13,8 @@ public static class ObjectContainmentSystem
     {
         FloorChunks.Clear();
 
-        List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
-        for (int i = 0; i < allParents.Count; i++)
+        var allParents = SceneManager.GetActiveScene().GetRootGameObjects();
+        for (int i = 0; i < allParents.Length; i++)
         {
             Component[] compArray = allParents[i].GetComponentsInChildren(typeof(MarkAsFloor), true);
             for (int k = 0; k < compArray.Length; k++)
@@ -22,9 +22,6 @@ public static class ObjectContainmentSystem
                 FloorChunks.Add(compArray[k].gameObject);
             }
         }
-
-        allParents.Clear();
-        allParents = null; // Done with it.
     }
 
     public static void UpdateActiveFlooring()
