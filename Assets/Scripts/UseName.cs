@@ -343,6 +343,10 @@ public class UseName : MonoBehaviour {
 
 		var result = s1.ToString();
 		s1.Clear();
-		consts.sprint(result,un._mouseLookScript.player);
+
+		if (un != null)
+		{
+			consts.sprint(result, un._mouseLookScript.player);
+		}
 	}
 }
