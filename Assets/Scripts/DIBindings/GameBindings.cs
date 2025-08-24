@@ -58,7 +58,6 @@ namespace Citadel.Game
             }
 
             ScenesLoader.OnActiveSceneChanged += OnSceneChanged;
-
             
             _const.InitializeInstance();
             _playerReference.InitializeInstance();
@@ -110,7 +109,6 @@ namespace Citadel.Game
                 Container.Inject(_config);
             }
         }
-        
         
         public static GameObject InstantiatePrefab(GameObject original, Vector3 position, Quaternion rotation, Transform parentTransform = null)
         {
