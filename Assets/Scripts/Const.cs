@@ -417,20 +417,20 @@ public class Const : SingletonHelper<Const>
 	public MFDManager MfdManager => _mfdManager;
 	public GameObject Player => _playerReference.gameObject;
 	[Inject] 
-	private PlayerReferenceManager _playerReference;
+	private readonly PlayerReferenceManager _playerReference;
 	[Inject] 
-	private LevelManager _levelManager;
-	[Inject] private ConsoleEmulator _consoleEmulator;
-	[Inject] private Config _config;
-	[Inject] private MFDManager _mfdManager;
-	[Inject] private Automap _automap;
-	[Inject] private Inventory _inventory;
-	[Inject] private MainMenuHandler _mainMenuHandler;
-	[Inject] private MouseLookScript _mouseLookScript;
-	[Inject] private PauseScript _pauseScript;
-	[Inject] private PlayerHealth _playerHealth;
-	[Inject] private DynamicCulling _dynamicCulling;
-	[Inject] private QuestLogNotesManager _questLogNotesManager;
+	private readonly LevelManager _levelManager;
+	[Inject] private readonly ConsoleEmulator _consoleEmulator;
+	[Inject] private readonly Config _config;
+	[Inject] private readonly MFDManager _mfdManager;
+	[Inject] private readonly Automap _automap;
+	[Inject] private readonly Inventory _inventory;
+	[Inject] private readonly MainMenuHandler _mainMenuHandler;
+	[Inject] private readonly MouseLookScript _mouseLookScript;
+	[Inject] private readonly PauseScript _pauseScript;
+	[Inject] private readonly PlayerHealth _playerHealth;
+	[Inject] private readonly DynamicCulling _dynamicCulling;
+	[Inject] private readonly QuestLogNotesManager _questLogNotesManager;
 
 	private void Awake()
 	{

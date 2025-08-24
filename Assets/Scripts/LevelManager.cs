@@ -58,21 +58,21 @@ public class LevelManager : MonoBehaviour
 	private GameObject _dummyGameObject;
 
 	[Inject]
-	private ConsoleEmulator _consoleEmulator;
+	private readonly ConsoleEmulator _consoleEmulator;
 	[Inject] 
-	private PlayerReferenceManager _playerReference;
-	[Inject] private Const _consts;
-	[Inject] private Config _config;
-	[Inject] private MFDManager _mfdManager;
-	[Inject] private Automap _automap;
-	[Inject] private GUIState _guiState;
-	[Inject] private Inventory _inventory;
-	[Inject] private Music _music;
-	[Inject] private PauseScript _pauseScript;
-	[Inject] private PlayerHealth _playerHealth;
-	[Inject] private PlayerMovement _playerMovement;
-	[Inject] private DynamicCulling _dynamicCulling;
-	[Inject] private QuestLogNotesManager _questLogNotesManager;
+	private readonly PlayerReferenceManager _playerReference;
+	[Inject] private readonly Const _consts;
+	[Inject] private readonly Config _config;
+	[Inject] private readonly MFDManager _mfdManager;
+	[Inject] private readonly Automap _automap;
+	[Inject] private readonly GUIState _guiState;
+	[Inject] private readonly Inventory _inventory;
+	[Inject] private readonly Music _music;
+	[Inject] private readonly PauseScript _pauseScript;
+	[Inject] private readonly PlayerHealth _playerHealth;
+	[Inject] private readonly PlayerMovement _playerMovement;
+	[Inject] private readonly DynamicCulling _dynamicCulling;
+	[Inject] private readonly QuestLogNotesManager _questLogNotesManager;
 
 	public static bool LoadLevelAfterSceneChanges { get; private set; }
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;

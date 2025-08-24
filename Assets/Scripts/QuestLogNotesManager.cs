@@ -1,17 +1,17 @@
-﻿using System.Collections;
-using System.Text;
-using System.Collections.Generic;
+﻿using System.Text;
 using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class QuestLogNotesManager : MonoBehaviour {
+public class QuestLogNotesManager : MonoBehaviour
+{
+	private const string DoorTo7Name = "door_elevator1_toLevel7";
+	
 	public GameObject[] notes;
 	public Text[] labels;
 	public Toggle[] checkBoxes;
 	public GameObject label15_StrikeThru;
 	public Door neuroSurgeryDoor;
-	public Door level6elevatorDoorTo7;
 
 	// 0 - Destroy level 1 nodes.					...Later add:  Code is #.		DONE, CHECK DONE
 	// 1 - Destroy level 2 nodes.					...Later add:  Code is #.		DONE, CHECK DONE
@@ -35,7 +35,8 @@ public class QuestLogNotesManager : MonoBehaviour {
 	[Inject] private Const _consts;
 	[Inject] private Inventory _inventory;
 
-	void Awake() {
+	void Awake()
+	{
 		for (int i=0;i<=17;i++) {
 			notes[i].SetActive(false);
 		}
@@ -57,7 +58,7 @@ public class QuestLogNotesManager : MonoBehaviour {
 	}
 
 	public void NotifyLockedDoorAttempt(Door d) {
-		if (d == level6elevatorDoorTo7) {
+		if (d!=null && d.gameObject.name == DoorTo7Name) {
 			notes[12].SetActive(true); // Jettison Beta Grove.
 			labels[12].text = _consts.stringTable[565];
 			if (_inventory != null) _inventory.hasNewNotes = true;
