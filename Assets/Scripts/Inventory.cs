@@ -1375,7 +1375,7 @@ public class Inventory : MonoBehaviour {
 			hasSoft[4] = false;
 			softs[4].SetActive(false); // turn the button off now that we are out
 		}
-		GameObject decoyObj = GameBindings.InstantiatePrefab(decoyPrefab,_playerMovement.transform.position,
+		GameObject decoyObj = RootInstaller.InstantiatePrefab(decoyPrefab,_playerMovement.transform.position,
 			_mouseLookScript.transform.rotation);
 		if (decoyObj != null) {
 			decoyObj.transform.SetParent(CyberSpaceStaticContainer.transform,true);

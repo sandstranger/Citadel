@@ -411,6 +411,7 @@ public class Const : SingletonHelper<Const>
 	private StringBuilder s1;
 	private StringBuilder s2;
 
+	public ConsoleEmulator ConsoleEmulator => _consoleEmulator;
 	public DynamicCulling DynamicCulling => _dynamicCulling;
 	public MouseLookScript MouseLookScript => _mouseLookScript;
 	public MFDManager MfdManager => _mfdManager;
@@ -1254,7 +1255,7 @@ CreateBlackTexture:
 
 		GameObject InstantiatePrefab(GameObject prefab)
 		{
-			return GameBindings.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity);
+			return RootInstaller.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity);
 		}
 	}
 

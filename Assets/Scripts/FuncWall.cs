@@ -243,7 +243,7 @@ public class FuncWall : MonoBehaviour {
 			// Assumption here is that we are loading to a freshly instantiated
 			// func_wall prefab and that there are no children chunks on the
 			// mover_target GameObject yet.
-			GameObject childGO = GameBindings.InstantiatePrefab(@const.GetPrefab(chunkdex),
+			GameObject childGO = RootInstaller.InstantiatePrefab(@const.GetPrefab(chunkdex),
 				go.transform.localPosition, // 0's, transform is below
 				@const.quaternionIdentity);
 			childGO.transform.SetParent(go.transform); // Set parent prior

@@ -610,7 +610,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,251); // wmarksman
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashMK3.SetActive(true);
-				smoke = GameBindings.InstantiatePrefab(muzSmokeMK3,muzFlashMK3.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = RootInstaller.InstantiatePrefab(muzSmokeMK3,muzFlashMK3.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;
@@ -640,7 +640,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,243); // wflechette
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashFlechette.SetActive(true);
-				smoke = GameBindings.InstantiatePrefab(muzSmokeFlechette,muzFlashFlechette.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = RootInstaller.InstantiatePrefab(muzSmokeFlechette,muzFlashFlechette.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 1;
@@ -672,7 +672,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,249); // wmagnum
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashMagnum.SetActive(true);
-				smoke = GameBindings.InstantiatePrefab(muzSmokeMagnum,muzFlashMagnum.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = RootInstaller.InstantiatePrefab(muzSmokeMagnum,muzFlashMagnum.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 3;
@@ -688,7 +688,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,255); // wpistol
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashPistol.SetActive(true);
-				smoke = GameBindings.InstantiatePrefab(muzSmokePistol,muzFlashPistol.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = RootInstaller.InstantiatePrefab(muzSmokePistol,muzFlashPistol.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 1;
@@ -712,7 +712,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,259); // wrailgun
                 FireRailgun(index);
 				muzFlashRailgun.SetActive(true);
-				smoke = GameBindings.InstantiatePrefab(muzSmokeRailgun,muzFlashRailgun.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = RootInstaller.InstantiatePrefab(muzSmokeRailgun,muzFlashRailgun.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;
@@ -722,7 +722,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,262); // wriotgun
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashRiotgun.SetActive(true);
-				smoke = GameBindings.InstantiatePrefab(muzSmokeRiotgun,muzFlashRiotgun.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = RootInstaller.InstantiatePrefab(muzSmokeRiotgun,muzFlashRiotgun.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 4;
@@ -732,7 +732,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,263); // wskorpion
                 if (DidRayHit(index)) HitScanFire(index);
 				muzFlashSkorpion.SetActive(true);
-				smoke = GameBindings.InstantiatePrefab(muzSmokeSkorpion,muzFlashSkorpion.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = RootInstaller.InstantiatePrefab(muzSmokeSkorpion,muzFlashSkorpion.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;
@@ -868,7 +868,7 @@ public class WeaponFire : MonoBehaviour {
 			case 15: holetype = _consts.GetPrefab(520); break;
 		}
 
-		GameObject impactMark = GameBindings.InstantiatePrefab(holetype,
+		GameObject impactMark = RootInstaller.InstantiatePrefab(holetype,
 			(tempHit.point + tempVec),
 			Quaternion.LookRotation(tempHit.normal*-1,Vector3.up),
 			hitGO.transform);
@@ -919,7 +919,7 @@ public class WeaponFire : MonoBehaviour {
         else  if (wep16index == 4) laserIndex = 407; // Yellow laser for ion
 
 		GameObject dynamicObjectsContainer = _levelManager.GetCurrentDynamicContainer();
-		GameObject lasertracer = GameBindings.InstantiatePrefab(_consts.GetPrefab(laserIndex),transform.position,_consts.quaternionIdentity) as GameObject;
+		GameObject lasertracer = RootInstaller.InstantiatePrefab(_consts.GetPrefab(laserIndex),transform.position,_consts.quaternionIdentity) as GameObject;
 
 		// Temporary object only, no need to save or mark as instantiated.
 		if (lasertracer != null) {
@@ -966,7 +966,7 @@ public class WeaponFire : MonoBehaviour {
 		bool showAttitude = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1;
 		bool showName = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1;
 
-		GameObject idFrame = GameBindings.InstantiatePrefab(_consts.GetPrefab(736), hm.transform.position, _consts.quaternionIdentity) as GameObject;
+		GameObject idFrame = RootInstaller.InstantiatePrefab(_consts.GetPrefab(736), hm.transform.position, _consts.quaternionIdentity) as GameObject;
 		if (idFrame == null) return;
 
 		TargetID tid = idFrame.GetComponent<TargetID>();

@@ -698,7 +698,7 @@ public class HealthManager : MonoBehaviour {
 		for (int i=0;i<4;i++) {
 			if (searchableItem.contents[i] < 0) continue;
 
-			GameObject tossObject = GameBindings.InstantiatePrefab(_consts.GetPrefab(searchableItem.contents[i] + 307),
+			GameObject tossObject = RootInstaller.InstantiatePrefab(_consts.GetPrefab(searchableItem.contents[i] + 307),
 				transform.position,_consts.quaternionIdentity);
 
 			if (tossObject != null) {

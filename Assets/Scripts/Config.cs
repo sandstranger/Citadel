@@ -11,17 +11,17 @@ public sealed class Config
 	private const string AUDIO_MODE_KEY = "AudioSpeakerMode";
 
 	[Inject]
-	private MainMenuHandler _mainMenuHandler;
+	private readonly MainMenuHandler _mainMenuHandler;
 	[Inject]
-	private Const _const;
+	private readonly Const _const;
 	[Inject]
-	private MFDManager _mfdManager;
+	private readonly MFDManager _mfdManager;
 	[Inject]
-	private MissionTimer _missionTimer;
+	private readonly MissionTimer _missionTimer;
 	[Inject]
-	private Music _music;
+	private readonly Music _music;
 	[Inject]
-	private DynamicCulling _dynamicCulling;
+	private readonly DynamicCulling _dynamicCulling;
 	private int lastAudioMode = -1;
 	
 	public void LoadConfig()

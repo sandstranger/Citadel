@@ -1207,7 +1207,7 @@ public class AIController : MonoBehaviour {
 
 		if (!hasLaser) return;
 
-		GameObject laz = GameBindings.InstantiatePrefab(_consts.GetPrefab(408),transform.position,
+		GameObject laz = RootInstaller.InstantiatePrefab(_consts.GetPrefab(408),transform.position,
 									 _consts.quaternionIdentity) as GameObject;
 
 		if (laz == null) return; // No laser!

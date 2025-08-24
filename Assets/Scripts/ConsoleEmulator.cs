@@ -17,27 +17,25 @@ using UnityEngine;
 // arrow or down arrow to change the entered text to the commands in memory.
 //
 // Does not support tab completion!  What do I look like a wizard?
-public sealed class ConsoleEmulator : SingletonHelper<ConsoleEmulator> {
+public sealed class ConsoleEmulator {
 	public readonly string[] lastCommand = new string[7];
-	[HideInInspector]
 	public int consoleMemdex;
-	[HideInInspector]
 	public GameObject lastSpawnedGO;
 
 	[Inject]
-	private LevelManager _levelManager;
+	private readonly LevelManager _levelManager;
 	[Inject]
-	private Const _consts;
+	private readonly Const _consts;
 	[Inject]
-	private Config _config;
-	[Inject] private MFDManager _mfdManager;
-	[Inject] private GetInput _getInput;
-	[Inject] private Inventory _inventory;
-	[Inject] private MouseLookScript _mouseLookScript;
-	[Inject] private LevelEditor _levelEditor;
-	[Inject] private PauseScript _pauseScript;
-	[Inject] private PlayerMovement _playerMovement;
-	[Inject] private WeaponCurrent _weaponCurrent;
+	private readonly Config _config;
+	[Inject] private readonly MFDManager _mfdManager;
+	[Inject] private readonly GetInput _getInput;
+	[Inject] private readonly Inventory _inventory;
+	[Inject] private readonly MouseLookScript _mouseLookScript;
+	[Inject] private readonly LevelEditor _levelEditor;
+	[Inject] private readonly PauseScript _pauseScript;
+	[Inject] private readonly PlayerMovement _playerMovement;
+	[Inject] private readonly WeaponCurrent _weaponCurrent;
 
 	public void ConsoleUpdate() {
         if (_getInput.Console()) _playerMovement.ToggleConsole();
@@ -1412,14 +1410,14 @@ Generic Materials (_consts.genericMaterials[])
 		GameObject go = null;
 		if (ConstIndexIsGeometry(val)) {
 			if (_consts.editMode || !cheat) {
-				go = GameBindings.InstantiatePrefab(_consts.GetPrefab(val),spawnPos,
+				go = RootInstaller.InstantiatePrefab(_consts.GetPrefab(val),spawnPos,
 									_consts.quaternionIdentity) as GameObject;
 			} else {
 				_consts.sprint("Indices 0 through 306 (level geometry chunks) "
 							 + "not possible when not on edit mode!");
 			}
 		} else {
-			go = GameBindings.InstantiatePrefab(_consts.GetPrefab(val),spawnPos, _consts.quaternionIdentity) as GameObject;
+			go = RootInstaller.InstantiatePrefab(_consts.GetPrefab(val),spawnPos, _consts.quaternionIdentity) as GameObject;
 		}
 
 		if (go != null) {

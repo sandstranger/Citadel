@@ -1218,7 +1218,7 @@ public class MouseLookScript : MonoBehaviour, IInitializer {
 				}
 			} else {
 				// Debug.Log("WARNING: Failed to get freeObjectInPool for object " + heldObject.ToString() + "being dropped! MouseLookScript DropHeldItem.",player);
-				tossObject = GameBindings.InstantiatePrefab(heldObject,(transform.position + (transform.forward * tossOffset)),
+				tossObject = RootInstaller.InstantiatePrefab(heldObject,(transform.position + (transform.forward * tossOffset)),
 					_consts.quaternionIdentity);  //effect
 				if (tossObject == null) {
 					_consts.sprint("BUG: Failed to instantiate object being dropped!",player);
@@ -1249,7 +1249,7 @@ public class MouseLookScript : MonoBehaviour, IInitializer {
 			// Throw an active grenade
 			grenadeActive = false;
 			_mfdManager.mouseClickHeldOverGUI = true; // Prevent shooting it.
-			tossObject = GameBindings.InstantiatePrefab(heldObject,(transform.position + (transform.forward * tossOffset)),
+			tossObject = RootInstaller.InstantiatePrefab(heldObject,(transform.position + (transform.forward * tossOffset)),
 				_consts.quaternionIdentity);  //effect
 			if (tossObject == null) {
 				_consts.sprint("BUG: Failed to instantiate object being dropped!",player);

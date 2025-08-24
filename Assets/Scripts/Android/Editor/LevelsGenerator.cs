@@ -16,9 +16,9 @@ namespace Citadel.Android.Tools
         internal static void GenerateLevelsPrefabs()
         {
             LevelManager levelManager = GameObject.FindAnyObjectByType<LevelManager>();
-            ConsoleEmulator consoleEmulator = GameObject.FindAnyObjectByType<ConsoleEmulator>();
             Const @consts = GameObject.FindAnyObjectByType<Const>();
-            
+            ConsoleEmulator consoleEmulator = @consts?.ConsoleEmulator;
+
             if (levelManager == null || consoleEmulator == null || consts == null)
             {
                 return;
