@@ -110,7 +110,7 @@ public class LevelManager : MonoBehaviour
 			LoadDynamicObjectsSavestrings();
 		}
 
-		if (UseDynamicLevelsLoading)
+		if (!Const.StartingNewGame && UseDynamicLevelsLoading)
 		{
 			LoadLevelData(currentLevel);
 		}
