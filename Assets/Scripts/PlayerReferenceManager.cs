@@ -35,7 +35,7 @@ public class PlayerReferenceManager : SingletonHelper<PlayerReferenceManager> {
 	
 	public static string SavePlayerData(GameObject plyr, PrefabIdentifier prefID) {
 		PlayerReferenceManager PRman = plyr.GetComponent<PlayerReferenceManager>();
-        StringBuilder s1 = new StringBuilder();
+        StringBuilder s1 = new StringBuilder(200);
         s1.Clear();
 		s1.Append("Hacker");//s1.Append(_consts.playerName);
         s1.Append(Utils.splitChar); s1.Append(PlayerHealth.Save(PRman.playerCapsule));

@@ -32,8 +32,8 @@ public class QuestLogNotesManager : MonoBehaviour
 	// 16- Access the bridge.														DONE, CHECK DONE
 	// 17- Destroy SHODAN. 															DONE, N/A CAN'T SEE DURING CREDITS
 	
-	[Inject] private Const _consts;
-	[Inject] private Inventory _inventory;
+	[Inject] private readonly Const _consts;
+	[Inject] private readonly Inventory _inventory;
 
 	void Awake()
 	{
@@ -47,13 +47,13 @@ public class QuestLogNotesManager : MonoBehaviour
 		}
 		labels[6].text = _consts.stringTable[554]; // Set:Escape neurosurgery suite.
 		notes[6].SetActive(true);
-		if (_inventory != null) _inventory.hasNewNotes = true;
+		_inventory.hasNewNotes = true;
 	}
 
 	public void NotifyDoorUnlock(Door d) {
 		if (d == neuroSurgeryDoor) {
 			checkBoxes[6].isOn = true; // Escape neurosurgery suite.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		}
 	}
 
@@ -61,7 +61,7 @@ public class QuestLogNotesManager : MonoBehaviour
 		if (d!=null && d.gameObject.name == DoorTo7Name) {
 			notes[12].SetActive(true); // Jettison Beta Grove.
 			labels[12].text = _consts.stringTable[565];
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		}
 	}
 
@@ -69,36 +69,36 @@ public class QuestLogNotesManager : MonoBehaviour
 		if (levelIndex != 1) {
 			notes[6].SetActive(true); // Escape neurosurgery suite.
 			checkBoxes[6].isOn = true;	// Escape neurosurgery suite.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		}
 		
 		if (levelIndex == 2) {
 			notes[1].SetActive(true); // Destroy level 2 nodes.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		} else if (levelIndex == 3) {
 			notes[2].SetActive(true); // Destroy level 3 nodes.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		} else if (levelIndex == 4) {
 			notes[3].SetActive(true); // Destroy level 4 nodes.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		} else if (levelIndex == 5) {
 			notes[4].SetActive(true); // Destroy level 5 nodes.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		} else if (levelIndex == 6) {
 			notes[5].SetActive(true); // Destroy level 6 nodes.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		} else if (levelIndex == 7) {
 			notes[13].SetActive(true); // Destroy the four relay antennae.
 			notes[16].SetActive(true); // Access the bridge.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		} else if (levelIndex == 8) {
 			notes[16].SetActive(true); // Access the bridge.
 			notes[17].SetActive(true); // Destroy SHODAN. 
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		} else if (levelIndex == 9) {
 			notes[16].SetActive(true); // Access the bridge.
 			checkBoxes[16].isOn = true; // Access the bridge.
-			if (_inventory != null) _inventory.hasNewNotes = true;
+			_inventory.hasNewNotes = true;
 		}
 	}
 
@@ -276,8 +276,7 @@ public class QuestLogNotesManager : MonoBehaviour
 	}
 	
 	public string Save() {
-		StringBuilder s1 = new StringBuilder();
-		s1.Clear();
+		StringBuilder s1 = new StringBuilder(200);
 		for (int i=0;i<18;i++) {
 			s1.Append(Utils.BoolToString(notes[i].activeSelf,"notes[" + i.ToString() + "].activeSelf"));
 			s1.Append(Utils.splitChar);
