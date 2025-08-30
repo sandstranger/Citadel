@@ -32,9 +32,6 @@ Shader "Custom/URPAutomapMaskingFoW"
         Pass
         {
             Name "MaskingPass"
-            Tags { "LightMode" = "UniversalForward" }
-            
-            // Явное указание ColorMask 0 как в исходном шейдере
             ColorMask 0
        
             HLSLPROGRAM

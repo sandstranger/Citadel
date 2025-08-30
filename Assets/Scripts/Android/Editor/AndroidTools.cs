@@ -28,11 +28,11 @@ namespace Citadel.Android.Tools
 
             foreach (var shader in allShaders)
             {
-                var usedMaterials = allMaterials.Where(material => material.shader.name == shader.name ).ToArray();
+                var usedMaterials = allMaterials.Where(material => material.shader.name == shader.name ).Select(material => material.name).ToList();
 
-                if (usedMaterials.Length > 0)
+                if (usedMaterials.Count > 0)
                 {
-                    Debug.Log($"Shader \"{shader.name}]\" are using in {string.Join(",",usedMaterials.Select(material => material.name))} materials");
+                    Debug.Log($"Shader \"{shader.name}]\" are using in {string.Join(",",usedMaterials)} materials");
                 }
             }
         }
