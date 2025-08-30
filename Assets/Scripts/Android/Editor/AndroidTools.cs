@@ -20,6 +20,23 @@ namespace Citadel.Android.Tools
             Debug.Log($"Setted mix render mode for {allLights.Length} lights");
         }
 
+        [MenuItem("Tools/Find all using shaders in materials (Advanced)")]
+        public static void FindAllUsingShaders()
+        {
+            var allShaders = FindAllComponentsInProject<Shader>();
+            var allMaterials = FindAllComponentsInProject<Material>();
+
+            foreach (var shader in allShaders)
+            {
+                var usedMaterialsCount = allMaterials.Count(material => material.shader.name == shader.name );
+
+                if (usedMaterialsCount > 0)
+                {
+                    Debug.Log($"Shader \"{shader.name}]\" are using in {usedMaterialsCount} materials");
+                }
+            }
+        }
+        
         [MenuItem("Tools/Find MeshRenderers Without Mesh (Advanced)")]
         public static void FindMeshRenderersAdvanced()
         {
@@ -115,11 +132,31 @@ namespace Citadel.Android.Tools
             return string.Join("/", pathParts);
         }
 
+        private static IReadOnlyList<T> FindAllComponentsInProject<T>() where T : Object
+        {
+            var components = new List<T>();
+            var guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}", new[] { "Assets" });
+
+            foreach (string guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var @object = AssetDatabase.LoadAssetAtPath<T>(path);
+
+                if (@object != null)
+                {
+                    components.Add(@object);
+                }
+            }
+
+            return components;
+        }
+        
         private class MissingMeshInfo
         {
             public string prefabPath;
             public string objectPath;
             public string componentType;
         }
+        
     }
 }

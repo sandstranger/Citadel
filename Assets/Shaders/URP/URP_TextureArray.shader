@@ -153,8 +153,7 @@ Shader "Custom/URPTextureArray"
             {
                 UNITY_SETUP_INSTANCE_ID(input);
 
-                // Get texture array index (you'll need to define how to get this)
-                float arrayIndex = input.uv.z; // Replace with your logic to get array index
+                float arrayIndex = input.uv.z;
                 float2 position = input.uv.xy;
                 // Sample textures from array
                 half4 albedo = SAMPLE_TEXTURE2D_ARRAY(_MainTex, sampler_MainTex, position, arrayIndex);
