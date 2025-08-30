@@ -35,6 +35,7 @@ Shader "Custom/URP3DTextShader" {
             struct Varyings {
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
+                float4 tangent : TANGENT;  // ДОБАВИЛ
                 float3 normalWS : TEXCOORD1;
             };
 
@@ -49,6 +50,7 @@ Shader "Custom/URP3DTextShader" {
                 Varyings OUT;
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
+                OUT.tangent = float4(1, 0, 0, 1);  // ДОБАВИЛ
                 OUT.normalWS = TransformObjectToWorldNormal(float3(0, 0, -1));
                 return OUT;
             }
