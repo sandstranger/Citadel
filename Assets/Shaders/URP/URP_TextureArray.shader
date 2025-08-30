@@ -1,189 +1,256 @@
-Shader "Custom/URPTextureArray" {
-    Properties {
-        [MainTexture] _MainTex("Albedo", 2DArray) = "white" {}
-        [MainColor] _BaseColor("Color", Color) = (1,1,1,1)
-        _Slice("Array Slice", Float) = 0
-        _SpecGlossMap("Specular", 2DArray) = "white" {}
-        _Smoothness("Smoothness", Range(0,1)) = 0.5
-        [Normal] _BumpMap("Normal Map", 2DArray) = "bump" {}
-        _BumpScale("Normal Scale", Float) = 1.0
-        [HDR] _EmissionColor("Emission Color", Color) = (0,0,0)
-        _EmissionMap("Emission", 2DArray) = "black" {}
+Shader "Custom/URPTextureArray"
+{
+    Properties
+    {
+        _MainTex("Albedo", 2DArray) = "" {}
+        _SpecGlossMap("Specular", 2DArray) = "" {}
+        _BumpScale("Scale", Float) = 1.0
+        _BumpMap("Normal Map", 2DArray) = "" {}
+        _EmissionColor("Color", Color) = (1,1,1)
+        _EmissionMap("Emission", 2DArray) = "" {}
+
+        [HideInInspector] _Mode ("__mode", Float) = 0.0
+        [HideInInspector] _SrcBlend ("__src", Float) = 1.0
+        [HideInInspector] _DstBlend ("__dst", Float) = 0.0
+        [HideInInspector] _ZWrite ("__zw", Float) = 1.0
     }
-    SubShader {
-        Tags {
+
+    SubShader
+    {
+        Tags
+        {
             "RenderType" = "Opaque"
             "RenderPipeline" = "UniversalPipeline"
             "UniversalMaterialType" = "Lit"
+            "IgnoreProjector" = "True"
         }
         LOD 300
-        Pass {
+
+        // ------------------------------------------------------------------
+        //  GBuffer pass (for deferred rendering)
+        // ------------------------------------------------------------------
+        Pass
+        {
             Name "GBuffer"
-            Tags { "LightMode" = "UniversalGBuffer" }
+            Tags
+            {
+                "LightMode" = "UniversalGBuffer"
+            }
+
+            ZWrite [_ZWrite]
+            ZTest LEqual
+
             HLSLPROGRAM
-            #pragma target 4.5
             #pragma vertex vert
             #pragma fragment frag
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            // -------------------------------------
+            // Universal Render Pipeline keywords
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
+            #pragma multi_compile_fragment _ _RENDER_PASS_ENABLED
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
+            #pragma multi_compile_fragment _ _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+
+            // -------------------------------------
+            // Unity defined keywords
+            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
+            #pragma multi_compile _ LIGHTMAP_ON
+
+            //--------------------------------------
+            // GPU Instancing
             #pragma multi_compile_instancing
-            #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _EMISSION
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/GBufferOutput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/UnityGBuffer.hlsl"
 
-            #ifndef GBUFFEROUTPUT_DEFINED
-            struct GBufferOutput {
-                float4 GBuffer0 : SV_Target0;
-                float4 GBuffer1 : SV_Target1;
-                float4 GBuffer2 : SV_Target2;
-                float4 GBuffer3 : SV_Target3;
-            };
-            #define GBUFFEROUTPUT_DEFINED 1
-            #endif
-            TEXTURE2D_ARRAY(_MainTex); SAMPLER(sampler_MainTex);
-            TEXTURE2D_ARRAY(_SpecGlossMap); SAMPLER(sampler_SpecGlossMap);
-            TEXTURE2D_ARRAY(_BumpMap); SAMPLER(sampler_BumpMap);
-            TEXTURE2D_ARRAY(_EmissionMap); SAMPLER(sampler_EmissionMap);
-            CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
-                float4 _BaseColor;
-                float _Slice;
-                float _BumpScale;
-                float _Smoothness;
-                float4 _EmissionColor;
-            CBUFFER_END
-            struct Attributes {
+            struct Attributes
+            {
                 float4 positionOS : POSITION;
                 float3 normalOS : NORMAL;
                 float4 tangentOS : TANGENT;
-                float2 texcoord : TEXCOORD0;
+                float3 texcoord : TEXCOORD0;
+                float2 lightmapUV : TEXCOORD1;
+                float4 color : COLOR; // Add vertex color input
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
-            struct Varyings {
+
+            struct Varyings
+            {
+                float3 uv : TEXCOORD0;
+                DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 1);
+
+                float3 positionWS : TEXCOORD2;
+                float3 normalWS : TEXCOORD3;
+                float4 tangentWS : TEXCOORD4;
+                float3 viewDirWS : TEXCOORD5;
+
+                half4 fogFactorAndVertexLight : TEXCOORD6;
+                float4 shadowCoord : TEXCOORD7;
+
                 float4 positionCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-                float3 positionWS : TEXCOORD1;
-                float3 normalWS : TEXCOORD2;
-                float4 tangentWS : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
-                UNITY_VERTEX_OUTPUT_STEREO
             };
-            Varyings vert(Attributes input) {
-                Varyings o = (Varyings)0;
-                UNITY_SETUP_INSTANCE_ID(input);
-                UNITY_TRANSFER_INSTANCE_ID(input, o);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-                VertexPositionInputs vpos = GetVertexPositionInputs(input.positionOS.xyz);
-                VertexNormalInputs vnorm = GetVertexNormalInputs(input.normalOS, input.tangentOS);
-                o.positionCS = vpos.positionCS;
-                o.uv = TRANSFORM_TEX(input.texcoord, _MainTex);
-                o.positionWS = vpos.positionWS;
-                o.normalWS = vnorm.normalWS;
-                o.tangentWS = float4(vnorm.tangentWS, input.tangentOS.w);
-                return o;
+
+            TEXTURE2D_ARRAY(_MainTex);
+            SAMPLER(sampler_MainTex);
+            TEXTURE2D_ARRAY(_SpecGlossMap);
+            SAMPLER(sampler_SpecGlossMap);
+            TEXTURE2D_ARRAY(_BumpMap);
+            SAMPLER(sampler_BumpMap);
+            TEXTURE2D_ARRAY(_EmissionMap);
+            SAMPLER(sampler_EmissionMap);
+
+            CBUFFER_START(UnityPerMaterial)
+                float _BumpScale;
+                float4 _MainTex_ST;
+                half4 _EmissionColor;
+            CBUFFER_END
+
+            float4 TexCoords(Attributes v)
+            {
+                float4 texcoord;
+                texcoord.xy = TRANSFORM_TEX(v.texcoord, _MainTex); // Always source from uv0
+                texcoord.z = floor(v.color.r * 255);
+                return texcoord;
             }
-            GBufferOutput frag(Varyings input) {
+
+            Varyings vert(Attributes input)
+            {
+                Varyings output = (Varyings)0;
+
                 UNITY_SETUP_INSTANCE_ID(input);
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                float2 uv = input.uv;
-                float slice = _Slice;
-                // Albedo
-                float4 albedoAlpha = SAMPLE_TEXTURE2D_ARRAY(_MainTex, sampler_MainTex, uv, slice) * _BaseColor;
-                // Specular
-                float4 specGloss = SAMPLE_TEXTURE2D_ARRAY(_SpecGlossMap, sampler_SpecGlossMap, uv, slice);
-                // Normal
-                float3 normalTS = UnpackNormalScale(SAMPLE_TEXTURE2D_ARRAY(_BumpMap, sampler_BumpMap, uv, slice), _BumpScale);
-                float3 normalWS = input.normalWS;
-                float3 bitangent = input.tangentWS.w * cross(input.normalWS, input.tangentWS.xyz);
-                normalWS = TransformTangentToWorld(normalTS, float3x3(input.tangentWS.xyz, bitangent, input.normalWS));
-                normalWS = normalize(normalWS);
-                // Emission
-                float3 emission = 0;
-                emission = SAMPLE_TEXTURE2D_ARRAY(_EmissionMap, sampler_EmissionMap, uv, slice).rgb * _EmissionColor.rgb;
-                GBufferOutput o;
-                o.GBuffer0 = float4(albedoAlpha.rgb, 1);
-                o.GBuffer1 = float4(specGloss.rgb, specGloss.a * _Smoothness);
-                o.GBuffer2 = float4(normalWS * 0.5 + 0.5, 1);
-                o.GBuffer3 = float4(emission, 1);
-                return o;
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+
+                VertexPositionInputs vertexInput = GetVertexPositionInputs(input.positionOS.xyz);
+                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS, input.tangentOS);
+
+                output.uv = TexCoords(input);
+                output.positionWS = vertexInput.positionWS;
+                output.normalWS = normalInput.normalWS;
+                output.tangentWS = float4(normalInput.tangentWS.xyz, input.tangentOS.w * GetOddNegativeScale());
+                output.viewDirWS = GetWorldSpaceViewDir(vertexInput.positionWS);
+                output.positionCS = vertexInput.positionCS;
+
+                OUTPUT_LIGHTMAP_UV(input.lightmapUV, unity_LightmapST, output.lightmapUV);
+                OUTPUT_SH(output.normalWS.xyz, output.vertexSH);
+
+                half3 vertexLight = VertexLighting(vertexInput.positionWS, normalInput.normalWS);
+                half fogFactor = ComputeFogFactor(vertexInput.positionCS.z);
+                output.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
+
+                output.shadowCoord = GetShadowCoord(vertexInput);
+
+                return output;
+            }
+
+            GBufferFragOutput frag(Varyings input)
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+
+                // Get texture array index (you'll need to define how to get this)
+                float arrayIndex = input.uv.z; // Replace with your logic to get array index
+                float2 position = input.uv.xy;
+                // Sample textures from array
+                half4 albedo = SAMPLE_TEXTURE2D_ARRAY(_MainTex, sampler_MainTex, position, arrayIndex);
+                half4 specGloss = SAMPLE_TEXTURE2D_ARRAY(_SpecGlossMap, sampler_SpecGlossMap, position, arrayIndex);
+                half3 normalTS = UnpackNormalScale(
+                    SAMPLE_TEXTURE2D_ARRAY(_BumpMap, sampler_BumpMap, position, arrayIndex), _BumpScale);
+                half3 emission = SAMPLE_TEXTURE2D_ARRAY(_EmissionMap, sampler_EmissionMap, position, arrayIndex).rgb
+                    * _EmissionColor.rgb;
+
+                InputData inputData = (InputData)0;
+                inputData.positionWS = input.positionWS;
+                inputData.normalWS = TransformTangentToWorld(normalTS, half3x3(input.tangentWS.xyz,
+                                                             cross(input.normalWS, input.tangentWS.xyz) * input.
+                                                             tangentWS.w,
+                                                             input.normalWS));
+                inputData.normalWS = NormalizeNormalPerPixel(inputData.normalWS);
+                inputData.viewDirectionWS = SafeNormalize(input.viewDirWS);
+                inputData.shadowCoord = input.shadowCoord;
+                inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
+                inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
+
+                SurfaceData surfaceData;
+                surfaceData.albedo = albedo.rgb;
+                surfaceData.specular = specGloss.rgb;
+                surfaceData.metallic = 0.0;
+                surfaceData.smoothness = specGloss.a;
+                surfaceData.normalTS = normalTS;
+                surfaceData.emission = emission;
+                surfaceData.occlusion = 1.0;
+                surfaceData.alpha = albedo.a;
+                surfaceData.clearCoatMask = 0.0;
+                surfaceData.clearCoatSmoothness = 0.0;
+
+                return SurfaceDataToGbuffer(surfaceData, inputData, surfaceData.smoothness,
+              surfaceData.emission + inputData.bakedGI * surfaceData.albedo);
             }
             ENDHLSL
         }
-        Pass {
+
+        // Shadow Caster Pass
+        Pass
+        {
             Name "ShadowCaster"
-            Tags { "LightMode" = "ShadowCaster" }
+            Tags
+            {
+                "LightMode" = "ShadowCaster"
+            }
+
             ZWrite On
             ZTest LEqual
             Cull Off
-            HLSLPROGRAM
-            #pragma target 4.5
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma multi_compile_shadowcaster
-            #pragma multi_compile_instancing
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            struct Attributes {
-                float4 positionOS : POSITION;
-                float3 normalOS : NORMAL;
-                float2 texcoord : TEXCOORD0;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-            };
-            struct Varyings {
-                float4 positionCS : SV_POSITION;
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-                UNITY_VERTEX_OUTPUT_STEREO
-            };
-            Varyings vert(Attributes input) {
-                Varyings o = (Varyings)0;
-                UNITY_SETUP_INSTANCE_ID(input);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-                o.positionCS = TransformObjectToHClip(input.positionOS.xyz);
-                return o;
-            }
-            float4 frag(Varyings input) : SV_Target {
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                return 0;
-            }
-            ENDHLSL
-        }
-        Pass {
-            Name "DepthOnly"
-            Tags { "LightMode" = "DepthOnly" }
-            ZWrite On
             ColorMask 0
-            Cull[_Cull]
+
             HLSLPROGRAM
-            #pragma target 4.5
             #pragma vertex vert
             #pragma fragment frag
+
             #pragma multi_compile_instancing
+
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            struct Attributes {
+
+            struct Attributes
+            {
                 float4 positionOS : POSITION;
                 float2 texcoord : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
-            struct Varyings {
+
+            struct Varyings
+            {
+                float2 uv : TEXCOORD0;
                 float4 positionCS : SV_POSITION;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
-                UNITY_VERTEX_OUTPUT_STEREO
             };
-            Varyings vert(Attributes input) {
-                Varyings o = (Varyings)0;
+
+            Varyings vert(Attributes input)
+            {
+                Varyings output = (Varyings)0;
                 UNITY_SETUP_INSTANCE_ID(input);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-                o.positionCS = TransformObjectToHClip(input.positionOS.xyz);
-                return o;
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+
+                output.uv = input.texcoord;
+                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+                return output;
             }
-            float4 frag(Varyings input) : SV_Target {
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+            half4 frag(Varyings input) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
                 return 0;
             }
             ENDHLSL
         }
     }
-    FallBack "Hidden/Universal Render Pipeline/FallbackError"
+
+    FallBack "Universal Render Pipeline/Lit"
 }
