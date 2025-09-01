@@ -16,6 +16,8 @@ Shader "Custom/URPViewWeapons"
             "RenderPipeline" = "UniversalPipeline"
         }
         
+        ZWrite On ZTest LEqual
+		Lighting On
         ZWrite On 
         ZTest LEqual
         Cull Back
