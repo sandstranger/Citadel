@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static Citadel.Editor.Utils;
 
 namespace Citadel.Android.Tools
 {
@@ -32,7 +32,7 @@ namespace Citadel.Android.Tools
 
                 if (usedMaterials.Count > 0)
                 {
-                    Debug.Log($"Shader \"{shader.name}]\" are using in {string.Join(",",usedMaterials)} materials");
+                    Debug.Log($"Shader \"{shader.name}\" are using in {string.Join(",",usedMaterials)} materials");
                 }
             }
         }
@@ -132,25 +132,6 @@ namespace Citadel.Android.Tools
             return string.Join("/", pathParts);
         }
 
-        private static IReadOnlyList<T> FindAllComponentsInProject<T>() where T : Object
-        {
-            var components = new List<T>();
-            var guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}", new[] { "Assets" });
-
-            foreach (string guid in guids)
-            {
-                var path = AssetDatabase.GUIDToAssetPath(guid);
-                var @object = AssetDatabase.LoadAssetAtPath<T>(path);
-
-                if (@object != null)
-                {
-                    components.Add(@object);
-                }
-            }
-
-            return components;
-        }
-        
         private class MissingMeshInfo
         {
             public string prefabPath;

@@ -523,7 +523,7 @@ MonoBehaviour:
     - line: '|     m_StaticBatching: 0'
     - line: '|     m_DynamicBatching: 1'
     - line: '|   - m_BuildTarget: Android'
-    - line: '|     m_StaticBatching: 1'
+    - line: '|     m_StaticBatching: 0'
     - line: '|     m_DynamicBatching: 1'
     - line: '|   m_BuildTargetShaderSettings: []'
     - line: '|   m_BuildTargetGraphicsJobs:'
