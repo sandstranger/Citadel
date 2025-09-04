@@ -215,7 +215,7 @@ MonoBehaviour:
     - line: '|   keepLoadedShadersAlive: 1'
     - line: '|   StripUnusedMeshComponents: 1'
     - line: '|   strictShaderVariantMatching: 0'
-    - line: '|   VertexChannelCompressionMask: 6'
+    - line: '|   VertexChannelCompressionMask: 246'
     - line: '|   iPhoneSdkVersion: 988'
     - line: '|   iOSSimulatorArchitecture: 0'
     - line: '|   iOSTargetOSVersionString: 13.0'
