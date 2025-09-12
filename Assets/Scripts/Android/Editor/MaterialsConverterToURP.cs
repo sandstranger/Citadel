@@ -61,7 +61,7 @@ namespace Citadel.Editor
                     { "Legacy Shaders/Transparent/Cutout/Specular", Shader.Find("Universal Render Pipeline/Lit") }
                 };
             });
-        
+
         [MenuItem("Tools/Convert all materials to URP")]
         private static void ConvertAllMaterialsToURP()
         {

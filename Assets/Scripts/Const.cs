@@ -311,7 +311,6 @@ public class Const : SingletonHelper<Const>
 	public Material segiEmitterMaterialRedFaint;
 	public const float segiVoxelSize = 0.4f;
 	public const float segiReducedExposure = 0.52f;
-	public GameObject testSphere;
 
 	// Irrelevant to inspector constants; automatically assigned during initialization or play.
 	[HideInInspector] public int AudioSpeakerMode;
@@ -2360,7 +2359,6 @@ CreateBlackTexture:
 		segiEmitterMaterialBlue = null;
 		segiEmitterMaterialPurple = null;
 		segiEmitterMaterialRedFaint = null;
-		testSphere = null;
 		npcCount = null;
 		audioLogImagesRefIndicesLH = null;
 		audioLogImagesRefIndicesRH = null;
