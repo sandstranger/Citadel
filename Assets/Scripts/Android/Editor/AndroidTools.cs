@@ -23,16 +23,16 @@ namespace Citadel.Android.Tools
         [MenuItem("Tools/Find all using shaders in materials (Advanced)")]
         public static void FindAllUsingShaders()
         {
-            var allShaders = FindAllComponentsInProject<Shader>();
+            var allShaders = FindAllComponentsInProject<Shader>().Select(shader => shader.name).Append("Legacy Shaders/Transparent/Bumped Diffuse").ToArray();
             var allMaterials = FindAllComponentsInProject<Material>();
 
-            foreach (var shader in allShaders)
+            foreach (var shaderName in allShaders)
             {
-                var usedMaterials = allMaterials.Where(material => material.shader.name == shader.name ).Select(material => material.name).ToList();
+                var usedMaterials = allMaterials.Where(material => material.shader.name == shaderName ).Select(material => material.name).ToList();
 
                 if (usedMaterials.Count > 0)
                 {
-                    Debug.Log($"Shader \"{shader.name}\" are using in {string.Join(",",usedMaterials)} materials");
+                    Debug.Log($"Shader \"{shaderName}\" are using in {string.Join(",",usedMaterials)} materials");
                 }
             }
         }

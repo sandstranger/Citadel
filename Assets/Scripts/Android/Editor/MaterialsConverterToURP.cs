@@ -94,6 +94,9 @@ namespace Citadel.Editor
                         material.SetTexture("_BaseMap", texture);
                         material.DisableEmission();
                         break;
+                    case TransparentBumpedDiffuseShaderName:
+                        ConvertLegacyBumpedDiffuseToURP(material);
+                        break;
                     case StandardShaderName:
                         ConvertStandardShaderToURP(material);
                         break;
@@ -187,6 +190,21 @@ namespace Citadel.Editor
             material.SetFloat("_WindFrequency", 0.0f);
         }
         
+        private static void ConvertLegacyBumpedDiffuseToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            var color = material.GetColor("_Color");
+            var bumpMap = material.GetTexture("_BumpMap");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetColor("_BaseColor", color);
+            material.SetTexture("_BumpMap", bumpMap);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_BlendModePreserveSpecular", 0.0f);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+        
         private static void ConvertStandardShaderToURP(Material material)
         {
             StandardShaderRenderingMode renderingMode = (StandardShaderRenderingMode)Convert.ToUInt32(material.GetFloat("_Mode"));
@@ -230,8 +248,6 @@ namespace Citadel.Editor
             {
                 material.SetFloat("_Surface", 1.0f); 
                 material.SetFloat("_Blend", 0.0f);
-                material.SetFloat("_AlphaClip", renderingMode == StandardShaderRenderingMode.Fade ? 0.0f : 1.0f);
-                material.SetFloat("_Cutoff", 0.0f); 
                 material.EnableKeyword("_ALPHATEST_ON");
             }
         }
@@ -281,9 +297,7 @@ namespace Citadel.Editor
             else if (renderingMode is StandardShaderRenderingMode.Fade or StandardShaderRenderingMode.Transparent)
             {
                 material.SetFloat("_Surface", 1.0f); 
-                material.SetFloat("_Blend", renderingMode == StandardShaderRenderingMode.Fade ? 0.0f : 1.0f);
-                material.SetFloat("_AlphaClip", 1.0f);
-                material.SetFloat("_Cutoff", 0.0f); 
+                material.SetFloat("_Blend", 0.0f);
                 material.EnableKeyword("_ALPHATEST_ON");
             }
         }
