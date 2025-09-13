@@ -83,15 +83,9 @@ namespace Citadel.Editor
             
             foreach (var material in allMaterials)
             {
-                bool shaderConverted = false;
-                bool enableGpuInstancing = material.enableInstancing;
+                var enableGpuInstancing = material.enableInstancing;
+                var oldShaderName = material.shader.name;
                 
-                if (_urpShaders.Value.ContainsKey(material.shader.name))
-                {
-                    convertedMaterials.Add(material.name);
-                    shaderConverted = true;
-                }
-
                 switch (material.shader.name)
                 {
                     case MobileDiffuseShaderName:
@@ -106,12 +100,28 @@ namespace Citadel.Editor
                     case StandardSpecularShaderName:
                         ConvertStandartSpecularShaderToURP(material);
                         break;
+                    case Gui3DTextShaderName:
+                    case AutoMapMaskingShaderName:
+                    case StandardTextureArrayShaderName:   
+                    case ViewWeaponsShaderName:
+                    case WireframeOverlayShaderName:
+                        material.shader = _urpShaders.Value[oldShaderName];
+                        break;
+                    case HighlightShaderName:
+                        var rimPower = material.GetFloat("_RimPower") - 1.0f;
+                        material.shader = _urpShaders.Value[oldShaderName];
+                        material.SetFloat("_RimPower", rimPower);
+                        break;
+                    case GrassShaderName:
+                        ConvertGrassShaderToURP(material);
+                        break;
                     default:
                         break;
                 }
                 
-                if (shaderConverted)
+                if (_urpShaders.Value.ContainsKey(oldShaderName))
                 {
+                    convertedMaterials.Add(material.name);
                     material.enableInstancing = enableGpuInstancing;
                     try
                     {
@@ -137,6 +147,44 @@ namespace Citadel.Editor
             {
                 material.enableInstancing = false;
             }
+        }
+        
+        [MenuItem("Tools/Change Global Illumination from Realtime to Baked on all materials")]
+        private static void ChangeGlobalIlluminationFromRealtimeToBaked()
+        {
+            foreach (var material in FindAllComponentsInProject<Material>())
+            {
+                if (material.globalIlluminationFlags.HasFlag(MaterialGlobalIlluminationFlags.RealtimeEmissive))
+                {
+                    material.globalIlluminationFlags &= ~MaterialGlobalIlluminationFlags.RealtimeEmissive;
+                    material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.BakedEmissive;
+                }
+            }
+        }
+
+        private static void ConvertGrassShaderToURP(Material material)
+        {
+            var grassBaseColor = material.GetColor("_Color");
+            var minBladeWidth = material.GetFloat("_BladeWidthRandom");
+            var maxBladeWidth = material.GetFloat("_BladeWidth");
+            var minBladeHeight = material.GetFloat("_BladeHeightRandom");
+            var maxBladeHeight = material.GetFloat("_BladeHeight");
+            var bladeForward = material.GetFloat("_BladeForward");
+            var bladeCurve = material.GetFloat("_BladeCurve");
+            var bendRotation = material.GetFloat("_BendRotationRandom");
+            
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetColor("_BaseColor", grassBaseColor);
+            material.SetColor("_TipColor", grassBaseColor);
+            material.SetFloat("_BladeWidthMin", minBladeWidth);
+            material.SetFloat("_BladeWidthMax", maxBladeWidth);
+            material.SetFloat("_BladeHeightMin", minBladeHeight);
+            material.SetFloat("_BladeHeightMax", maxBladeHeight);
+            material.SetFloat("_BladeBendDistance", bladeForward);
+            material.SetFloat("_BladeBendCurve", bladeCurve);
+            material.SetFloat("_BendDelta", bendRotation);
+            material.SetFloat("_TessellationGrassDistance", 0.2f);
+            material.SetFloat("_WindFrequency", 0.0f);
         }
         
         private static void ConvertStandardShaderToURP(Material material)
