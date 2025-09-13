@@ -85,6 +85,7 @@ namespace Citadel.Editor
             {
                 var enableGpuInstancing = material.enableInstancing;
                 var oldShaderName = material.shader.name;
+                var oldShaderQueue = material.renderQueue;
                 
                 switch (material.shader.name)
                 {
@@ -114,7 +115,10 @@ namespace Citadel.Editor
                     case StandardTextureArrayShaderName:   
                     case ViewWeaponsShaderName:
                     case WireframeOverlayShaderName:
+                    case TwoSidedSpecularShaderName:  
+                    case BumpDistortShaderName:   
                         material.shader = _urpShaders.Value[oldShaderName];
+                        material.renderQueue = oldShaderQueue;
                         break;
                     case HighlightShaderName:
                         var rimPower = material.GetFloat("_RimPower") - 1.0f;
@@ -123,6 +127,33 @@ namespace Citadel.Editor
                         break;
                     case GrassShaderName:
                         ConvertGrassShaderToURP(material);
+                        break;
+                    case AlphaPremultiplyParticleShaderName:
+                        ConvertLegacyPremultiplyParticleShaderToURP(material);
+                        break;
+                    case AdditiveParticleShaderName:
+                        ConvertAdditiveParticleShaderNameToURP(material);
+                        break;
+                    case AlphaBlendedParticleShaderName:
+                        ConvertAlphaBlendedParticleShaderNameToURP(material);
+                        break;
+                    case VertexLitBlendedParticleShaderName:
+                        ConvertVertexLitBlendedParticleShaderNameToURP(material);
+                        break;
+                    case UnlitTransparentCutoutShaderName:
+                        ConvertUnlitTransparentCutoutToURP(material);
+                        break;
+                    case MultiplyParticleShaderName:
+                        ConvertLegacyMultiplyParticleShaderToURP(material);
+                        break;
+                    case MobileParticleAdditiveShaderName:
+                        ConvertMobileAdditiveParticleShaderNameToURP(material);
+                        break;
+                    case MobileParticleMultiplyShaderName:
+                        ConvertMobileMultiplyParticleShaderToURP(material);
+                        break;
+                    case StandardSurfaceParticleShaderName:
+                        ConvertStandardParticleShaderToURP(material);
                         break;
                     default:
                         break;
@@ -206,6 +237,20 @@ namespace Citadel.Editor
             material.DisableEmission();
         }
 
+        private static void ConvertUnlitTransparentCutoutToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            var cutoff = material.GetFloat("_Cutoff");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_AlphaClip", 1.0f);
+            material.SetFloat("_Blend", 0.0f);
+            material.SetFloat("_Cutoff", cutoff); 
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+
         private static void ConvertUnlitTextureToURP(Material material)
         {
             var texture = material.GetTexture("_MainTex");
@@ -225,6 +270,125 @@ namespace Citadel.Editor
             material.SetTexture("_BumpMap", bumpMap);
             material.SetFloat("_Surface", 1.0f);
             material.SetFloat("_BlendModePreserveSpecular", 0.0f);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+
+        private static void ConvertVertexLitBlendedParticleShaderNameToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_Blend", 0.0f);
+            material.SetFloat("_ColorMode", 0.0f);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+        
+        private static void ConvertAlphaBlendedParticleShaderNameToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            var invFade = material.GetFloat("_InvFade");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_Blend", 0.0f);
+            material.SetFloat("_ColorMode", 4.0f);
+            material.SetFloat("_SoftParticlesEnabled", 1.0f);
+            material.SetFloat("_SoftParticlesNearFadeDistance", invFade / 10.0f);
+            material.SetFloat("_SoftParticlesFarFadeDistance", invFade);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+        
+        private static void ConvertAdditiveParticleShaderNameToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            var invFade = material.GetFloat("_InvFade");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_Blend", 2.0f);
+            material.SetFloat("_ColorMode", 4.0f);
+            material.SetFloat("_SoftParticlesEnabled", 1.0f);
+            material.SetFloat("_SoftParticlesNearFadeDistance", invFade / 10.0f);
+            material.SetFloat("_SoftParticlesFarFadeDistance", invFade);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+
+        private static void ConvertMobileAdditiveParticleShaderNameToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_Blend", 2.0f);
+            material.SetFloat("_ColorMode", 4.0f);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+        
+        private static void ConvertLegacyPremultiplyParticleShaderToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            var invFade = material.GetFloat("_InvFade");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_Blend", 1.0f);
+            material.SetFloat("_ColorMode", 4.0f);
+            material.SetFloat("_SoftParticlesEnabled", 1.0f);
+            material.SetFloat("_SoftParticlesNearFadeDistance", invFade / 10.0f);
+            material.SetFloat("_SoftParticlesFarFadeDistance", invFade);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+        
+        private static void ConvertLegacyMultiplyParticleShaderToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            var invFade = material.GetFloat("_InvFade");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_Blend", 3.0f);
+            material.SetFloat("_ColorMode", 4.0f);
+            material.SetFloat("_SoftParticlesEnabled", 1.0f);
+            material.SetFloat("_SoftParticlesNearFadeDistance", invFade / 10.0f);
+            material.SetFloat("_SoftParticlesFarFadeDistance", invFade);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+        
+        private static void ConvertMobileMultiplyParticleShaderToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_Blend", 3.0f);
+            material.SetFloat("_ColorMode", 4.0f);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+        
+        private static void ConvertStandardParticleShaderToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            var color = material.GetColor("_Color");
+            var nearFadeDistance = material.GetFloat("_SoftParticlesNearFadeDistance");
+            var farFadeDistance = material.GetFloat("_SoftParticlesFarFadeDistance");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.SetFloat("_Blend", 0.0f);
+            material.SetFloat("_ColorMode", 0.0f);
+            material.SetColor("_BaseColor", color);
+            material.SetFloat("_SoftParticlesEnabled", 1.0f);
+            material.SetFloat("_SoftParticlesNearFadeDistance", nearFadeDistance);
+            material.SetFloat("_SoftParticlesFarFadeDistance", farFadeDistance);
             material.EnableKeyword("_ALPHATEST_ON");
             material.DisableEmission();
         }
