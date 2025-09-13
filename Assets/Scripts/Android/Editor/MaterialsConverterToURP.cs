@@ -94,6 +94,12 @@ namespace Citadel.Editor
                         material.SetTexture("_BaseMap", texture);
                         material.DisableEmission();
                         break;
+                    case UnlitTransparentShaderName:
+                        ConvertUnlitTransparentToURP(material);
+                        break;
+                    case UnlitTextureShaderName:
+                        ConvertUnlitTextureToURP(material);
+                        break;
                     case TransparentBumpedDiffuseShaderName:
                         ConvertLegacyBumpedDiffuseToURP(material);
                         break;
@@ -188,6 +194,24 @@ namespace Citadel.Editor
             material.SetFloat("_BendDelta", bendRotation);
             material.SetFloat("_TessellationGrassDistance", 0.2f);
             material.SetFloat("_WindFrequency", 0.0f);
+        }
+        
+        private static void ConvertUnlitTransparentToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.SetFloat("_Surface", 1.0f);
+            material.EnableKeyword("_ALPHATEST_ON");
+            material.DisableEmission();
+        }
+
+        private static void ConvertUnlitTextureToURP(Material material)
+        {
+            var texture = material.GetTexture("_MainTex");
+            material.shader = _urpShaders.Value[material.shader.name];
+            material.SetTexture("_BaseMap", texture);
+            material.DisableEmission();
         }
         
         private static void ConvertLegacyBumpedDiffuseToURP(Material material)
