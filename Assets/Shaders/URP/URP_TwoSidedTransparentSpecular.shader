@@ -198,56 +198,6 @@ Shader "Custom/URPTwoSidedTransparentSpecular" {
             }
             ENDHLSL
         }
-
-        // Depth-only pass for sorting
-        Pass {
-            Name "DepthOnly"
-            Tags { "LightMode" = "DepthOnly" }
-
-            ZWrite On
-            ColorMask 0
-            Cull Off
-
-            HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-
-            struct Attributes {
-                float4 positionOS : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct Varyings {
-                float4 positionHCS : SV_POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-
-            CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
-                float4 _Color;
-                float _Alpha;
-            CBUFFER_END
-
-            Varyings vert(Attributes IN) {
-                Varyings OUT;
-                VertexPositionInputs vertexInput = GetVertexPositionInputs(IN.positionOS.xyz);
-                OUT.positionHCS = vertexInput.positionCS;
-                OUT.uv = TRANSFORM_TEX(IN.uv, _MainTex);
-                return OUT;
-            }
-
-            half4 frag(Varyings IN) : SV_Target {
-                half4 texcol = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv) * _Color;
-                clip(texcol.a * _Alpha - 0.5);
-                return 0;
-            }
-            ENDHLSL
-        }
     }
     FallBack "Universal Render Pipeline/Unlit"
 }

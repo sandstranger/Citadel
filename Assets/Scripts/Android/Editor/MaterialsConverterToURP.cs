@@ -34,31 +34,44 @@ namespace Citadel.Editor
         private const string MobileParticleMultiplyShaderName = "Mobile/Particles/Multiply";
         private const string StandardSurfaceParticleShaderName = "Particles/Standard Surface";
         private const string TransparentBumpedDiffuseShaderName = "Legacy Shaders/Transparent/Bumped Diffuse";
+        private const string MobileDiffuseShaderName = "Mobile/Diffuse";
         
-        private static readonly Lazy<IReadOnlyDictionary<string,Shader>> _urpShaders = new Lazy<IReadOnlyDictionary<string,Shader>> (
-            () =>
+        private static readonly Lazy<IReadOnlyDictionary<string,Shader>> _urpShaders = new( () =>
             {
                 var urpLitShader = Shader.Find("Universal Render Pipeline/Lit");
                 var urpSimpleLitShader = Shader.Find("Universal Render Pipeline/Simple Lit");
+                var urpUnlitShader = Shader.Find("Universal Render Pipeline/Unlit");
+                var urpParticleShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
                 
-                return new Dictionary<string, Shader>()
+                return new Dictionary<string, Shader>
                 {
-                    { "Standard", urpLitShader },
-                    { "Standard (Specular setup)", urpLitShader },
-                    { "Unlit/Texture", Shader.Find("Universal Render Pipeline/Unlit") },
-                    { "Unlit/Color", Shader.Find("Universal Render Pipeline/Unlit") },
-                    { "Unlit/Transparent", Shader.Find("Universal Render Pipeline/Unlit") },
-                    { "Unlit/Transparent Cutout", Shader.Find("Universal Render Pipeline/Unlit") },
-                    { "Legacy Shaders/Diffuse", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Specular", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Bumped Diffuse", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Bumped Specular", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Parallax Diffuse", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Parallax Specular", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Transparent/Diffuse", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Transparent/Cutout/Diffuse", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Transparent/Specular", Shader.Find("Universal Render Pipeline/Lit") },
-                    { "Legacy Shaders/Transparent/Cutout/Specular", Shader.Find("Universal Render Pipeline/Lit") }
+                    { StandardShaderName, urpLitShader },
+                    { StandardSpecularShaderName, urpLitShader },
+                    { Gui3DTextShaderName, Shader.Find("Custom/URP3DTextShader") },
+                    { AutoMapMaskingShaderName, Shader.Find("Custom/URPAutomapMaskingFoW") },
+                    { StandardTextureArrayShaderName, Shader.Find("Custom/URPTextureArray") },
+                    { CustomTransparentCutoutShaderName, urpUnlitShader },
+                    { CustomTransparentCutoutOverlayShaderName, urpUnlitShader },
+                    { TwoSidedSpecularShaderName, Shader.Find("Custom/URPTwoSidedTransparentSpecular") },
+                    { GrassShaderName, Shader.Find("Custom/URPGrass") },
+                    { HighlightShaderName, Shader.Find("Custom/URPHighlightShader") },
+                    { ViewWeaponsShaderName, Shader.Find("Custom/URPViewWeapons") },
+                    { WireframeShaderName, Shader.Find("Custom/URPWireframe") },
+                    { WireframeOverlayShaderName, Shader.Find("Custom/URPWireframeOverlay") },
+                    { BumpDistortShaderName, Shader.Find("Custom/URPStained BumpDistort") },
+                    { UnlitTransparentShaderName, urpUnlitShader },
+                    { UnlitTextureShaderName, urpUnlitShader },
+                    { AlphaPremultiplyParticleShaderName, urpParticleShader },
+                    { AdditiveParticleShaderName, urpParticleShader },
+                    { AlphaBlendedParticleShaderName, urpParticleShader },
+                    { VertexLitBlendedParticleShaderName, urpParticleShader },
+                    { UnlitTransparentCutoutShaderName, urpUnlitShader },
+                    { MultiplyParticleShaderName, urpParticleShader },
+                    { MobileParticleAdditiveShaderName, urpParticleShader },
+                    { MobileParticleMultiplyShaderName, urpParticleShader },
+                    { StandardSurfaceParticleShaderName, urpParticleShader },
+                    { TransparentBumpedDiffuseShaderName, urpSimpleLitShader },
+                    { MobileDiffuseShaderName, urpSimpleLitShader },
                 };
             });
 
@@ -66,20 +79,180 @@ namespace Citadel.Editor
         private static void ConvertAllMaterialsToURP()
         {
             var allMaterials = FindAllComponentsInProject<Material>();
-            int convertedCount = 0;
-
+            List<string> convertedMaterials = new(allMaterials.Count);
+            
             foreach (var material in allMaterials)
             {
-                Debug.Log(material.shader.name);
+                bool shaderConverted = false;
+                bool enableGpuInstancing = material.enableInstancing;
                 
-                if (material.shader.name == "Standard")
+                if (_urpShaders.Value.ContainsKey(material.shader.name))
                 {
-//                    material.shader = Shader.Find("Universal Render Pipeline/Lit");
-                    convertedCount++;
+                    convertedMaterials.Add(material.name);
+                    shaderConverted = true;
+                }
+
+                switch (material.shader.name)
+                {
+                    case MobileDiffuseShaderName:
+                        var texture = material.GetTexture("_MainTex");
+                        material.shader = _urpShaders.Value[MobileDiffuseShaderName];
+                        material.SetTexture("_BaseMap", texture);
+                        material.DisableEmission();
+                        break;
+                    case StandardShaderName:
+                        ConvertStandardShaderToURP(material);
+                        break;
+                    case StandardSpecularShaderName:
+                        ConvertStandartSpecularShaderToURP(material);
+                        break;
+                    default:
+                        break;
+                }
+                
+                if (shaderConverted)
+                {
+                    material.enableInstancing = enableGpuInstancing;
+                    try
+                    {
+                        material.SetFloat("_XRMotionVectorsPass", 0.0f);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
 
-            Debug.Log($"Converted {convertedCount} materials to URP");
+            if (convertedMaterials.Count > 0)
+            {
+                Debug.Log($"Converted {string.Join(",", convertedMaterials)} materials to URP");
+                AssetDatabase.Refresh();
+            }
+        }
+        
+        [MenuItem("Tools/Disable GPU Instancing on all materials")]
+        private static void DisableGPUInstancing()
+        {
+            foreach (var material in FindAllComponentsInProject<Material>())
+            {
+                material.enableInstancing = false;
+            }
+        }
+        
+        private static void ConvertStandardShaderToURP(Material material)
+        {
+            StandardShaderRenderingMode renderingMode = (StandardShaderRenderingMode)Convert.ToUInt32(material.GetFloat("_Mode"));
+                    
+            var materialIllumination = material.globalIlluminationFlags;
+            var texture = material.GetTexture("_MainTex");
+            var normalMap = material.GetTexture("_BumpMap");
+            var color = material.GetColor("_Color");
+            var metallic = material.GetFloat("_Metallic");
+            var smoothness = material.GetFloat("_Glossiness");
+            var emissionColor = material.GetColor("_EmissionColor");
+            var glossyReflections = material.GetFloat("_GlossyReflections");
+            var specularHighlights = material.GetFloat("_SpecularHighlights");
+            var cutoff = material.GetFloat("_Cutoff");
+            
+            material.shader = _urpShaders.Value[StandardShaderName];
+            material.SetTexture("_BaseMap", texture);
+            material.SetColor("_BaseColor", color);
+            material.SetFloat("_Metallic", metallic);
+            material.SetFloat("_Smoothness", smoothness);
+            material.SetColor("_EmissionColor", emissionColor);
+            material.SetFloat("_GlossyReflections", glossyReflections);
+            material.SetFloat("_SpecularHighlights", specularHighlights);
+            material.SetTexture("_BumpMap", normalMap);
+            material.globalIlluminationFlags = materialIllumination;
+            
+            if (normalMap != null)
+            {
+                material.SetFloat("_BumpScale", 1.0f);
+            }
+            
+            if (renderingMode is StandardShaderRenderingMode.Cutout)
+            {
+                material.SetFloat("_Surface", 1.0f);
+                material.SetFloat("_AlphaClip", 1.0f);
+                material.SetFloat("_Blend", 0.0f);
+                material.SetFloat("_Cutoff", cutoff); 
+                material.EnableKeyword("_ALPHATEST_ON");
+            }
+            else if (renderingMode is StandardShaderRenderingMode.Fade or StandardShaderRenderingMode.Transparent)
+            {
+                material.SetFloat("_Surface", 1.0f); 
+                material.SetFloat("_Blend", 0.0f);
+                material.SetFloat("_AlphaClip", renderingMode == StandardShaderRenderingMode.Fade ? 0.0f : 1.0f);
+                material.SetFloat("_Cutoff", 0.0f); 
+                material.EnableKeyword("_ALPHATEST_ON");
+            }
+        }
+        
+        private static void ConvertStandartSpecularShaderToURP(Material material)
+        {
+            StandardShaderRenderingMode renderingMode = (StandardShaderRenderingMode)Convert.ToUInt32(material.GetFloat("_Mode"));
+                    
+            var materialIllumination = material.globalIlluminationFlags;            
+            var texture = material.GetTexture("_MainTex");
+            var normalMap = material.GetTexture("_BumpMap");
+            var specularMap = material.GetTexture("_SpecGlossMap");
+            var color = material.GetColor("_Color");
+            var specularColor = material.GetColor("_SpecColor");
+            var smoothness = material.GetFloat("_Glossiness");
+            var emissionColor = material.GetColor("_EmissionColor");
+            var glossyReflections = material.GetFloat("_GlossyReflections");
+            var specularHighlights = material.GetFloat("_SpecularHighlights");
+            var cutoff = material.GetFloat("_Cutoff");
+                    
+            material.shader = _urpShaders.Value[StandardSpecularShaderName];
+            material.SetFloat("_WorkflowMode", 0.0f); 
+            material.SetTexture("_BaseMap", texture);
+            material.SetColor("_BaseColor", color);
+            material.SetColor("_SpecColor", specularColor);
+            material.SetFloat("_Smoothness", smoothness);
+            material.SetColor("_EmissionColor", emissionColor);
+            material.SetFloat("_GlossyReflections", glossyReflections);
+            material.SetFloat("_SpecularHighlights", specularHighlights);
+            material.SetTexture("_BumpMap", normalMap);
+            material.SetTexture("_SpecGlossMap", specularMap);
+            material.globalIlluminationFlags = materialIllumination;
+
+            if (normalMap != null)
+            {
+                material.SetFloat("_BumpScale", 1.0f);
+            }
+            
+            if (renderingMode is StandardShaderRenderingMode.Cutout)
+            {
+                material.SetFloat("_Surface", 1.0f);
+                material.SetFloat("_AlphaClip", 1.0f);
+                material.SetFloat("_Blend", 0.0f);
+                material.SetFloat("_Cutoff", cutoff); 
+                material.EnableKeyword("_ALPHATEST_ON");
+            }
+            else if (renderingMode is StandardShaderRenderingMode.Fade or StandardShaderRenderingMode.Transparent)
+            {
+                material.SetFloat("_Surface", 1.0f); 
+                material.SetFloat("_Blend", renderingMode == StandardShaderRenderingMode.Fade ? 0.0f : 1.0f);
+                material.SetFloat("_AlphaClip", 1.0f);
+                material.SetFloat("_Cutoff", 0.0f); 
+                material.EnableKeyword("_ALPHATEST_ON");
+            }
+        }
+        
+        private static void DisableEmission(this Material material)
+        {
+            material.DisableKeyword("_EMISSION");
+            material.SetColor("_EmissionColor", Color.black);
+            material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+        }
+        
+        private enum StandardShaderRenderingMode
+        {
+            Opaque = 0,
+            Cutout = 1,
+            Fade = 2,
+            Transparent = 3
         }
     }
 }
