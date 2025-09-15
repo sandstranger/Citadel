@@ -1,4 +1,6 @@
 ﻿// Modified version of Unity's Global Fog Effect for SSMS
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -50,8 +52,21 @@ namespace SSMS {
 		[HideInInspector]
 		public RenderTexture fogRT;
 
-
+		private void Awake()
+		{
+			if (!Config.EnablePostProcessEffects)
+			{
+				SetGlobalFogParams();
+				this.enabled = false;
+			}
+		}
+		
 		void OnEnable(){
+			if (!Config.EnablePostProcessEffects)
+			{
+				return;
+			}
+
 			fogShader = Shader.Find ("Hidden/SSMS Global Fog");
 
 			if (fogMaterial == null) {
@@ -62,6 +77,11 @@ namespace SSMS {
 		}
 
 		void OnDisable(){
+			if (!Config.EnablePostProcessEffects)
+			{
+				return;
+			}
+
 			if (fogRT != null){
 				fogRT.Release ();
 			}
@@ -69,23 +89,32 @@ namespace SSMS {
 			DestroyImmediate (fogMaterial);
 		}
 
+		private void SetGlobalFogParams()
+		{
+			if (setGlobalSettings) {
+				if (fogStart < 0) { fogStart = 0; }
+				if (fogEnd < 0) { fogEnd = 0; }
+
+				RenderSettings.fogColor = this.fogColor;
+				RenderSettings.fogMode = this.fogMode;
+				RenderSettings.fogDensity = this.fogDensity;
+				RenderSettings.fogStartDistance = this.fogStart;
+				RenderSettings.fogEndDistance = this.fogEnd;
+			}
+		}
+
         [ImageEffectOpaque]
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
+	        if (!Config.EnablePostProcessEffects)
+	        {
+		        return;
+	        }
+
             // Global fog settings
-
-            if (setGlobalSettings) {
-                if (fogStart < 0) { fogStart = 0; }
-                if (fogEnd < 0) { fogEnd = 0; }
-
-                RenderSettings.fogColor = this.fogColor;
-                RenderSettings.fogMode = this.fogMode;
-                RenderSettings.fogDensity = this.fogDensity;
-                RenderSettings.fogStartDistance = this.fogStart;
-                RenderSettings.fogEndDistance = this.fogEnd;
-            }
-
-
+            
+            SetGlobalFogParams();
+            
             if (/*CheckResources() == false ||*/ (!distanceFog && !heightFog))
             {
                 Graphics.Blit(source, destination);

@@ -303,6 +303,11 @@ public class SEGI : MonoBehaviour {
 
 	void Start()
 	{
+		if (!Config.EnablePostProcessEffects)
+		{
+			return;
+		}
+
 		InitCheck();
 	}
 
@@ -653,6 +658,11 @@ public class SEGI : MonoBehaviour {
 
 	void OnEnable()
 	{
+		if (!Config.EnablePostProcessEffects)
+		{
+			return;
+		}
+
 		InitCheck();
 		ResizeRenderTextures();
 
@@ -766,6 +776,12 @@ public class SEGI : MonoBehaviour {
     }
 
 	void OnPreRender() {
+
+		if (!Config.EnablePostProcessEffects)
+		{
+			return;
+		}
+
 		//Force reinitialization to make sure that everything is working properly if one of the cameras was unexpectedly destroyed
 		if (!voxelCamera || !shadowCam) initChecker = null;
 		InitCheck();
@@ -913,6 +929,11 @@ public class SEGI : MonoBehaviour {
 
 	[ImageEffectOpaque]
 	void OnRenderImage(RenderTexture source, RenderTexture destination) {
+		if (!Config.EnablePostProcessEffects)
+		{
+			return;
+		}
+		
 		if (notReadyToRender) {
 			Graphics.Blit(source, destination);
 			return;

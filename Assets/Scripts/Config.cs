@@ -8,6 +8,8 @@ using UnityEngine.PostProcessing;
 // Handles configuration parsing for user settings.
 public sealed class Config
 {
+	public static bool EnablePostProcessEffects { get; set; } = false;
+
 	private const string AUDIO_MODE_KEY = "AudioSpeakerMode";
 
 	[Inject]

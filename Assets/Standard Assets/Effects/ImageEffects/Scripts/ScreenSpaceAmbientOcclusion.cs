@@ -25,6 +25,7 @@ namespace UnityStandardAssets.ImageEffects {
         public Texture2D m_RandomTexture;
 
         private bool m_Supported;
+        private Camera _camera;
 
         private static Material CreateMaterial (Shader shader)
         {
@@ -51,6 +52,11 @@ namespace UnityStandardAssets.ImageEffects {
 
         void Start()
         {
+	        if (!Config.EnablePostProcessEffects)
+	        {
+		        return;
+	        }
+	        
             //if (!SystemInfo.supportsImageEffects || !SystemInfo.SupportsRenderTextureFormat (RenderTextureFormat.Depth))
             //{
             //    m_Supported = false;
@@ -72,7 +78,15 @@ namespace UnityStandardAssets.ImageEffects {
         }
 
         void OnEnable () {
-            GetComponent<Camera>().depthTextureMode |= DepthTextureMode.DepthNormals;
+	        if (_camera == null)
+	        {
+		        _camera = GetComponent<Camera>();
+	        }
+
+	        if (Config.EnablePostProcessEffects)
+	        {
+		        _camera.depthTextureMode |= DepthTextureMode.DepthNormals;
+	        }
         }
 
         private void CreateMaterials ()
@@ -87,7 +101,7 @@ namespace UnityStandardAssets.ImageEffects {
         [ImageEffectOpaque]
         void OnRenderImage (RenderTexture source, RenderTexture destination)
         {
-            if (!m_Supported || !m_SSAOShader.isSupported) {
+            if (!m_Supported || !m_SSAOShader.isSupported || !Config.EnablePostProcessEffects) {
                 enabled = false;
                 return;
             }
