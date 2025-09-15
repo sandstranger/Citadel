@@ -9,7 +9,7 @@ namespace Citadel.Android.Tools
     internal static class AndroidTools
     {
         [MenuItem("Tools/Set all lights to mix render mode")]
-        internal static void SetAllLightsToMixRenderMode()
+        private static void SetAllLightsToMixRenderMode()
         {
             var allLights = GameObject.FindObjectsOfType<Light>(true);
             foreach (Light light in allLights)
@@ -20,8 +20,30 @@ namespace Citadel.Android.Tools
             Debug.Log($"Setted mix render mode for {allLights.Length} lights");
         }
 
+        [MenuItem("Tools/Disable GPU Instancing on all materials")]
+        private static void DisableGPUInstancing()
+        {
+            foreach (var material in FindAllComponentsInProject<Material>())
+            {
+                material.enableInstancing = false;
+            }
+        }
+        
+        [MenuItem("Tools/Change Global Illumination from Realtime to Baked on all materials")]
+        private static void ChangeGlobalIlluminationFromRealtimeToBaked()
+        {
+            foreach (var material in FindAllComponentsInProject<Material>())
+            {
+                if (material.globalIlluminationFlags.HasFlag(MaterialGlobalIlluminationFlags.RealtimeEmissive))
+                {
+                    material.globalIlluminationFlags &= ~MaterialGlobalIlluminationFlags.RealtimeEmissive;
+                    material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.BakedEmissive;
+                }
+            }
+        }
+        
         [MenuItem("Tools/Find all using shaders in materials (Advanced)")]
-        public static void FindAllUsingShaders()
+        private static void FindAllUsingShaders()
         {
             var allShaders = FindAllComponentsInProject<Shader>().Select(shader => shader.name).Append("Legacy Shaders/Transparent/Bumped Diffuse").ToArray();
             var allMaterials = FindAllComponentsInProject<Material>();
@@ -38,7 +60,7 @@ namespace Citadel.Android.Tools
         }
         
         [MenuItem("Tools/Find MeshRenderers Without Mesh (Advanced)")]
-        public static void FindMeshRenderersAdvanced()
+        private static void FindMeshRenderersAdvanced()
         {
             List<MissingMeshInfo> results = new List<MissingMeshInfo>();
 

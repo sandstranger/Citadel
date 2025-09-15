@@ -149,7 +149,7 @@ public class MainMenuHandler : MonoBehaviour {
 		GoToFrontPage();
 		CheckAndPlayIntro();
 #else
-		Config.SetVolume();
+		_config.SetVolume();
 		FileBrowser.SetFilters(false,new FileBrowser.Filter("SHOCK RES Files",
 															".RES",".res"));
 		FileBrowser.SetDefaultFilter( ".RES" );

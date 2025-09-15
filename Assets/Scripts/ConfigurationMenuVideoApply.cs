@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class ConfigurationMenuVideoApply : MonoBehaviour {
 	public Dropdown resolutionPicker;
-
+	[Inject] 
+	private readonly Config _config;
+	[Inject]
+	private readonly Const _consts;
+	
 	public void OnApplyClick () {
 #if !UNITY_ANDROID		
 		int x = Screen.resolutions[resolutionPicker.value].width;
@@ -17,7 +22,7 @@ public class ConfigurationMenuVideoApply : MonoBehaviour {
 		Screen.fullScreen = _consts.GraphicsFullscreen;
 		_consts.GraphicsResWidth = Screen.resolutions[resolutionPicker.value].width;
 		_consts.GraphicsResHeight = Screen.resolutions[resolutionPicker.value].height;
-		Config.WriteConfig();
+		_config.WriteConfig();
 #endif
 	}
 }
