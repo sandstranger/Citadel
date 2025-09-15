@@ -1052,8 +1052,8 @@ MonoBehaviour:
       type: {class: AndroidPlatformBuildSettings, ns: UnityEditor.Android, asm: UnityEditor.Android.Extensions}
       data:
         m_Development: 0
-        m_ConnectProfiler: 0
-        m_BuildWithDeepProfilingSupport: 0
+        m_ConnectProfiler: 1
+        m_BuildWithDeepProfilingSupport: 1
         m_AllowDebugging: 0
         m_WaitForManagedDebugger: 0
         m_ManagedDebuggerFixedPort: 0
