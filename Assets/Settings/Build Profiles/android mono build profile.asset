@@ -75,7 +75,7 @@ MonoBehaviour:
     - line: '|   m_ActiveColorSpace: 0'
     - line: '|   unsupportedMSAAFallback: 0'
     - line: '|   m_SpriteBatchMaxVertexCount: 65535'
-    - line: '|   m_SpriteBatchVertexThreshold: 300'
+    - line: '|   m_SpriteBatchVertexThreshold: 1000'
     - line: '|   m_MTRendering: 1'
     - line: '|   mipStripping: 1'
     - line: '|   numberOfMipsStripped: 0'
@@ -523,7 +523,7 @@ MonoBehaviour:
     - line: '|     m_StaticBatching: 0'
     - line: '|     m_DynamicBatching: 1'
     - line: '|   - m_BuildTarget: Android'
-    - line: '|     m_StaticBatching: 0'
+    - line: '|     m_StaticBatching: 1'
     - line: '|     m_DynamicBatching: 1'
     - line: '|   m_BuildTargetShaderSettings: []'
     - line: '|   m_BuildTargetGraphicsJobs:'
@@ -1054,7 +1054,7 @@ MonoBehaviour:
         m_Development: 0
         m_ConnectProfiler: 1
         m_BuildWithDeepProfilingSupport: 1
-        m_AllowDebugging: 0
+        m_AllowDebugging: 1
         m_WaitForManagedDebugger: 0
         m_ManagedDebuggerFixedPort: 0
         m_ExplicitNullChecks: 0

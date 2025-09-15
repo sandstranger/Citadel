@@ -52,7 +52,7 @@ PlayerSettings:
   m_ActiveColorSpace: 0
   unsupportedMSAAFallback: 0
   m_SpriteBatchMaxVertexCount: 65535
-  m_SpriteBatchVertexThreshold: 300
+  m_SpriteBatchVertexThreshold: 1000
   m_MTRendering: 1
   mipStripping: 1
   numberOfMipsStripped: 0
@@ -499,7 +499,7 @@ PlayerSettings:
     m_StaticBatching: 0
     m_DynamicBatching: 1
   - m_BuildTarget: Android
-    m_StaticBatching: 0
+    m_StaticBatching: 1
     m_DynamicBatching: 1
   m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs:

@@ -32,10 +32,10 @@ public sealed class Config
 		string basePath = Utils.GetAppropriateDataPath();
 		Utils.ConfirmExistsMakeIfNot(basePath, "Config.ini");
 
-#if UNITY_EDITOR
-		_const.GraphicsResWidth = Screen.width;
-		_const.GraphicsResHeight = Screen.height;
-#elif !UNITY_ANDROID
+#if UNITY_ANDROID 
+		_const.GraphicsResWidth = Mathf.RoundToInt(Screen.width/1.5f);
+		_const.GraphicsResHeight = Mathf.RoundToInt(Screen.height/1.5f);
+#else
 		_const.GraphicsResWidth = AssignConfigInt("Graphics","ResolutionWidth");
 		_const.GraphicsResHeight = AssignConfigInt("Graphics","ResolutionHeight");
 #endif

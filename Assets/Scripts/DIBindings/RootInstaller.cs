@@ -32,6 +32,7 @@ namespace Citadel.Game
         [SerializeField] private WeaponFire _weaponFire;
         [SerializeField] private WeaponCurrent _weaponCurrent;
         [SerializeField] private QuestLogNotesManager _questLogNotesManager;
+        [SerializeField] private Camera _mainCamera;
 
         private readonly Config _config = new();
         private readonly ConsoleEmulator _consoleEmulator = new();
@@ -66,12 +67,14 @@ namespace Citadel.Game
             _mouseLookScript.Initialize();
 
             Container.Bind<Config>().FromInstance(_config).AsSingle();
+            Container.BindInstance(_mainCamera).AsSingle();
             Container.BindInstance(_playerReference).AsSingle();
             Container.BindInstance(_biomonitorGraphSystem).AsSingle();
             Container.BindInstance(_playerEnergy).AsSingle();
             Container.Bind<DynamicCulling>().FromInstance(FindFirstObjectByType<DynamicCulling>()).AsTransient();
             Container.Bind<LevelManager>().FromInstance(FindFirstObjectByType<LevelManager>()).AsTransient();
             Container.Bind<LevelEditor>().FromInstance(FindFirstObjectByType<LevelEditor>()).AsTransient();
+            Container.Bind<LightDistanceCuller>().FromInstance(FindFirstObjectByType<LightDistanceCuller>()).AsTransient();
             Container.BindInstance(_const).AsSingle();
             Container.BindInstance(_mfdManager).AsSingle();
             Container.BindInstance(_automap).AsSingle();
@@ -134,11 +137,14 @@ namespace Citadel.Game
                 var dynamicCulling = FindFirstObjectByType<DynamicCulling>();
                 var levelManager = FindFirstObjectByType<LevelManager>();
                 var levelEditor = FindFirstObjectByType<LevelEditor>();
-                
+                var lightsCuller = FindFirstObjectByType<LightDistanceCuller>();
+
+                Container.Rebind<LightDistanceCuller>().FromInstance(lightsCuller).AsTransient();
                 Container.Rebind<DynamicCulling>().FromInstance(dynamicCulling).AsTransient();
                 Container.Rebind<LevelManager>().FromInstance(levelManager).AsTransient();
                 Container.Rebind<LevelEditor>().FromInstance(levelEditor).AsTransient();
-                
+
+                Container.Inject(lightsCuller);
                 Container.Inject(levelEditor);
                 Container.Inject(levelManager);
                 Container.Inject(dynamicCulling);

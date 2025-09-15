@@ -430,7 +430,8 @@ public class Const : SingletonHelper<Const>
 	[Inject] private readonly PlayerHealth _playerHealth;
 	[Inject] private readonly DynamicCulling _dynamicCulling;
 	[Inject] private readonly QuestLogNotesManager _questLogNotesManager;
-
+	[Inject] private readonly LightDistanceCuller _lightDistanceCuller; 
+	
 	private void Awake()
 	{
 		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
@@ -1922,6 +1923,7 @@ CreateBlackTexture:
 		loading = false;
 		loadPercentText.text = "";
 		GoIntoGame(loadTimer);
+		_lightDistanceCuller.Rebuild();
 	}
 
 	public void NPCAudioOcclusion() {

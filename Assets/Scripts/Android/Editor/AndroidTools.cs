@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -20,12 +21,26 @@ namespace Citadel.Android.Tools
             Debug.Log($"Setted mix render mode for {allLights.Length} lights");
         }
 
-        [MenuItem("Tools/Disable GPU Instancing on all materials")]
-        private static void DisableGPUInstancing()
+        [MenuItem("Tools/Update GPU Instancing on all materials")]
+        private static void UpdateGPUInstancing()
         {
-            foreach (var material in FindAllComponentsInProject<Material>())
+            var allMaterials = FindAllComponentsInProject<Material>();
+            var allMeshRenderers = 
+                FindAllComponentsInProject<GameObject>().SelectMany(gameObject =>
+                {
+                    var meshRender = gameObject.GetComponent<SkinnedMeshRenderer>();
+                    return gameObject.GetComponentsInChildren<SkinnedMeshRenderer>(true).Append(meshRender);
+                }).Where(meshRenderer => meshRenderer!=null).Distinct().ToArray();
+
+            foreach (var material in allMaterials)
             {
-                material.enableInstancing = false;
+                try
+                {
+                    material.enableInstancing = !allMeshRenderers.Any(meshRenderer => meshRenderer.sharedMaterials.Contains(material));
+                }
+                catch (Exception e)
+                {
+                }
             }
         }
         
@@ -37,6 +52,10 @@ namespace Citadel.Android.Tools
                 if (material.globalIlluminationFlags.HasFlag(MaterialGlobalIlluminationFlags.RealtimeEmissive))
                 {
                     material.globalIlluminationFlags &= ~MaterialGlobalIlluminationFlags.RealtimeEmissive;
+                    material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.BakedEmissive;
+                }
+                else
+                {
                     material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.BakedEmissive;
                 }
             }

@@ -996,7 +996,7 @@ public class DynamicCulling : MonoBehaviour {
     }
 
     public void Cull_Init() {
-        if (!cullEnabled || _cullingWasInit)
+        if (!cullEnabled)
         {
             return;
         }
@@ -1824,6 +1824,7 @@ public class DynamicCulling : MonoBehaviour {
             }
             
             int range = (int)Mathf.Floor(lights[i].range / 2.56f);
+            Debug.Log(range);
             int xMin = x - range;
             int xMax = x + range;
             int yMin = y - range;

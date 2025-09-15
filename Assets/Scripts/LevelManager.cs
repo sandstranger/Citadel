@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Citadel.Game;
 using Citadel.SceneManagement;
 using Zenject;
 using UnityEngine;
@@ -73,6 +74,7 @@ public class LevelManager : MonoBehaviour
 	[Inject] private readonly PlayerMovement _playerMovement;
 	[Inject] private readonly DynamicCulling _dynamicCulling;
 	[Inject] private readonly QuestLogNotesManager _questLogNotesManager;
+	[Inject] private readonly LightDistanceCuller _lightDistanceCuller;
 
 	public static bool LoadLevelAfterSceneChanges { get; private set; }
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
@@ -301,11 +303,17 @@ public class LevelManager : MonoBehaviour
 	
 	public void LoadLevel(int levnum, Vector3 targetPosition, bool loadLevelForced = false)
 	{
+		_lightDistanceCuller.Clear();
 		LoadLevelAfterSceneChanges = false;
 		if (!LevNumInBounds(levnum)) { Debug.LogWarning("levnum out of bounds"); return; }
 
 		// NOTE: Check this first since the button for the current level has a null destination.  This is fine and expected.
-		if (currentLevel == levnum && !loadLevelForced) { _consts.sprint(_consts.stringTable[9]); return; } //Already there
+		if (currentLevel == levnum && !loadLevelForced)
+		{
+			_consts.sprint(_consts.stringTable[9]);
+			_lightDistanceCuller.Rebuild();
+			return;
+		} //Already there
 
 		_mfdManager.TurnOffElevatorPad();
 // 		Debug.Log("Cleared GUI Over Button state from clicking on elevator button in MFD side pane");
@@ -344,6 +352,7 @@ public class LevelManager : MonoBehaviour
 		}
 		
 		PostLoadLevelSetupSystems();
+		_lightDistanceCuller.Rebuild();
 		if (currentLevel != 13) {
 			_dynamicCulling.Cull_Init();
 			System.GC.Collect();
@@ -721,6 +730,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public void UnloadLevelDynamicObjects(int curlevel, bool saveExisting) {
+		_lightDistanceCuller.Clear();
 		Transform tr = GetRequestedLevelDynamicContainer(curlevel).transform;
 		if (saveExisting) {
 			List<GameObject> allDynamicObjects = new List<GameObject>();
