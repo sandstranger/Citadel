@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0a07a69aa48684202912c98dce9e889d
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 193314
+  packageName: Nanolod | Automatic LODs
+  packageVersion: 1.2
+  assetPath: Assets/Nanolod/Examples/Precomputed/Precomputed.unity
+  uploadId: 462125

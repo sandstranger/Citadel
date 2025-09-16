@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 13b6e8a31eeff41d7a007d863e92e9ea
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 193314
+  packageName: Nanolod | Automatic LODs
+  packageVersion: 1.2
+  assetPath: Assets/Nanolod/Examples/Runtime/Runtime.unity
+  uploadId: 462125

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 77926c82de2364debab5082355addfb4
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 193314
+  packageName: Nanolod | Automatic LODs
+  packageVersion: 1.2
+  assetPath: Assets/Nanolod/Nanolod.asmdef
+  uploadId: 462125

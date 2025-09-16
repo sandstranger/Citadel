@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 671c0c1b325d84fdba91ae7f4cbec9ab
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 193314
+  packageName: Nanolod | Automatic LODs
+  packageVersion: 1.2
+  assetPath: Assets/Nanolod/Examples/Assets/Forest Dude/license.txt
+  uploadId: 462125

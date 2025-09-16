@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6178260a9da1a4f3793217cddd4264f0
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 193314
+  packageName: Nanolod | Automatic LODs
+  packageVersion: 1.2
+  assetPath: Assets/Nanolod/Examples/Assets/Black.mat
+  uploadId: 462125

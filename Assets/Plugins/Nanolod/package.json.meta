@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 79665bae5f9474dd3bbafb840ce97133
+PackageManifestImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 193314
+  packageName: Nanolod | Automatic LODs
+  packageVersion: 1.2
+  assetPath: Assets/Nanolod/package.json
+  uploadId: 462125
