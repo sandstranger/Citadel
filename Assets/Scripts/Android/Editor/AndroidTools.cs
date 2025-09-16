@@ -21,6 +21,32 @@ namespace Citadel.Android.Tools
             Debug.Log($"Setted mix render mode for {allLights.Length} lights");
         }
 
+        [MenuItem("Tools/Replace all standard shader to standard optimized shader")]
+        private static void ReplaceAllStandardShader()
+        {
+            var standardShaderOptimized = Shader.Find("Standard Optimized");
+            var standardShaderSpecularOptimized = Shader.Find("Standard (Specular setup) Optimized");
+            
+            foreach (var material in FindAllComponentsInProject<Material>())
+            {
+                switch (material.shader.name)
+                {
+                    case "Standard (Specular setup)":
+                        material.shader = standardShaderSpecularOptimized;
+                        EditorUtility.SetDirty(material);
+                        break;
+                    case "Standard":
+                        material.shader = standardShaderOptimized;
+                        EditorUtility.SetDirty(material);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
+            AssetDatabase.Refresh();
+        }
+        
         [MenuItem("Tools/Update GPU Instancing on all materials")]
         private static void UpdateGPUInstancing()
         {
