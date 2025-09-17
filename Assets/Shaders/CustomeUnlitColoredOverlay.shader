@@ -23,7 +23,8 @@ SubShader {
             #pragma fragment frag
             #pragma target 2.0
             #pragma multi_compile_fog
-            
+            #pragma multi_compile_instancing // Добавляем поддержку инстансинга
+
             #include "UnityCG.cginc"
 
             struct appdata_t {

@@ -6,7 +6,7 @@
         _Shininess ("Shininess", Range(0.03, 1)) = 0.078125
         _Gloss ("Gloss", Range(0,1)) = 0.4
         _Alpha ("Transparency", Range(0,1)) = 1.0
-        _DitherScale ("Dither Scale", Range(0.1, 100)) = 1.0 // Added for control
+        _DitherScale ("Dither Scale", Range(0.1, 100)) = 1.0
     }
     SubShader {
         Tags { 
@@ -15,29 +15,38 @@
         }
         LOD 200
         
-        Cull Off // Renders both sides
+        Cull Off
         
         // Main surface pass
         CGPROGRAM
         #pragma surface surf BlinnPhong alpha:fade
         #pragma target 3.0
+        #pragma multi_compile_instancing // Добавляем поддержку инстансинга
 
         sampler2D _MainTex;
-        fixed4 _Color;
         half _Shininess;
         half _Gloss;
-        fixed _Alpha;
+
+        // Объявляем буфер для свойств инстансинга
+        UNITY_INSTANCING_BUFFER_START(Props)
+            UNITY_DEFINE_INSTANCED_PROP(fixed4, _Color)
+            UNITY_DEFINE_INSTANCED_PROP(fixed, _Alpha)
+        UNITY_INSTANCING_BUFFER_END(Props)
 
         struct Input {
             float2 uv_MainTex;
         };
 
         void surf (Input IN, inout SurfaceOutput o) {
-            fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * _Color;
+            // Используем инстансированные свойства
+            fixed4 instancedColor = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+            fixed instancedAlpha = UNITY_ACCESS_INSTANCED_PROP(Props, _Alpha);
+            
+            fixed4 c = tex2D(_MainTex, IN.uv_MainTex) * instancedColor;
             o.Albedo = c.rgb;
             o.Specular = _Shininess;
             o.Gloss = _Gloss;
-            o.Alpha = c.a * _Alpha;
+            o.Alpha = c.a * instancedAlpha;
         }
         ENDCG
 
@@ -48,29 +57,36 @@
             
             ZWrite On
             ZTest LEqual
-            Cull Off // Two-sided shadows
+            Cull Off
 
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma target 3.0
             #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing // Добавляем поддержку инстансинга
             #include "UnityCG.cginc"
 
             struct v2f {
                 V2F_SHADOW_CASTER;
                 float2 uv : TEXCOORD1;
                 float4 screenPos : TEXCOORD2;
+                UNITY_VERTEX_INPUT_INSTANCE_ID // Добавляем ID инстанса
             };
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            fixed4 _Color;
-            fixed _Alpha;
             float _DitherScale;
+
+            // Объявляем буфер для свойств инстансинга
+            UNITY_INSTANCING_BUFFER_START(ShadowProps)
+                UNITY_DEFINE_INSTANCED_PROP(fixed4, _Color)
+                UNITY_DEFINE_INSTANCED_PROP(fixed, _Alpha)
+            UNITY_INSTANCING_BUFFER_END(ShadowProps)
 
             v2f vert(appdata_base v) {
                 v2f o;
+                UNITY_SETUP_INSTANCE_ID(v); // Устанавливаем ID инстанса
                 TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
                 o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
                 o.screenPos = ComputeScreenPos(o.pos);
@@ -92,8 +108,14 @@
             }
 
             fixed4 frag(v2f i) : SV_Target {
-                fixed4 texcol = tex2D(_MainTex, i.uv) * _Color;
-                fixed alpha = texcol.a * _Alpha;
+                UNITY_SETUP_INSTANCE_ID(i); // Устанавливаем ID инстанса
+                
+                // Используем инстансированные свойства
+                fixed4 instancedColor = UNITY_ACCESS_INSTANCED_PROP(ShadowProps, _Color);
+                fixed instancedAlpha = UNITY_ACCESS_INSTANCED_PROP(ShadowProps, _Alpha);
+                
+                fixed4 texcol = tex2D(_MainTex, i.uv) * instancedColor;
+                fixed alpha = texcol.a * instancedAlpha;
                 
                 // Apply finer dithering
                 float2 screenUV = i.screenPos.xy / i.screenPos.w;

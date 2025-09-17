@@ -55,8 +55,6 @@ Shader "Standard Optimized"
     SubShader
     {
         Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
-        LOD 150
-
         // ------------------------------------------------------------------
         //  Base forward pass (directional light, emission, lightmaps, ...)
         Pass

@@ -10,13 +10,18 @@ namespace Citadel.Game
     [DisallowMultipleComponent]
     internal sealed class LightDistanceCuller : MonoBehaviour
     {
-        [Header("Source lights")] public bool autoFindLights = true;
+        [SerializeField]
+        private bool _enableLightsCulling = true;
+        [FormerlySerializedAs("autoFindLights")]
+        [Header("Source lights")] 
+        [SerializeField]
+        private bool _autoFindLights = true;
         [FormerlySerializedAs("manualLights")] [SerializeField]
         private Light[] _manualLights;
         [FormerlySerializedAs("maxDistance")]
         [Header("Culling")] 
         [SerializeField]
-        private float _maxDistance = 10f;
+        private float _maxDistance = 20f;
         [FormerlySerializedAs("checkInterval")] [SerializeField]
         private float _checkInterval = 0.2f;
         [FormerlySerializedAs("useFade")] [SerializeField]
@@ -42,6 +47,11 @@ namespace Citadel.Game
 
         private void Start()
         {
+            if (!_enableLightsCulling)
+            {
+                return;
+            }
+            
             _camTransform = (_cam != null) ? _cam.transform : transform;
             _sqrMaxDistance = _maxDistance * _maxDistance;
             RefreshLightList();
@@ -56,14 +66,14 @@ namespace Citadel.Game
         {
             Clear();
 
-            Light[] found = autoFindLights ? FindObjectsOfType<Light>(true) : _manualLights;
+            Light[] found = _autoFindLights ? FindObjectsOfType<Light>(true) : _manualLights;
           
             if (found == null)
             {
                 return;
             }
 
-            UnityEngine.Debug.Log($"Found {found.Length} lights (autoFind={autoFindLights}).");
+            UnityEngine.Debug.Log($"Found {found.Length} lights (autoFind={_autoFindLights}).");
 
             foreach (var l in found)
             {
@@ -108,6 +118,11 @@ namespace Citadel.Game
 
         private void Update()
         {
+            if (!_enableLightsCulling)
+            {
+                return;
+            }
+
             _timer += Time.unscaledDeltaTime;
             if (_timer >= _checkInterval)
             {

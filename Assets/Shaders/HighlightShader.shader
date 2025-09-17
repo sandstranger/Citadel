@@ -3,7 +3,6 @@
  {
   _ColorTint("Color Tint", Color) = (1, 1, 1, 1)
   _MainTex("Base (RGB)", 2D) = "white" {}
-  //_BumpMap("Normal Map", 2D) = "bump" {}
   _RimColor("Rim Color", Color) = (1, 1, 1, 1)
   _RimPower("Rim Power", Range(1.0, 6.0)) = 3.0
   _HSVAAdjust("HSVA Adjust", Vector) = (0,0,0,0)
@@ -14,42 +13,47 @@
 
   CGPROGRAM
   #pragma surface surf Lambert
+  #pragma multi_compile_instancing // Добавляем поддержку инстансинга
 
   struct Input {
-
    float4 color : Color;
    float2 uv_MainTex;
-   //float2 uv_BumpMap;
    float3 viewDir;
-
+   UNITY_VERTEX_INPUT_INSTANCE_ID // Добавляем ID инстанса
   };
 
-  float4 _ColorTint;
-  sampler2D _MainTex;
-  //sampler2D _BumpMap;
-  float4 _RimColor;
-  float _RimPower;
-  float4 _HSVAAdjust;
+  // Объявляем буфер для свойств инстансинга
+  UNITY_INSTANCING_BUFFER_START(Props)
+    UNITY_DEFINE_INSTANCED_PROP(float4, _ColorTint)
+    UNITY_DEFINE_INSTANCED_PROP(float4, _RimColor)
+    UNITY_DEFINE_INSTANCED_PROP(float, _RimPower)
+    UNITY_DEFINE_INSTANCED_PROP(float4, _HSVAAdjust)
+  UNITY_INSTANCING_BUFFER_END(Props)
 
+  sampler2D _MainTex;
 
   void surf (Input IN, inout SurfaceOutput o) 
   {
+    UNITY_SETUP_INSTANCE_ID(IN); // Устанавливаем ID инстанса
+    
+    // Используем инстансированные свойства
+    float4 instancedColorTint = UNITY_ACCESS_INSTANCED_PROP(Props, _ColorTint);
+    float4 instancedRimColor = UNITY_ACCESS_INSTANCED_PROP(Props, _RimColor);
+    float instancedRimPower = UNITY_ACCESS_INSTANCED_PROP(Props, _RimPower);
+    float4 instancedHSVAAdjust = UNITY_ACCESS_INSTANCED_PROP(Props, _HSVAAdjust);
 
+    IN.color = instancedColorTint;
+    IN.color.x += instancedHSVAAdjust.x;
+    IN.color.y += instancedHSVAAdjust.y;
+    IN.color.z += instancedHSVAAdjust.z;
+    IN.color.a += instancedHSVAAdjust.a;
+    
+    o.Albedo = tex2D (_MainTex, IN.uv_MainTex).rgb * IN.color;
 
-   IN.color = _ColorTint;
-   IN.color.x += _HSVAAdjust.x;
-   IN.color.y += _HSVAAdjust.y;
-   IN.color.z += _HSVAAdjust.z;
-   IN.color.a += _HSVAAdjust.a;
-   o.Albedo = tex2D (_MainTex, IN.uv_MainTex).rgb * IN.color;
-   //o.Normal = UnpackNormal(tex2D(_BumpMap,IN.uv_BumpMap));
-
-   half rim = 1.0 - saturate(dot(normalize(IN.viewDir), o.Normal));
-   o.Emission = _RimColor.rgb * pow(rim, _RimPower);
-
-
+    half rim = 1.0 - saturate(dot(normalize(IN.viewDir), o.Normal));
+    o.Emission = instancedRimColor.rgb * pow(rim, instancedRimPower);
   }
   ENDCG
  } 
  FallBack "Diffuse"
-}﻿
+}

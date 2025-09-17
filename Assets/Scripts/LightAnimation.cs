@@ -41,7 +41,7 @@ public class LightAnimation : MonoBehaviour {
 		if (minIntensity < 0.01f) minIntensity = 0.01f;
 		animLight = GetComponent<Light>();
 		animLight.intensity = maxIntensity;
-		if (segiEmitter == null) segiEmitter = Utils.CreateSEGIEmitter(_consts,gameObject,LevelManager.currentLevel,0,animLight);
+	//	if (segiEmitter == null) segiEmitter = Utils.CreateSEGIEmitter(_consts,gameObject,LevelManager.currentLevel,0,animLight);
 		EnableSEGIEmitter();
 		animLight.intensity = minIntensity;
 		ScaleSEGIEmitter();
@@ -62,18 +62,21 @@ public class LightAnimation : MonoBehaviour {
 	}
 	
 	private void EnableSEGIEmitter() {
+		return;
         if (segiEmitter == null) return;
         
         segiEmitter.SetActive(true);
     }
     
     private void DisableSEGIEmitter() {
+	    return;
         if (segiEmitter == null) return;
         
         segiEmitter.SetActive(false);
     }
     
     public void ScaleSEGIEmitter() {
+	    return;
         if (segiEmitter == null) return;
 		
 		float fac = (animLight.intensity - minIntensity) / maxIntensity;

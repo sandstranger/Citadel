@@ -54,8 +54,6 @@ Shader "Standard (Specular setup) Optimized"
     SubShader
     {
         Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
-        LOD 150
-
         Pass
         {
             Name "FORWARD"

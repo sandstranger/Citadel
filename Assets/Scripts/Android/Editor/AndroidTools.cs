@@ -9,6 +9,41 @@ namespace Citadel.Android.Tools
 {
     internal static class AndroidTools
     {
+        [MenuItem("Tools/Remove all SEGIEmitters from active scene")]
+        private static void RemoveAllSegiEmittersFromActiveScene()
+        {
+            var emitters = GameObject.FindObjectsOfType<GameObject>(true).Where(gameobject => gameobject.name.Contains("SEGIEmitter"))
+                .ToArray();
+
+            foreach (var emitter in emitters)
+            {
+                GameObject.DestroyImmediate(emitter);
+            }
+        }
+
+        [MenuItem("Tools/Update grass lods")]
+        private static void UpdateGrassLods()
+        {
+            var lods = GameObject.FindObjectsOfType<LODGroup>(true);
+            
+            foreach (var lod in lods)
+            {
+                if (lod.gameObject.name.Contains("prop_foliage_fern"))
+                {
+                    lod.animateCrossFading = true;
+                    lod.fadeMode = LODFadeMode.CrossFade;
+                    lod.gameObject.isStatic = true;
+                    lod.size = 3;
+
+                    foreach (var lodChild in lod.GetComponentsInChildren<Transform>(true))
+                    {
+                        lodChild.gameObject.SetActive(true);
+                        lodChild.gameObject.isStatic = true;
+                    }
+                }
+            }
+        }
+        
         [MenuItem("Tools/Set all lights to mix render mode")]
         private static void SetAllLightsToMixRenderMode()
         {
