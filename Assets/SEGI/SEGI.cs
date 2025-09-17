@@ -729,6 +729,11 @@ public class SEGI : MonoBehaviour {
 
 	void Update()
 	{
+		if (!Config.EnablePostProcessEffects)
+		{
+			return;
+		}
+		
 		if (notReadyToRender)
 			return;
 

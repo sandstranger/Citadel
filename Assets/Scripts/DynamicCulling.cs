@@ -15,8 +15,8 @@ public class DynamicCulling : MonoBehaviour {
     [HideInInspector] public const int WORLDX = 64;
     [HideInInspector] public const int ARRSIZE = WORLDX * WORLDX;
     [HideInInspector] public const float CELLXHALF = 1.28f;
-    
-    public bool cullEnabled = true;
+
+    public bool cullEnabled => false;
     public bool debugHelpers = false;
 //     public bool dynamicObjectCull = true;
     public bool lightCulling = true;
@@ -576,6 +576,7 @@ public class DynamicCulling : MonoBehaviour {
     }
     
     void PutChunksInCells() {
+        return;
         Transform ctn = _levelManager.GetCurrentGeometryContainer().transform;
         int chunkCount = ctn.childCount;
         GameObject childGO = null;
@@ -761,14 +762,19 @@ public class DynamicCulling : MonoBehaviour {
     public void FindMeshRenderers(int type) {
         GameObject container = null;
         switch(type) {
-            case 1: container = _levelManager.GetCurrentDynamicContainer(); break;
-            case 2: container = _levelManager.GetCurrentDoorsContainer(); break;
+          //  case 1: container = _levelManager.GetCurrentDynamicContainer(); break;
+         //   case 2: container = _levelManager.GetCurrentDoorsContainer(); break;
             case 3: container = _levelManager.GetRequestedLevelNPCContainer(LevelManager.currentLevel); break;
-            case 4: container = _levelManager.GetCurrentStaticSaveableContainer(); break;
-            case 5: container = _levelManager.GetCurrentLightsContainer(); break;
-            default: container = _levelManager.GetCurrentStaticImmutableContainer(); break;
+         //   case 4: container = _levelManager.GetCurrentStaticSaveableContainer(); break;
+         //   case 5: container = _levelManager.GetCurrentLightsContainer(); break;
+        //    default: container = _levelManager.GetCurrentStaticImmutableContainer(); break;
         }
 
+        if (container == null)
+        {
+            return;
+        }
+        
         Transform ctr = container.transform;
         Component[] compArray = container.GetComponentsInChildren(typeof(MeshRenderer),true);
         int count = ctr.childCount;

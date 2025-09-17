@@ -10,41 +10,30 @@ namespace Citadel.Game
     [DisallowMultipleComponent]
     internal sealed class LightDistanceCuller : MonoBehaviour
     {
-        [SerializeField]
-        private bool _enableLightsCulling = true;
-        [FormerlySerializedAs("autoFindLights")]
+        private const int TrackedLightsInitialCapacity = 1500;
+        private const float CheckInterval = 0.3f;
+        
+        [SerializeField] private bool _enableLightsCulling = true;
         [Header("Source lights")] 
-        [SerializeField]
-        private bool _autoFindLights = true;
-        [FormerlySerializedAs("manualLights")] [SerializeField]
-        private Light[] _manualLights;
-        [FormerlySerializedAs("maxDistance")]
+        [SerializeField] private bool _autoFindLights = true;
+        [SerializeField] private Light[] _manualLights;
         [Header("Culling")] 
-        [SerializeField]
-        private float _maxDistance = 20f;
-        [FormerlySerializedAs("checkInterval")] [SerializeField]
-        private float _checkInterval = 0.2f;
-        [FormerlySerializedAs("useFade")] [SerializeField]
-        private bool _useFade = true;
-        [FormerlySerializedAs("fadeSpeed")] [SerializeField]
-        private float _fadeSpeed = 10f;
-
-        [FormerlySerializedAs("ignoreLayers")]
+        [SerializeField] private float _maxDistance = 20f;
+        [SerializeField] private bool _useFade = true;
+        [SerializeField] private float _fadeSpeed = 10f;
         [Header("Filters")]
-        [SerializeField]
-        private LayerMask _ignoreLayers = 0; // если нужно игнорировать некоторые слои (поставьте слой в биты)
+        [SerializeField] private LayerMask _ignoreLayers = 0;
 
         private Transform _camTransform;
         private float _sqrMaxDistance;
         private float _timer = 0f;
 
-        private readonly HashSet<Light> _trackedLights = new();
-        private readonly Dictionary<Light, float> _origIntensity = new();
-        private readonly Dictionary<Light, float> _targetIntensity = new();
-        private readonly HashSet<Light> _toggleOnlyLights = new();
+        private readonly List<LightData> _trackedLights = new(TrackedLightsInitialCapacity);
+        private bool _needsRebuild = true;
+
         [Inject]
         private readonly Camera _cam;
-
+        
         private void Start()
         {
             if (!_enableLightsCulling)
@@ -52,70 +41,32 @@ namespace Citadel.Game
                 return;
             }
             
-            _camTransform = (_cam != null) ? _cam.transform : transform;
+            _camTransform = (_cam != null) ? _cam.transform : Camera.main.transform;
             _sqrMaxDistance = _maxDistance * _maxDistance;
-            RefreshLightList();
         }
 
         private void OnDestroy()
         {
-            Clear();
+            RestoreAllLights();
         }
 
-        private void RefreshLightList()
+        public void SetMaxDistance(float distance)
         {
-            Clear();
-
-            Light[] found = _autoFindLights ? FindObjectsOfType<Light>(true) : _manualLights;
-          
-            if (found == null)
-            {
-                return;
-            }
-
-            UnityEngine.Debug.Log($"Found {found.Length} lights (autoFind={_autoFindLights}).");
-
-            foreach (var l in found)
-            {
-                if (l == null || !l.enabled || l.type == LightType.Directional || ((1 << l.gameObject.layer) & _ignoreLayers) != 0)
-                {
-                    continue;
-                }
-
-                // добавляем в набор (HashSet предотвращает дубликаты)
-                _trackedLights.Add(l);
-
-                // получим / создадим сторедж и убедимся, что он содержит первоначальные значения
-                var storage = l.GetComponent<LightIntensityStorage>();
-                if (storage == null)
-                {
-                    storage = l.gameObject.AddComponent<LightIntensityStorage>();
-                    storage.Intensity = l.intensity;
-                    storage.WasEnabled = l.enabled;
-                    storage.Saved = true;
-                }
-                else if (!storage.Saved)
-                {
-                    // если компонент есть, но он не инициализирован нашим скриптом — инициализируем и пометим
-                    storage.Intensity = l.intensity;
-                    storage.WasEnabled = l.enabled;
-                    storage.Saved = true;
-                }
-
-                _origIntensity[l] = storage.Intensity;
-                _targetIntensity[l] = storage.Intensity;
-
-                var monos = l.gameObject.GetComponents<MonoBehaviour>();
-                bool hasLightAnimation = monos.Any(m => m != null && m.GetType().Name == "LightAnimation");
-                if (hasLightAnimation)
-                {
-                    _toggleOnlyLights.Add(l);
-                }
-            }
-
-            UnityEngine.Debug.Log($"Tracked lights: {_trackedLights.Count}, toggle-only: {_toggleOnlyLights.Count}");
+            _maxDistance = Mathf.Max(0.01f, distance);
+            _sqrMaxDistance = _maxDistance * _maxDistance;
         }
 
+        public void Clear()
+        {
+            RestoreAllLights();
+            _trackedLights.Clear();
+        }
+        
+        public void Rebuild()
+        {
+            _needsRebuild = true;
+        }
+        
         private void Update()
         {
             if (!_enableLightsCulling)
@@ -123,13 +74,23 @@ namespace Citadel.Game
                 return;
             }
 
+            if (_needsRebuild)
+            {
+                RebuildLightList();
+                _needsRebuild = false;
+            }
+
+            if (_trackedLights.Count == 0)
+            {
+                return;
+            }
+            
             _timer += Time.unscaledDeltaTime;
-            if (_timer >= _checkInterval)
+            if (_timer >= CheckInterval)
             {
                 _timer = 0f;
                 DoCullCheck();
 
-                // Если без fade, применяем изменения сразу (мгновенно)
                 if (!_useFade)
                 {
                     ApplyImmediate();
@@ -138,116 +99,165 @@ namespace Citadel.Game
 
             if (_useFade)
             {
-                float delta = _fadeSpeed * Time.deltaTime;
+                ApplyFade();
+            }
+        }
 
-                foreach (var l in _trackedLights.ToArray()) // ToArray чтобы безопасно обходить HashSet
+        private void RebuildLightList()
+        {
+            Clear();
+            
+            Light[] found = _autoFindLights ? FindObjectsOfType<Light>(true) : _manualLights;
+
+            if (found == null)
+            {
+                return;
+            }
+
+            foreach (var light in found)
+            {
+                if (light == null || !light.enabled || 
+                    light.type == LightType.Directional || 
+                    ((1 << light.gameObject.layer) & _ignoreLayers) != 0)
                 {
-                    if (l == null) continue;
-
-                    // Если это toggle-only свет — не трогаем intensity, просто включаем/выключаем
-                    if (_toggleOnlyLights.Contains(l))
-                    {
-                        bool shouldBeOn = _targetIntensity.ContainsKey(l)
-                            ? _targetIntensity[l] > 0.001f
-                            : _origIntensity[l] > 0.001f;
-                        l.enabled = shouldBeOn;
-                        continue;
-                    }
-
-                    float cur = l.intensity;
-                    float targ = _targetIntensity.ContainsKey(l) ? _targetIntensity[l] : _origIntensity[l];
-
-                    if (Mathf.Approximately(cur, targ)) continue;
-
-                    float next = Mathf.MoveTowards(cur, targ, delta);
-                    l.intensity = next;
-
-                    // Включаем/выключаем компонент Light для экономии в ряде случаев
-                    l.enabled = next > 0.001f;
+                    continue;
                 }
+
+                bool hasLightAnimation = light.GetComponent<LightAnimation>() != null;
+
+                var lightData = new LightData(
+                    light,
+                    light.intensity,
+                    light.intensity,
+                    hasLightAnimation,
+                    light.enabled);
+
+                _trackedLights.Add(lightData);
             }
         }
 
         private void DoCullCheck()
         {
-            if (_camTransform == null) return;
-            Vector3 camPos = _camTransform.position;
-            float sqrMax = _sqrMaxDistance;
-
-            foreach (var l in _trackedLights.ToArray())
+            if (_camTransform == null)
             {
-                if (l == null) continue;
+                return;
+            }
+            
+            Vector3 camPos = _camTransform.position;
 
-                float sqrDist = (l.transform.position - camPos).sqrMagnitude;
+            for (int i = 0; i < _trackedLights.Count; i++)
+            {
+                var lightData = _trackedLights[i];
+                if (lightData.Light == null) continue;
 
-                if (sqrDist <= sqrMax)
+                float sqrDist = (lightData.Light.transform.position - camPos).sqrMagnitude;
+                
+                var targetIntensity = sqrDist <= _sqrMaxDistance ? 
+                    lightData.OriginalIntensity : 0f;
+                
+                _trackedLights[i] =new LightData(
+                    lightData.Light,
+                    lightData.OriginalIntensity,
+                    targetIntensity,
+                    lightData.IsToggleOnly,
+                    lightData.WasEnabled);
+            }
+        }
+
+        private void ApplyFade()
+        {
+            float delta = _fadeSpeed * Time.deltaTime;
+
+            for (int i = 0; i < _trackedLights.Count; i++)
+            {
+                var lightData = _trackedLights[i];
+                if (lightData.Light == null) continue;
+
+                if (lightData.IsToggleOnly)
                 {
-                    _targetIntensity[l] = _origIntensity.ContainsKey(l) ? _origIntensity[l] : l.intensity;
+                    lightData.Light.enabled = lightData.TargetIntensity > 0.001f;
                 }
                 else
                 {
-                    _targetIntensity[l] = 0f;
+                    float current = lightData.Light.intensity;
+                    float target = lightData.TargetIntensity;
+                    
+                    if (!Mathf.Approximately(current, target))
+                    {
+                        float next = Mathf.MoveTowards(current, target, delta);
+                        lightData.Light.intensity = next;
+                        lightData.Light.enabled = next > 0.001f;
+                    }
                 }
+                
+                _trackedLights[i] = lightData;
             }
         }
 
         private void ApplyImmediate()
         {
-            foreach (var l in _trackedLights.ToArray())
+            for (int i = 0; i < _trackedLights.Count; i++)
             {
-                if (l == null) continue;
-                float targ = _targetIntensity.ContainsKey(l) ? _targetIntensity[l] : _origIntensity[l];
+                var lightData = _trackedLights[i];
+                if (lightData.Light == null) continue;
 
-                if (_toggleOnlyLights.Contains(l))
+                if (lightData.IsToggleOnly)
                 {
-                    // простой on/off
-                    l.enabled = targ > 0.001f;
+                    lightData.Light.enabled = lightData.TargetIntensity > 0.001f;
                 }
                 else
                 {
-                    // мгновенно назначаем intensity и включаем/выключаем
-                    l.intensity = targ;
-                    l.enabled = targ > 0.001f;
+                    lightData.Light.intensity = lightData.TargetIntensity;
+                    lightData.Light.enabled = lightData.TargetIntensity > 0.001f;
                 }
             }
         }
 
-        public void SetMaxDistance(float d)
+        private void RestoreAllLights()
         {
-            _maxDistance = Mathf.Max(0.01f, d);
-            _sqrMaxDistance = _maxDistance * _maxDistance;
-        }
-
-        public void Clear()
-        {
-            foreach (var trackedLight in _trackedLights.ToArray())
+            for (int i = 0; i < _trackedLights.Count; i++)
             {
-                if (trackedLight == null) continue;
-                try
-                {
-                    LightIntensityStorage storage = trackedLight.GetComponent<LightIntensityStorage>();
+                var lightData = _trackedLights[i];
+                if (lightData.Light == null) continue;
 
-                    if (storage != null && storage.Saved)
-                    {
-                        trackedLight.intensity = storage.Intensity;
-                        trackedLight.enabled = storage.WasEnabled;
-                    }
-                }
-                catch (Exception)
-                {
-                    // безопасно молчим, но желательно логировать при дебаге
-                }
+                lightData.Light.intensity = lightData.OriginalIntensity;
+                lightData.Light.enabled = lightData.WasEnabled;
+            }
+        }
+        
+        private readonly struct LightData : IEquatable<LightData>
+        {
+            public readonly Light Light;
+            public readonly float OriginalIntensity;
+            public readonly float TargetIntensity;
+            public readonly bool IsToggleOnly;
+            public readonly bool WasEnabled;
+
+            public LightData(Light light, float originalIntensity, float targetIntensity, bool isToggleOnly, bool wasEnabled)
+            {
+                Light = light;
+                OriginalIntensity = originalIntensity;
+                TargetIntensity = targetIntensity;
+                IsToggleOnly = isToggleOnly;
+                WasEnabled = wasEnabled;
             }
 
-            _trackedLights.Clear();
-            _origIntensity.Clear();
-            _targetIntensity.Clear();
-            _toggleOnlyLights.Clear();
-        }
+            public bool Equals(LightData other)
+            {
+                return Equals(Light, other.Light) && 
+                       OriginalIntensity.Equals(other.OriginalIntensity) &&
+                       TargetIntensity.Equals(other.TargetIntensity) && IsToggleOnly == other.IsToggleOnly && WasEnabled == other.WasEnabled;
+            }
 
-        public void Rebuild()
-        {
-            RefreshLightList();
+            public override bool Equals(object obj)
+            {
+                return obj is LightData other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Light, OriginalIntensity, TargetIntensity, IsToggleOnly, WasEnabled);
+            }
         }
     }
 }

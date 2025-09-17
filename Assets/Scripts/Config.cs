@@ -11,6 +11,7 @@ public sealed class Config
 	public static bool EnablePostProcessEffects { get; set; } = false;
 
 	private const string AUDIO_MODE_KEY = "AudioSpeakerMode";
+	private static bool _configDataWasSetted = false;
 
 	[Inject]
 	private readonly MainMenuHandler _mainMenuHandler;
@@ -32,9 +33,11 @@ public sealed class Config
 		string basePath = Utils.GetAppropriateDataPath();
 		Utils.ConfirmExistsMakeIfNot(basePath, "Config.ini");
 
-#if UNITY_ANDROID 
-		_const.GraphicsResWidth = Mathf.RoundToInt(Screen.width/1.5f);
-		_const.GraphicsResHeight = Mathf.RoundToInt(Screen.height/1.5f);
+#if UNITY_ANDROID
+		QualitySettings.vSyncCount = 0;
+		Application.targetFrameRate = 60;
+		_const.GraphicsResWidth = Mathf.RoundToInt(Screen.width/1.8f);
+		_const.GraphicsResHeight = Mathf.RoundToInt(Screen.height/1.8f);
 #else
 		_const.GraphicsResWidth = AssignConfigInt("Graphics","ResolutionWidth");
 		_const.GraphicsResHeight = AssignConfigInt("Graphics","ResolutionHeight");
@@ -87,15 +90,25 @@ public sealed class Config
 		_const.InputQuickItemPickup = AssignConfigBool("Input", "QuickItemPickup");
 		_const.InputQuickReloadWeapons = AssignConfigBool("Input", "QuickReloadWeapons");
 		_const.NoShootMode = AssignConfigBool("Input", "NoShootMode");
-		SetVolume();
-		_const.sprint("Setting screen resolution to "
-		             + _const.GraphicsResWidth.ToString()
-		             + ", " + _const.GraphicsResHeight.ToString()
-		             + ", Fullscreen: "
-		             + _const.GraphicsFullscreen.ToString());
-		Screen.SetResolution(_const.GraphicsResWidth, _const.GraphicsResHeight, true);
-		Screen.fullScreen = _const.GraphicsFullscreen;
-		SetShadows();
+
+		if (!_configDataWasSetted)
+		{
+			SetVolume();
+			Debug.Log("Setting screen resolution to "
+			          + _const.GraphicsResWidth.ToString()
+			          + ", " + _const.GraphicsResHeight.ToString()
+			          + ", Fullscreen: "
+			          + _const.GraphicsFullscreen.ToString());
+		
+			Screen.SetResolution(_const.GraphicsResWidth, _const.GraphicsResHeight, true);
+			Screen.fullScreen = _const.GraphicsFullscreen;
+			SetShadows();
+			SetAudioMode();
+		}
+		
+		if (_const.GraphicsShadowMode > 2) _const.GraphicsShadowMode = 2;
+		if (_const.GraphicsShadowMode < 0) _const.GraphicsShadowMode = 0;
+		
 		SetModelDetail();
 		SetBloom();
 		SetSEGI();
@@ -106,7 +119,7 @@ public sealed class Config
 		SetAA();
 		SetVSync();
 		SetLanguage();
-		SetAudioMode();
+		_configDataWasSetted = true;
 	}
 	
 	public void WriteConfig() {
@@ -199,11 +212,12 @@ public sealed class Config
 	}
 	
 	public void SetSEGI() {
-		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<SEGI>().enabled = _const.GraphicsSEGI;
-		SetBrightness();
+		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<SEGI>().enabled = false;
+//		SetBrightness();
 	}
 
 	public void SetVSync() {
+#if !UNITY_ANDROID		
 		if (_const.GraphicsVSync) {
 			Application.targetFrameRate = _const.TARGET_FPS * 2;
 			QualitySettings.vSyncCount = 1;
@@ -213,6 +227,7 @@ public sealed class Config
 		}
 		
 		Debug.Log("Set VSYNC to " + _const.GraphicsVSync.ToString() + ", target framerate is " + Application.targetFrameRate.ToString());
+#endif
 	}
 
 	public void SetFXAA(AntialiasingModel.FxaaPreset preset) {
@@ -286,6 +301,7 @@ public sealed class Config
 	// No Detail (aka flat cards, ala original)
 	// High Detail (Citadel intended graphics)
 	public void SetModelDetail() {
+		return;
 		if (_const.GraphicsModelDetail == 0) {
 			_dynamicCulling.lodSqrDist = 0f;
 		} else {

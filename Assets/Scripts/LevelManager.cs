@@ -84,7 +84,6 @@ public class LevelManager : MonoBehaviour
 	public static bool UseDynamicLevelsLoading => ScenesLoader.LoadedSceneName == ScenesLoader.DynamicLevelsSceneName;
 
 	void Awake () {
-		_dummyGameObject = new("dummy_gameobject");
 		if (currentLevel < 0) {
 			if (_consts == null) return;
 			if (_consts.player1CapsuleMainCameragGO == null) return;

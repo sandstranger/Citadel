@@ -836,7 +836,10 @@ public class AIController : MonoBehaviour {
 	}
 	
 	Vector3 GetAStarPoint() {
-		if (_dynamicCulling == null) return GetWanderPoint();
+		if (_dynamicCulling == null || !_dynamicCulling.cullEnabled)
+		{
+			return GetWanderPoint();
+		}
 		
 		Vector2Int currentCell = _dynamicCulling.PosToCellCoords(transform.position);
 		if (!_dynamicCulling.XYPairInBounds(currentCell.x,currentCell.y)) return GetWanderPoint();

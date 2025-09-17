@@ -4,7 +4,8 @@
     "references": [
         "SimpleFileBrowser.Runtime",
         "BetterStreamingAssets",
-        "Zenject"
+        "Zenject",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
