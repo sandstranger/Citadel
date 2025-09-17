@@ -3,7 +3,7 @@
 --- !u!55 &1
 PhysicsManager:
   m_ObjectHideFlags: 0
-  serializedVersion: 13
+  serializedVersion: 19
   m_Gravity: {x: 0, y: -9.81, z: 0}
   m_DefaultMaterial: {fileID: 0}
   m_BounceThreshold: 1
@@ -17,21 +17,21 @@ PhysicsManager:
   m_EnableAdaptiveForce: 0
   m_ClothInterCollisionDistance: 0
   m_ClothInterCollisionStiffness: 0
-  m_ContactsGeneration: 1
   m_LayerCollisionMatrix: cffe7ee1cf1e7cc0cf3e7cc0ffffffffc80000c0c80000c0ffffffffffffffffc80000c0cffc78c1cf1ef6c6cf667ee1cf0677c5cd4a0cc1c96a7ec1c90200c0c81070c0c95c78c1cf7c70c1cf6a0ac0cf5e67c5cf5e57c5cf5e37c5c80400c0c97a76e0c80400c0c81470c0c80000c0c80000c0c90800c1ffffffffffffffff
-  m_AutoSimulation: 1
+  m_SimulationMode: 0
   m_AutoSyncTransforms: 0
   m_ReuseCollisionCallbacks: 1
+  m_InvokeCollisionCallbacks: 1
   m_ClothInterCollisionSettingsToggle: 0
   m_ClothGravity: {x: 0, y: -9.81, z: 0}
   m_ContactPairsMode: 0
-  m_BroadphaseType: 1
-  m_WorldBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 300, y: 300, z: 300}
-  m_WorldSubdivisions: 16
+  m_BroadphaseType: 2
   m_FrictionType: 0
   m_EnableEnhancedDeterminism: 1
-  m_EnableUnifiedHeightmaps: 0
+  m_ImprovedPatchFriction: 0
+  m_GenerateOnTriggerStayEvents: 1
   m_SolverType: 0
   m_DefaultMaxAngularSpeed: 7
+  m_ScratchBufferChunkCount: 4
+  m_CurrentBackendId: 4072204805
+  m_FastMotionThreshold: 3.4028235e+38
