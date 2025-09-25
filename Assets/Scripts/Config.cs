@@ -29,7 +29,7 @@ public sealed class Config
 	private readonly PostProcessProfile _postProcessingProfile;
 	[Inject] 
 	private readonly Camera _camera;
-	[Inject] private IReadOnlyCollection<PostProcessLayer> _postProcessLayers;
+	[Inject] private readonly IReadOnlyCollection<PostProcessLayerStorage> _postProcessLayers;
 
 	private readonly Lazy<ScreenSpaceReflections> _screenSpaceReflections;
 	private readonly Lazy<AmbientOcclusion> _ambientOcclusion;
@@ -256,32 +256,38 @@ public sealed class Config
 		
 		foreach (var postProcessLayer in _postProcessLayers)
 		{
-			if (!postProcessLayer.gameObject.name.Contains("SensaroundCamera"))
+			if (!postProcessLayer.PostProcessLayer.gameObject.name.Contains("SensaroundCamera"))
 			{
-				postProcessLayer.fog.enabled = EnablePostProcessEffects;
-				postProcessLayer.fog.excludeSkybox = true;
+				postProcessLayer.PostProcessLayer.fog.enabled = EnablePostProcessEffects;
+				postProcessLayer.PostProcessLayer.fog.excludeSkybox = true;
 			}
 		}
 	}
 	
 	public void SetAA() {
 		if (_const.GraphicsAAMode < 0) _const.GraphicsAAMode = 0;
-		if (_const.GraphicsAAMode > 4) _const.GraphicsAAMode = 4;
+		if (_const.GraphicsAAMode > 6) _const.GraphicsAAMode = 6;
 		switch (_const.GraphicsAAMode) {
 			case 0: // No Antialiasing, turn off the profile's antialiasing entirely.
-				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.None);
+				UpdateBaseAntianalising(PostProcessLayer.Antialiasing.None);
 				break;
 			case 1: // FXAA Extreme Performance, FXAA is a bit different so we call a helper function to set it.
-				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.FastApproximateAntialiasing, enableFastFxaa: true);
+				UpdateBaseAntianalising(PostProcessLayer.Antialiasing.FastApproximateAntialiasing, enableFastFxaa: true);
 				break;
 			case 2:
-				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.FastApproximateAntialiasing, enableFastFxaa: false);
+				UpdateBaseAntianalising(PostProcessLayer.Antialiasing.FastApproximateAntialiasing, enableFastFxaa: false);
 				break;
 			case 3:
-				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.SubpixelMorphologicalAntialiasing);
+				UpdateBaseAntianalising(PostProcessLayer.Antialiasing.SubpixelMorphologicalAntialiasing);
 				break;
 			case 4: 
-				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.TemporalAntialiasing);
+				UpdateBaseAntianalising(PostProcessLayer.Antialiasing.TemporalAntialiasing);
+				break;
+			case 5: 
+				UpdateSuperResolutionUpscaler(Upscaling.UpscalerType.FSR2);
+				break;
+			case 6: 
+				UpdateSuperResolutionUpscaler(Upscaling.UpscalerType.FSR3);
 				break;
 		}
 	}
@@ -402,14 +408,42 @@ public sealed class Config
 		return false;
 	}
 	
-	private void UpdateAntiAntianalising(PostProcessLayer.Antialiasing antialiasing, bool enableFastFxaa = true)
+	private void UpdateBaseAntianalising(PostProcessLayer.Antialiasing antialiasing, bool enableFastFxaa = true)
 	{
 		foreach (var postProcessLayer in _postProcessLayers)
 		{
-			postProcessLayer.antialiasingMode = antialiasing;
-			postProcessLayer.subpixelMorphologicalAntialiasing.quality = SubpixelMorphologicalAntialiasing.Quality.Low;
-			postProcessLayer.fastApproximateAntialiasing.fastMode = enableFastFxaa;
-			postProcessLayer.fastApproximateAntialiasing.keepAlpha = true;
+			postProcessLayer.PostProcessLayer.antialiasingMode = antialiasing;
+			postProcessLayer.PostProcessLayer.subpixelMorphologicalAntialiasing.quality = SubpixelMorphologicalAntialiasing.Quality.Low;
+			postProcessLayer.PostProcessLayer.fastApproximateAntialiasing.fastMode = enableFastFxaa;
+			postProcessLayer.PostProcessLayer.fastApproximateAntialiasing.keepAlpha = postProcessLayer.HasTargetTexture;
+		}
+	}
+	
+	private void UpdateSuperResolutionUpscaler(Upscaling.UpscalerType upscalerType)
+	{
+		foreach (var postProcessLayer in _postProcessLayers)
+		{
+			if (postProcessLayer.HasTargetTexture)
+			{
+				continue;
+			}
+			
+			postProcessLayer.PostProcessLayer.antialiasingMode = PostProcessLayer.Antialiasing.AdvancedUpscaling;
+			postProcessLayer.PostProcessLayer.superResolution.upscalerType = upscalerType;
+		}
+	}
+
+	internal readonly struct PostProcessLayerStorage
+	{
+		public bool HasTargetTexture => _camera.targetTexture!=null;
+		
+		public readonly PostProcessLayer PostProcessLayer;
+		private readonly Camera _camera;
+
+		public PostProcessLayerStorage(PostProcessLayer postProcessLayer)
+		{
+			PostProcessLayer = postProcessLayer;
+			_camera = postProcessLayer.GetComponent<Camera>();
 		}
 	}
 }

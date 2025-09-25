@@ -40,6 +40,7 @@ namespace Citadel.Game
         [SerializeField] private PostProcessLayer[] _postProcessLayers;
 
         private readonly List<object> _itemsToInject = new();
+        private readonly List<Config.PostProcessLayerStorage> _postProcessLayerStorages = new();
 
         private void Awake()
         {
@@ -65,13 +66,18 @@ namespace Citadel.Game
             _const.InitializeInstance();
             _playerReference.InitializeInstance();
             _playerPatch.Initialize();
+            
+            foreach (var postProcessLayer in _postProcessLayers)
+            {
+                _postProcessLayerStorages.Add(new Config.PostProcessLayerStorage(postProcessLayer));
+            }
         }
 
         public override void InstallBindings()
         {
+            Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>().FromInstance(_postProcessLayerStorages).AsSingle();
             Container.Bind<Config>().AsSingle();
             Container.Bind<ConsoleEmulator>().AsSingle();
-            Container.Bind<IReadOnlyCollection<PostProcessLayer>>().FromInstance(_postProcessLayers).AsSingle();
             Container.Bind<PostProcessProfile>().FromInstance(_postProcessProfile).AsSingle();
             Container.BindInstance(_mainCamera).AsSingle();
             Container.BindInstance(_playerReference).AsSingle();

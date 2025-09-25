@@ -161,13 +161,13 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.postprocessing": {
-      "version": "3.5.1",
+      "version": "file:com.unity.postprocessing",
       "depth": 0,
-      "source": "registry",
+      "source": "embedded",
       "dependencies": {
-        "com.unity.modules.physics": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
+        "com.unity.modules.physics": "1.0.0",
+        "fidelityfx.fsr": "1.0.1"
+      }
     },
     "com.unity.profiling.core": {
       "version": "1.0.2",
@@ -300,6 +300,12 @@
       "source": "git",
       "dependencies": {},
       "hash": "d741912bfeaad8da4fe0f258f4f3eefe1fe7b3f3"
+    },
+    "fidelityfx.fsr": {
+      "version": "file:fidelityfx.fsr",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
