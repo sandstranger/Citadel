@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Citadel.Game;
 using Citadel.SceneManagement;
+using UnityEditor;
 using Zenject;
 using UnityEngine;
 
@@ -1386,7 +1387,7 @@ Generic Materials (_consts.genericMaterials[])
 */
 	public GameObject SpawnDynamicObject(int val, int lev, bool cheat,
 												GameObject forcedContainer,
-												int saveID) {
+												int saveID, bool spawnObjectAsPrefab = false) {
 		if (!ConstIndexInBounds(val)) {
 			Debug.Log("Const index out of bounds: " + val.ToString());
 			return null;
@@ -1410,34 +1411,43 @@ Generic Materials (_consts.genericMaterials[])
 		GameObject go = null;
 		if (ConstIndexIsGeometry(val)) {
 			if (_consts.editMode || !cheat) {
-				go = RootInstaller.InstantiatePrefab(_consts.GetPrefab(val),spawnPos,
-									_consts.quaternionIdentity) as GameObject;
+				InstantiatePrefab();
 			} else {
 				_consts.sprint("Indices 0 through 306 (level geometry chunks) "
 							 + "not possible when not on edit mode!");
 			}
 		} else {
-			go = RootInstaller.InstantiatePrefab(_consts.GetPrefab(val),spawnPos, _consts.quaternionIdentity) as GameObject;
+			InstantiatePrefab();
 		}
 
 		if (go != null) {
-			if (forcedContainer != null) {
-				go.transform.SetParent(forcedContainer.transform);
-			} else {
-				Level levS = _levelManager.levelScripts[lev];
-				
-				GameObject parGO = levS.dynamicObjectsContainer;
-				if (ConstIndexIsNPC(val)) {
-					parGO = levS.NPCsSaveableInstantiated;
-				} else if (ConstIndexIsGeometry(val)) {
-					parGO = levS.geometryContainer;
-				} else if (ConstIndexIsDynamicObject(val)) {
-					parGO = levS.dynamicObjectsContainer;
+			if (!spawnObjectAsPrefab)
+			{
+				if (forcedContainer != null)
+				{
+					go.transform.SetParent(forcedContainer.transform);
 				}
+				else
+				{
+					Level levS = _levelManager.levelScripts[lev];
 
-				go.transform.SetParent(parGO.transform);
+					GameObject parGO = levS.dynamicObjectsContainer;
+					if (ConstIndexIsNPC(val))
+					{
+						parGO = levS.NPCsSaveableInstantiated;
+					}
+					else if (ConstIndexIsGeometry(val))
+					{
+						parGO = levS.geometryContainer;
+					}
+					else if (ConstIndexIsDynamicObject(val))
+					{
+						parGO = levS.dynamicObjectsContainer;
+					}
+
+					go.transform.SetParent(parGO.transform);
+				}
 			}
-			
 			if (cheat && ConstIndexIsHardware(val)) { // Hardware
 				UseableObjectUse uo = go.GetComponent<UseableObjectUse>();
 				int dex14 = _inventory.hardware14fromConstdex(uo.useableItemIndex);
@@ -1468,6 +1478,27 @@ Generic Materials (_consts.genericMaterials[])
 			}
 		}
 		return go;
+
+		void InstantiatePrefab()
+		{
+			var prefab = _consts.GetPrefab(val);
+#if UNITY_EDITOR
+			if (spawnObjectAsPrefab && forcedContainer != null)
+			{
+				go = PrefabUtility.InstantiatePrefab(prefab, forcedContainer.transform) as GameObject;
+				go.transform.position = spawnPos;
+				go.transform.rotation = _consts.quaternionIdentity;
+			}
+			else
+			{
+				go = RootInstaller.InstantiatePrefab(prefab,spawnPos,
+					_consts.quaternionIdentity) as GameObject;
+			}
+#else
+			go = RootInstaller.InstantiatePrefab(prefab,spawnPos,
+				_consts.quaternionIdentity) as GameObject;
+#endif
+		}
 	}
 
 	public GameObject SpawnDynamicObject(int val, int lev, bool cheat,

@@ -587,7 +587,7 @@ public static class SaveLoad {
             return null;
         }
 
-        GameObject chunk = consoleEmulator.SpawnDynamicObject(constdex,curlevel,false,null,0);
+        GameObject chunk = consoleEmulator.SpawnDynamicObject(constdex,curlevel,false,levelGeometryParent,0, true);
         if (chunk == null) return null;
 
         if (levelGeometryParent != null)

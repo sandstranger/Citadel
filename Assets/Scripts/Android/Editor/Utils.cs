@@ -8,7 +8,12 @@ namespace Citadel.Editor
     {
         public static IReadOnlyList<T> FindAllComponentsInProject<T>() where T : Object
         {
-            var guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}", new[] { "Assets" });
+            return FindAllComponentsInProject<T>($"t:{typeof(T).Name}");
+        }
+
+        public static IReadOnlyList<T> FindAllComponentsInProject<T>(string typeName) where T : Object
+        {
+            var guids = AssetDatabase.FindAssets($"t:{typeName}", new[] { "Assets" });
             var components = new List<T>(guids.Length);
 
             foreach (string guid in guids)

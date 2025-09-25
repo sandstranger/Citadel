@@ -24,21 +24,20 @@ namespace Citadel.Android.Tools
                 return;
             }
             
-            if (Directory.Exists(LevelsPrefabsLocations))
-            {
-                Directory.Delete(LevelsPrefabsLocations, true);
-            }
-            
             for (var i = 0; i <= MaxLevels; ++i)
             {
                 var currentLevelPrefabsLocation = Path.Combine(LevelsPrefabsLocations, $"Level_{i}");
                 var levelGeometryParent = new GameObject("LevelGeometry");
                 var levelLightsParent = new GameObject("LevelLights");
                 LoadLevelGeometry(consts,consoleEmulator, levelManager,i, levelGeometryParent, levelLightsParent);
-                LoadLevelLights(consts,consoleEmulator, levelManager,i, levelLightsParent);
-                
-                SavePrefab(levelGeometryParent, currentLevelPrefabsLocation);
-                SavePrefab(levelLightsParent, currentLevelPrefabsLocation);
+             //   LoadLevelLights(consts,consoleEmulator, levelManager,i, levelLightsParent);
+
+             if (File.Exists(currentLevelPrefabsLocation))
+             {
+                 File.Delete(currentLevelPrefabsLocation);
+             }
+             SavePrefab(levelGeometryParent, currentLevelPrefabsLocation);
+              //  SavePrefab(levelLightsParent, currentLevelPrefabsLocation);
                 Object.DestroyImmediate(levelGeometryParent);
                 Object.DestroyImmediate(levelLightsParent);
             }
@@ -114,7 +113,8 @@ namespace Citadel.Android.Tools
                     lit.enabled = true;
                     lit.lightmapBakeType = LightmapBakeType.Mixed;
                     lit.gameObject.name = "ChunkLight_" + lit.gameObject.name;
-                    lit.transform.SetParent(lightsParent.transform,true);
+                    GameObject.DestroyImmediate(lit.gameObject);
+//                    lit.transform.SetParent(lightsParent.transform,true);
 // 				UnityEngine.Debug.Log("Moved light off of " + lit.gameObject.name);
                 }
 			

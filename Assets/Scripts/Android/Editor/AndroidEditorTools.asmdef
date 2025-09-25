@@ -2,7 +2,9 @@
     "name": "AndroidEditorTools",
     "rootNamespace": "",
     "references": [
-        "Citadel"
+        "Citadel",
+        "Unity.AutoLOD",
+        "Unity.AutoLOD.Editor"
     ],
     "includePlatforms": [
         "Editor"

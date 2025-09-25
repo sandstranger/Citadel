@@ -111,6 +111,7 @@ MonoBehaviour:
     - line: '|   muteOtherAudioSources: 0'
     - line: '|   Prepare IOS For Recording: 0'
     - line: '|   Force IOS Speakers When Recording: 0'
+    - line: '|   audioSpatialExperience: 0'
     - line: '|   deferSystemGesturesMode: 0'
     - line: '|   hideHomeButton: 0'
     - line: '|   submitAnalytics: 1'
@@ -215,7 +216,7 @@ MonoBehaviour:
     - line: '|   keepLoadedShadersAlive: 1'
     - line: '|   StripUnusedMeshComponents: 1'
     - line: '|   strictShaderVariantMatching: 0'
-    - line: '|   VertexChannelCompressionMask: 246'
+    - line: '|   VertexChannelCompressionMask: -1'
     - line: '|   iPhoneSdkVersion: 988'
     - line: '|   iOSSimulatorArchitecture: 0'
     - line: '|   iOSTargetOSVersionString: 13.0'
@@ -905,6 +906,7 @@ MonoBehaviour:
     - line: '|     33: UNITY_POST_PROCESSING_STACK_V2'
     - line: '|     4: CROSS_PLATFORM_INPUT;MOBILE_INPUT'
     - line: '|     7: CROSS_PLATFORM_INPUT;MOBILE_INPUT;UNITY_POST_PROCESSING_STACK_V2'
+    - line: '|     Android: ENABLE_UNITYMESHSIMPLIFIER'
     - line: '|   additionalCompilerArguments: {}'
     - line: '|   platformArchitecture:'
     - line: '|     iPhone: 1'
@@ -921,7 +923,7 @@ MonoBehaviour:
     - line: '|   il2cppCodeGeneration: {}'
     - line: '|   il2cppStacktraceInformation: {}'
     - line: '|   managedStrippingLevel:'
-    - line: '|     Android: 1'
+    - line: '|     Android: 2'
     - line: '|     EmbeddedLinux: 1'
     - line: '|     GameCoreScarlett: 1'
     - line: '|     GameCoreXboxOne: 1'
@@ -1051,10 +1053,10 @@ MonoBehaviour:
     - rid: 8459001560450728178
       type: {class: AndroidPlatformBuildSettings, ns: UnityEditor.Android, asm: UnityEditor.Android.Extensions}
       data:
-        m_Development: 0
-        m_ConnectProfiler: 1
-        m_BuildWithDeepProfilingSupport: 1
-        m_AllowDebugging: 1
+        m_Development: 1
+        m_ConnectProfiler: 0
+        m_BuildWithDeepProfilingSupport: 0
+        m_AllowDebugging: 0
         m_WaitForManagedDebugger: 0
         m_ManagedDebuggerFixedPort: 0
         m_ExplicitNullChecks: 0
@@ -1070,7 +1072,7 @@ MonoBehaviour:
         m_DebugSymbolLevel: 1
         m_DebugSymbolFormat: 5
         m_CurrentDeploymentTargetId: __builtin__target_default
-        m_BuildType: 2
+        m_BuildType: 1
         m_LinkTimeOptimization: 0
         m_BuildAppBundle: 0
         m_IPAddressToConnect: 
