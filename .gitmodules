@@ -1,0 +1,3 @@
+[submodule "Assets/Plugins/AutoLOD"]
+	path = Assets/Plugins/AutoLOD
+	url = https://github.com/sandstranger/AutoLOD.git
