@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Zenject;
 using UnityEngine;
@@ -28,7 +29,7 @@ public sealed class Config
 	private readonly PostProcessProfile _postProcessingProfile;
 	[Inject] 
 	private readonly Camera _camera;
-	[Inject] private PostProcessLayer[] _postProcessLayers;
+	[Inject] private IReadOnlyCollection<PostProcessLayer> _postProcessLayers;
 
 	private readonly Lazy<ScreenSpaceReflections> _screenSpaceReflections;
 	private readonly Lazy<AmbientOcclusion> _ambientOcclusion;
@@ -255,7 +256,11 @@ public sealed class Config
 		
 		foreach (var postProcessLayer in _postProcessLayers)
 		{
-			postProcessLayer.fog.enabled = EnablePostProcessEffects;
+			if (!postProcessLayer.gameObject.name.Contains("SensaroundCamera"))
+			{
+				postProcessLayer.fog.enabled = EnablePostProcessEffects;
+				postProcessLayer.fog.excludeSkybox = true;
+			}
 		}
 	}
 	
@@ -404,6 +409,7 @@ public sealed class Config
 			postProcessLayer.antialiasingMode = antialiasing;
 			postProcessLayer.subpixelMorphologicalAntialiasing.quality = SubpixelMorphologicalAntialiasing.Quality.Low;
 			postProcessLayer.fastApproximateAntialiasing.fastMode = enableFastFxaa;
+			postProcessLayer.fastApproximateAntialiasing.keepAlpha = true;
 		}
 	}
 }

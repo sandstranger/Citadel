@@ -71,7 +71,7 @@ namespace Citadel.Game
         {
             Container.Bind<Config>().AsSingle();
             Container.Bind<ConsoleEmulator>().AsSingle();
-            Container.Bind<PostProcessLayer[]>().FromInstance(_postProcessLayers).AsSingle();
+            Container.Bind<IReadOnlyCollection<PostProcessLayer>>().FromInstance(_postProcessLayers).AsSingle();
             Container.Bind<PostProcessProfile>().FromInstance(_postProcessProfile).AsSingle();
             Container.BindInstance(_mainCamera).AsSingle();
             Container.BindInstance(_playerReference).AsSingle();

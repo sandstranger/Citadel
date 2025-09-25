@@ -66,7 +66,10 @@ public class PauseRigidbody : MonoBehaviour {
 		} else {
 			rbody.collisionDetectionMode = previouscolDetMode;
 		}
-		
-		rbody.linearVelocity = previousVelocity;
+
+		if (!rbody.isKinematic)
+		{
+			rbody.linearVelocity = previousVelocity;
+		}
 	}
 }

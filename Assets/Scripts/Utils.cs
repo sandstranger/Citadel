@@ -1346,7 +1346,10 @@ public class Utils {
 		readFloaty = GetFloatFromString(entries[index],"velocity.y"); index++;
 		readFloatz = GetFloatFromString(entries[index],"velocity.z"); index++;
 		tempvec = new Vector3(readFloatx,readFloaty,readFloatz);
-		rbody.linearVelocity = tempvec;
+		if (!rbody.isKinematic)
+		{
+			rbody.linearVelocity = tempvec;
+		}
 // 		CollisionDetectionMode oldCollision = rbody.collisionDetectionMode;
 		rbody.isKinematic = GetBoolFromString(entries[index],"isKinematic"); index++;
 // 		if (rbody.isKinematic) rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
