@@ -18,25 +18,6 @@ public class ConfigurationMenuAAApply : MonoBehaviour {
 		Initialize();
 	}
 	
-	public void SetOptionsText() {
-		if (!_consts.stringTableLoaded) return;
-		if (aaPicker == null) return;
-
-		List<string> aaList = new List<string>();
-		for (int i=0;i<6;i++) {
-			switch(i) {
-				case 0: aaList.Add(_consts.stringTable[779]); break;
-				case 1: aaList.Add(_consts.stringTable[780]); break;
-				case 2: aaList.Add(_consts.stringTable[781]); break;
-				case 3: aaList.Add(_consts.stringTable[782]); break;
-				case 4: aaList.Add(_consts.stringTable[783]); break;
-				case 5: aaList.Add(_consts.stringTable[784]); break;
-			}
-		}
-		aaPicker.ClearOptions();
-		aaPicker.AddOptions(aaList);
-	}
-
 	void Initialize() {
 		if (aaPicker == null) aaPicker = GetComponent<Dropdown>();
 		if (aaPicker == null) {
@@ -44,7 +25,6 @@ public class ConfigurationMenuAAApply : MonoBehaviour {
 			return;
 		}
 		
-		SetOptionsText();
 		if (aaPicker.value != _consts.GraphicsAAMode) {
 			aaPicker.value = _consts.GraphicsAAMode;
 		}
@@ -54,7 +34,7 @@ public class ConfigurationMenuAAApply : MonoBehaviour {
 		if (aaPicker != null)
 			_consts.GraphicsAAMode = aaPicker.value;
 		else
-			_consts.GraphicsAAMode = 1; // Default to FXAA Extreme Performance
+			_consts.GraphicsAAMode = 0; // Default to FXAA Extreme Performance
 
 		_config.WriteConfig();
 		_config.SetAA();

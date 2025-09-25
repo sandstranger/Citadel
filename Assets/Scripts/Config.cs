@@ -1,9 +1,8 @@
 using System;
-using System.Collections;
 using System.Globalization;
 using Zenject;
 using UnityEngine;
-using UnityEngine.PostProcessing;
+using UnityEngine.Rendering.PostProcessing;
 
 // Handles configuration parsing for user settings.
 public sealed class Config
@@ -25,8 +24,27 @@ public sealed class Config
 	private readonly Music _music;
 	[Inject]
 	private readonly DynamicCulling _dynamicCulling;
-	private int lastAudioMode = -1;
+	[Inject]
+	private readonly PostProcessProfile _postProcessingProfile;
+	[Inject] 
+	private readonly Camera _camera;
+	[Inject] private PostProcessLayer[] _postProcessLayers;
+
+	private readonly Lazy<ScreenSpaceReflections> _screenSpaceReflections;
+	private readonly Lazy<AmbientOcclusion> _ambientOcclusion;
+	private readonly Lazy<Bloom> _bloom;
+	private readonly Lazy<ColorGrading> _colorGrading;
 	
+	private int lastAudioMode = -1;
+
+	public Config()
+	{
+		_colorGrading = new Lazy<ColorGrading>(() => _postProcessingProfile.GetSetting<ColorGrading>());
+		_bloom = new Lazy<Bloom>(() => _postProcessingProfile.GetSetting<Bloom>());
+		_ambientOcclusion = new Lazy<AmbientOcclusion>(()=> _postProcessingProfile.GetSetting<AmbientOcclusion>());
+		_screenSpaceReflections = new Lazy<ScreenSpaceReflections> ( () => _postProcessingProfile.GetSetting<ScreenSpaceReflections>());
+	}
+
 	public void LoadConfig()
 	{
 		// The currently used config is always Config.ini.
@@ -204,16 +222,16 @@ public sealed class Config
 	}
 
 	public void SetFOV() {
-		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().fieldOfView = _const.GraphicsFOV;
+		_camera.fieldOfView = _const.GraphicsFOV;
 	}
 
-	public void SetBloom() {
-		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.bloom.enabled = _const.GraphicsBloom;
+	public void SetBloom()
+	{
+		_bloom.Value.active = _const.GraphicsBloom;
 	}
 	
 	public void SetSEGI() {
-		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<SEGI>().enabled = false;
-//		SetBrightness();
+		SetBrightness();
 	}
 
 	public void SetVSync() {
@@ -230,47 +248,36 @@ public sealed class Config
 #endif
 	}
 
-	public void SetFXAA(AntialiasingModel.FxaaPreset preset) {
-		AntialiasingModel.Settings amS = AntialiasingModel.Settings.defaultSettings;
-		amS.fxaaSettings.preset = preset;
-		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.antialiasing.enabled = true;
-		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.antialiasing.settings = amS;
+	public void UpdateFog(float fogDensity, Color fogColor)
+	{
+		RenderSettings.fogColor = fogColor;
+		RenderSettings.fogDensity = fogDensity;
+		
+		foreach (var postProcessLayer in _postProcessLayers)
+		{
+			postProcessLayer.fog.enabled = EnablePostProcessEffects;
+		}
 	}
-
-	// None
-	// ExtremePerformance,
-	// Performance,
-	// Default,
-	// Quality,
-	// ExtremeQuality
+	
 	public void SetAA() {
 		if (_const.GraphicsAAMode < 0) _const.GraphicsAAMode = 0;
-		if (_const.GraphicsAAMode > 5) _const.GraphicsAAMode = 5;
+		if (_const.GraphicsAAMode > 4) _const.GraphicsAAMode = 4;
 		switch (_const.GraphicsAAMode) {
 			case 0: // No Antialiasing, turn off the profile's antialiasing entirely.
-				_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.antialiasing.enabled = false;
+				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.None);
 				break;
 			case 1: // FXAA Extreme Performance, FXAA is a bit different so we call a helper function to set it.
-				SetFXAA(AntialiasingModel.FxaaPreset.ExtremePerformance);
+				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.FastApproximateAntialiasing, enableFastFxaa: true);
 				break;
-			case 2: // FXAA Performance
-				SetFXAA(AntialiasingModel.FxaaPreset.Performance);
+			case 2:
+				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.FastApproximateAntialiasing, enableFastFxaa: false);
 				break;
-			case 3: // FXAA Default
-				SetFXAA(AntialiasingModel.FxaaPreset.Default);
+			case 3:
+				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.SubpixelMorphologicalAntialiasing);
 				break;
-			case 4: // FXAA Extreme Quality
-				SetFXAA(AntialiasingModel.FxaaPreset.Quality);
+			case 4: 
+				UpdateAntiAntianalising(PostProcessLayer.Antialiasing.TemporalAntialiasing);
 				break;
-			case 5: // FXAA Extreme Quality
-				SetFXAA(AntialiasingModel.FxaaPreset.ExtremeQuality);
-				break;
-			//case 6: // TAA Default  -- Too ugly, removed.  Might add back later to test if there's better quality settings when I have a graphics card that can handle it.
-		//		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.antialiasing.enabled = true;
-		//		AntialiasingModel.Settings amS = _const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.antialiasing.settings;
-		//		amS.method = AntialiasingModel.Method.Taa;
-		//		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.antialiasing.settings = amS;
-		//		break;
 		}
 	}
 
@@ -317,60 +324,16 @@ public sealed class Config
 	public void SetSSR() {
 		if (_const.GraphicsSSRMode > 2) _const.GraphicsSSRMode = 2;
 		if (_const.GraphicsSSRMode < 0) _const.GraphicsSSRMode = 0;
-		switch (_const.GraphicsSSRMode) {
-			case 0: // No SSR
-				_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.screenSpaceReflection.enabled = false;
-				break;
-			case 1: // Low SSR
-				SetSSRPreset(ScreenSpaceReflectionModel.SSRResolution.Low);
-				break;
-			case 2: // High SSR
-				SetSSRPreset(ScreenSpaceReflectionModel.SSRResolution.Low); // Also low as it still looks good and prevents spikes every 0.25secs
-				break;
-		}
+		_screenSpaceReflections.Value.active = _const.GraphicsSSRMode > 0;
 	}
 
-	public void SetSSRPreset(ScreenSpaceReflectionModel.SSRResolution preset) {
-		ScreenSpaceReflectionModel.Settings ssr = ScreenSpaceReflectionModel.Settings.defaultSettings;
-		ssr.reflection.reflectionQuality = preset;
-		ssr.reflection.blendType = ScreenSpaceReflectionModel.SSRReflectionBlendType.Additive;
-		ssr.reflection.maxDistance = 100f;
-		if (preset == ScreenSpaceReflectionModel.SSRResolution.High) {
-			ssr.reflection.iterationCount = 1024;
-			ssr.reflection.stepSize = 1;
-		} else {
-			ssr.reflection.iterationCount = 512;
-			ssr.reflection.stepSize = 6;
-		}
-
-		ssr.intensity.reflectionMultiplier = 0.25f;
-		ssr.reflection.widthModifier = 0.5f;
-		ssr.reflection.reflectionBlur = 1.0f;
-		ssr.reflection.reflectBackfaces = false;
-		ssr.intensity.fadeDistance = 100f;
-		ssr.intensity.fresnelFade = 1.0f;
-		ssr.intensity.fresnelFadePower = 1.0f;
-		ssr.screenEdgeMask.intensity = 0.03f;
-		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.screenSpaceReflection.enabled = true;
-		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.screenSpaceReflection.settings = ssr;
-	}
-
-	public void SetSSAO() {
-// 		_const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile.ambientOcclusion.enabled = _const.GraphicsSSAO;
-		_const.player1CapsuleMainCameragGO.GetComponent<UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion>().enabled = _const.GraphicsSSAO;
+	public void SetSSAO()
+	{
+		_ambientOcclusion.Value.active = _const.GraphicsSSAO;
 	}
 
 	public void SetBrightness() {
-		float tempf = _const.GraphicsGamma;
-		if (tempf < 1) tempf = 0;
-		else tempf = tempf/100;
-		tempf = (tempf * 8f) - 4f;
-		if (_const.GraphicsSEGI) tempf -= Const.segiReducedExposure;
-		tempf += 2.2f;
-		PostProcessingProfile ppf = _const.player1CapsuleMainCameragGO.GetComponent<Camera>().GetComponent<PostProcessingBehaviour>().profile;
-		ColorGradingModel.Settings cgms = ppf.colorGrading.settings;
-		cgms.basic.postExposure = tempf;
-		ppf.colorGrading.settings = cgms;
+		_colorGrading.Value.brightness.value = _const.GraphicsGamma;
 	}
 
 	public void SetLanguage() {
@@ -380,7 +343,6 @@ public sealed class Config
 			txtLoc.UpdateText();
 		}
 		
-		_mainMenuHandler.aaaApply.SetOptionsText();
 		_mainMenuHandler.shadApply.SetOptionsText();
 		_mainMenuHandler.ssrApply.SetOptionsText();
 		_mainMenuHandler.audModeApply.SetOptionsText();
@@ -433,5 +395,15 @@ public sealed class Config
 			if (inputInt > 0) return true; else return false;
 		} else _const.sprint("Warning: Could not parse config key " + keyname + " as bool: " + inputCapture);
 		return false;
+	}
+	
+	private void UpdateAntiAntianalising(PostProcessLayer.Antialiasing antialiasing, bool enableFastFxaa = true)
+	{
+		foreach (var postProcessLayer in _postProcessLayers)
+		{
+			postProcessLayer.antialiasingMode = antialiasing;
+			postProcessLayer.subpixelMorphologicalAntialiasing.quality = SubpixelMorphologicalAntialiasing.Quality.Low;
+			postProcessLayer.fastApproximateAntialiasing.fastMode = enableFastFxaa;
+		}
 	}
 }

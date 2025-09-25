@@ -8,7 +8,7 @@ using System.Text;
 using Citadel.Game;
 using Zenject;
 
-public class MouseLookScript : MonoBehaviour, IInitializer {
+public class MouseLookScript : MonoBehaviour {
     // External references
 	public GameObject player;
 	public GameObject canvasContainer;
@@ -64,7 +64,7 @@ public class MouseLookScript : MonoBehaviour, IInitializer {
     private float zRotationV;
     private float currentZRotation;
     private string mlookstring1;
-    [HideInInspector] public Camera playerCamera;
+    [HideInInspector,Inject] public Camera playerCamera;
     private GameObject heldObject;
 	private Quaternion tempQuat;
 	private Vector3 tempVec;
@@ -118,10 +118,6 @@ public class MouseLookScript : MonoBehaviour, IInitializer {
 
 	private static readonly StringBuilder s1 = new StringBuilder(500 * 1024);
     
-	public void Initialize() {
-		playerCamera = GetComponent<Camera>(); // Needed elsewhere, do early.
-	}
-
     void Start (){
 		ResetHeldItem();
 		Cursor.lockState = CursorLockMode.None;

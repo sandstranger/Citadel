@@ -37,7 +37,6 @@ public class WeaponFire : MonoBehaviour {
 	public GameObject muzFlashStungun;
 	public float[] fogBaseDensityForLevel;
 	public Color[] fogColorForLevel;
-	public SSMS.SSMSGlobalFog ssmsGlobalFog;
 	public Transform reloadContainer; // Recoil the weapon view models
     public bool overloadEnabled; // save
 	public float reloadFinished; // save
@@ -102,7 +101,10 @@ public class WeaponFire : MonoBehaviour {
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private PlayerMovement _playerMovement;
 	[Inject] private WeaponCurrent _weaponCurrent;
+	[Inject] private readonly Config _config;
 
+	private int _currentLevel = int.MinValue;
+	
 	// Not needed on Const as this only exists in one unique place on player.
 	private float[] driftForWeapon = new float[16]{5f,0f,15f,50f,0f,0f,0f,8f,
 												   3f,3f,3f,12f,10f,30f,0f,3f};
@@ -304,8 +306,7 @@ public class WeaponFire : MonoBehaviour {
 		// Slowly cool off any weapons that have been heated from firing
 		HeatBleedOff();
 		if (fogFac > 255) fogFac = 255;
-		ssmsGlobalFog.fogDensity = 0.451f * (fogBaseDensityForLevel[LevelManager.currentLevel] + ((((float)fogFac)/255f) * fogBaseDensityForLevel[LevelManager.currentLevel]));
-		ssmsGlobalFog.fogColor = ssmsGlobalFog.fogTint = fogColorForLevel[LevelManager.currentLevel];
+		UpdateFog();
 		UpdateWeaponReloadDip();
 		RotateViewWeapon();
 		Recoiling();
@@ -347,6 +348,17 @@ public class WeaponFire : MonoBehaviour {
 		lerpStartTime = _pauseScript.relativeTime;
 	}
 
+	private void UpdateFog()
+	{
+		if (_currentLevel != LevelManager.currentLevel && _config!=null)
+		{
+			_currentLevel = LevelManager.currentLevel;
+			var fogDensity = 0.451f * (fogBaseDensityForLevel[_currentLevel] + ((((float)fogFac)/255f) * fogBaseDensityForLevel[_currentLevel]));
+			var fogColor = fogColorForLevel[_currentLevel];
+			_config.UpdateFog(fogDensity, fogColor);
+		}
+	}
+	
 	void RotateViewWeapon() {
 		if (_mouseLookScript.inventoryMode) {
 			float screenHalf = (Screen.width/2f);

@@ -5,7 +5,8 @@
         "SimpleFileBrowser.Runtime",
         "BetterStreamingAssets",
         "Zenject",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "Unity.Postprocessing.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

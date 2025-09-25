@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using Citadel.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 using Zenject;
 
 namespace Citadel.Game
 {
     internal sealed class RootInstaller : MonoInstaller
     {
+        private static RootInstaller _instance;
+
         [SerializeField] 
         private PlayerReferenceManager _playerReference;
         [SerializeField] 
@@ -33,14 +36,12 @@ namespace Citadel.Game
         [SerializeField] private WeaponCurrent _weaponCurrent;
         [SerializeField] private QuestLogNotesManager _questLogNotesManager;
         [SerializeField] private Camera _mainCamera;
+        [SerializeField] private PostProcessProfile _postProcessProfile;
+        [SerializeField] private PostProcessLayer[] _postProcessLayers;
 
-        private readonly Config _config = new();
-        private readonly ConsoleEmulator _consoleEmulator = new();
         private readonly List<object> _itemsToInject = new();
 
-        private static RootInstaller _instance;
-        
-        public override void InstallBindings()
+        private void Awake()
         {
             if (_instance == null)
             {
@@ -64,9 +65,14 @@ namespace Citadel.Game
             _const.InitializeInstance();
             _playerReference.InitializeInstance();
             _playerPatch.Initialize();
-            _mouseLookScript.Initialize();
+        }
 
-            Container.Bind<Config>().FromInstance(_config).AsSingle();
+        public override void InstallBindings()
+        {
+            Container.Bind<Config>().AsSingle();
+            Container.Bind<ConsoleEmulator>().AsSingle();
+            Container.Bind<PostProcessLayer[]>().FromInstance(_postProcessLayers).AsSingle();
+            Container.Bind<PostProcessProfile>().FromInstance(_postProcessProfile).AsSingle();
             Container.BindInstance(_mainCamera).AsSingle();
             Container.BindInstance(_playerReference).AsSingle();
             Container.BindInstance(_biomonitorGraphSystem).AsSingle();
@@ -93,13 +99,8 @@ namespace Citadel.Game
             Container.BindInstance(_playerMovement).AsSingle();
             Container.BindInstance(_weaponFire).AsSingle();
             Container.BindInstance(_weaponCurrent).AsSingle();
-            Container.BindInstance(_consoleEmulator).AsSingle();
             Container.BindInstance(_questLogNotesManager).AsSingle();
             
-            Container.Inject(_config);
-            Container.Inject(_consoleEmulator);
-            
-            _itemsToInject.Add(_config);
             _itemsToInject.Add(_playerReference);
             _itemsToInject.Add(_biomonitorGraphSystem);
             _itemsToInject.Add(_playerEnergy);
@@ -121,7 +122,6 @@ namespace Citadel.Game
             _itemsToInject.Add(_playerMovement);
             _itemsToInject.Add(_weaponFire);
             _itemsToInject.Add(_weaponCurrent);
-            _itemsToInject.Add(_consoleEmulator);
             _itemsToInject.Add(_questLogNotesManager);
         }
 
