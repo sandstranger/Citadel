@@ -12,25 +12,27 @@ namespace Citadel.Game
     internal sealed class FsrQualityDropdown : MonoBehaviour
     {
         private const string QualityPrefix = "FSR Quality: ";
+        private static readonly List<Dropdown.OptionData> _fsrQualityOptions = BuildFsrQualityOptions();
+
         [SerializeField]
         private Dropdown _dropDown;
         [Inject] private readonly Config _config;
 
         private void Awake()
         {
-            _dropDown.options = BuildFsrQualityOptions();
+            _dropDown.options = _fsrQualityOptions;
             _dropDown.value = (int)_config.SuperResolutionUpscalerQuality;
             _dropDown.onValueChanged.AddListener(newValue=> _config.SuperResolutionUpscalerQuality = (Fsr2.QualityMode) newValue);
         }
 
-        private List<Dropdown.OptionData> BuildFsrQualityOptions()
+        private static List<Dropdown.OptionData> BuildFsrQualityOptions()
         {
             var fsr2QualityModes = Enum.GetValues(typeof(Fsr2.QualityMode)).OfType<Fsr2.QualityMode>().ToArray();
-            var dropDownOptions = new List<Dropdown.OptionData>(Enumerable.Repeat<Dropdown.OptionData>(null, fsr2QualityModes.Length));
+            var dropDownOptions = new List<Dropdown.OptionData>(fsr2QualityModes.Length);
 
             foreach (var fsr2QualityMode in fsr2QualityModes)
             {
-                dropDownOptions[(int)fsr2QualityMode] = new Dropdown.OptionData($"{QualityPrefix}{fsr2QualityMode}");
+                dropDownOptions.Add(new Dropdown.OptionData($"{QualityPrefix}{fsr2QualityMode}"));
             }
 
             return dropDownOptions;
