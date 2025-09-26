@@ -22,6 +22,7 @@ Shader "Hidden/Internal-DeferredShading-Optimized"
             #pragma fragment frag
             #pragma multi_compile_lightpass
             #pragma exclude_renderers nomrt
+            #pragma multi_compile ___ UNITY_HDR_ON
 
             #include "UnityCG.cginc"
             #include "UnityDeferredLibrary.cginc"
@@ -48,10 +49,19 @@ Shader "Hidden/Internal-DeferredShading-Optimized"
                 return half4(diffuse * light.color, 1);
             }
 
-            fixed4 frag(unity_v2f_deferred i) : SV_Target
+            #ifdef UNITY_HDR_ON
+half4
+            #else
+            fixed4
+            #endif
+            frag(unity_v2f_deferred i) : SV_Target
             {
                 half4 c = CalculateLightMobile(i);
+                #ifdef UNITY_HDR_ON
+    return c;
+                #else
                 return exp2(-c);
+                #endif
             }
             ENDCG
         }
