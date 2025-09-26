@@ -244,7 +244,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.5.1",
+      "version": "1.6.0",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
@@ -300,6 +300,12 @@
       "source": "git",
       "dependencies": {},
       "hash": "d741912bfeaad8da4fe0f258f4f3eefe1fe7b3f3"
+    },
+    "com.yvesalbuquerque.autolod": {
+      "version": "file:com.yvesalbuquerque.autolod",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
     },
     "fidelityfx.fsr": {
       "version": "file:fidelityfx.fsr",
