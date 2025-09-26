@@ -423,7 +423,7 @@ public sealed class Config
 	{
 		foreach (var postProcessLayer in _postProcessLayers)
 		{
-			if (postProcessLayer.HasTargetTexture)
+			if (postProcessLayer.IsConfigCamera)
 			{
 				continue;
 			}
@@ -435,6 +435,7 @@ public sealed class Config
 
 	internal readonly struct PostProcessLayerStorage
 	{
+		public bool IsConfigCamera => _camera.gameObject.name == "ConfigCamera";
 		public bool HasTargetTexture => _camera.targetTexture!=null;
 		
 		public readonly PostProcessLayer PostProcessLayer;
