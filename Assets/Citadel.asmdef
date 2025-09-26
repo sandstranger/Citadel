@@ -6,7 +6,8 @@
         "BetterStreamingAssets",
         "Zenject",
         "Unity.TextMeshPro",
-        "Unity.Postprocessing.Runtime"
+        "Unity.Postprocessing.Runtime",
+        "FidelityFX.FSR"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

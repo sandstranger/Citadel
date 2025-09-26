@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Citadel.Game;
+using FidelityFX.FSR2;
 using Zenject;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
+using PlayerPrefs = Citadel.Game.PlayerPrefsExtensions;
 
 // Handles configuration parsing for user settings.
 public sealed class Config
 {
-	public static bool EnablePostProcessEffects { get; set; } = false;
-
 	private const string AUDIO_MODE_KEY = "AudioSpeakerMode";
 	private static bool _configDataWasSetted = false;
 
@@ -35,11 +36,28 @@ public sealed class Config
 	private readonly Lazy<AmbientOcclusion> _ambientOcclusion;
 	private readonly Lazy<Bloom> _bloom;
 	private readonly Lazy<ColorGrading> _colorGrading;
+	private readonly PlayerPrefsBoolValue _enableFog;
+	private readonly PlayerPrefsEnumValue<Fsr2.QualityMode> _superResolutionUpscalerQuality;
 	
 	private int lastAudioMode = -1;
 
+	public bool EnableFog
+	{
+		get => _enableFog.Value;
+		set => _enableFog.Value = value;
+	}
+
+	public Fsr2.QualityMode SuperResolutionUpscalerQuality
+	{
+		get => _superResolutionUpscalerQuality.Value;
+		set => _superResolutionUpscalerQuality.Value = value;
+	}
+	
 	public Config()
 	{
+		_superResolutionUpscalerQuality = new PlayerPrefsEnumValue<Fsr2.QualityMode>("super_resolution_quality", 
+			UpdateSuperResolutionQuality,Fsr2.QualityMode.Balanced);
+		_enableFog = new PlayerPrefsBoolValue("enable_fog", SetFog);
 		_colorGrading = new Lazy<ColorGrading>(() => _postProcessingProfile.GetSetting<ColorGrading>());
 		_bloom = new Lazy<Bloom>(() => _postProcessingProfile.GetSetting<Bloom>());
 		_ambientOcclusion = new Lazy<AmbientOcclusion>(()=> _postProcessingProfile.GetSetting<AmbientOcclusion>());
@@ -138,6 +156,8 @@ public sealed class Config
 		SetAA();
 		SetVSync();
 		SetLanguage();
+		SetFog(EnableFog);
+		UpdateSuperResolutionQuality(SuperResolutionUpscalerQuality);
 		_configDataWasSetted = true;
 	}
 	
@@ -232,7 +252,6 @@ public sealed class Config
 	}
 	
 	public void SetSEGI() {
-		SetBrightness();
 	}
 
 	public void SetVSync() {
@@ -249,19 +268,10 @@ public sealed class Config
 #endif
 	}
 
-	public void UpdateFog(float fogDensity, Color fogColor)
+	public void UpdateFogSettings(float fogDensity, Color fogColor)
 	{
 		RenderSettings.fogColor = fogColor;
 		RenderSettings.fogDensity = fogDensity;
-		
-		foreach (var postProcessLayer in _postProcessLayers)
-		{
-			if (!postProcessLayer.PostProcessLayer.gameObject.name.Contains("SensaroundCamera"))
-			{
-				postProcessLayer.PostProcessLayer.fog.enabled = EnablePostProcessEffects;
-				postProcessLayer.PostProcessLayer.fog.excludeSkybox = true;
-			}
-		}
 	}
 	
 	public void SetAA() {
@@ -357,7 +367,6 @@ public sealed class Config
 		_mainMenuHandler.shadApply.SetOptionsText();
 		_mainMenuHandler.ssrApply.SetOptionsText();
 		_mainMenuHandler.audModeApply.SetOptionsText();
-		_mainMenuHandler.mdlDetApply.SetOptionsText();
 	}
 	
 	public void SetAudioMode() {
@@ -423,7 +432,7 @@ public sealed class Config
 	{
 		foreach (var postProcessLayer in _postProcessLayers)
 		{
-			if (postProcessLayer.IsConfigCamera)
+			if (postProcessLayer.HasTargetTexture)
 			{
 				continue;
 			}
@@ -433,9 +442,29 @@ public sealed class Config
 		}
 	}
 
+	private void UpdateSuperResolutionQuality(Fsr2.QualityMode qualityMode)
+	{
+		foreach (var postProcessLayer in _postProcessLayers)
+		{
+			if (!postProcessLayer.HasTargetTexture)
+			{
+				postProcessLayer.PostProcessLayer.superResolution.qualityMode = qualityMode;
+			}
+		}
+	}
+	
+	private void SetFog(bool enableFog)
+	{
+		foreach (var postProcessLayer in _postProcessLayers)
+		{
+			postProcessLayer.PostProcessLayer.fog.enabled = !postProcessLayer.PostProcessLayer.gameObject.name.Contains("SensaroundCamera") && 
+			                                                enableFog;
+			postProcessLayer.PostProcessLayer.fog.excludeSkybox = true;
+		}
+	}
+
 	internal readonly struct PostProcessLayerStorage
 	{
-		public bool IsConfigCamera => _camera.gameObject.name == "ConfigCamera";
 		public bool HasTargetTexture => _camera.targetTexture!=null;
 		
 		public readonly PostProcessLayer PostProcessLayer;

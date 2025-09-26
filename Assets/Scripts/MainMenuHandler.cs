@@ -111,7 +111,6 @@ public class MainMenuHandler : MonoBehaviour {
 	public ConfigurationMenuShadowsApply shadApply;
 	public ConfigurationMenuSSRApply ssrApply;
 	public ConfigurationMenuAudioModeApply audModeApply;
-	public ConfigurationMenuModelDetailApply mdlDetApply;
 
 	[HideInInspector] public bool returnToPause = false;
 	[HideInInspector] public bool fileBrowserOpen = false;
@@ -1187,6 +1186,5 @@ public class MainMenuHandler : MonoBehaviour {
 		shadApply = null;
 		ssrApply = null;
 		audModeApply = null;
-		mdlDetApply = null;
 	}
 }

@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using System.Text;
 using Citadel.Game;
+using Citadel.SceneManagement;
 using Zenject;
+using Random = UnityEngine.Random;
 
 public class WeaponFire : MonoBehaviour {
 	// External references, required
@@ -103,13 +106,20 @@ public class WeaponFire : MonoBehaviour {
 	[Inject] private WeaponCurrent _weaponCurrent;
 	[Inject] private readonly Config _config;
 
-	private int _currentLevel = int.MinValue;
-	
 	// Not needed on Const as this only exists in one unique place on player.
 	private float[] driftForWeapon = new float[16]{5f,0f,15f,50f,0f,0f,0f,8f,
 												   3f,3f,3f,12f,10f,30f,0f,3f};
+	private void Awake()
+	{
+		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
+	}
 
-    void Start() {
+	private void OnDestroy()
+	{
+		ScenesLoader.OnSceneLoaded -= OnSceneLoaded;
+	}
+
+	void Start() {
         damageData = new DamageData(_consts);
         tempHit = new RaycastHit();
         tempVec = new Vector3(0f, 0f, 0f);
@@ -305,8 +315,6 @@ public class WeaponFire : MonoBehaviour {
 
 		// Slowly cool off any weapons that have been heated from firing
 		HeatBleedOff();
-		if (fogFac > 255) fogFac = 255;
-		UpdateFog();
 		UpdateWeaponReloadDip();
 		RotateViewWeapon();
 		Recoiling();
@@ -348,14 +356,24 @@ public class WeaponFire : MonoBehaviour {
 		lerpStartTime = _pauseScript.relativeTime;
 	}
 
+	private void OnSceneLoaded(string sceneName)
+	{
+		UpdateFog();
+	}
+	
 	private void UpdateFog()
 	{
-		if (_currentLevel != LevelManager.currentLevel && _config!=null)
+		if (fogFac > 255)
 		{
-			_currentLevel = LevelManager.currentLevel;
-			var fogDensity = 0.451f * (fogBaseDensityForLevel[_currentLevel] + ((((float)fogFac)/255f) * fogBaseDensityForLevel[_currentLevel]));
-			var fogColor = fogColorForLevel[_currentLevel];
-			_config.UpdateFog(fogDensity, fogColor);
+			fogFac = 255;
+		}
+
+		if (_config!=null)
+		{
+			var currentLevel = LevelManager.currentLevel;
+			var fogDensity = 0.451f * (fogBaseDensityForLevel[currentLevel] + ((((float)fogFac)/255f) * fogBaseDensityForLevel[currentLevel]));
+			var fogColor = fogColorForLevel[currentLevel];
+			_config.UpdateFogSettings(fogDensity, fogColor);
 		}
 	}
 	
