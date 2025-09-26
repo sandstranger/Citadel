@@ -9,12 +9,36 @@ namespace Citadel.Android.Tools
 {
     internal static class LodsCreator
     {
-        private const float ObjectSize = 10.0f;
+        private const float OldObjectSize = 10.0f;
+        private const float NewObjectSize = 25.0f;
         private const float Lod0TransitionScreen = 0.50f;
         private const float Lod1TransitionScreen = 0.27f;
         private const float Lod2TransitionScreen = 0.125f;
         private const float MinMeshTrianglesCountToGenerateLods = 399.0f;
 
+        [MenuItem("Tools/Update lods visibility")]
+        private static void UpdateLodsVisibility()
+        {
+            foreach (var projectPrefab in FindAllComponentsInProject<GameObject>("Prefab"))
+            {
+                var lod = projectPrefab.GetComponent<LODGroup>();
+
+                if (lod != null && Mathf.Approximately(lod.size, OldObjectSize))
+                {
+                    GameObject prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(projectPrefab);
+                    lod = prefabInstance.GetComponent<LODGroup>();
+                    
+                    lod.size = NewObjectSize;
+                    lod.fadeMode = LODFadeMode.CrossFade;
+                    lod.animateCrossFading = true;
+                    
+                    PrefabUtility.SaveAsPrefabAsset(prefabInstance, AssetDatabase.GetAssetPath(projectPrefab));
+                    Object.DestroyImmediate(prefabInstance);
+                    EditorUtility.SetDirty(projectPrefab);
+                }
+            }
+        }
+        
         [MenuItem("Tools/Find low object size lods")]
         private static void FindLowObjectSizeLods()
         {
@@ -71,7 +95,7 @@ namespace Citadel.Android.Tools
                     lods[2].screenRelativeTransitionHeight = Lod2TransitionScreen;
                     lod.SetLODs(lods);
                     lod.RecalculateBounds();
-                    lod.size = ObjectSize;
+                    lod.size = NewObjectSize;
                     lod.fadeMode = LODFadeMode.CrossFade;
                     lod.animateCrossFading = true;
                     PrefabUtility.SaveAsPrefabAsset(prefabInstance, AssetDatabase.GetAssetPath(projectPrefab));
