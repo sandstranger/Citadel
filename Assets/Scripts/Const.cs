@@ -685,6 +685,7 @@ public class Const : SingletonHelper<Const>
 	private void OnStartLoadScene(string sceneName)
 	{
 		_targetRegister.Clear();
+		_targetnameRegister.Clear();
 	}
 	
 	private void OnSceneLoaded(string sceneName)
