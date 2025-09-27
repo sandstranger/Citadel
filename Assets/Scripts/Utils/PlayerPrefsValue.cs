@@ -26,7 +26,15 @@ namespace Citadel.Game
 
         public T Value
         {
-            get => _hasValue ? _savedValue : GetValue(_playerPrefsKey, _defaultValue);
+            get
+            {
+                if (!_hasValue)
+                {
+                    _savedValue = GetValue(_playerPrefsKey, _defaultValue);
+                }
+
+                return _savedValue;
+            }
             set
             {
                 _hasValue = true;

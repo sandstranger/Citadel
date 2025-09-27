@@ -136,6 +136,8 @@ public class MainMenuHandler : MonoBehaviour {
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private DynamicCulling _dynamicCulling;
 
+	private readonly PlayerPrefsBoolValue _introVideoWasPlayed = new("intro_video_was_played");
+	
 	private void Awake()
 	{
 		BackGroundMusic.ignoreListenerPause = true; // Play when paused.
@@ -223,16 +225,16 @@ public class MainMenuHandler : MonoBehaviour {
 	}
 	
 	void CheckAndPlayIntro() {
-        string basePath = Utils.GetAppropriateDataPath();
-		string indn = Utils.SafePathCombine(basePath,"introdone.dat");
-		if (System.IO.File.Exists(indn)) {
+		if (_introVideoWasPlayed.Value) {
 			IntroVideo.SetActive(false);
 			ClearVideoRT();
 			IntroVideoContainer.SetActive(false);
 			BackGroundMusic.clip = _music.titleMusic;
 			if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
-		} else {
-			System.IO.File.Create(indn);
+		} 
+		else 
+		{
+			_introVideoWasPlayed.Value = true;
 			PlayIntro();
 		}
 	}
