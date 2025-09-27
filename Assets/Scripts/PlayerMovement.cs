@@ -1152,8 +1152,6 @@ public class PlayerMovement : MonoBehaviour {
 		if ((!gravliftState && _getInput.Jump())
 			|| gravliftState && _getInput.JumpDown()) {
 
-			Debug.Log("CALLED JUMP");
-			
 			if (!justJumped) {
 				if (grounded || gravliftState || _inventory.JumpJetsActive()) {
 					jumpTime = jumpImpulseTime;

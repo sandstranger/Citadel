@@ -114,7 +114,8 @@ public class MainMenuHandler : MonoBehaviour {
 
 	[HideInInspector] public bool returnToPause = false;
 	[HideInInspector] public bool fileBrowserOpen = false;
-	public bool dataFound = false;
+	public bool dataFound { get; set; } = true;
+
 	private enum Pages : byte {fp,sp,mp,np,lp,op,sv,cd};
 	private Pages currentPage;
 	private bool typingSaveGame = false;
@@ -142,10 +143,8 @@ public class MainMenuHandler : MonoBehaviour {
 	{
 		BackGroundMusic.ignoreListenerPause = true; // Play when paused.
 		ResetPages();
-		dataFound = false;
 		inCutscene = false;
 #if UNITY_ANDROID
-		dataFound = true;
 		_config.SetVolume();
 		GoToFrontPage();
 		CheckAndPlayIntro();
@@ -246,7 +245,6 @@ public class MainMenuHandler : MonoBehaviour {
 		if (File.Exists(alogPath)) {
 			// Go right on into the game, all good here.
 			InitialDisplay.SetActive(false);
-			dataFound = true;
 			_config.SetVolume();
 			GoToFrontPage();
 			CheckAndPlayIntro();
@@ -263,7 +261,6 @@ public class MainMenuHandler : MonoBehaviour {
 			// OK, now show that we didn't find them
 			InitialDisplay.SetActive(false);
 			CouldNotFindDialogue.SetActive(true);
-			dataFound = false;
 		}
 	}
 
@@ -832,7 +829,6 @@ public class MainMenuHandler : MonoBehaviour {
 
 		// Must have both to get audio logs and SHODAN barks.
 		if (File.Exists(fromPath)) {
-			dataFound = true;
 			string toPath = Utils.SafePathCombine(basePath,"CITALOG.RES");
 			File.Copy(fromPath,toPath,true); // Set overwrite to true in case we have 1 and not the other.
 		}

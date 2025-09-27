@@ -130,7 +130,6 @@ public sealed class Config
 
 		if (!_configDataWasSetted)
 		{
-			SetVolume();
 			Debug.Log("Setting screen resolution to "
 			          + _const.GraphicsResWidth.ToString()
 			          + ", " + _const.GraphicsResHeight.ToString()
@@ -145,7 +144,8 @@ public sealed class Config
 		
 		if (_const.GraphicsShadowMode > 2) _const.GraphicsShadowMode = 2;
 		if (_const.GraphicsShadowMode < 0) _const.GraphicsShadowMode = 0;
-		
+
+		SetVolume();
 		SetModelDetail();
 		SetBloom();
 		SetSEGI();
