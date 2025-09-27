@@ -278,8 +278,8 @@ public class Const : SingletonHelper<Const>
 
     public Font mainFont1; // Used to force Point filter mode.
 	public Font mainFont2; // Used to force Point filter mode.
-	/*[DTValidator.Optional] */public List<GameObject> TargetRegister; // Doesn't need to be full, available space for maps and mods made by the community to use tons of objects
-	public List<string> TargetnameRegister;
+	/*[DTValidator.Optional] */private readonly List<GameObject> _targetRegister = new (); // Doesn't need to be full, available space for maps and mods made by the community to use tons of objects
+	private readonly List<string> _targetnameRegister = new();
     public string[] stringTable;
 	[HideInInspector] public bool stringTableLoaded = false;
 	[HideInInspector] public bool loading = false;
@@ -435,6 +435,7 @@ public class Const : SingletonHelper<Const>
 	private void Awake()
 	{
 		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
+		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
 		
 #if UNITY_EDITOR || !UNITY_ANDROID
 		TARGET_FPS = 144;
@@ -465,8 +466,6 @@ public class Const : SingletonHelper<Const>
 		}
 		
 		lastTargetRegistrySize = 0;
-		TargetRegister = new List<GameObject>();
-		TargetnameRegister = new List<string>();
 		for (i=0;i<allParents.Count;i++) {
 			found = 0;
 			Component[] compArray = allParents[i].GetComponentsInChildren(typeof(TargetIO),true); // find all TargetIO components, including inactive (hence the true here at the end)
@@ -683,6 +682,11 @@ public class Const : SingletonHelper<Const>
 		}
 	}
 
+	private void OnStartLoadScene(string sceneName)
+	{
+		_targetRegister.Clear();
+	}
+	
 	private void OnSceneLoaded(string sceneName)
 	{
 		ResetPauseLists();
@@ -1566,8 +1570,8 @@ CreateBlackTexture:
 
 		// Remove and clear out everything and reset any lists.
 		ClearActiveAutomapOverlays();
-		TargetRegister.Clear();
-		TargetnameRegister.Clear();
+		_targetRegister.Clear();
+		_targetnameRegister.Clear();
 		for (i=0;i<healthObjectsRegistration.Length;i++) {
 			healthObjectsRegistration[i] = null;
 		}
@@ -2079,16 +2083,16 @@ CreateBlackTexture:
 		// Find each gameobject with matching targetname in the register, then
 		// call Use for each.
 		bool succeeded = false;
-		for (int i=0;i<TargetRegister.Count;i++) {
-			if (TargetnameRegister.Count < 1) {
+		for (int i=0;i<_targetRegister.Count;i++) {
+			if (_targetnameRegister.Count < 1) {
 				UnityEngine.Debug.LogWarning("NO TARGETNAMES IN "
 										   + "TargetnameRegister!!!");
 				return;
 			}
 
-			if (TargetnameRegister[i] != targetname) continue;
+			if (_targetnameRegister[i] != targetname) continue;
 
-			if (TargetRegister[i] != null) {
+			if (_targetRegister[i] != null) {
 				numtargetsfound++;
 				tempUD.CopyBitsFromUseData(ud);
 
@@ -2096,27 +2100,27 @@ CreateBlackTexture:
 
 				// Added activeSelf bit to keep from spamming SetActive
 				// when running targets through a trigger_multiple
-				if (tempUD.GOSetActive && !TargetRegister[i].activeSelf) {
+				if (tempUD.GOSetActive && !_targetRegister[i].activeSelf) {
 					//UnityEngine.Debug.Log("GOSetActive on " + targetname);
-					TargetRegister[i].SetActive(true);
+					_targetRegister[i].SetActive(true);
 					succeeded = true;
 				}
 
 				// Diddo for activeSelf to prevent spamming SetActive.
-				if (tempUD.GOSetDeactive && TargetRegister[i].activeSelf) {
+				if (tempUD.GOSetDeactive && _targetRegister[i].activeSelf) {
 					//UnityEngine.Debug.Log("GOSetDeactive on " + targetname);
-					TargetRegister[i].SetActive(false);
+					_targetRegister[i].SetActive(false);
 					succeeded = true;
 				}
 
 				if (tempUD.GOToggleActive) {
 					// If I abuse this with a trigger_multiple someone should
 					// shoot me.
-					TargetRegister[i].SetActive(!TargetRegister[i].activeSelf);
+					_targetRegister[i].SetActive(!_targetRegister[i].activeSelf);
 					succeeded = true;
 				}
 
-				TargetIO tio = TargetRegister[i].GetComponent<TargetIO>();
+				TargetIO tio = _targetRegister[i].GetComponent<TargetIO>();
 				tio.Targetted(tempUD);
 				succeeded = true;
 			}
@@ -2131,23 +2135,23 @@ CreateBlackTexture:
 	// Should ONLY come from a TargetIO
 	public void AddToTargetRegister(TargetIO tio, GameObject go) {
 		string tn = tio.targetname;
-	    for (int i=0;i<TargetRegister.Count; i++) {
-	        if (TargetRegister[i] == null) continue;
-	        if (TargetRegister[i] != go) continue; // Key check for whole loop.
+	    for (int i=0;i<_targetRegister.Count; i++) {
+	        if (_targetRegister[i] == null) continue;
+	        if (_targetRegister[i] != go) continue; // Key check for whole loop.
 			
 	        // GameObject go is in registry already
-            if (TargetnameRegister[i] == tn) {
+            if (_targetnameRegister[i] == tn) {
                 return; // Already in register, name and object.
             } else {
-                TargetnameRegister[i] = tn; // Fix up partial registry.
+                _targetnameRegister[i] = tn; // Fix up partial registry.
                 return; // Ok it's good now.
             }
 	    }
 	    
 	    // GameObject isn't in registry, add fresh.
-	    TargetRegister.Add(go);
-		TargetnameRegister.Add(tn);
-		lastTargetRegistrySize = TargetnameRegister.Count;
+	    _targetRegister.Add(go);
+		_targetnameRegister.Add(tn);
+		lastTargetRegistrySize = _targetnameRegister.Count;
 	}
 
 	public void AddToTextLocalizationRegister(TextLocalization txtloc) {
@@ -2308,6 +2312,7 @@ CreateBlackTexture:
 	
 	void OnDestroy() {
 		ScenesLoader.OnSceneLoaded -= OnSceneLoaded;
+		ScenesLoader.OnStartLoadScene -= OnStartLoadScene;
 		questData = null;
 		useableItemsFrobIcons = null;
 		useableItemsIcons = null;
@@ -2339,8 +2344,8 @@ CreateBlackTexture:
 		InputConfigNames = null;
 		mainFont1 = null;
 		mainFont2 = null;
-		TargetRegister = null;
-		TargetnameRegister = null;
+		_targetRegister.Clear();
+		_targetnameRegister.Clear();
 		stringTable = null;
 		reloadTime = null;
 		screenCodes = null;

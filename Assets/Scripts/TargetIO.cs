@@ -79,6 +79,9 @@ public class TargetIO : MonoBehaviour {
 	}
 	
 	public void RemoteStart(GameObject sender,string sourcefunc) {
+		if (!string.IsNullOrEmpty(targetname)) {
+			_consts.AddToTargetRegister(this,gameObject); // Always, since on load we need to refill register.
+		}
 		Initialize();
 	}
 	
