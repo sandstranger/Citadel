@@ -8,7 +8,7 @@ namespace Citadel.Editor
     {
         public static IReadOnlyList<T> FindAllComponentsInProject<T>() where T : Object
         {
-            return FindAllComponentsInProject<T>($"t:{typeof(T).Name}");
+            return FindAllComponentsInProject<T>(typeof(T).Name);
         }
 
         public static IReadOnlyList<T> FindAllComponentsInProject<T>(string typeName) where T : Object

@@ -3,12 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using static Citadel.Editor.Utils;
 
 namespace Citadel.Android.Tools
 {
     internal static class AndroidTools
     {
+        [MenuItem("Tools/Set custom material to all ui elements")]
+        private static void SetCustomMaterialToAllUIElements()
+        {
+            const string materialNameToIgnore = "ui_automapmasker";
+
+            var materialToReplace = FindAllComponentsInProject<Material>().First(material => material.name == "DefaultUIMaterial");
+
+            var playerPrefab = FindAllComponentsInProject<GameObject>("Prefab").First(prefab => prefab.name == "Player");
+            GameObject prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
+            
+            var uiElements = prefabInstance.GetComponentsInChildren<RawImage>(true).Cast<ICanvasElement>()
+                .Union(prefabInstance.GetComponentsInChildren<Image>(true)).Union(prefabInstance.GetComponentsInChildren<Text>(true)).Cast<Graphic>().ToArray();
+            
+            foreach (var uiElement in uiElements)
+            {
+                if (uiElement.material != null && uiElement.material.name == materialNameToIgnore)
+                {
+                    continue;
+                }
+
+                uiElement.material = materialToReplace;
+            }
+
+            PrefabUtility.SaveAsPrefabAsset(prefabInstance, AssetDatabase.GetAssetPath(playerPrefab));
+            GameObject.DestroyImmediate(prefabInstance);
+            EditorUtility.SetDirty(playerPrefab);
+        }
+        
         [MenuItem("Tools/Remove all SEGIEmitters from active scene")]
         private static void RemoveAllSegiEmittersFromActiveScene()
         {
@@ -18,29 +47,6 @@ namespace Citadel.Android.Tools
             foreach (var emitter in emitters)
             {
                 GameObject.DestroyImmediate(emitter);
-            }
-        }
-
-        [MenuItem("Tools/Update grass lods")]
-        private static void UpdateGrassLods()
-        {
-            var lods = GameObject.FindObjectsOfType<LODGroup>(true);
-            
-            foreach (var lod in lods)
-            {
-                if (lod.gameObject.name.Contains("prop_foliage_fern"))
-                {
-                    lod.animateCrossFading = true;
-                    lod.fadeMode = LODFadeMode.CrossFade;
-                    lod.gameObject.isStatic = true;
-                    lod.size = 3;
-
-                    foreach (var lodChild in lod.GetComponentsInChildren<Transform>(true))
-                    {
-                        lodChild.gameObject.SetActive(true);
-                        lodChild.gameObject.isStatic = true;
-                    }
-                }
             }
         }
         

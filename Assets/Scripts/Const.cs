@@ -686,6 +686,7 @@ public class Const : SingletonHelper<Const>
 	{
 		_targetRegister.Clear();
 		_targetnameRegister.Clear();
+		lastTargetRegistrySize = 0;
 	}
 	
 	private void OnSceneLoaded(string sceneName)
