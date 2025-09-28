@@ -4,12 +4,12 @@ SpriteAtlasImporter:
   externalObjects: {}
   textureSettings:
     serializedVersion: 2
-    anisoLevel: 1
+    anisoLevel: 3
     compressionQuality: 50
     maxTextureSize: 2048
     textureCompression: 0
-    filterMode: 0
-    generateMipMaps: 0
+    filterMode: 2
+    generateMipMaps: 1
     readable: 0
     crunchedCompression: 0
     sRGB: 1
