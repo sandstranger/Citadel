@@ -1,7 +1,6 @@
 Shader "Deferred/Grass" {
     Properties {
         _Color ("Color Tint", Color) = (1,1,1,1)
-        _TessellationUniform ("Tessellation Uniform", Range(1, 64)) = 1
         _BladeWidth("Blade Width", Float) = 0.05
         _BladeWidthRandom("Blade Width Random", Float) = 0.02
         _BladeHeight("Blade Height", Float) = 0.5
@@ -14,6 +13,7 @@ Shader "Deferred/Grass" {
     CGINCLUDE
     #include "UnityCG.cginc"
     #include "UnityPBSLighting.cginc"
+    
     float _BladeHeight;
     float _BladeHeightRandom;
     float _BladeWidthRandom;
@@ -22,74 +22,34 @@ Shader "Deferred/Grass" {
     float _BladeCurve;
     float _BendRotationRandom;
 
+    // Добавляем поддержку GPU Instancing для свойства _Color
+    UNITY_INSTANCING_BUFFER_START(Props)
+        UNITY_DEFINE_INSTANCED_PROP(float4, _Color)
+    UNITY_INSTANCING_BUFFER_END(Props)
+
     struct vertexInput {
         float4 vertex : POSITION;
         float3 normal : NORMAL;
         float4 tangent : TANGENT;
+        UNITY_VERTEX_INPUT_INSTANCE_ID // Добавляем ID инстанса
     };
 
     vertexInput vert(vertexInput v) {
-        return v;
-    }
-
-    struct TessellationFactors {
-        float edge[3] : SV_TessFactor;
-        float inside : SV_InsideTessFactor;
-    };
-
-    float _TessellationUniform;
-    TessellationFactors patchConstantFunction (InputPatch<vertexInput, 3> patch) {
-        TessellationFactors f;
-        f.edge[0] = _TessellationUniform;
-        f.edge[1] = _TessellationUniform;
-        f.edge[2] = _TessellationUniform;
-        f.inside = _TessellationUniform;
-        return f;
-    }
-
-    [UNITY_domain("tri")]
-    [UNITY_outputcontrolpoints(3)]
-    [UNITY_outputtopology("triangle_cw")]
-    [UNITY_partitioning("integer")]
-    [UNITY_patchconstantfunc("patchConstantFunction")]
-    vertexInput hull (InputPatch<vertexInput, 3> patch, uint id : SV_OutputControlPointID) {
-        return patch[id];
+        vertexInput o;
+        UNITY_SETUP_INSTANCE_ID(v); // Устанавливаем ID инстанса
+        UNITY_TRANSFER_INSTANCE_ID(v, o); // Передаем в вывод
+        o.vertex = v.vertex;
+        o.normal = v.normal;
+        o.tangent = v.tangent;
+        return o;
     }
 
     struct geometryOutput {
         float4 pos : SV_POSITION;
         float3 normal : TEXCOORD1;
         float4 tangent : TANGENT;
+        UNITY_VERTEX_INPUT_INSTANCE_ID // Передаем ID в геометрический шейдер
     };
-
-    struct tessellationVert {
-        float4 pos : SV_POSITION;
-        float3 normal : NORMAL;
-        float4 tangent : TANGENT;
-    };
-
-    tessellationVert tessVert(vertexInput v) {
-        tessellationVert o;
-        o.pos = v.vertex;
-        o.normal = v.normal;
-        o.tangent = v.tangent;
-        return o;
-    }
-
-    [UNITY_domain("tri")]
-    tessellationVert domain(TessellationFactors factors, OutputPatch<vertexInput, 3> patch, float3 barycentricCoordinates : SV_DomainLocation) {
-        vertexInput v;
-        v.vertex = patch[0].vertex * barycentricCoordinates.x + 
-                patch[1].vertex * barycentricCoordinates.y + 
-                patch[2].vertex * barycentricCoordinates.z;
-        v.normal = patch[0].normal * barycentricCoordinates.x + 
-                patch[1].normal * barycentricCoordinates.y + 
-                patch[2].normal * barycentricCoordinates.z;
-        v.tangent = patch[0].tangent * barycentricCoordinates.x + 
-                    patch[1].tangent * barycentricCoordinates.y + 
-                    patch[2].tangent * barycentricCoordinates.z;
-        return tessVert(v);
-    }
 
     float rand(float3 co) {
         return frac(sin(dot(co.xyz, float3(12.9898, 78.233, 53.539))) * 43758.5453);
@@ -109,42 +69,39 @@ Shader "Deferred/Grass" {
         );
     }
 
-    geometryOutput GenerateGrassVertex(float3 vertexPosition, float width, float height, float forward, float3x3 transformMatrix, float4 tangent) {
+    // ИСПРАВЛЕНИЕ: Добавляем параметр input для передачи данных инстанса
+    geometryOutput GenerateGrassVertex(float3 vertexPosition, float width, float height, float forward, float3x3 transformMatrix, float4 tangent, vertexInput input) {
         geometryOutput o;
         float3 tangentPoint = float3(width, forward, height);
-        float3 tangentNormal = float3(0,-1,0);//-normalize(float3(0, -1, forward));
+        float3 tangentNormal = float3(0,-1,0);
         float3 localNormal = normalize(mul(transformMatrix, tangentNormal));
         float3 localOffset = mul(transformMatrix, tangentPoint);
         float3 localPosition = vertexPosition + localOffset;
         o.pos = UnityObjectToClipPos(localPosition);
         o.normal = UnityObjectToWorldNormal(localNormal);
         o.tangent = float4(UnityObjectToWorldDir(tangent.xyz), tangent.w);
+        
+        // ИСПРАВЛЕНИЕ: Правильно передаем ID инстанса
+        UNITY_TRANSFER_INSTANCE_ID(input, o);
         return o;
     }
 
     #define BLADE_SEGMENTS 3
     [maxvertexcount(BLADE_SEGMENTS * 2 + 4)]
-    void geo(triangle tessellationVert IN[3], inout TriangleStream<geometryOutput> triStream) {
-//         float3 pos = IN[0].pos.xyz;
-//         float3 pos = (IN[0].pos.xyz + IN[1].pos.xyz + IN[2].pos.xyz) / 3.0; // Average position
-        float3 pos0 = IN[0].pos.xyz;
-        float3 pos1 = IN[1].pos.xyz;
-        float3 pos2 = IN[2].pos.xyz;
+    void geo(triangle vertexInput IN[3], inout TriangleStream<geometryOutput> triStream) {
+        // Устанавливаем ID инстанса для геометрического шейдера
+        UNITY_SETUP_INSTANCE_ID(IN[0]);
+        
+        float3 pos0 = IN[0].vertex.xyz;
+        float3 pos1 = IN[1].vertex.xyz;
+        float3 pos2 = IN[2].vertex.xyz;
         float3 pos = pos0;
         if (pos1.x < pos.x) pos = pos1;
         if (pos2.x < pos.x) pos = pos2;
-        // Each blade of grass is constructed in tangent space with respect
-		// to the emitting vertex's normal and tangent vectors, where the width
-		// lies along the X axis and the height along Z.
 
-		// Construct random rotations to point the blade in a direction.
         float3x3 facingRotationMatrix = AngleAxis3x3(rand(pos) * UNITY_TWO_PI, float3(0, 0, 1));
-
-		// Matrix to bend the blade in the direction it's facing.
         float3x3 bendRotationMatrix = AngleAxis3x3(rand(pos.zzx) * _BendRotationRandom * UNITY_PI * 0.5, float3(-1, 0, 0));
 
-		// Construct a matrix to transform our blade from tangent space
-		// to local space; this is the same process used when sampling normal maps.
         float3 vNormal = IN[0].normal;
         float4 vTangent = IN[0].tangent;
         float3 vBinormal = cross(vNormal, vTangent) * vTangent.w;
@@ -154,9 +111,6 @@ Shader "Deferred/Grass" {
             vTangent.z, vBinormal.z, vNormal.z
         );
 
-        // Construct full tangent to local matrix, including our rotations.
-		// Construct a second matrix with only the facing rotation; this will be used 
-		// for the root of the blade, to ensure it always faces the correct direction.
         float3x3 transformationMatrix = mul(mul(tangentToLocal, facingRotationMatrix), bendRotationMatrix);
         float3x3 transformationMatrixFacing = mul(tangentToLocal, facingRotationMatrix);
 
@@ -171,14 +125,13 @@ Shader "Deferred/Grass" {
             float segmentWidth = width * (1 - t * 0.5);
             float segmentForward = pow(t, _BladeCurve) * forward;
 
-			// Select the facing-only transformation matrix for the root of the blade.
             float3x3 transformMatrix = i == 0 ? transformationMatrixFacing : transformationMatrix;
 
-            triStream.Append(GenerateGrassVertex(pos, segmentWidth, segmentHeight, segmentForward, transformMatrix, vTangent));
-            triStream.Append(GenerateGrassVertex(pos, -segmentWidth, segmentHeight, segmentForward, transformMatrix, vTangent));
+            // ИСПРАВЛЕНИЕ: Передаем IN[0] как параметр input
+            triStream.Append(GenerateGrassVertex(pos, segmentWidth, segmentHeight, segmentForward, transformMatrix, vTangent, IN[0]));
+            triStream.Append(GenerateGrassVertex(pos, -segmentWidth, segmentHeight, segmentForward, transformMatrix, vTangent, IN[0]));
         }
 
-		// Add the final 4 vertices as the squared tip (cut grass!).
         float baseT = (BLADE_SEGMENTS - 1) / (float)(BLADE_SEGMENTS - 1);
         float baseHeight = height * baseT * 0.9;
         float baseWidth = width * (1 - baseT * 0.5);
@@ -188,10 +141,11 @@ Shader "Deferred/Grass" {
         float tipWidth = width * 0.3;
         float tipForward = pow(1.0, _BladeCurve) * forward * 2;
 
-        triStream.Append(GenerateGrassVertex(pos, baseWidth, baseHeight, baseForward, transformationMatrix, vTangent));
-        triStream.Append(GenerateGrassVertex(pos, -baseWidth, baseHeight, baseForward, transformationMatrix, vTangent));
-        triStream.Append(GenerateGrassVertex(pos, tipWidth, tipHeight, tipForward, transformationMatrix, vTangent));
-        triStream.Append(GenerateGrassVertex(pos, -tipWidth, tipHeight, tipForward, transformationMatrix, vTangent));
+        // ИСПРАВЛЕНИЕ: Передаем IN[0] как параметр input
+        triStream.Append(GenerateGrassVertex(pos, baseWidth, baseHeight, baseForward, transformationMatrix, vTangent, IN[0]));
+        triStream.Append(GenerateGrassVertex(pos, -baseWidth, baseHeight, baseForward, transformationMatrix, vTangent, IN[0]));
+        triStream.Append(GenerateGrassVertex(pos, tipWidth, tipHeight, tipForward, transformationMatrix, vTangent, IN[0]));
+        triStream.Append(GenerateGrassVertex(pos, -tipWidth, tipHeight, tipForward, transformationMatrix, vTangent, IN[0]));
         triStream.RestartStrip();
     }
     ENDCG
@@ -199,19 +153,16 @@ Shader "Deferred/Grass" {
     SubShader {
         Pass {
             Tags {"LightMode"="Deferred"}
-//             Cull Off
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment pixel_shader
             #pragma geometry geo
-            #pragma hull hull
-            #pragma domain domain
             #pragma target 4.6
             #pragma exclude_renderers nomrt
             #pragma multi_compile ___ UNITY_HDR_ON
+            #pragma multi_compile_instancing // Включаем GPU Instancing
+            
             #include "UnityPBSLighting.cginc"
-
-            float4 _Color;
 
             struct structurePS {
                 half4 albedo : SV_Target0;
@@ -221,12 +172,19 @@ Shader "Deferred/Grass" {
             };
             
             structurePS pixel_shader(geometryOutput vs) {
+                // Устанавливаем ID инстанса для фрагментного шейдера
+                UNITY_SETUP_INSTANCE_ID(vs);
+                
                 structurePS ps;
                 float3 normalDirection = normalize(vs.normal);
-                ps.albedo = _Color;
+                
+                // Получаем цвет через GPU Instancing
+                float4 instanceColor = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
+                
+                ps.albedo = instanceColor;
                 ps.specular = 0;
                 ps.normal = float4(normalDirection * 0.5 + 0.5, 1.0);
-                ps.emission = _Color * 0.25;
+                ps.emission = instanceColor * 0.25;
                 ps.emission.a = 1;
                 #ifndef UNITY_HDR_ON
                     ps.emission.rgb = exp2(-ps.emission.rgb);
@@ -239,26 +197,25 @@ Shader "Deferred/Grass" {
         // Shadow Caster Pass
         Pass {
             Tags {"LightMode" = "ShadowCaster"}
-//             Cull Off
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment shadow_fragment
             #pragma geometry geo
-            #pragma hull hull
-            #pragma domain domain
-            #pragma target 4.6
+            #pragma target 4.0
             #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing // Включаем GPU Instancing для теней
 
             #include "UnityCG.cginc"
-            #include "AutoLight.cginc" // For shadow support
+            #include "AutoLight.cginc"
 
             struct v2f {
                 V2F_SHADOW_CASTER;
-                float2 uv : TEXCOORD2; // Pass UVs if needed for texture array
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             float4 shadow_fragment(v2f i) : SV_Target {
-                SHADOW_CASTER_FRAGMENT(i) // Outputs depth to shadow map
+                UNITY_SETUP_INSTANCE_ID(i);
+                SHADOW_CASTER_FRAGMENT(i)
             }
             ENDCG
         }
