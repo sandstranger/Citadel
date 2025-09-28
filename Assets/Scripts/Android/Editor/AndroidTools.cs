@@ -5,11 +5,18 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using static Citadel.Editor.Utils;
+using Object = UnityEngine.Object;
 
 namespace Citadel.Android.Tools
 {
     internal static class AndroidTools
     {
+        [MenuItem("Tools/Find all canvases")]
+        private static void FindAllCanvases()
+        {
+            Debug.Log($"Found canvases {String.Join(",",Object.FindObjectsOfType<Canvas>(true).Select(canvas => canvas.gameObject.name).ToArray())}");
+        }
+        
         [MenuItem("Tools/Set custom material to all ui elements")]
         private static void SetCustomMaterialToAllUIElements()
         {
