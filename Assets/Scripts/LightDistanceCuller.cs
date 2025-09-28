@@ -67,7 +67,7 @@ namespace Citadel.Game
             _needsRebuild = true;
         }
         
-        private void Update()
+        private void FixedUpdate()
         {
             if (!_enableLightsCulling)
             {
@@ -107,7 +107,8 @@ namespace Citadel.Game
         {
             Clear();
             
-            Light[] found = _autoFindLights ? FindObjectsOfType<Light>(true) : _manualLights;
+            Light[] found = _autoFindLights ? FindObjectsByType(typeof (Light), FindObjectsInactive.Include, FindObjectsSortMode.None)
+                    .Cast<Light>().ToArray() : _manualLights;
 
             if (found == null)
             {
@@ -145,12 +146,12 @@ namespace Citadel.Game
             
             Vector3 camPos = _camTransform.position;
 
-            for (int i = 0; i < _trackedLights.Count; i++)
+            for (int i = 0; i < _trackedLights.Count; ++i)
             {
                 var lightData = _trackedLights[i];
                 if (lightData.Light == null) continue;
 
-                float sqrDist = (lightData.Light.transform.position - camPos).sqrMagnitude;
+                float sqrDist = (lightData.LightTransform.position - camPos).sqrMagnitude;
                 
                 var targetIntensity = sqrDist <= _sqrMaxDistance ? 
                     lightData.OriginalIntensity : 0f;
@@ -168,7 +169,7 @@ namespace Citadel.Game
         {
             float delta = _fadeSpeed * Time.deltaTime;
 
-            for (int i = 0; i < _trackedLights.Count; i++)
+            for (int i = 0; i < _trackedLights.Count; ++i)
             {
                 var lightData = _trackedLights[i];
                 if (lightData.Light == null) continue;
@@ -182,7 +183,7 @@ namespace Citadel.Game
                     float current = lightData.Light.intensity;
                     float target = lightData.TargetIntensity;
                     
-                    if (!Mathf.Approximately(current, target))
+                    if (!FastApproximately2(current, target))
                     {
                         float next = Mathf.MoveTowards(current, target, delta);
                         lightData.Light.intensity = next;
@@ -196,7 +197,7 @@ namespace Citadel.Game
 
         private void ApplyImmediate()
         {
-            for (int i = 0; i < _trackedLights.Count; i++)
+            for (int i = 0; i < _trackedLights.Count; ++i)
             {
                 var lightData = _trackedLights[i];
                 if (lightData.Light == null) continue;
@@ -215,7 +216,7 @@ namespace Citadel.Game
 
         private void RestoreAllLights()
         {
-            for (int i = 0; i < _trackedLights.Count; i++)
+            for (int i = 0; i < _trackedLights.Count; ++i)
             {
                 var lightData = _trackedLights[i];
                 if (lightData.Light == null) continue;
@@ -225,8 +226,15 @@ namespace Citadel.Game
             }
         }
         
+        private static bool FastApproximately2(float a, float b, float epsilon = 1E-05f)
+        {
+            float diff = a - b;
+            return diff * diff < epsilon * epsilon;
+        }
+        
         private readonly struct LightData : IEquatable<LightData>
         {
+            public readonly Transform LightTransform;
             public readonly Light Light;
             public readonly float OriginalIntensity;
             public readonly float TargetIntensity;
@@ -240,6 +248,7 @@ namespace Citadel.Game
                 TargetIntensity = targetIntensity;
                 IsToggleOnly = isToggleOnly;
                 WasEnabled = wasEnabled;
+                LightTransform = light.transform;
             }
 
             public bool Equals(LightData other)
