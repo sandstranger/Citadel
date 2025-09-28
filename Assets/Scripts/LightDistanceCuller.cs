@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace Citadel.Game
         private const int TrackedLightsInitialCapacity = 1500;
         private const float CheckInterval = 0.3f;
         
+        private static readonly WaitForSeconds _checkIntervalAwaiter = new WaitForSeconds(CheckInterval);
+        
         [SerializeField] private bool _enableLightsCulling = true;
         [Header("Source lights")] 
         [SerializeField] private bool _autoFindLights = true;
@@ -26,10 +29,8 @@ namespace Citadel.Game
 
         private Transform _camTransform;
         private float _sqrMaxDistance;
-        private float _timer = 0f;
 
         private readonly List<LightData> _trackedLights = new(TrackedLightsInitialCapacity);
-        private bool _needsRebuild = true;
 
         [Inject]
         private readonly Camera _cam;
@@ -43,10 +44,12 @@ namespace Citadel.Game
             
             _camTransform = (_cam != null) ? _cam.transform : Camera.main.transform;
             _sqrMaxDistance = _maxDistance * _maxDistance;
+            StartCoroutine(CullCheckCoroutine());
         }
 
         private void OnDestroy()
         {
+            StopAllCoroutines();
             RestoreAllLights();
         }
 
@@ -64,45 +67,32 @@ namespace Citadel.Game
         
         public void Rebuild()
         {
-            _needsRebuild = true;
+            RebuildLightList();
         }
         
-        private void FixedUpdate()
+        private IEnumerator CullCheckCoroutine()
         {
-            if (!_enableLightsCulling)
+            while (_enableLightsCulling)
             {
-                return;
-            }
-
-            if (_needsRebuild)
-            {
-                RebuildLightList();
-                _needsRebuild = false;
-            }
-
-            if (_trackedLights.Count == 0)
-            {
-                return;
-            }
-            
-            _timer += Time.unscaledDeltaTime;
-            if (_timer >= CheckInterval)
-            {
-                _timer = 0f;
-                DoCullCheck();
-
-                if (!_useFade)
+                if (_trackedLights.Count > 0)
                 {
-                    ApplyImmediate();
-                }
-            }
+                    DoCullCheck();
 
-            if (_useFade)
-            {
-                ApplyFade();
+                    if (!_useFade)
+                    {
+                        ApplyImmediate();
+                    }
+                    else
+                    {
+                        ApplyFade();
+                    }
+                }
+
+                yield return _checkIntervalAwaiter;
             }
         }
-
+        
+        
         private void RebuildLightList()
         {
             Clear();
