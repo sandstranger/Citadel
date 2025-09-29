@@ -44,10 +44,12 @@ namespace Citadel.Game
             SetMaxDistance(_androidConfig.LightsCullingMaxDistance);
             _camTransform = (_cam != null) ? _cam.transform : Camera.main.transform;
             StartLightsCulling();
+            _androidConfig.OnLightsCullingValueChanged += OnLightsCullingValueChanged;
         }
 
         private void OnDestroy()
         {
+            _androidConfig.OnLightsCullingValueChanged -= OnLightsCullingValueChanged;
             StopLightsCulling();
         }
 
@@ -85,14 +87,14 @@ namespace Citadel.Game
             Clear();
         }
 
-        private void FixedUpdate()
+        private void OnLightsCullingValueChanged(bool enableLightsCulling)
         {
-            if (_enableLightsCulling == _androidConfig.EnableLightsCulling)
+            if (_enableLightsCulling == enableLightsCulling)
             {
                 return;
             }
             
-            _enableLightsCulling = _androidConfig.EnableLightsCulling;
+            _enableLightsCulling = enableLightsCulling;
 
             if (_enableLightsCulling)
             {

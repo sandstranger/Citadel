@@ -1,3 +1,5 @@
+using System;
+
 namespace Citadel.Game
 {
     internal sealed class AndroidConfig
@@ -7,6 +9,12 @@ namespace Citadel.Game
         private readonly PlayerPrefsBoolValue _enableLightsCulling = new("enable_lights_culling", true);
         private readonly PlayerPrefsFloatValue _lightsCullingMaxDistance = new("lights_culling_max_distance", LightDistanceCuller.DefaultMaxDistance);
 
+        public event Action<bool> OnLightsCullingValueChanged
+        {
+            add => _enableLightsCulling.OnPlayerPrefsValueChanged += value;
+            remove => _enableLightsCulling.OnPlayerPrefsValueChanged -= value;
+        }
+        
         public bool EnableLightsCulling
         {
             get => _enableLightsCulling.Value; 
