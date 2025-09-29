@@ -4,20 +4,13 @@ namespace Citadel.Game
 {
     internal abstract class PlayerPrefsValue <T>
     {
-        private Action<T> _onPlayerPrefsValueChanged;
-
         private readonly string _playerPrefsKey;
         private readonly T _defaultValue;
 
         private T _savedValue;
         private bool _hasValue;
+        private Action<T> _onPlayerPrefsValueChanged;
 
-        public event Action<T> OnPlayerPrefsValueChanged
-        {
-            add { _onPlayerPrefsValueChanged += value; }
-            remove { _onPlayerPrefsValueChanged -= value; }
-        }
-        
         protected PlayerPrefsValue(string playerPrefsKey, T defaultValue = default )
         {
             _playerPrefsKey = playerPrefsKey;
@@ -31,6 +24,12 @@ namespace Citadel.Game
             _defaultValue = defaultValue;
         }
 
+        public event Action<T> OnPlayerPrefsValueChanged
+        {
+            add { _onPlayerPrefsValueChanged += value; }
+            remove { _onPlayerPrefsValueChanged -= value; }
+        }
+        
         public T Value
         {
             get
