@@ -697,6 +697,7 @@ public class Const : SingletonHelper<Const>
 		{
 			StartingNewGame = false;
 			LevelManager.currentLevel = LevelManager.NewGameLevelIndex;
+			_lightDistanceCuller.Rebuild();
 			GoIntoGame();
 		}
 		else if (_saveFileIndex.HasValue)

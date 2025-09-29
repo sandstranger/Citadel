@@ -11,22 +11,23 @@ namespace Citadel.Game
     [DisallowMultipleComponent]
     internal sealed class LightDistanceCuller : MonoBehaviour
     {
-        private const int TrackedLightsInitialCapacity = 1500;
+        public const float MaxDistance = 20.0f;
+        private const int TrackedLightsInitialCapacity = 3500;
         private const float CheckInterval = 0.3f;
         
-        private static readonly WaitForSeconds _checkIntervalAwaiter = new WaitForSeconds(CheckInterval);
+        private static readonly WaitForSeconds _checkIntervalAwaiter = new(CheckInterval);
         
-        [SerializeField] private bool _enableLightsCulling = true;
         [Header("Source lights")] 
         [SerializeField] private bool _autoFindLights = true;
         [SerializeField] private Light[] _manualLights;
-        [Header("Culling")] 
-        [SerializeField] private float _maxDistance = 20f;
         [SerializeField] private bool _useFade = true;
         [SerializeField] private float _fadeSpeed = 10f;
         [Header("Filters")]
         [SerializeField] private LayerMask _ignoreLayers = 0;
 
+        private bool _enableLightsCulling;
+        private float _maxDistance;
+        
         private Transform _camTransform;
         private float _sqrMaxDistance;
 
@@ -34,29 +35,20 @@ namespace Citadel.Game
 
         [Inject]
         private readonly Camera _cam;
+        [Inject]
+        private readonly AndroidConfig _androidConfig;
         
         private void Start()
         {
-            if (!_enableLightsCulling)
-            {
-                return;
-            }
-            
+            _enableLightsCulling = _androidConfig.EnableLightsCulling;
+            SetMaxDistance(_androidConfig.LightsCullingMaxDistance);
             _camTransform = (_cam != null) ? _cam.transform : Camera.main.transform;
-            _sqrMaxDistance = _maxDistance * _maxDistance;
-            StartCoroutine(CullCheckCoroutine());
+            StartLightsCulling();
         }
 
         private void OnDestroy()
         {
-            StopAllCoroutines();
-            RestoreAllLights();
-        }
-
-        public void SetMaxDistance(float distance)
-        {
-            _maxDistance = Mathf.Max(0.01f, distance);
-            _sqrMaxDistance = _maxDistance * _maxDistance;
+            StopLightsCulling();
         }
 
         public void Clear()
@@ -69,13 +61,60 @@ namespace Citadel.Game
         {
             RebuildLightList();
         }
-        
+
+        private void SetMaxDistance(float distance)
+        {
+            _maxDistance = Mathf.Max(0.01f, distance);
+            _sqrMaxDistance = _maxDistance * _maxDistance;
+        }
+
+        private void StartLightsCulling()
+        {
+            if (!_enableLightsCulling)
+            {
+                return;
+            }
+            
+            Rebuild();
+            StartCoroutine(CullCheckCoroutine());
+        }
+
+        private void StopLightsCulling()
+        {
+            StopAllCoroutines();
+            Clear();
+        }
+
+        private void FixedUpdate()
+        {
+            if (_enableLightsCulling == _androidConfig.EnableLightsCulling)
+            {
+                return;
+            }
+            
+            _enableLightsCulling = _androidConfig.EnableLightsCulling;
+
+            if (_enableLightsCulling)
+            {
+                StartLightsCulling();
+            }
+            else
+            {
+                StopLightsCulling();
+            }
+        }
+
         private IEnumerator CullCheckCoroutine()
         {
             while (_enableLightsCulling)
             {
                 if (_trackedLights.Count > 0)
                 {
+                    if (!FastApproximately2(_maxDistance, _androidConfig.LightsCullingMaxDistance))
+                    {
+                        SetMaxDistance(_androidConfig.LightsCullingMaxDistance);
+                    }
+                    
                     DoCullCheck();
 
                     if (!_useFade)
@@ -116,10 +155,12 @@ namespace Citadel.Game
 
                 bool hasLightAnimation = light.GetComponent<LightAnimation>() != null;
 
+                var lightIntensity = light.intensity;
+                
                 var lightData = new LightData(
                     light,
-                    light.intensity,
-                    light.intensity,
+                    lightIntensity,
+                    lightIntensity,
                     hasLightAnimation,
                     light.enabled);
 
