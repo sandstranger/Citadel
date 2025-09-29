@@ -5,7 +5,7 @@ namespace Citadel.Game
         public static AndroidConfig Default { get; } = new();
 		
         private readonly PlayerPrefsBoolValue _enableLightsCulling = new("enable_lights_culling", true);
-        private readonly PlayerPrefsFloatValue _lightsCullingMaxDistance = new("lighs_culling_max_distance", LightDistanceCuller.MaxDistance);
+        private readonly PlayerPrefsFloatValue _lightsCullingMaxDistance = new("lights_culling_max_distance", LightDistanceCuller.DefaultMaxDistance);
 
         public bool EnableLightsCulling
         {

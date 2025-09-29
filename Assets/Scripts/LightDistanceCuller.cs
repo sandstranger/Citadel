@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 namespace Citadel.Game
@@ -11,7 +10,8 @@ namespace Citadel.Game
     [DisallowMultipleComponent]
     internal sealed class LightDistanceCuller : MonoBehaviour
     {
-        public const float MaxDistance = 20.0f;
+        public const float MinDistance = 6.0f;
+        public const float DefaultMaxDistance = 20.0f;
         private const int TrackedLightsInitialCapacity = 3500;
         private const float CheckInterval = 0.3f;
         
@@ -64,7 +64,7 @@ namespace Citadel.Game
 
         private void SetMaxDistance(float distance)
         {
-            _maxDistance = Mathf.Max(0.01f, distance);
+            _maxDistance = Mathf.Max(MinDistance, distance);
             _sqrMaxDistance = _maxDistance * _maxDistance;
         }
 
