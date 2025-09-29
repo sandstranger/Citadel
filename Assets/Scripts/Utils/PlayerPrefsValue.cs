@@ -26,8 +26,8 @@ namespace Citadel.Game
 
         public event Action<T> OnPlayerPrefsValueChanged
         {
-            add { _onPlayerPrefsValueChanged += value; }
-            remove { _onPlayerPrefsValueChanged -= value; }
+            add => _onPlayerPrefsValueChanged += value;
+            remove => _onPlayerPrefsValueChanged -= value; 
         }
         
         public T Value

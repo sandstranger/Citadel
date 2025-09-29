@@ -21,7 +21,6 @@ public class PauseScript : MonoBehaviour {
 
 	[HideInInspector] public bool paused = false;
 	[HideInInspector] public bool previousInvMode = true;
-	[HideInInspector] public bool onSaveDialog = false;
 	public float relativeTime;
 	public float absoluteTime;
 	private readonly List<AmbientRegistration> _ambientRegistry = new();
@@ -39,6 +38,8 @@ public class PauseScript : MonoBehaviour {
 									// than once on every Update all over the
 									// code.
 
+	public bool OnSaveDialog => hardSaveDialog.activeSelf || saveDialog.activeSelf;
+									
 	private void Awake()
 	{
 		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
@@ -66,7 +67,7 @@ public class PauseScript : MonoBehaviour {
 		if (!menuActive) {
 			if (!_mouseLookScript.playerCamera.enabled) _mouseLookScript.playerCamera.enabled = true;
 			if (_getInput.Menu()) {
-				if (onSaveDialog)
+				if (OnSaveDialog)
 					ExitSaveDialog();
 				else
 					PauseToggle();
@@ -216,7 +217,9 @@ public class PauseScript : MonoBehaviour {
 		pauseText.SetActive(true);
 	}
 
-	public void PauseDisable() {
+	public void PauseDisable()
+	{
+		_consts.QuitAfterSavingDone = false;
 		AudioListener.pause = false;
 		UnpauseSystems();
 		if (previousInvMode != _mouseLookScript.inventoryMode) {
@@ -289,7 +292,7 @@ public class PauseScript : MonoBehaviour {
 	}
 
 	public void OpenSaveDialog() {
-		if (onSaveDialog) return;
+		if (OnSaveDialog) return;
 
 		if (_playerMovement.inCyberSpace) {
 			_consts.sprint(_consts.stringTable[602]); // Cannot save in cyberspace
@@ -298,27 +301,20 @@ public class PauseScript : MonoBehaviour {
 		}
 
 		DisablePauseUI();
-		if (_consts.justSavedTimeStamp < Time.time) {
-			onSaveDialog = true;
-			saveDialog.SetActive(true);
-		}
+		saveDialog.SetActive(true);
 	}
 
 	public void OpenSaveDialogHard() {
-		if (onSaveDialog) return;
+		if (OnSaveDialog) return;
 
 		DisablePauseUI();
-		if (_consts.justSavedTimeStamp < Time.time) {
-			onSaveDialog = true;
-			hardSaveDialog.SetActive(true);
-		}
+		hardSaveDialog.SetActive(true);
 	}
 
 	public void ExitSaveDialog() {
 		EnablePauseUI();
 		saveDialog.SetActive(false);
 		hardSaveDialog.SetActive(false);
-		onSaveDialog = false;
 	}
 
 	public void SavePause() {
@@ -326,7 +322,7 @@ public class PauseScript : MonoBehaviour {
 			_consts.sprint(_consts.stringTable[602]); // Cannot save in cyberspace
 			return;
 		}
-		if (onSaveDialog) return;
+		if (OnSaveDialog) return;
 
 		DisablePauseUI();
 		saveDialog.SetActive(false); // turn off dialog
@@ -335,7 +331,7 @@ public class PauseScript : MonoBehaviour {
 	}
 
 	public void LoadPause() {
-		if (onSaveDialog) return;
+		if (OnSaveDialog) return;
 
 		DisablePauseUI();
 		saveDialog.SetActive(false); // turn off dialog
@@ -348,6 +344,7 @@ public class PauseScript : MonoBehaviour {
 		saveDialog.SetActive(false); // turn off dialog
 		mainMenu.SetActive(true);
 		_mainMenuHandler.InitialDisplay.SetActive(false);
+		_consts.QuitAfterSavingDone = true;
 		_mainMenuHandler.GoToSaveGameSubmenu(true);
 	}
 
@@ -387,7 +384,7 @@ public class PauseScript : MonoBehaviour {
 	}
 
 	public void PauseOptions () {
-		if (onSaveDialog) return;
+		if (OnSaveDialog) return;
 
 		DisablePauseUI();
 		mainMenu.SetActive(true);

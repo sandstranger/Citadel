@@ -566,6 +566,7 @@ public class MainMenuHandler : MonoBehaviour {
 	}
 
 	public void GoToFrontPage() {
+		_consts.QuitAfterSavingDone = false;
 		ResetPages();
 		frontPage.SetActive(true);
 		currentPage = Pages.fp;
@@ -755,7 +756,9 @@ public class MainMenuHandler : MonoBehaviour {
 		} else _consts.Load(index,false);
 	}
 
-	public void GoBack () {
+	public void GoBack ()
+	{
+		_consts.QuitAfterSavingDone = false;
 		EventSystem.current.SetSelectedGameObject(null);
 		if (typingSaveGame) {
 			saveNameInput[currentSaveSlot].SetActive(false);

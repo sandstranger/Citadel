@@ -302,6 +302,7 @@ public class LevelManager : MonoBehaviour
 	
 	public void LoadLevel(int levnum, Vector3 targetPosition, bool loadLevelForced = false)
 	{
+		_consts.QuitAfterSavingDone = false;
 		_lightDistanceCuller.Clear();
 		LoadLevelAfterSceneChanges = false;
 		if (!LevNumInBounds(levnum)) { Debug.LogWarning("levnum out of bounds"); return; }

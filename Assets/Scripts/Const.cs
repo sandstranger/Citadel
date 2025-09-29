@@ -222,7 +222,9 @@ public class Const : SingletonHelper<Const>
 	public static int _difficultyMission = 2;
 	public static int _difficultyPuzzle = 2;
 	public static int _difficultyCyber = 2;
-	
+
+	public bool QuitAfterSavingDone { get; set; } = false;
+
 	//Config constants
 	public int difficultyCombat
 	{
@@ -691,6 +693,7 @@ public class Const : SingletonHelper<Const>
 	
 	private void OnSceneLoaded(string sceneName)
 	{
+		QuitAfterSavingDone = false;
 		ResetPauseLists();
 		
 		if (StartingNewGame)
@@ -1322,6 +1325,7 @@ CreateBlackTexture:
 	// Save the Game
 	// ========================================================================
 	public IEnumerator SaveRoutine(int saveFileIndex,string savename) {
+		bool quitAfterSaving = QuitAfterSavingDone;
 		sprint(stringTable[194]); // Indicate we are saving "Saving..."
 		yield return null; // Update to show this sprint.
 
@@ -1421,6 +1425,12 @@ CreateBlackTexture:
 		saveTimer.Stop();
 		sprint(stringTable[195] + " (" + saveTimer.Elapsed.ToString() + ")");
 		if (saveFileIndex < 7) justSavedTimeStamp = Time.time + savedReminderTime; // using normal run time, don't ask again to save for next 7 seconds
+
+		if (quitAfterSaving)
+		{
+			QuitAfterSavingDone = false;
+			_pauseScript.NoSavePauseQuit();
+		}
 	}
 
 	// Start a New Game
@@ -1553,7 +1563,9 @@ CreateBlackTexture:
 
 	// LOAD 2. Called from Load menu or Quick Load.
 	// LOAD 6. Called from _consts.Start().
-	public IEnumerator LoadRoutine(int saveFileIndex, bool actual) {
+	public IEnumerator LoadRoutine(int saveFileIndex, bool actual)
+	{
+		QuitAfterSavingDone = false;
 		Stopwatch loadTimer = new Stopwatch();
 		Stopwatch loadUpdateTimer = new Stopwatch(); // For loading % indicator.
 		loadTimer.Start();
