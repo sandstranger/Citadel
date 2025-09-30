@@ -104,7 +104,7 @@ MonoBehaviour:
     - line: '|   androidFullscreenMode: 1'
     - line: '|   androidAutoRotationBehavior: 1'
     - line: '|   androidPredictiveBackSupport: 1'
-    - line: '|   androidApplicationEntry: 1'
+    - line: '|   androidApplicationEntry: 2'
     - line: '|   defaultIsNativeResolution: 0'
     - line: '|   macRetinaSupport: 1'
     - line: '|   runInBackground: 0'
