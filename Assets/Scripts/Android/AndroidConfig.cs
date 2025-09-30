@@ -1,7 +1,7 @@
 using System;
-using System.Globalization;
 using System.IO;
 using UnityEngine;
+using static System.Boolean;
 
 namespace Citadel.Game
 {
@@ -39,7 +39,7 @@ namespace Citadel.Game
             set
             {
                 _enableVulkanApi.Value = value;
-                File.WriteAllText(PathToPreferVulkanApiFile,value.ToString(CultureInfo.InvariantCulture).ToLowerInvariant());
+                File.WriteAllText(PathToPreferVulkanApiFile,value ? TrueString : FalseString);
             }
         }
     }
