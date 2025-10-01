@@ -25,16 +25,14 @@ namespace Citadel.Android.Tools
 
                 if (lod != null && Mathf.Approximately(lod.size, OldObjectSize))
                 {
-                    GameObject prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(projectPrefab);
-                    lod = prefabInstance.GetComponent<LODGroup>();
-                    
-                    lod.size = NewObjectSize;
-                    lod.fadeMode = LODFadeMode.CrossFade;
-                    lod.animateCrossFading = true;
-                    
-                    PrefabUtility.SaveAsPrefabAsset(prefabInstance, AssetDatabase.GetAssetPath(projectPrefab));
-                    Object.DestroyImmediate(prefabInstance);
-                    EditorUtility.SetDirty(projectPrefab);
+                    InstantiatePrefab(projectPrefab, prefabInstance =>
+                    {
+                        lod = prefabInstance.GetComponent<LODGroup>();
+                        lod.size = NewObjectSize;
+                        lod.fadeMode = LODFadeMode.CrossFade;
+                        lod.animateCrossFading = true;
+                        return true;
+                    });
                 }
             }
         }
@@ -65,47 +63,47 @@ namespace Citadel.Android.Tools
 
                 var meshFilters = projectPrefab.GetComponentsInChildren<MeshRenderer>(true, true)
                     .Select(render => render.GetComponent<MeshFilter>()).Where(mesh => mesh!=null && mesh.sharedMesh!=null).ToArray();
-                GameObject prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(projectPrefab);
-                AutoLOD.GenerateLODs(prefabInstance);
 
-                var createdLods = prefabInstance.GetComponentsInChildren<MeshRenderer>(true)
-                    .Where(render => render.gameObject.name.Contains("LOD")).ToArray();
-                
-                foreach (var createdLod in createdLods)
+                InstantiatePrefab(projectPrefab, prefabInstance =>
                 {
-                    var createdLodName = createdLod.gameObject.name;
-                    var originalMeshFilter = meshFilters.FirstOrDefault( meshFilter  => createdLodName.Contains(meshFilter.sharedMesh.name));
+                    AutoLOD.GenerateLODs(prefabInstance);
 
-                    if (originalMeshFilter != null)
+                    var createdLods = prefabInstance.GetComponentsInChildren<MeshRenderer>(true)
+                        .Where(render => render.gameObject.name.Contains("LOD")).ToArray();
+
+                    foreach (var createdLod in createdLods)
                     {
-                        var originalRender = originalMeshFilter.GetComponent<MeshRenderer>();
-                        createdLod.gameObject.SetActive(originalMeshFilter.gameObject.activeSelf);
-                        createdLod.gameObject.isStatic = originalMeshFilter.gameObject.isStatic;
-                        createdLod.receiveGI = originalRender.receiveGI;
+                        var createdLodName = createdLod.gameObject.name;
+                        var originalMeshFilter = meshFilters.FirstOrDefault(meshFilter =>
+                            createdLodName.Contains(meshFilter.sharedMesh.name));
+
+                        if (originalMeshFilter != null)
+                        {
+                            var originalRender = originalMeshFilter.GetComponent<MeshRenderer>();
+                            createdLod.gameObject.SetActive(originalMeshFilter.gameObject.activeSelf);
+                            createdLod.gameObject.isStatic = originalMeshFilter.gameObject.isStatic;
+                            createdLod.receiveGI = originalRender.receiveGI;
+                        }
                     }
-                }
-                
-                var lod = prefabInstance.GetComponent<LODGroup>();
-                
-                if (lod != null)
-                {
-                    var lods = lod.GetLODs();
-                    lods[0].screenRelativeTransitionHeight = Lod0TransitionScreen;
-                    lods[1].screenRelativeTransitionHeight = Lod1TransitionScreen;
-                    lods[2].screenRelativeTransitionHeight = Lod2TransitionScreen;
-                    lod.SetLODs(lods);
-                    lod.RecalculateBounds();
-                    lod.size = NewObjectSize;
-                    lod.fadeMode = LODFadeMode.CrossFade;
-                    lod.animateCrossFading = true;
-                    PrefabUtility.SaveAsPrefabAsset(prefabInstance, AssetDatabase.GetAssetPath(projectPrefab));
-                    Object.DestroyImmediate(prefabInstance);
-                    EditorUtility.SetDirty(projectPrefab);
-                }
-                else
-                {
-                    Object.DestroyImmediate(prefabInstance);
-                }
+
+                    var lod = prefabInstance.GetComponent<LODGroup>();
+
+                    if (lod != null)
+                    {
+                        var lods = lod.GetLODs();
+                        lods[0].screenRelativeTransitionHeight = Lod0TransitionScreen;
+                        lods[1].screenRelativeTransitionHeight = Lod1TransitionScreen;
+                        lods[2].screenRelativeTransitionHeight = Lod2TransitionScreen;
+                        lod.SetLODs(lods);
+                        lod.RecalculateBounds();
+                        lod.size = NewObjectSize;
+                        lod.fadeMode = LODFadeMode.CrossFade;
+                        lod.animateCrossFading = true;
+                        return true;
+                    }
+
+                    return false;
+                });
             }
             
             AssetDatabase.Refresh();

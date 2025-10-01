@@ -1,11 +1,32 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Citadel.Editor
 {
     public static class Utils
     {
+        public static void InstantiatePrefab(GameObject prefab, Func<GameObject,bool> onPrefabInstantiated)
+        {
+            GameObject prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            bool saveInstantiatedPrefab = onPrefabInstantiated?.Invoke(prefabInstance) ?? false;
+            if (saveInstantiatedPrefab)
+            {
+                try
+                {
+                    PrefabUtility.SaveAsPrefabAsset(prefabInstance, AssetDatabase.GetAssetPath(prefab));
+                    EditorUtility.SetDirty(prefab);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Can not save prefab = {prefab.name} due to exception: {e}");
+                }
+            }
+            Object.DestroyImmediate(prefabInstance);
+        }
+        
         public static IReadOnlyList<T> FindAllComponentsInProject<T>() where T : Object
         {
             return FindAllComponentsInProject<T>(typeof(T).Name);

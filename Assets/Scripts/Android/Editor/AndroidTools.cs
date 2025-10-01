@@ -16,33 +16,76 @@ namespace Citadel.Android.Tools
         {
             Debug.Log($"Found canvases {String.Join(",",Object.FindObjectsOfType<Canvas>(true).Select(canvas => canvas.gameObject.name).ToArray())}");
         }
-        
+
+        [MenuItem("Tools/Remove double materials from Render components")]
+        private static void RemoveDoubleMaterialsFromRenderComponents()
+        {
+            var prefabs = FindAllComponentsInProject<GameObject>("Prefab");
+
+            foreach (var prefab in prefabs)
+            {
+                InstantiatePrefab(prefab, prefabInstance =>
+                {
+                    bool saveInstantiatedPrefab = false;
+                    foreach (var renderer in prefabInstance.GetComponentsInChildren<Renderer>(true))
+                    {
+                        bool updateSharedMaterialsOnRender = renderer.sharedMaterials.Any(sharedMaterial => sharedMaterial == null);
+                        var materials = renderer.sharedMaterials.Where(sharedMaterial => sharedMaterial != null).ToArray();
+                        var materialsToSet = new List<Material>(materials);
+
+                        foreach (var material in materials)
+                        {
+                            var materialsCount = materials.Count(sharedMaterial => sharedMaterial.name == material.name);
+
+                            if (materialsCount > 1)
+                            {
+                                materialsToSet.RemoveAll(sharedMaterial => sharedMaterial.name == material.name);
+                                materialsToSet.Add(material);
+                                updateSharedMaterialsOnRender = true;
+                            }
+
+                            if (updateSharedMaterialsOnRender)
+                            {
+                                saveInstantiatedPrefab = true;
+                                renderer.sharedMaterials = materialsToSet.ToArray();
+                            }
+                        }
+                    }
+
+                    return saveInstantiatedPrefab;
+                });
+            }
+        }
+
         [MenuItem("Tools/Set custom material to all ui elements")]
         private static void SetCustomMaterialToAllUIElements()
         {
             const string materialNameToIgnore = "ui_automapmasker";
 
-            var materialToReplace = FindAllComponentsInProject<Material>().First(material => material.name == "DefaultUIMaterial");
+            var materialToReplace = FindAllComponentsInProject<Material>()
+                .First(material => material.name == "DefaultUIMaterial");
 
-            var playerPrefab = FindAllComponentsInProject<GameObject>("Prefab").First(prefab => prefab.name == "Player");
-            GameObject prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
-            
-            var uiElements = prefabInstance.GetComponentsInChildren<RawImage>(true).Cast<ICanvasElement>()
-                .Union(prefabInstance.GetComponentsInChildren<Image>(true)).Union(prefabInstance.GetComponentsInChildren<Text>(true)).Cast<Graphic>().ToArray();
-            
-            foreach (var uiElement in uiElements)
+            var playerPrefab = FindAllComponentsInProject<GameObject>("Prefab")
+                .First(prefab => prefab.name == "Player");
+
+            InstantiatePrefab(playerPrefab, prefabInstance =>
             {
-                if (uiElement.material != null && uiElement.material.name == materialNameToIgnore)
+                var uiElements = prefabInstance.GetComponentsInChildren<RawImage>(true).Cast<ICanvasElement>()
+                    .Union(prefabInstance.GetComponentsInChildren<Image>(true))
+                    .Union(prefabInstance.GetComponentsInChildren<Text>(true)).Cast<Graphic>().ToArray();
+
+                foreach (var uiElement in uiElements)
                 {
-                    continue;
+                    if (uiElement.material != null && uiElement.material.name == materialNameToIgnore)
+                    {
+                        continue;
+                    }
+
+                    uiElement.material = materialToReplace;
                 }
 
-                uiElement.material = materialToReplace;
-            }
-
-            PrefabUtility.SaveAsPrefabAsset(prefabInstance, AssetDatabase.GetAssetPath(playerPrefab));
-            GameObject.DestroyImmediate(prefabInstance);
-            EditorUtility.SetDirty(playerPrefab);
+                return true;
+            });
         }
         
         [MenuItem("Tools/Remove all SEGIEmitters from active scene")]
