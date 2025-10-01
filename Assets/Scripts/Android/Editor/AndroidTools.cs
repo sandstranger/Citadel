@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using static Citadel.Editor.Utils;
 using Object = UnityEngine.Object;
@@ -15,8 +16,41 @@ namespace Citadel.Android.Tools
         private static void FindAllCanvases()
         {
             Debug.Log($"Found canvases {String.Join(",",Object.FindObjectsOfType<Canvas>(true).Select(canvas => canvas.gameObject.name).ToArray())}");
+        }     
+        
+        [MenuItem("Tools/Set all lights to not important mode")]
+        private static void SetAllLightsToAutoMode()
+        {
+            foreach (var light in GameObject.FindObjectsOfType<Light>(true))
+            { 
+                light.renderMode = LightRenderMode.ForceVertex;
+            }
         }
 
+        [MenuItem("Tools/Set all shadowcasters to static mode")]
+        private static void SetAllShadowCastersToStaticMode()
+        {
+            foreach (var prefab in FindAllComponentsInProject<GameObject>("Prefab"))
+            {
+                InstantiatePrefab(prefab, prefabInstance =>
+                {
+                    var renderers = prefabInstance.GetComponentsInChildren<Renderer>(true).Where(render => render!=null).ToArray();
+                    var shadowCasters = renderers.Where(render => render.sharedMaterials!=null && render.sharedMaterials.Any(material => material!=null && material.name == "black_shadowhelper")).ToArray();
+                    var setShadowCastersToStaticMode = shadowCasters.Length > 0 && renderers.Any(render => render.gameObject.isStatic);
+
+                    if (setShadowCastersToStaticMode)
+                    {
+                        foreach (var shadowCaster in shadowCasters)
+                        {
+                            shadowCaster.gameObject.isStatic = true;
+                        }
+                    }
+
+                    return setShadowCastersToStaticMode;
+                });
+            }
+        }
+        
         [MenuItem("Tools/Remove double materials from Render components")]
         private static void RemoveDoubleMaterialsFromRenderComponents()
         {

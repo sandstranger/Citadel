@@ -28,7 +28,7 @@ MonoBehaviour:
     - line: '|   serializedVersion: 28'
     - line: '|   productGUID: c7f113d90f31811419af5bdf7b249ea3'
     - line: '|   AndroidProfiler: 0'
-    - line: '|   AndroidFilterTouchesWhenObscured: 0'
+    - line: '|   AndroidFilterTouchesWhenObscured: 1'
     - line: '|   AndroidEnableSustainedPerformanceMode: 0'
     - line: '|   defaultScreenOrientation: 4'
     - line: '|   targetDevice: 2'
