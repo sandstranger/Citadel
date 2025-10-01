@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 15003, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: android IL2CPP build profile
+  m_Name: android mono LOW RAM USAGE build profile
   m_EditorClassIdentifier: 
   m_AssetVersion: 1
   m_BuildTarget: 13
@@ -80,7 +80,7 @@ MonoBehaviour:
     - line: '|   mipStripping: 1'
     - line: '|   numberOfMipsStripped: 0'
     - line: '|   numberOfMipsStrippedPerMipmapLimitGroup: {}'
-    - line: '|   m_StackTraceTypes: 010000000100000000000000000000000100000001000000'
+    - line: '|   m_StackTraceTypes: 010000000100000001000000010000000100000001000000'
     - line: '|   iosShowActivityIndicatorOnLoading: -1'
     - line: '|   androidShowActivityIndicatorOnLoading: 2'
     - line: '|   iosUseCustomAppBackgroundBehavior: 0'
@@ -292,7 +292,7 @@ MonoBehaviour:
     - line: '|   useCustomGradlePropertiesTemplate: 0'
     - line: '|   useCustomGradleSettingsTemplate: 0'
     - line: '|   useCustomProguardFile: 0'
-    - line: '|   AndroidTargetArchitectures: 11'
+    - line: '|   AndroidTargetArchitectures: 1'
     - line: '|   AndroidSplashScreenScale: 0'
     - line: '|   androidSplashScreen: {instanceID: 0}'
     - line: '|   AndroidKeystoreName: ''{inproject}: '''
@@ -524,8 +524,8 @@ MonoBehaviour:
     - line: '|     m_StaticBatching: 0'
     - line: '|     m_DynamicBatching: 1'
     - line: '|   - m_BuildTarget: Android'
-    - line: '|     m_StaticBatching: 1'
-    - line: '|     m_DynamicBatching: 0'
+    - line: '|     m_StaticBatching: 0'
+    - line: '|     m_DynamicBatching: 1'
     - line: '|   m_BuildTargetShaderSettings: []'
     - line: '|   m_BuildTargetGraphicsJobs:'
     - line: '|   - m_BuildTarget: MacStandaloneSupport'
@@ -926,7 +926,7 @@ MonoBehaviour:
     - line: '|   platformArchitecture:'
     - line: '|     iPhone: 1'
     - line: '|   scriptingBackend:'
-    - line: '|     Android: 1'
+    - line: '|     Android: 0'
     - line: '|     Standalone: 0'
     - line: '|     WP8: 2'
     - line: '|     WebGL: 1'

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 15003, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: android IL2CPP build profile
+  m_Name: android IL2CPP LOW RAM USAGE build profile
   m_EditorClassIdentifier: 
   m_AssetVersion: 1
   m_BuildTarget: 13
@@ -524,8 +524,8 @@ MonoBehaviour:
     - line: '|     m_StaticBatching: 0'
     - line: '|     m_DynamicBatching: 1'
     - line: '|   - m_BuildTarget: Android'
-    - line: '|     m_StaticBatching: 1'
-    - line: '|     m_DynamicBatching: 0'
+    - line: '|     m_StaticBatching: 0'
+    - line: '|     m_DynamicBatching: 1'
     - line: '|   m_BuildTargetShaderSettings: []'
     - line: '|   m_BuildTargetGraphicsJobs:'
     - line: '|   - m_BuildTarget: MacStandaloneSupport'
