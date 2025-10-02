@@ -88,7 +88,6 @@ Shader "Standard (Specular setup) Optimized"
 
             #pragma vertex vertBase
             #pragma fragment fragBase
-            #define MOBILE_OPTIMIZED
             #include "UnityStandardCoreForward.cginc"
 
             ENDCG
@@ -125,9 +124,45 @@ Shader "Standard (Specular setup) Optimized"
             #pragma vertex vertDeferred
             #pragma fragment fragDeferred
 
-            // МОБИЛЬНАЯ ОПТИМИЗАЦИЯ: использование упрощенной библиотеки
-            #define MOBILE_OPTIMIZED
             #include "UnityStandardCore.cginc"
+
+            ENDCG
+        }
+
+        //  Additive forward pass (one light per pass)
+        Pass
+        {
+            Name "FORWARD_DELTA"
+            Tags { "LightMode" = "ForwardAdd" }
+            Blend [_SrcBlend] One
+            Fog { Color (0,0,0,0) } // in additive pass fog should be black
+            ZWrite Off
+            ZTest LEqual
+
+            CGPROGRAM
+            #pragma target 3.0
+
+            // -------------------------------------
+
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local _SPECGLOSSMAP
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local _ _DETAIL_MULX2_OFF
+            // #pragma shader_feature_local_fragment _DETAIL_MULX2
+            // #pragma shader_feature_local _PARALLAXMAP
+            #pragma shader_feature_local _ _PARALLAXMAP_OFF
+            #pragma shader_feature_local _ _OCCLUSIONMAP_OFF
+
+            #pragma multi_compile_fwdadd_fullshadows
+            #pragma multi_compile_fog
+            // Uncomment the following line to enable dithering LOD crossfade. Note: there are more in the file to uncomment for other passes.
+            //#pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #pragma vertex vertAdd
+            #pragma fragment fragAdd
+            #include "UnityStandardCoreForward.cginc"
 
             ENDCG
         }
@@ -178,8 +213,6 @@ Shader "Standard (Specular setup) Optimized"
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature EDITOR_VISUALIZATION
             #pragma shader_feature_local _ _DETAIL_MULX2_OFF
-
-            #define MOBILE_OPTIMIZED
             #include "UnityStandardMeta.cginc"
             ENDCG
         }
