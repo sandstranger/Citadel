@@ -25,6 +25,7 @@ Properties {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 3.0            
             #pragma multi_compile_instancing // Добавляем поддержку инстансинга
             #pragma instancing_options assumeuniformscaling // Опция для инстансинга
  

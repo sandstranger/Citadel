@@ -17,14 +17,12 @@ Shader "Custom/Geometry/Wireframe" {
             #pragma vertex vert
             #pragma fragment frag
             #pragma geometry geom
-            #pragma multi_compile_instancing // Добавляем поддержку инстансинга
-
-            // Change "shader_feature" with "pragma_compile" if you want set this keyword from c# code
+            #pragma target 3.0
+            #pragma multi_compile_instancing
             #pragma shader_feature __ _REMOVEDIAG_ON
 
             #include "UnityCG.cginc"
 
-            // Объявляем буфер для свойств инстансинга
             UNITY_INSTANCING_BUFFER_START(Props)
                 UNITY_DEFINE_INSTANCED_PROP(float, _WireframeVal)
                 UNITY_DEFINE_INSTANCED_PROP(fixed4, _Color)
@@ -33,24 +31,29 @@ Shader "Custom/Geometry/Wireframe" {
 
             struct v2g {
                 float4 worldPos : SV_POSITION;
-                UNITY_VERTEX_INPUT_INSTANCE_ID // Добавляем ID инстанса
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct g2f {
                 float4 pos : SV_POSITION;
                 float3 bary : TEXCOORD0;
-                UNITY_VERTEX_INPUT_INSTANCE_ID // Добавляем ID инстанса для фрагментного шейдера
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             v2g vert(appdata_base v) {
                 v2g o;
-                UNITY_SETUP_INSTANCE_ID(v); // Устанавливаем ID инстанса
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_TRANSFER_INSTANCE_ID(v, o);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 return o;
             }
 
             [maxvertexcount(3)]
             void geom(triangle v2g IN[3], inout TriangleStream<g2f> triStream) {
+                UNITY_SETUP_INSTANCE_ID(IN[0]);
+                UNITY_SETUP_INSTANCE_ID(IN[1]);
+                UNITY_SETUP_INSTANCE_ID(IN[2]);
+
                 float3 param = float3(0., 0., 0.);
 
                 #if _REMOVEDIAG_ON
@@ -67,26 +70,31 @@ Shader "Custom/Geometry/Wireframe" {
                 #endif
 
                 g2f o;
-                UNITY_SETUP_INSTANCE_ID(IN[0]); // Устанавливаем ID инстанса для первого вершины
-                UNITY_TRANSFER_INSTANCE_ID(IN[0], o); // Передаем ID инстанса
                 
+                // Первая вершина
+                UNITY_TRANSFER_INSTANCE_ID(IN[0], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[0].worldPos);
                 o.bary = float3(1., 0., 0.) + param;
                 triStream.Append(o);
                 
+                // Вторая вершина  
+                UNITY_TRANSFER_INSTANCE_ID(IN[1], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[1].worldPos);
                 o.bary = float3(0., 0., 1.) + param;
                 triStream.Append(o);
                 
+                // Третья вершина
+                UNITY_TRANSFER_INSTANCE_ID(IN[2], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[2].worldPos);
                 o.bary = float3(0., 1., 0.) + param;
                 triStream.Append(o);
+                
+                triStream.RestartStrip();
             }
 
             fixed4 frag(g2f i) : SV_Target {
-                UNITY_SETUP_INSTANCE_ID(i); // Устанавливаем ID инстанса
+                UNITY_SETUP_INSTANCE_ID(i);
                 
-                // Используем инстансированные свойства
                 float wireframeVal = UNITY_ACCESS_INSTANCED_PROP(Props, _WireframeVal);
                 fixed4 color = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
                 float centerAlpha = UNITY_ACCESS_INSTANCED_PROP(Props, _CenterAlpha);
@@ -107,14 +115,13 @@ Shader "Custom/Geometry/Wireframe" {
             #pragma vertex vert
             #pragma fragment frag
             #pragma geometry geom
-            #pragma multi_compile_instancing // Добавляем поддержку инстансинга
+            #pragma target 3.0            
+            #pragma multi_compile_instancing
 
-            // Change "shader_feature" with "pragma_compile" if you want set this keyword from c# code
             #pragma shader_feature __ _REMOVEDIAG_ON
 
             #include "UnityCG.cginc"
 
-            // Объявляем буфер для свойств инстансинга
             UNITY_INSTANCING_BUFFER_START(Props)
                 UNITY_DEFINE_INSTANCED_PROP(float, _WireframeVal)
                 UNITY_DEFINE_INSTANCED_PROP(fixed4, _Color)
@@ -123,24 +130,29 @@ Shader "Custom/Geometry/Wireframe" {
 
             struct v2g {
                 float4 worldPos : SV_POSITION;
-                UNITY_VERTEX_INPUT_INSTANCE_ID // Добавляем ID инстанса
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct g2f {
                 float4 pos : SV_POSITION;
                 float3 bary : TEXCOORD0;
-                UNITY_VERTEX_INPUT_INSTANCE_ID // Добавляем ID инстанса для фрагментного шейдера
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             v2g vert(appdata_base v) {
                 v2g o;
-                UNITY_SETUP_INSTANCE_ID(v); // Устанавливаем ID инстанса
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_TRANSFER_INSTANCE_ID(v, o);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex);
                 return o;
             }
 
             [maxvertexcount(3)]
             void geom(triangle v2g IN[3], inout TriangleStream<g2f> triStream) {
+                UNITY_SETUP_INSTANCE_ID(IN[0]);
+                UNITY_SETUP_INSTANCE_ID(IN[1]);
+                UNITY_SETUP_INSTANCE_ID(IN[2]);
+
                 float3 param = float3(0., 0., 0.);
 
                 #if _REMOVEDIAG_ON
@@ -157,31 +169,36 @@ Shader "Custom/Geometry/Wireframe" {
                 #endif
 
                 g2f o;
-                UNITY_SETUP_INSTANCE_ID(IN[0]); // Устанавливаем ID инстанса для первого вершины
-                UNITY_TRANSFER_INSTANCE_ID(IN[0], o); // Передаем ID инстанса
                 
+                // Первая вершина
+                UNITY_TRANSFER_INSTANCE_ID(IN[0], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[0].worldPos);
                 o.bary = float3(1., 0., 0.) + param;
                 triStream.Append(o);
                 
+                // Вторая вершина  
+                UNITY_TRANSFER_INSTANCE_ID(IN[1], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[1].worldPos);
                 o.bary = float3(0., 0., 1.) + param;
                 triStream.Append(o);
                 
+                // Третья вершина
+                UNITY_TRANSFER_INSTANCE_ID(IN[2], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[2].worldPos);
                 o.bary = float3(0., 1., 0.) + param;
                 triStream.Append(o);
+                
+                triStream.RestartStrip();
             }
 
             fixed4 frag(g2f i) : SV_Target {
-                UNITY_SETUP_INSTANCE_ID(i); // Устанавливаем ID инстанса
+                UNITY_SETUP_INSTANCE_ID(i);
                 
-                // Используем инстансированные свойства
                 float wireframeVal = UNITY_ACCESS_INSTANCED_PROP(Props, _WireframeVal);
                 fixed4 color = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
                 float centerAlpha = UNITY_ACCESS_INSTANCED_PROP(Props, _CenterAlpha);
                 
-                if(!any(bool3(i.bary.x <= wireframeVal, i.bary.y <= wireframeVal, i.bary.z <= wireframeVal)))
+                if(!any(bool3(i.bary.x < wireframeVal, i.bary.y < wireframeVal, i.bary.z < wireframeVal)))
                     return fixed4(color.r, color.g, color.b, centerAlpha);
 
                 return color;

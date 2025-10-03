@@ -157,7 +157,7 @@ Shader "Deferred/Grass" {
             #pragma vertex vert
             #pragma fragment pixel_shader
             #pragma geometry geo
-            #pragma target 4.6
+            #pragma target 4.0
             #pragma exclude_renderers nomrt
             #pragma multi_compile ___ UNITY_HDR_ON
             #pragma multi_compile_instancing // Включаем GPU Instancing

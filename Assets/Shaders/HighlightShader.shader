@@ -13,6 +13,7 @@
 
   CGPROGRAM
   #pragma surface surf Lambert
+  #pragma target 3.0
   #pragma multi_compile_instancing // Добавляем поддержку инстансинга
 
   struct Input {

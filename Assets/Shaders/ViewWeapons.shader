@@ -22,6 +22,7 @@ Shader "Custom/ViewWeapons" {
             #pragma fragment MyFragmentProgram
             #pragma multi_compile_fwdbase
             #pragma multi_compile_instancing
+            #pragma target 3.0
             #include "UnityCG.cginc"
             #include "UnityLightingCommon.cginc"
             #include "AutoLight.cginc"
