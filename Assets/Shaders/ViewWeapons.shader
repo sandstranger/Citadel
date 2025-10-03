@@ -60,9 +60,9 @@ Shader "Custom/ViewWeapons" {
                 
                 float depthOffset = UNITY_ACCESS_INSTANCED_PROP(Props, _DepthOffset);
                 #if defined(UNITY_REVERSED_Z)
-                    i.position.z -= depthOffset;
+                    i.position.z -= depthOffset * i.position.w;
                 #else
-                    i.position.z += depthOffset;
+                    i.position.z += depthOffset * i.position.w;
                 #endif
 
                 i.uv = TRANSFORM_TEX(v.uv, _MainTex);
