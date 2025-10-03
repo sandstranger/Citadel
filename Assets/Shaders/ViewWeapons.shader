@@ -59,8 +59,12 @@ Shader "Custom/ViewWeapons" {
                 i.position = UnityObjectToClipPos(v.position);
                 
                 float depthOffset = UNITY_ACCESS_INSTANCED_PROP(Props, _DepthOffset);
-                i.position.z -= depthOffset;
-                
+                #if defined(UNITY_REVERSED_Z)
+                    i.position.z -= depthOffset;
+                #else
+                    i.position.z += depthOffset;
+                #endif
+
                 i.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 i.worldNormal = UnityObjectToWorldNormal(v.normal);
                 i.worldPos = mul(unity_ObjectToWorld, v.position).xyz;

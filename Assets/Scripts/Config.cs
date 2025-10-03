@@ -365,7 +365,6 @@ public sealed class Config
 		}
 		
 		_mainMenuHandler.shadApply.SetOptionsText();
-		_mainMenuHandler.ssrApply.SetOptionsText();
 		_mainMenuHandler.audModeApply.SetOptionsText();
 	}
 	

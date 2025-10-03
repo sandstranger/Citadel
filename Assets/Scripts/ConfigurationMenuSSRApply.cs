@@ -18,23 +18,6 @@ public class ConfigurationMenuSSRApply : MonoBehaviour {
 		Initialize();
 	}
 	
-	public void SetOptionsText() {
-		if (_consts == null) return;
-		if (!_consts.stringTableLoaded) return;
-		if (picker == null) return;
-
-		List<string> ssrList = new List<string>();
-		for (int i=0;i<3;i++) {
-			switch(i) {
-				case 0: ssrList.Add(_consts.stringTable[788]); break;
-				case 1: ssrList.Add(_consts.stringTable[789]); break;
-				case 2: ssrList.Add(_consts.stringTable[790]); break;
-			}
-		}
-		picker.ClearOptions();
-		picker.AddOptions(ssrList);
-	}
-
 	void Initialize() {
 		if (picker == null) picker = GetComponent<Dropdown>();
 		if (picker == null) {
@@ -42,7 +25,6 @@ public class ConfigurationMenuSSRApply : MonoBehaviour {
 					  + "aaPicker.");
 		}
 
-		SetOptionsText();
 		if (picker.value != _consts.GraphicsSSRMode) {
 			picker.value = _consts.GraphicsSSRMode;
 		}
