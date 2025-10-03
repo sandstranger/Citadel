@@ -110,11 +110,6 @@ public class LevelManager : MonoBehaviour
 			StaticObjectsSaveStrings.ResetSaveStrings();
 			LoadDynamicObjectsSavestrings();
 		}
-
-		if (!Const.StartingNewGame && UseDynamicLevelsLoading)
-		{
-			LoadLevelData(currentLevel);
-		}
 	}
 
 	public bool LevelExists(int levelID)

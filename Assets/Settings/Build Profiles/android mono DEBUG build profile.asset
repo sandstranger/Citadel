@@ -18,8 +18,10 @@ MonoBehaviour:
   m_PlatformId: b9b35072a6f44c2e863f17467ea3dc13
   m_PlatformBuildProfile:
     rid: 8459001560450728178
-  m_OverrideGlobalSceneList: 0
-  m_Scenes: []
+  m_OverrideGlobalSceneList: 1
+  m_Scenes:
+  - m_enabled: 1
+    m_path: Assets/Scenes/1-MedicalLevelScene.unity
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
     m_Settings:
@@ -75,7 +77,7 @@ MonoBehaviour:
     - line: '|   m_ActiveColorSpace: 0'
     - line: '|   unsupportedMSAAFallback: 0'
     - line: '|   m_SpriteBatchMaxVertexCount: 65535'
-    - line: '|   m_SpriteBatchVertexThreshold: 1000'
+    - line: '|   m_SpriteBatchVertexThreshold: 8000'
     - line: '|   m_MTRendering: 1'
     - line: '|   mipStripping: 1'
     - line: '|   numberOfMipsStripped: 0'
@@ -525,7 +527,7 @@ MonoBehaviour:
     - line: '|     m_DynamicBatching: 1'
     - line: '|   - m_BuildTarget: Android'
     - line: '|     m_StaticBatching: 1'
-    - line: '|     m_DynamicBatching: 0'
+    - line: '|     m_DynamicBatching: 1'
     - line: '|   m_BuildTargetShaderSettings: []'
     - line: '|   m_BuildTargetGraphicsJobs:'
     - line: '|   - m_BuildTarget: MacStandaloneSupport'
@@ -573,7 +575,7 @@ MonoBehaviour:
     - line: '|     m_APIs: 10000000'
     - line: '|     m_Automatic: 1'
     - line: '|   - m_BuildTarget: AndroidPlayer'
-    - line: '|     m_APIs: 0b00000015000000'
+    - line: '|     m_APIs: 150000000b000000'
     - line: '|     m_Automatic: 0'
     - line: '|   m_BuildTargetVRSettings:'
     - line: '|   - m_BuildTarget: Standalone'
@@ -1071,7 +1073,7 @@ MonoBehaviour:
         m_Development: 1
         m_ConnectProfiler: 0
         m_BuildWithDeepProfilingSupport: 1
-        m_AllowDebugging: 1
+        m_AllowDebugging: 0
         m_WaitForManagedDebugger: 0
         m_ManagedDebuggerFixedPort: 0
         m_ExplicitNullChecks: 0

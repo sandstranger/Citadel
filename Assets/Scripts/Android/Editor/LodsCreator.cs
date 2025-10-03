@@ -12,8 +12,7 @@ namespace Citadel.Android.Tools
         private const float OldObjectSize = 10.0f;
         private const float NewObjectSize = 25.0f;
         private const float Lod0TransitionScreen = 0.50f;
-        private const float Lod1TransitionScreen = 0.27f;
-        private const float Lod2TransitionScreen = 0.125f;
+        private const float Lod1TransitionScreen = 0.21f;
         private const float MinMeshTrianglesCountToGenerateLods = 399.0f;
 
         [MenuItem("Tools/Update lods visibility")]
@@ -23,14 +22,19 @@ namespace Citadel.Android.Tools
             {
                 var lod = projectPrefab.GetComponent<LODGroup>();
 
-                if (lod != null && Mathf.Approximately(lod.size, OldObjectSize))
+                if (lod != null && Mathf.Approximately(lod.size, NewObjectSize))
                 {
                     InstantiatePrefab(projectPrefab, prefabInstance =>
                     {
                         lod = prefabInstance.GetComponent<LODGroup>();
-                        lod.size = NewObjectSize;
+                        var lods = lod.GetLODs();
+                        lods[0].screenRelativeTransitionHeight = Lod0TransitionScreen;
+                        lods[1].screenRelativeTransitionHeight = Lod1TransitionScreen;
+                        lod.SetLODs(lods);
+                        lod.RecalculateBounds();
                         lod.fadeMode = LODFadeMode.CrossFade;
                         lod.animateCrossFading = true;
+                        lod.size = NewObjectSize;
                         return true;
                     });
                 }
@@ -44,7 +48,7 @@ namespace Citadel.Android.Tools
             {
                 var lod = projectPrefab.GetComponent<LODGroup>();
 
-                if (lod != null)
+                if (lod != null && lod.size < NewObjectSize)
                 {
                     Debug.Log(lod.gameObject.name);
                 }
@@ -61,11 +65,13 @@ namespace Citadel.Android.Tools
                     continue;
                 }
 
-                var meshFilters = projectPrefab.GetComponentsInChildren<MeshRenderer>(true, true)
-                    .Select(render => render.GetComponent<MeshFilter>()).Where(mesh => mesh!=null && mesh.sharedMesh!=null).ToArray();
-
                 InstantiatePrefab(projectPrefab, prefabInstance =>
                 {
+                    AutoLOD.RemoveLODs(prefabInstance);
+
+                    var meshFilters = prefabInstance.GetComponentsInChildren<MeshRenderer>(true, true)
+                        .Select(render => render.GetComponent<MeshFilter>()).Where(mesh => mesh!=null && mesh.sharedMesh!=null).ToArray();
+                    
                     AutoLOD.GenerateLODs(prefabInstance);
 
                     var createdLods = prefabInstance.GetComponentsInChildren<MeshRenderer>(true)
@@ -83,6 +89,12 @@ namespace Citadel.Android.Tools
                             createdLod.gameObject.SetActive(originalMeshFilter.gameObject.activeSelf);
                             createdLod.gameObject.isStatic = originalMeshFilter.gameObject.isStatic;
                             createdLod.receiveGI = originalRender.receiveGI;
+                            bool removeStaticBatchingFlagFromLod  = createdLod.gameObject.isStatic && createdLod.sharedMaterials.Any(material => material!=null && material.name == "black_shadowhelper");
+
+                            if (removeStaticBatchingFlagFromLod)
+                            {
+                                RemoveStaticBatchingFlag(createdLod.gameObject);
+                            }
                         }
                     }
 
@@ -93,12 +105,11 @@ namespace Citadel.Android.Tools
                         var lods = lod.GetLODs();
                         lods[0].screenRelativeTransitionHeight = Lod0TransitionScreen;
                         lods[1].screenRelativeTransitionHeight = Lod1TransitionScreen;
-                        lods[2].screenRelativeTransitionHeight = Lod2TransitionScreen;
                         lod.SetLODs(lods);
                         lod.RecalculateBounds();
-                        lod.size = NewObjectSize;
                         lod.fadeMode = LODFadeMode.CrossFade;
                         lod.animateCrossFading = true;
+                        lod.size = NewObjectSize;
                         return true;
                     }
 
@@ -118,9 +129,9 @@ namespace Citadel.Android.Tools
                 return false;
             }
             
-            var createdLods = gameObject.GetComponentsInChildren<LODGroup>(true, true);
+            var lod = gameObject.GetComponent<LODGroup>();
 
-            if (createdLods.Length > 0)
+            if (lod == null || !Mathf.Approximately(lod.size, NewObjectSize))
             {
                 return false;
             }

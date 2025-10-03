@@ -75,7 +75,7 @@ MonoBehaviour:
     - line: '|   m_ActiveColorSpace: 0'
     - line: '|   unsupportedMSAAFallback: 0'
     - line: '|   m_SpriteBatchMaxVertexCount: 65535'
-    - line: '|   m_SpriteBatchVertexThreshold: 1000'
+    - line: '|   m_SpriteBatchVertexThreshold: 8000'
     - line: '|   m_MTRendering: 1'
     - line: '|   mipStripping: 1'
     - line: '|   numberOfMipsStripped: 0'

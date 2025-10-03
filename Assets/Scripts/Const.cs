@@ -292,9 +292,9 @@ public class Const : SingletonHelper<Const>
 	public Sprite[] logImages;
 
 	public GameObject eventSystem;
-	private GameObject[] prefabs; // Everything
+	private static readonly GameObject[] _prefabs = new GameObject[768]; // Everything
 	public GameObject prefabFallback;
-	public Texture2D[] textures;
+	private static readonly Texture2D[] _textures = new Texture2D[39];
 	public Texture[] sequenceTextures;
 	public Text loadPercentText;
 	public Material[] genericMaterials;
@@ -700,8 +700,9 @@ public class Const : SingletonHelper<Const>
 		{
 			StartingNewGame = false;
 			LevelManager.currentLevel = LevelManager.NewGameLevelIndex;
-			_lightDistanceCuller.Rebuild();
 			GoIntoGame();
+			_lightDistanceCuller.Rebuild();
+			ClearPrefabs(true);
 		}
 		else if (_saveFileIndex.HasValue)
 		{
@@ -1038,46 +1039,48 @@ CreateBlackTexture:
 	}
 
 	private void LoadTextures() {
-		textures = new Texture2D[39];
-        textures[0] =  LoadTextureFromFile("worldedgesclosed_0.png");
-        textures[1] =  LoadTextureFromFile("worldedgesclosed_1.png");
-        textures[2] =  LoadTextureFromFile("worldedgesclosed_2.png");
-        textures[3] =  LoadTextureFromFile("worldedgesclosed_3.png");
-        textures[4] =  LoadTextureFromFile("worldedgesclosed_4.png");
-        textures[5] =  LoadTextureFromFile("worldedgesclosed_5.png");
-        textures[6] =  LoadTextureFromFile("worldedgesclosed_6.png");
-        textures[7] =  LoadTextureFromFile("worldedgesclosed_7.png");
-        textures[8] =  LoadTextureFromFile("worldedgesclosed_8.png");
-        textures[9] =  LoadTextureFromFile("worldedgesclosed_9.png");
-        textures[10] = LoadTextureFromFile("worldedgesclosed_10.png");
-        textures[11] = LoadTextureFromFile("worldedgesclosed_11.png");
-        textures[12] = LoadTextureFromFile("worldedgesclosed_12.png");
-        textures[13] = LoadTextureFromFile("worldcellopen_0.png");
-        textures[14] = LoadTextureFromFile("worldcellopen_1.png");
-        textures[15] = LoadTextureFromFile("worldcellopen_2.png");
-        textures[16] = LoadTextureFromFile("worldcellopen_3.png");
-        textures[17] = LoadTextureFromFile("worldcellopen_4.png");
-        textures[18] = LoadTextureFromFile("worldcellopen_5.png");
-        textures[19] = LoadTextureFromFile("worldcellopen_6.png");
-        textures[20] = LoadTextureFromFile("worldcellopen_7.png");
-        textures[21] = LoadTextureFromFile("worldcellopen_8.png");
-        textures[22] = LoadTextureFromFile("worldcellopen_9.png");
-        textures[23] = LoadTextureFromFile("worldcellopen_10.png");
-        textures[24] = LoadTextureFromFile("worldcellopen_11.png");
-        textures[25] = LoadTextureFromFile("worldcellopen_12.png");
-		textures[26] = LoadTextureFromFile("worldcellskyvis_0.png");
-        textures[27] = LoadTextureFromFile("worldcellskyvis_1.png");
-        textures[28] = LoadTextureFromFile("worldcellskyvis_2.png");
-        textures[29] = LoadTextureFromFile("worldcellskyvis_3.png");
-        textures[30] = LoadTextureFromFile("worldcellskyvis_4.png");
-        textures[31] = LoadTextureFromFile("worldcellskyvis_5.png");
-        textures[32] = LoadTextureFromFile("worldcellskyvis_6.png");
-        textures[33] = LoadTextureFromFile("worldcellskyvis_7.png");
-        textures[34] = LoadTextureFromFile("worldcellskyvis_8.png");
-        textures[35] = LoadTextureFromFile("worldcellskyvis_9.png");
-        textures[36] = LoadTextureFromFile("worldcellskyvis_10.png");
-        textures[37] = LoadTextureFromFile("worldcellskyvis_11.png");
-        textures[38] = LoadTextureFromFile("worldcellskyvis_12.png");
+		if (_textures.All(texture => texture == null))
+		{
+			_textures[0] = LoadTextureFromFile("worldedgesclosed_0.png");
+			_textures[1] = LoadTextureFromFile("worldedgesclosed_1.png");
+			_textures[2] = LoadTextureFromFile("worldedgesclosed_2.png");
+			_textures[3] = LoadTextureFromFile("worldedgesclosed_3.png");
+			_textures[4] = LoadTextureFromFile("worldedgesclosed_4.png");
+			_textures[5] = LoadTextureFromFile("worldedgesclosed_5.png");
+			_textures[6] = LoadTextureFromFile("worldedgesclosed_6.png");
+			_textures[7] = LoadTextureFromFile("worldedgesclosed_7.png");
+			_textures[8] = LoadTextureFromFile("worldedgesclosed_8.png");
+			_textures[9] = LoadTextureFromFile("worldedgesclosed_9.png");
+			_textures[10] = LoadTextureFromFile("worldedgesclosed_10.png");
+			_textures[11] = LoadTextureFromFile("worldedgesclosed_11.png");
+			_textures[12] = LoadTextureFromFile("worldedgesclosed_12.png");
+			_textures[13] = LoadTextureFromFile("worldcellopen_0.png");
+			_textures[14] = LoadTextureFromFile("worldcellopen_1.png");
+			_textures[15] = LoadTextureFromFile("worldcellopen_2.png");
+			_textures[16] = LoadTextureFromFile("worldcellopen_3.png");
+			_textures[17] = LoadTextureFromFile("worldcellopen_4.png");
+			_textures[18] = LoadTextureFromFile("worldcellopen_5.png");
+			_textures[19] = LoadTextureFromFile("worldcellopen_6.png");
+			_textures[20] = LoadTextureFromFile("worldcellopen_7.png");
+			_textures[21] = LoadTextureFromFile("worldcellopen_8.png");
+			_textures[22] = LoadTextureFromFile("worldcellopen_9.png");
+			_textures[23] = LoadTextureFromFile("worldcellopen_10.png");
+			_textures[24] = LoadTextureFromFile("worldcellopen_11.png");
+			_textures[25] = LoadTextureFromFile("worldcellopen_12.png");
+			_textures[26] = LoadTextureFromFile("worldcellskyvis_0.png");
+			_textures[27] = LoadTextureFromFile("worldcellskyvis_1.png");
+			_textures[28] = LoadTextureFromFile("worldcellskyvis_2.png");
+			_textures[29] = LoadTextureFromFile("worldcellskyvis_3.png");
+			_textures[30] = LoadTextureFromFile("worldcellskyvis_4.png");
+			_textures[31] = LoadTextureFromFile("worldcellskyvis_5.png");
+			_textures[32] = LoadTextureFromFile("worldcellskyvis_6.png");
+			_textures[33] = LoadTextureFromFile("worldcellskyvis_7.png");
+			_textures[34] = LoadTextureFromFile("worldcellskyvis_8.png");
+			_textures[35] = LoadTextureFromFile("worldcellskyvis_9.png");
+			_textures[36] = LoadTextureFromFile("worldcellskyvis_10.png");
+			_textures[37] = LoadTextureFromFile("worldcellskyvis_11.png");
+			_textures[38] = LoadTextureFromFile("worldcellskyvis_12.png");
+		}
 	}
 
 	public Sprite GetSpriteFromTexture(int useableItemIndex) {
@@ -1942,6 +1945,7 @@ CreateBlackTexture:
 		loading = false;
 		loadPercentText.text = "";
 		GoIntoGame(loadTimer);
+		ClearPrefabs(true);
 		_lightDistanceCuller.Rebuild();
 	}
 
@@ -2366,9 +2370,6 @@ CreateBlackTexture:
 		screenCodes = null;
 		logImages = null;
 		eventSystem = null;
-		prefabs = null;
-		for (int i=0;i<textures.Length;i++) Destroy(textures[i]);
-		textures = null;
 		sequenceTextures = null;
 		loadPercentText = null;
 		genericMaterials = null;
@@ -3147,18 +3148,25 @@ CreateBlackTexture:
 		
 		return "item_paper_wad";
 	}
-	
-	public void ClearPrefabs() {
-		prefabs = null;
+
+	public void ClearPrefabs(bool clearUnusedAssets = false)
+	{
+		for (var i = 0; i < _prefabs.Length; i++)
+		{
+			_prefabs[i] = null;
+		}
+
+		if (clearUnusedAssets)
+		{
+			Resources.UnloadUnusedAssets();
+		}
 	}
 	
 	// Must not return null.  Returns item_paper_wad as fallback (0 is fallback constIndex elsewhere).
 	public GameObject GetPrefab(int constIndex) {
-		if (prefabs == null) prefabs = new GameObject[748];
-		if (prefabs.Length < 748) prefabs = new GameObject[748];
 		if (constIndex < 0 || constIndex >= 748) { UnityEngine.Debug.LogWarning("Invalid constIndex of " + constIndex.ToString() + " passed to GetPrefab"); return prefabFallback; }
 		
-		if (prefabs[constIndex] == null) {
+		if (_prefabs[constIndex] == null) {
 			string prefabName = GetPrefabNameFromIndex(constIndex);
 			GameObject loadedPrefab = Resources.Load<GameObject>("Prefabs/" + prefabName);
 			
@@ -3167,9 +3175,9 @@ CreateBlackTexture:
 				return prefabFallback;
 			}
 
-			prefabs[constIndex] = loadedPrefab;
+			_prefabs[constIndex] = loadedPrefab;
 		}
 		
-		return prefabs[constIndex];
+		return _prefabs[constIndex];
 	}
 }

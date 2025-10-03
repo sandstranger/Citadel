@@ -27,8 +27,8 @@ namespace Citadel.Android.Tools
             }
         }
 
-        [MenuItem("Tools/Set all shadowcasters to static mode")]
-        private static void SetAllShadowCastersToStaticMode()
+        [MenuItem("Tools/Remove shadowcasters static batching flag")]
+        private static void RemoveShadowCastersStaticFlag()
         {
             foreach (var prefab in FindAllComponentsInProject<GameObject>("Prefab"))
             {
@@ -36,17 +36,49 @@ namespace Citadel.Android.Tools
                 {
                     var renderers = prefabInstance.GetComponentsInChildren<Renderer>(true).Where(render => render!=null).ToArray();
                     var shadowCasters = renderers.Where(render => render.sharedMaterials!=null && render.sharedMaterials.Any(material => material!=null && material.name == "black_shadowhelper")).ToArray();
-                    var setShadowCastersToStaticMode = shadowCasters.Length > 0 && renderers.Any(render => render.gameObject.isStatic);
+                    var removeShadowCasterStaticFlag = shadowCasters.Any(shadowCaster => shadowCaster.gameObject.isStatic);
 
-                    if (setShadowCastersToStaticMode)
+                    if (removeShadowCasterStaticFlag)
                     {
                         foreach (var shadowCaster in shadowCasters)
                         {
-                            shadowCaster.gameObject.isStatic = true;
+                            if (shadowCaster.gameObject.isStatic)
+                            {
+                                RemoveStaticBatchingFlag(shadowCaster.gameObject);
+                            }
                         }
                     }
 
-                    return setShadowCastersToStaticMode;
+                    return removeShadowCasterStaticFlag;
+                });
+            }
+        }
+
+        [MenuItem("Tools/Remove static batching flag from LOD2 Level")]
+        private static void RemoveStaticBatchingFlagFromLOD2Level()
+        {
+            foreach (var prefab in FindAllComponentsInProject<GameObject>("Prefab"))
+            {
+                if (prefab.GetComponent<LODGroup>() == null)
+                {
+                    continue;
+                }
+                
+                InstantiatePrefab(prefab, prefabInstance =>
+                {
+                    var renderers = prefabInstance.GetComponentsInChildren<Renderer>(true).Where(render => render!=null && 
+                        render.gameObject.isStatic && render.gameObject.name.EndsWith("LOD2",StringComparison.Ordinal)).ToArray();
+                    var removeStaticBatchingFlag = renderers.Length > 0;
+
+                    if (removeStaticBatchingFlag)
+                    {
+                        foreach (var renderer in renderers)
+                        {
+                            RemoveStaticBatchingFlag(renderer.gameObject);
+                        }
+                    }
+
+                    return removeStaticBatchingFlag;
                 });
             }
         }

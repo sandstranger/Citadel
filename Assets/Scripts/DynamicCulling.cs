@@ -632,6 +632,8 @@ public class DynamicCulling : MonoBehaviour {
     }
 
     void DetermineClosedEdges() {
+        return;
+        /*
         // The first indices in _consts.textures are the world closed edges.
         // Priorities priorities after all.  Gotta figure out if we should draw
         // anything else first before it matters what texture it has.
@@ -684,7 +686,7 @@ public class DynamicCulling : MonoBehaviour {
                 else if (skyData.r <= 0.5f && skyData.g <= 0.5f && skyData.b > 0.5f) gridCells[x,y].skyVisible = 1; // All blue cells marked as sky visible.
                 else gridCells[x,y].skyVisible = 0; // All white and black cells marked as 0.
             }
-        }
+        }*/
     }
 
     // ========================================================================

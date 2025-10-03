@@ -6,8 +6,15 @@ using Object = UnityEngine.Object;
 
 namespace Citadel.Editor
 {
-    public static class Utils
+    internal static class Utils
     {
+        public static void RemoveStaticBatchingFlag(GameObject targetObject)
+        {
+            StaticEditorFlags currentFlags = GameObjectUtility.GetStaticEditorFlags(targetObject);
+            StaticEditorFlags newFlags = currentFlags & ~StaticEditorFlags.BatchingStatic;
+            GameObjectUtility.SetStaticEditorFlags(targetObject, newFlags);
+        }
+        
         public static void InstantiatePrefab(GameObject prefab, Func<GameObject,bool> onPrefabInstantiated)
         {
             GameObject prefabInstance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
