@@ -17,16 +17,16 @@ Shader "Custom/Geometry/Wireframe" {
             #pragma vertex vert
             #pragma fragment frag
             #pragma geometry geom
-            #pragma target 3.0
+            #pragma target 4.0
             #pragma multi_compile_instancing
             #pragma shader_feature __ _REMOVEDIAG_ON
 
             #include "UnityCG.cginc"
 
             UNITY_INSTANCING_BUFFER_START(Props)
-                UNITY_DEFINE_INSTANCED_PROP(float, _WireframeVal)
+                UNITY_DEFINE_INSTANCED_PROP(half, _WireframeVal)
                 UNITY_DEFINE_INSTANCED_PROP(fixed4, _Color)
-                UNITY_DEFINE_INSTANCED_PROP(float, _CenterAlpha)
+                UNITY_DEFINE_INSTANCED_PROP(half, _CenterAlpha)
             UNITY_INSTANCING_BUFFER_END(Props)
 
             struct v2g {
@@ -36,7 +36,7 @@ Shader "Custom/Geometry/Wireframe" {
 
             struct g2f {
                 float4 pos : SV_POSITION;
-                float3 bary : TEXCOORD0;
+                half3 bary : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -54,12 +54,12 @@ Shader "Custom/Geometry/Wireframe" {
                 UNITY_SETUP_INSTANCE_ID(IN[1]);
                 UNITY_SETUP_INSTANCE_ID(IN[2]);
 
-                float3 param = float3(0., 0., 0.);
+                half3 param = half3(0., 0., 0.);
 
                 #if _REMOVEDIAG_ON
-                float EdgeA = length(IN[0].worldPos - IN[1].worldPos);
-                float EdgeB = length(IN[1].worldPos - IN[2].worldPos);
-                float EdgeC = length(IN[2].worldPos - IN[0].worldPos);
+                half EdgeA = length(IN[0].worldPos - IN[1].worldPos);
+                half EdgeB = length(IN[1].worldPos - IN[2].worldPos);
+                half EdgeC = length(IN[2].worldPos - IN[0].worldPos);
 
                 if(EdgeA > EdgeB && EdgeA > EdgeC)
                     param.y = 1.;
@@ -74,19 +74,19 @@ Shader "Custom/Geometry/Wireframe" {
                 // Первая вершина
                 UNITY_TRANSFER_INSTANCE_ID(IN[0], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[0].worldPos);
-                o.bary = float3(1., 0., 0.) + param;
+                o.bary = half3(1., 0., 0.) + param;
                 triStream.Append(o);
                 
                 // Вторая вершина  
                 UNITY_TRANSFER_INSTANCE_ID(IN[1], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[1].worldPos);
-                o.bary = float3(0., 0., 1.) + param;
+                o.bary = half3(0., 0., 1.) + param;
                 triStream.Append(o);
                 
                 // Третья вершина
                 UNITY_TRANSFER_INSTANCE_ID(IN[2], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[2].worldPos);
-                o.bary = float3(0., 1., 0.) + param;
+                o.bary = half3(0., 1., 0.) + param;
                 triStream.Append(o);
                 
                 triStream.RestartStrip();
@@ -95,9 +95,9 @@ Shader "Custom/Geometry/Wireframe" {
             fixed4 frag(g2f i) : SV_Target {
                 UNITY_SETUP_INSTANCE_ID(i);
                 
-                float wireframeVal = UNITY_ACCESS_INSTANCED_PROP(Props, _WireframeVal);
+                half wireframeVal = UNITY_ACCESS_INSTANCED_PROP(Props, _WireframeVal);
                 fixed4 color = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
-                float centerAlpha = UNITY_ACCESS_INSTANCED_PROP(Props, _CenterAlpha);
+                half centerAlpha = UNITY_ACCESS_INSTANCED_PROP(Props, _CenterAlpha);
                 
                 if(!any(bool3(i.bary.x < wireframeVal, i.bary.y < wireframeVal, i.bary.z < wireframeVal)))
                     return fixed4(color.r, color.g, color.b, centerAlpha);
@@ -115,7 +115,7 @@ Shader "Custom/Geometry/Wireframe" {
             #pragma vertex vert
             #pragma fragment frag
             #pragma geometry geom
-            #pragma target 3.0            
+            #pragma target 4.0            
             #pragma multi_compile_instancing
 
             #pragma shader_feature __ _REMOVEDIAG_ON
@@ -123,9 +123,9 @@ Shader "Custom/Geometry/Wireframe" {
             #include "UnityCG.cginc"
 
             UNITY_INSTANCING_BUFFER_START(Props)
-                UNITY_DEFINE_INSTANCED_PROP(float, _WireframeVal)
+                UNITY_DEFINE_INSTANCED_PROP(half, _WireframeVal)
                 UNITY_DEFINE_INSTANCED_PROP(fixed4, _Color)
-                UNITY_DEFINE_INSTANCED_PROP(float, _CenterAlpha)
+                UNITY_DEFINE_INSTANCED_PROP(half, _CenterAlpha)
             UNITY_INSTANCING_BUFFER_END(Props)
 
             struct v2g {
@@ -135,7 +135,7 @@ Shader "Custom/Geometry/Wireframe" {
 
             struct g2f {
                 float4 pos : SV_POSITION;
-                float3 bary : TEXCOORD0;
+                half3 bary : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -143,7 +143,7 @@ Shader "Custom/Geometry/Wireframe" {
                 v2g o;
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_TRANSFER_INSTANCE_ID(v, o);
-                o.worldPos = mul(unity_ObjectToWorld, v.vertex);
+                o.worldPos =  mul(unity_ObjectToWorld, v.vertex);
                 return o;
             }
 
@@ -153,12 +153,12 @@ Shader "Custom/Geometry/Wireframe" {
                 UNITY_SETUP_INSTANCE_ID(IN[1]);
                 UNITY_SETUP_INSTANCE_ID(IN[2]);
 
-                float3 param = float3(0., 0., 0.);
+                half3 param = half3(0., 0., 0.);
 
                 #if _REMOVEDIAG_ON
-                float EdgeA = length(IN[0].worldPos - IN[1].worldPos);
-                float EdgeB = length(IN[1].worldPos - IN[2].worldPos);
-                float EdgeC = length(IN[2].worldPos - IN[0].worldPos);
+                half EdgeA = length(IN[0].worldPos - IN[1].worldPos);
+                half EdgeB = length(IN[1].worldPos - IN[2].worldPos);
+                half EdgeC = length(IN[2].worldPos - IN[0].worldPos);
 
                 if(EdgeA > EdgeB && EdgeA > EdgeC)
                     param.y = 1.;
@@ -173,19 +173,19 @@ Shader "Custom/Geometry/Wireframe" {
                 // Первая вершина
                 UNITY_TRANSFER_INSTANCE_ID(IN[0], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[0].worldPos);
-                o.bary = float3(1., 0., 0.) + param;
+                o.bary = half3(1., 0., 0.) + param;
                 triStream.Append(o);
                 
                 // Вторая вершина  
                 UNITY_TRANSFER_INSTANCE_ID(IN[1], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[1].worldPos);
-                o.bary = float3(0., 0., 1.) + param;
+                o.bary = half3(0., 0., 1.) + param;
                 triStream.Append(o);
                 
                 // Третья вершина
                 UNITY_TRANSFER_INSTANCE_ID(IN[2], o);
                 o.pos = mul(UNITY_MATRIX_VP, IN[2].worldPos);
-                o.bary = float3(0., 1., 0.) + param;
+                o.bary = half3(0., 1., 0.) + param;
                 triStream.Append(o);
                 
                 triStream.RestartStrip();
@@ -194,9 +194,9 @@ Shader "Custom/Geometry/Wireframe" {
             fixed4 frag(g2f i) : SV_Target {
                 UNITY_SETUP_INSTANCE_ID(i);
                 
-                float wireframeVal = UNITY_ACCESS_INSTANCED_PROP(Props, _WireframeVal);
+                half wireframeVal = UNITY_ACCESS_INSTANCED_PROP(Props, _WireframeVal);
                 fixed4 color = UNITY_ACCESS_INSTANCED_PROP(Props, _Color);
-                float centerAlpha = UNITY_ACCESS_INSTANCED_PROP(Props, _CenterAlpha);
+                half centerAlpha = UNITY_ACCESS_INSTANCED_PROP(Props, _CenterAlpha);
                 
                 if(!any(bool3(i.bary.x < wireframeVal, i.bary.y < wireframeVal, i.bary.z < wireframeVal)))
                     return fixed4(color.r, color.g, color.b, centerAlpha);

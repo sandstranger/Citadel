@@ -63,7 +63,7 @@ Shader "Standard (Specular setup) Optimized"
             ZWrite [_ZWrite]
 
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
 
             // -------------------------------------
 
@@ -101,7 +101,7 @@ Shader "Standard (Specular setup) Optimized"
             Tags { "LightMode" = "Deferred" }
 
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
             #pragma exclude_renderers nomrt
 
             // Упрощенные настройки для мобильных устройств
@@ -140,7 +140,7 @@ Shader "Standard (Specular setup) Optimized"
             ZTest LEqual
 
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
 
             // -------------------------------------
 
@@ -176,7 +176,7 @@ Shader "Standard (Specular setup) Optimized"
             ZWrite On ZTest LEqual
 
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
 
             // Упрощенные настройки для мобильных устройств
             #pragma shader_feature_local _ _ALPHATEST_ON

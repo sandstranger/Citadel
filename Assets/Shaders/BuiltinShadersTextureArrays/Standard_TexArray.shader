@@ -20,7 +20,7 @@ Shader "Custom/StandardTextureArray" {
             Tags { "LightMode" = "Deferred" }
             ZWrite On
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
             #pragma exclude_renderers nomrt
             #pragma shader_feature _EMISSION
             #pragma multi_compile_prepassfinal
@@ -40,7 +40,7 @@ Shader "Custom/StandardTextureArray" {
             Cull Off // Enable two-sided shadow casting
 
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
             #pragma vertex vertShadow
             #pragma fragment fragShadow
             #pragma multi_compile_shadowcaster

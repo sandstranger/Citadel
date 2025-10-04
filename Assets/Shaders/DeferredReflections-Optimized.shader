@@ -14,7 +14,8 @@ Shader "Hidden/Internal-DeferredReflections-Optimized"
             ZTest LEqual
             Blend [_SrcBlend] [_DstBlend]
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
+            #pragma exclude_renderers nomrt
             #pragma vertex vert_deferred
             #pragma fragment frag
 
@@ -32,7 +33,7 @@ Shader "Hidden/Internal-DeferredReflections-Optimized"
             fixed4 frag(unity_v2f_deferred i) : SV_Target
             {
                 i.ray = i.ray * (_ProjectionParams.z / i.ray.z);
-                float2 uv = i.uv.xy / i.uv.w;
+                half2 uv = i.uv.xy / i.uv.w;
 
                 fixed depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv);
                 depth = Linear01Depth(depth);
@@ -42,7 +43,7 @@ Shader "Hidden/Internal-DeferredReflections-Optimized"
                 fixed4 gbuffer1 = tex2D(_CameraGBufferTexture1, uv);
                 fixed4 gbuffer2 = tex2D(_CameraGBufferTexture2, uv);
 
-                fixed3 normalWorld = gbuffer2.rgb * 2.0 - 1.0;
+                fixed3 normalWorld = mad(gbuffer2.rgb, 2, -1);
                 fixed smoothness = gbuffer1.a;
                 fixed3 specColor = gbuffer1.rgb;
 
@@ -67,9 +68,10 @@ Shader "Hidden/Internal-DeferredReflections-Optimized"
             Blend [_SrcBlend] [_DstBlend]
 
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
             #pragma vertex vert
             #pragma fragment frag
+            #pragma exclude_renderers nomrt
             #pragma multi_compile ___ UNITY_HDR_ON
 
             #include "UnityCG.cginc"
@@ -78,7 +80,7 @@ Shader "Hidden/Internal-DeferredReflections-Optimized"
 
             struct v2f
             {
-                float2 uv : TEXCOORD0;
+                half2 uv : TEXCOORD0;
                 float4 pos : SV_POSITION;
             };
 

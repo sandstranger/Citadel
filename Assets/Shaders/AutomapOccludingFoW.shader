@@ -25,10 +25,8 @@ Properties {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-            #pragma target 3.0            
+            #pragma target 3.5            
             #pragma multi_compile_instancing // Добавляем поддержку инстансинга
-            #pragma instancing_options assumeuniformscaling // Опция для инстансинга
- 
             #include "UnityCG.cginc"
  
             struct appdata
@@ -46,7 +44,7 @@ Properties {
             
             // Объявляем буфер для свойств инстансинга, если нужно
             UNITY_INSTANCING_BUFFER_START(Props)
-                UNITY_DEFINE_INSTANCED_PROP(float4, _InstanceColor)
+                UNITY_DEFINE_INSTANCED_PROP(half4, _InstanceColor)
             UNITY_INSTANCING_BUFFER_END(Props)
          
             v2f vert (appdata v)

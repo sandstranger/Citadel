@@ -17,7 +17,7 @@ Shader "Hidden/Internal-DeferredShading-Optimized"
             Blend [_SrcBlend] [_DstBlend]
 
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
             #pragma vertex vert_deferred
             #pragma fragment frag
             #pragma multi_compile_lightpass
@@ -43,7 +43,7 @@ Shader "Hidden/Internal-DeferredShading-Optimized"
                 half4 gbuffer0 = tex2D(_CameraGBufferTexture0, uv);
                 half4 gbuffer2 = tex2D(_CameraGBufferTexture2, uv);
                 half3 diffuseColor = gbuffer0.rgb;
-                half3 normalWorld = gbuffer2.rgb * 2 - 1;
+                half3 normalWorld = mad(gbuffer2.rgb, 2, -1);
                 half ndotl = saturate(dot(normalWorld, light.dir));
                 half3 diffuse = diffuseColor * ndotl;
                 return half4(diffuse * light.color, 1);
@@ -78,7 +78,7 @@ half4
             }
 
             CGPROGRAM
-            #pragma target 3.0
+            #pragma target 3.5
             #pragma vertex vert
             #pragma fragment frag
             #pragma exclude_renderers nomrt
@@ -89,11 +89,11 @@ half4
 
             struct v2f
             {
-                half4 vertex : SV_POSITION;
+                float4 vertex : SV_POSITION;
                 half2 texcoord : TEXCOORD0;
             };
 
-            v2f vert(float4 vertex : POSITION, float2 texcoord : TEXCOORD0)
+            v2f vert(float4 vertex : POSITION, half2 texcoord : TEXCOORD0)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(vertex);
