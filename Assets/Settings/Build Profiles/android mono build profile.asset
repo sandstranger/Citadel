@@ -584,7 +584,7 @@ MonoBehaviour:
     - line: '|   m_DefaultShaderChunkSizeInMB: 16'
     - line: '|   m_DefaultShaderChunkCount: 0'
     - line: '|   openGLRequireES31: 1'
-    - line: '|   openGLRequireES31AEP: 1'
+    - line: '|   openGLRequireES31AEP: 0'
     - line: '|   openGLRequireES32: 0'
     - line: '|   m_TemplateCustomTags: {}'
     - line: '|   mobileMTRendering:'

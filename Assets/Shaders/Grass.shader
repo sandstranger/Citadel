@@ -77,7 +77,7 @@ Shader "Deferred/Grass"
 
     // ИСПРАВЛЕНИЕ: Добавляем параметр input для передачи данных инстанса
     geometryOutput GenerateGrassVertex(half3 vertexPosition, half width, half height, half forward,
-                                                       float3x3 transformMatrix, half4 tangent, vertexInput input)
+                                                       half3x3 transformMatrix, half4 tangent, vertexInput input)
     {
         geometryOutput o;
         UNITY_SETUP_INSTANCE_ID(input);
