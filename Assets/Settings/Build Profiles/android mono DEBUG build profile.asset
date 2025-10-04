@@ -575,7 +575,7 @@ MonoBehaviour:
     - line: '|     m_APIs: 10000000'
     - line: '|     m_Automatic: 1'
     - line: '|   - m_BuildTarget: AndroidPlayer'
-    - line: '|     m_APIs: 150000000b000000'
+    - line: '|     m_APIs: 0b00000015000000'
     - line: '|     m_Automatic: 0'
     - line: '|   m_BuildTargetVRSettings:'
     - line: '|   - m_BuildTarget: Standalone'
@@ -585,8 +585,8 @@ MonoBehaviour:
     - line: '|     - Oculus'
     - line: '|   m_DefaultShaderChunkSizeInMB: 16'
     - line: '|   m_DefaultShaderChunkCount: 0'
-    - line: '|   openGLRequireES31: 0'
-    - line: '|   openGLRequireES31AEP: 0'
+    - line: '|   openGLRequireES31: 1'
+    - line: '|   openGLRequireES31AEP: 1'
     - line: '|   openGLRequireES32: 0'
     - line: '|   m_TemplateCustomTags: {}'
     - line: '|   mobileMTRendering:'
@@ -1070,7 +1070,7 @@ MonoBehaviour:
     - rid: 8459001560450728178
       type: {class: AndroidPlatformBuildSettings, ns: UnityEditor.Android, asm: UnityEditor.Android.Extensions}
       data:
-        m_Development: 1
+        m_Development: 0
         m_ConnectProfiler: 0
         m_BuildWithDeepProfilingSupport: 1
         m_AllowDebugging: 0
@@ -1089,7 +1089,7 @@ MonoBehaviour:
         m_DebugSymbolLevel: 1
         m_DebugSymbolFormat: 5
         m_CurrentDeploymentTargetId: __builtin__target_default
-        m_BuildType: 1
+        m_BuildType: 2
         m_LinkTimeOptimization: 0
         m_BuildAppBundle: 0
         m_IPAddressToConnect: 
