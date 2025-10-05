@@ -282,7 +282,7 @@ MonoBehaviour:
     - line: '|   iOSRequireARKit: 0'
     - line: '|   iOSAutomaticallyDetectAndAddCapabilities: 1'
     - line: '|   appleEnableProMotion: 0'
-    - line: '|   shaderPrecisionModel: 0'
+    - line: '|   shaderPrecisionModel: 1'
     - line: '|   clonedFromGUID: 00000000000000000000000000000000'
     - line: '|   templatePackageId: '
     - line: '|   templateDefaultScene: '
