@@ -17,7 +17,12 @@ public class SaveObject : MonoBehaviour {
 	[HideInInspector] public string saveableType;
 	[HideInInspector] public bool initialized = false;
 
-	[Inject] private LevelManager _levelManager;
+	[Inject] private readonly LevelManager _levelManager;
+	[Inject] private readonly Const _consts;
+
+	public LevelManager LevelManager => _levelManager;
+	
+	public Const Consts => _consts;
 	
 	public void Start() {
 		if (initialized) return;
@@ -55,6 +60,7 @@ public class SaveObject : MonoBehaviour {
 			case SaveableType.DelayedSpawn: saveableType = "DelayedSpawn"; break;
 			case SaveableType.SecurityCamera: saveableType = "SecurityCamera"; break;
 			case SaveableType.Trigger: saveableType = "Trigger"; break;
+			case SaveableType.TriggerRadiation: saveableType = "TriggerRadiation"; break;
 			case SaveableType.Projectile: saveableType = "Projectile"; break;
 			case SaveableType.NormalScreen: saveableType = "NormalScreen"; break;
 			case SaveableType.CyberSwitch: saveableType = "CyberSwitch"; break;
@@ -163,6 +169,8 @@ public class SaveObject : MonoBehaviour {
 			case SaveableType.Projectile:               s1.Append(DelayedSpawn.Save(go)); s1.Append(Utils.splitChar);
 										      s1.Append(ProjectileEffectImpact.Save(go)); break;
 			case SaveableType.NormalScreen:            s1.Append(HealthManager.Save(go,prefID)); break; // Saves TargetIO
+			case SaveableType.TriggerRadiation:    		   s1.Append(Radiation.Save(go));
+															s1.Append(TargetIO.Save(go)); break;
 			case SaveableType.CyberSwitch:               s1.Append(CyberSwitch.Save(go,prefID)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(go)); break;
 			case SaveableType.CyberItem:               s1.Append(HealthManager.Save(go.transform.GetChild(0).GetChild(0).gameObject,prefID)); break; // Saves TargetIO
@@ -277,6 +285,8 @@ public class SaveObject : MonoBehaviour {
 			case SaveableType.Projectile:             index =           DelayedSpawn.Load(go,ref entries,index);
 													  index = ProjectileEffectImpact.Load(go,ref entries,index); break;
 			case SaveableType.NormalScreen:			  index =          HealthManager.Load(go,ref entries,index,prefID,levelID); break; // Loads TargetIO
+			case SaveableType.TriggerRadiation:       index =              Radiation.Load(go,ref entries,index);
+													  index =               TargetIO.Load(go,ref entries,index); break;
 			case SaveableType.CyberSwitch:			  index =            CyberSwitch.Load(go,ref entries,index,prefID,levelID);
 													  index =               TargetIO.Load(go,ref entries,index); break;
 			case SaveableType.CyberItem:			  index =          HealthManager.Load(go.transform.GetChild(0).GetChild(0).gameObject,ref entries,index,prefID,levelID); break; // Loads TargetIO

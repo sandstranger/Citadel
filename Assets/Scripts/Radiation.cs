@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Zenject;
+﻿using Zenject;
+using System.Text;
 using UnityEngine;
 
 public class Radiation : MonoBehaviour {
 	public float radiationAmount = 11f;
-
-	private float intervalTime = 1f;
-	private float radFinished = 0f;
+	public float intervalTime = 1f;
+	public float radFinished = 0f;
+	private static StringBuilder s1 = new StringBuilder();
 
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private PlayerHealth _playerHealth;
@@ -47,5 +46,24 @@ public class Radiation : MonoBehaviour {
 	
 	void OnDisable() {
 		_playerHealth.radiationArea = false;
+	}
+	
+	public static string Save(GameObject go) {
+		Radiation rad = go.GetComponent<Radiation>();
+		s1.Clear();
+		s1.Append(Utils.FloatToString(rad.radiationAmount,"radiationAmount"));
+		s1.Append(Utils.splitChar);	
+		s1.Append(Utils.FloatToString(rad.intervalTime,"intervalTime"));
+		s1.Append(Utils.splitChar);	
+		s1.Append(Utils.SaveRelativeTimeDifferential(rad._pauseScript,rad.radFinished,"radFinished"));
+		return s1.ToString();
+	}
+
+	public static int Load(GameObject go, ref string[] entries, int index) {
+		Radiation rad = go.GetComponent<Radiation>();
+		rad.radiationAmount = Utils.GetFloatFromString(entries[index],"radiationAmount"); index++;
+		rad.intervalTime = Utils.GetFloatFromString(entries[index],"intervalTime"); index++;
+		rad.radFinished = Utils.LoadRelativeTimeDifferential(rad._pauseScript,entries[index],"radFinished"); index++;
+		return index;
 	}
 }
