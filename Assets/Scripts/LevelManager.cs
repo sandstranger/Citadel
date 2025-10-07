@@ -44,7 +44,6 @@ public class LevelManager : MonoBehaviour
 	public Level levelScript;
 	public GameObject geometryContainer;
 	public GameObject npcContainer;
-	public Vector3[] elevatorTargetDestinations;
 	public Material rtxEmissive;
 	public Mesh sphereMesh;
 	public SkyRotate skyRotate;
@@ -57,6 +56,36 @@ public class LevelManager : MonoBehaviour
 	private static readonly StringBuilder s1 = new(200*1024);
 	private GameObject _dummyGameObject;
 
+	[SerializeField]
+	private Vector3[] _elevatorDestinations = {
+		new (48.38161f, -45.00156f, -18.16852f),
+		new (51.20589f, -28.30795f, -25.9704f),
+		new (5.32389f, -28.38895f, 33.28318f),
+		new (2.56813f, -15.496f, 13.00925f),
+		new (5.066132f, -15.496f, -20.70875f),
+		new (15.29313f, -15.496f, -10.29f),
+		new (-1.289999f, 1.04f, 5.099999f),
+		new (8.96f, 12.585f, -6.4383f),
+		new (-16.534f, 13.873f, -39.7983f),
+		new (-1.9688f, 33.6865f, -46.261f),
+		new (-14.7078f, 33.7015f, -30.939f),
+		new (59.5022f, 31.8125f, 35.773f),
+		new (-58.3108f, 33.7345f, -38.3f),
+		new (54.27659f, 33.7345f, -61.49423f),
+		new (0.611199f, 35.6205f, 43.71f),
+		new (-4.5088f, 35.6205f, 43.71f),
+		new (-1.9628f, 33.7225f, -69.18999f),
+		new (25.113f, 48.44443f, -10.649f),
+		new (17.48f, 50.98643f, 56.21f),
+		new (4.889f, 58.727f, 19.975f),
+		new (9.983f, 96.922f, -41.9f),
+		new (2.303f, 106.77f, -38.554f),
+		new (42.453f, 136.007f, -6.534f),
+		new (11.214f, 168.558f, -23.302f),
+		new (17.77f, 195.747f, 18.103f),
+		new (11.2683f, -55.45489f, 39.70428f)
+	};
+	
 	[Inject]
 	private readonly ConsoleEmulator _consoleEmulator;
 	[Inject] 
@@ -300,19 +329,19 @@ public class LevelManager : MonoBehaviour
 		_guiState.ClearOverButton();
 		if (targetPosition.x == 0 && targetPosition.y == 0 && targetPosition.z == 0) {
 			switch(levnum) {
-				case 0:  targetPosition = elevatorTargetDestinations[25]; break;
-				case 1:  targetPosition =  elevatorTargetDestinations[0]; break;
-				case 2:  targetPosition =  elevatorTargetDestinations[1]; break;
-				case 3:  targetPosition =  elevatorTargetDestinations[3]; break;
-				case 4:  targetPosition =  elevatorTargetDestinations[6]; break;
-				case 5:  targetPosition =  elevatorTargetDestinations[7]; break;
-				case 6:  targetPosition =  elevatorTargetDestinations[9]; break;
-				case 7:  targetPosition = elevatorTargetDestinations[17]; break;
-				case 8:  targetPosition = elevatorTargetDestinations[19]; break;
-				case 9:  targetPosition = elevatorTargetDestinations[21]; break;
-				case 10: targetPosition = elevatorTargetDestinations[22]; break;
-				case 11: targetPosition = elevatorTargetDestinations[23]; break;
-				case 12: targetPosition = elevatorTargetDestinations[24]; break;
+				case 0:  targetPosition = _elevatorDestinations[25]; break;
+				case 1:  targetPosition =  _elevatorDestinations[0]; break;
+				case 2:  targetPosition =  _elevatorDestinations[1]; break;
+				case 3:  targetPosition =  _elevatorDestinations[3]; break;
+				case 4:  targetPosition =  _elevatorDestinations[6]; break;
+				case 5:  targetPosition =  _elevatorDestinations[7]; break;
+				case 6:  targetPosition =  _elevatorDestinations[9]; break;
+				case 7:  targetPosition = _elevatorDestinations[17]; break;
+				case 8:  targetPosition = _elevatorDestinations[19]; break;
+				case 9:  targetPosition = _elevatorDestinations[21]; break;
+				case 10: targetPosition = _elevatorDestinations[22]; break;
+				case 11: targetPosition = _elevatorDestinations[23]; break;
+				case 12: targetPosition = _elevatorDestinations[24]; break;
 			}
 		}
 
@@ -946,7 +975,6 @@ public class LevelManager : MonoBehaviour
 		npcsm = null;
 		levelScript = null;
 		npcContainer = null;
-		elevatorTargetDestinations = null;
 		rtxEmissive = null;
 		sphereMesh = null;
 		pipe_maint2_3_coolant = null;

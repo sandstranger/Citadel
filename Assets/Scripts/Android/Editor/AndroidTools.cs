@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -22,12 +23,14 @@ namespace Citadel.Android.Tools
             
             foreach (var elevDestination in elevDestinations)
             {
-                result.Add($"{elevDestination.gameObject.name} world position" + elevDestination.transform.position);
+                var position = elevDestination.transform.position;
+                result.Add($"new ({position.x.ToString(CultureInfo.InvariantCulture)}f, {position.y.ToString(CultureInfo.InvariantCulture)}f," +
+                           $" {position.z.ToString(CultureInfo.InvariantCulture)}f)");
             }
 
             if (result.Count > 0)
             {
-                Debug.Log(string.Join(Environment.NewLine, result));
+                Debug.Log(string.Join("," + Environment.NewLine, result));
             }
         }
         
