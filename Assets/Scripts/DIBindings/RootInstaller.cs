@@ -10,12 +10,9 @@ namespace Citadel.Game
     {
         private static RootInstaller _instance;
 
-        [SerializeField] 
-        private PlayerReferenceManager _playerReference;
-        [SerializeField] 
-        private BiomonitorGraphSystem _biomonitorGraphSystem;
-        [SerializeField] 
-        private PlayerEnergy _playerEnergy;
+        [SerializeField] private PlayerReferenceManager _playerReference;
+        [SerializeField] private BiomonitorGraphSystem _biomonitorGraphSystem;
+        [SerializeField] private PlayerEnergy _playerEnergy;
         [SerializeField] private Const _const;
         [SerializeField] private MFDManager _mfdManager;
         [SerializeField] private Automap _automap;
@@ -62,11 +59,11 @@ namespace Citadel.Game
             }
 
             ScenesLoader.OnActiveSceneChanged += OnSceneChanged;
-            
+
             _const.InitializeInstance();
             _playerReference.InitializeInstance();
             _playerPatch.Initialize();
-            
+
             foreach (var postProcessLayer in _postProcessLayers)
             {
                 _postProcessLayerStorages.Add(new Config.PostProcessLayerStorage(postProcessLayer));
@@ -76,7 +73,8 @@ namespace Citadel.Game
         public override void InstallBindings()
         {
             Container.Bind<AndroidConfig>().FromInstance(AndroidConfig.Default).AsSingle();
-            Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>().FromInstance(_postProcessLayerStorages).AsSingle();
+            Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>()
+                .FromInstance(_postProcessLayerStorages).AsSingle();
             Container.Bind<Config>().AsSingle();
             Container.Bind<ConsoleEmulator>().AsSingle();
             Container.Bind<PostProcessProfile>().FromInstance(_postProcessProfile).AsSingle();
@@ -87,7 +85,8 @@ namespace Citadel.Game
             Container.Bind<DynamicCulling>().FromInstance(FindFirstObjectByType<DynamicCulling>()).AsTransient();
             Container.Bind<LevelManager>().FromInstance(FindFirstObjectByType<LevelManager>()).AsTransient();
             Container.Bind<LevelEditor>().FromInstance(FindFirstObjectByType<LevelEditor>()).AsTransient();
-            Container.Bind<LightDistanceCuller>().FromInstance(FindFirstObjectByType<LightDistanceCuller>()).AsTransient();
+            Container.Bind<LightDistanceCuller>().FromInstance(FindFirstObjectByType<LightDistanceCuller>())
+                .AsTransient();
             Container.BindInstance(_const).AsSingle();
             Container.BindInstance(_mfdManager).AsSingle();
             Container.BindInstance(_automap).AsSingle();
@@ -107,7 +106,7 @@ namespace Citadel.Game
             Container.BindInstance(_weaponFire).AsSingle();
             Container.BindInstance(_weaponCurrent).AsSingle();
             Container.BindInstance(_questLogNotesManager).AsSingle();
-            
+
             _itemsToInject.Add(_playerReference);
             _itemsToInject.Add(_biomonitorGraphSystem);
             _itemsToInject.Add(_playerEnergy);
@@ -139,31 +138,29 @@ namespace Citadel.Game
 
         private void OnSceneChanged(string sceneName)
         {
-            if (!LevelManager.UseDynamicLevelsLoading)
+            var dynamicCulling = FindFirstObjectByType<DynamicCulling>();
+            var levelManager = FindFirstObjectByType<LevelManager>();
+            var levelEditor = FindFirstObjectByType<LevelEditor>();
+            var lightsCuller = FindFirstObjectByType<LightDistanceCuller>();
+
+            Container.Rebind<LightDistanceCuller>().FromInstance(lightsCuller).AsTransient();
+            Container.Rebind<DynamicCulling>().FromInstance(dynamicCulling).AsTransient();
+            Container.Rebind<LevelManager>().FromInstance(levelManager).AsTransient();
+            Container.Rebind<LevelEditor>().FromInstance(levelEditor).AsTransient();
+
+            Container.Inject(lightsCuller);
+            Container.Inject(levelEditor);
+            Container.Inject(levelManager);
+            Container.Inject(dynamicCulling);
+
+            foreach (var itemToInject in _itemsToInject)
             {
-                var dynamicCulling = FindFirstObjectByType<DynamicCulling>();
-                var levelManager = FindFirstObjectByType<LevelManager>();
-                var levelEditor = FindFirstObjectByType<LevelEditor>();
-                var lightsCuller = FindFirstObjectByType<LightDistanceCuller>();
-
-                Container.Rebind<LightDistanceCuller>().FromInstance(lightsCuller).AsTransient();
-                Container.Rebind<DynamicCulling>().FromInstance(dynamicCulling).AsTransient();
-                Container.Rebind<LevelManager>().FromInstance(levelManager).AsTransient();
-                Container.Rebind<LevelEditor>().FromInstance(levelEditor).AsTransient();
-
-                Container.Inject(lightsCuller);
-                Container.Inject(levelEditor);
-                Container.Inject(levelManager);
-                Container.Inject(dynamicCulling);
-                
-                foreach (var itemToInject in _itemsToInject)
-                {
-                    Container.Inject(itemToInject);
-                }
+                Container.Inject(itemToInject);
             }
         }
-        
-        public static GameObject InstantiatePrefab(GameObject original, Vector3 position, Quaternion rotation, Transform parentTransform = null)
+
+        public static GameObject InstantiatePrefab(GameObject original, Vector3 position, Quaternion rotation,
+            Transform parentTransform = null)
         {
             return _instance.Container.InstantiatePrefab(original, position, rotation, parentTransform);
         }

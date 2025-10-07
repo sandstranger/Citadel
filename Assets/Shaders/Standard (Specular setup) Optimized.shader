@@ -1,5 +1,4 @@
 // Unity built-in shader source. Copyright (c) 2016 Unity Technologies. MIT license (see license.txt)
-// Оптимизированная версия для мобильных устройств с поддержкой Deferred Rendering
 
 Shader "Standard (Specular setup) Optimized"
 {
@@ -22,7 +21,6 @@ Shader "Standard (Specular setup) Optimized"
         _BumpScale("Scale", Float) = 1.0
         [Normal] _BumpMap("Normal Map", 2D) = "bump" {}
 
-        // Эти параметры оставлены для совместимости с редактором, но не используются в мобильной версии
         _Parallax ("Height Scale", Range (0.005, 0.08)) = 0.02
         _ParallaxMap ("Height Map", 2D) = "black" {}
 
@@ -32,13 +30,14 @@ Shader "Standard (Specular setup) Optimized"
         _EmissionColor("Color", Color) = (0,0,0)
         _EmissionMap("Emission", 2D) = "white" {}
 
-        // Эти параметры оставлены для совместимости с редактором, но не используются в мобильной версии
         _DetailMask("Detail Mask", 2D) = "white" {}
+
         _DetailAlbedoMap("Detail Albedo x2", 2D) = "grey" {}
         _DetailNormalMapScale("Scale", Float) = 1.0
         [Normal] _DetailNormalMap("Normal Map", 2D) = "bump" {}
 
         [Enum(UV0,0,UV1,1)] _UVSec ("UV Set for secondary textures", Float) = 0
+
 
         // Blending state
         [HideInInspector] _Mode ("__mode", Float) = 0.0
@@ -54,6 +53,11 @@ Shader "Standard (Specular setup) Optimized"
     SubShader
     {
         Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
+        LOD 100
+
+
+        // ------------------------------------------------------------------
+        //  Base forward pass (directional light, emission, lightmaps, ...)
         Pass
         {
             Name "FORWARD"
@@ -71,11 +75,9 @@ Shader "Standard (Specular setup) Optimized"
             #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_fragment _EMISSION
             #pragma shader_feature_local _SPECGLOSSMAP
-         //   #pragma shader_feature_local_fragment _DETAIL_MULX2
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
             #pragma shader_feature_local_fragment _GLOSSYREFLECTIONS_OFF
-            //#pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _ _DETAIL_MULX2_OFF
             #pragma shader_feature_local _ _PARALLAXMAP_OFF
             #pragma shader_feature_local _ _OCCLUSIONMAP_OFF
@@ -92,43 +94,7 @@ Shader "Standard (Specular setup) Optimized"
 
             ENDCG
         }
-        
         // ------------------------------------------------------------------
-        //  ТОЛЬКО Deferred pass (оптимизированная версия для мобильных)
-        Pass
-        {
-            Name "DEFERRED"
-            Tags { "LightMode" = "Deferred" }
-
-            CGPROGRAM
-            #pragma target 3.5
-            #pragma exclude_renderers nomrt
-
-            // Упрощенные настройки для мобильных устройств
-            #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature_fragment _EMISSION
-            #pragma shader_feature_local _SPECGLOSSMAP
-            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
-            // УБРАНЫ детали и параллакс для мобильных устройств
-            #pragma shader_feature_local _ _DETAIL_MULX2_OFF
-            // #pragma shader_feature_local_fragment _DETAIL_MULX2
-            // #pragma shader_feature_local _PARALLAXMAP
-            #pragma shader_feature_local _ _PARALLAXMAP_OFF
-            #pragma shader_feature_local _ _OCCLUSIONMAP_OFF
-
-            #pragma multi_compile_prepassfinal
-            #pragma multi_compile_instancing
-            
-            #pragma vertex vertDeferred
-            #pragma fragment fragDeferred
-
-            #include "UnityStandardCore.cginc"
-
-            ENDCG
-        }
-
         //  Additive forward pass (one light per pass)
         Pass
         {
@@ -150,8 +116,6 @@ Shader "Standard (Specular setup) Optimized"
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
             #pragma shader_feature_local _ _DETAIL_MULX2_OFF
-            // #pragma shader_feature_local_fragment _DETAIL_MULX2
-            // #pragma shader_feature_local _PARALLAXMAP
             #pragma shader_feature_local _ _PARALLAXMAP_OFF
             #pragma shader_feature_local _ _OCCLUSIONMAP_OFF
 
@@ -166,9 +130,8 @@ Shader "Standard (Specular setup) Optimized"
 
             ENDCG
         }
-
         // ------------------------------------------------------------------
-        //  Shadow rendering pass (минимальная версия)
+        //  Shadow rendering pass
         Pass {
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }
@@ -178,25 +141,68 @@ Shader "Standard (Specular setup) Optimized"
             CGPROGRAM
             #pragma target 3.5
 
-            // Упрощенные настройки для мобильных устройств
-            #pragma shader_feature_local _ _ALPHATEST_ON
+            // -------------------------------------
+
+
+            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
             #pragma shader_feature_local _SPECGLOSSMAP
-            #pragma shader_feature_local _ _DETAIL_MULX2_OFF
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-            #pragma skip_variants SHADOWS_SOFT
             #pragma multi_compile_shadowcaster
+            #pragma multi_compile_instancing
+            #pragma shader_feature_local _ _DETAIL_MULX2_OFF
+            #pragma shader_feature_local _ _PARALLAXMAP_OFF
+            #pragma shader_feature_local _ _OCCLUSIONMAP_OFF
+
+            // Uncomment the following line to enable dithering LOD crossfade. Note: there are more in the file to uncomment for other passes.
+            //#pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #pragma vertex vertShadowCaster
             #pragma fragment fragShadowCaster
 
-            #define MOBILE_OPTIMIZED
             #include "UnityStandardShadow.cginc"
+
+            ENDCG
+        }
+        // ------------------------------------------------------------------
+        //  Deferred pass
+        Pass
+        {
+            Name "DEFERRED"
+            Tags { "LightMode" = "Deferred" }
+
+            CGPROGRAM
+            #pragma target 3.5
+            #pragma exclude_renderers nomrt
+
+
+            // -------------------------------------
+
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_fragment _EMISSION
+            #pragma shader_feature_local _SPECGLOSSMAP
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local _ _DETAIL_MULX2_OFF
+            #pragma shader_feature_local _ _PARALLAXMAP_OFF
+            #pragma shader_feature_local _ _OCCLUSIONMAP_OFF
+
+            #pragma multi_compile_prepassfinal
+            #pragma multi_compile_instancing
+            // Uncomment the following line to enable dithering LOD crossfade. Note: there are more in the file to uncomment for other passes.
+            //#pragma multi_compile _ LOD_FADE_CROSSFADE
+
+            #pragma vertex vertDeferred
+            #pragma fragment fragDeferred
+
+            #include "UnityStandardCore.cginc"
 
             ENDCG
         }
 
         // ------------------------------------------------------------------
-        //  META pass для совместимости с редактором
+        // Extracts information for lightmapping, GI (emission, albedo, ...)
+        // This pass it not used during regular rendering.
         Pass
         {
             Name "META"
@@ -213,13 +219,14 @@ Shader "Standard (Specular setup) Optimized"
             #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
             #pragma shader_feature EDITOR_VISUALIZATION
             #pragma shader_feature_local _ _DETAIL_MULX2_OFF
+            #pragma shader_feature_local _ _PARALLAXMAP_OFF
+            #pragma shader_feature_local _ _OCCLUSIONMAP_OFF
+
             #include "UnityStandardMeta.cginc"
             ENDCG
         }
     }
 
-    // ------------------------------------------------------------------
-    //  Fallback для случаев, когда deferred недоступен
-    FallBack "Mobile/VertexLit"
+    FallBack "VertexLit"
     CustomEditor "StandardShaderGUI"
 }

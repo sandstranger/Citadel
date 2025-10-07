@@ -1441,7 +1441,7 @@ Generic Materials (_consts.genericMaterials[])
 				}
 				else
 				{
-					Level levS = _levelManager.levelScripts[lev];
+					Level levS = _levelManager.levelScript;
 
 					GameObject parGO = levS.dynamicObjectsContainer;
 					if (ConstIndexIsNPC(val))

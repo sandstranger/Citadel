@@ -143,19 +143,6 @@ namespace Citadel.Android.Tools
                     !meshFilters.Any(mesh => mesh.sharedMesh.name.Contains("med1_1_")) && meshFilters.Any(meshFilter => meshFilter.sharedMesh.GetTrianglesCount() >= MinMeshTrianglesCountToGenerateLods));
         }
         
-        private static T[] GetComponentsInChildren<T>(this GameObject gameObject, bool includeInactive = false, bool includeSelf = false) where T : Component
-        {
-            var components = gameObject.GetComponentsInChildren<T>(includeInactive);
-
-            if (includeSelf)
-            {
-                var selfComponent = gameObject.GetComponent<T>();
-                return selfComponent!=null ? components.Prepend(selfComponent).ToArray() : components;
-            }
-
-            return components;
-        }
-        
         private static float GetTrianglesCount(this Mesh mesh)
         {
             return mesh.triangles.Length / 3.0f;

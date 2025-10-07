@@ -55,9 +55,7 @@ public class SpawnManager : MonoBehaviour {
 		if (_pauseScript.MenuActive()) return;
 		if (!active) return;
 
-		if (_levelManager.npcsm[LevelManager.currentLevel] == null) return;
-
-		NPCSubManager subM = _levelManager.npcsm[LevelManager.currentLevel];
+		NPCSubManager subM = _levelManager.npcsm;
 		int numNPCs = subM.childrenNPCsAICs.Length;		
 		if (numNPCs > 300) return;
 

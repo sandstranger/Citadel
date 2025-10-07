@@ -1546,12 +1546,6 @@ CreateBlackTexture:
 		_saveFileIndex = saveFileIndex;
 		WriteDatForIntroPlayed(introNotPlayed); // reset
 
-		if (LevelManager.UseDynamicLevelsLoading)
-		{
-			StartCoroutine(LoadRoutine(_saveFileIndex.Value,false));
-			return;
-		}
-		
 		var levelIndexFromSave = ReadLevelIndexFromSave(saveFileIndex);
 
 		if (levelIndexFromSave != LevelManager.currentLevel)
@@ -1598,18 +1592,10 @@ CreateBlackTexture:
 		LevelManager.StaticObjectsSaveStrings.ResetSaveStrings();
 		var readFileList = ReadSave(saveFileIndex);
 		
-		for (i=0;i<LevelManager.MaxLevelsCount;i++) {
-
-			if (!_levelManager.LevelExists(i))
-			{
-				continue;
-			}
-			
-			_levelManager.UnloadLevelDynamicObjects(i,false); // Delete them all!
-			_levelManager.UnloadLevelNPCs(i); // Delete them all!
-			loadPercentText.text = "Preparing level " + i.ToString();
-			yield return new WaitForSeconds(0.1f); // Update progress text.
-		}
+		_levelManager.UnloadLevelDynamicObjects(LevelManager.currentLevel,false); // Delete them all!
+		_levelManager.UnloadLevelNPCs(LevelManager.currentLevel); // Delete them all!
+		loadPercentText.text = "Preparing level " + i.ToString();
+		yield return new WaitForSeconds(0.1f); // Update progress text.
 
 		loadPercentText.text = "Open Save File         ";
 		yield return null; // Update progress text.
@@ -1755,7 +1741,7 @@ CreateBlackTexture:
 				}
 
 				const string levelIdName = "levelID";
-				if (!wasLoaded && !LevelManager.UseDynamicLevelsLoading && readFileList[i].Contains(levelIdName))
+				if (!wasLoaded && readFileList[i].Contains(levelIdName))
 				{
 					var line = readFileList[i];
 					var entryToParse = line.Split(Utils.splitCharChar).First(entry => entry.Contains(levelIdName));
@@ -1831,7 +1817,7 @@ CreateBlackTexture:
 					savID = Utils.GetIntFromString(entries[2],"SaveID");
 					bool isNpc = ConsoleEmulator.ConstIndexIsNPC(constdex);
 					bool isDynamicObject = ConsoleEmulator.ConstIndexIsDynamicObject(constdex);
-					bool levelExists = _levelManager.LevelExists(levID);
+					bool levelExists = levID == LevelManager.currentLevel;
 					bool saveObjectToStaticStrings = !isDynamicObject && !levelExists && i < (readFileList.Count - 1);
 
 					if (saveObjectToStaticStrings)
@@ -1881,10 +1867,7 @@ CreateBlackTexture:
 			_levelManager.LoadLevelDynamicObjects(LevelManager.currentLevel);
 			loadUpdateTimer.Stop();
 
-			// LOAD 8.  Repopulate registries as needed that were on Awake.
-			for (i = 0; i < _levelManager.npcsm.Length; i++ ) {
-				_levelManager.npcsm[i]?.RepopulateChildList();
-			}
+			_levelManager.npcsm.RepopulateChildList();
 			
 			if (_inventory.hasHardware[1]) {
 				// Go through all HealthManagers in the game and initialize the

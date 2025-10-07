@@ -12,19 +12,73 @@ namespace Citadel.Android.Tools
 {
     internal static class AndroidTools
     {
+        [MenuItem("Tools/Debug/Print all not static objects with meshes on selected Gameobject to console")]
+        private static void PrintAllNotStaticObjects()
+        {
+            var selectedGameObject = Selection.activeGameObject;
+
+            if (selectedGameObject != null)
+            {
+                var result = new HashSet<string>();
+                
+                foreach (Transform child in selectedGameObject.transform)
+                {
+                    var meshRenders = child.gameObject.GetComponentsInChildren<MeshRenderer>(true, true);
+
+                    var childName = child.gameObject.name;
+                    if (meshRenders.Any(render => !render.gameObject.isStatic) && !result.Any(childName.StartsWith))
+                    {
+                        result.Add(childName);
+                    }
+                }
+
+                if (result.Count > 0)
+                {
+                    Debug.Log($"not static childs on selected \"{selectedGameObject.name}\" gameobject {string.Join(",", result)}");
+                }
+            }
+        }
+        
         [MenuItem("Tools/Find all canvases")]
         private static void FindAllCanvases()
         {
             Debug.Log($"Found canvases {String.Join(",",Object.FindObjectsOfType<Canvas>(true).Select(canvas => canvas.gameObject.name).ToArray())}");
-        }     
-        
-        [MenuItem("Tools/Set all lights to not important mode")]
-        private static void SetAllLightsToAutoMode()
+        }
+
+        [MenuItem("Tools/Set all lights on scene to not important mode")]
+        private static void SetAllLightsInSceneToNotImportantMode()
         {
-            foreach (var light in GameObject.FindObjectsOfType<Light>(true))
-            { 
+            foreach (var light in Object.FindObjectsOfType<Light>(true))
+            {
                 light.renderMode = LightRenderMode.ForceVertex;
             }
+        }
+        
+        [MenuItem("Tools/Set all lights in prefabs to not important mode")]
+        private static void SetAllLightsInPrefabsToNotImportantMode()
+        {
+            foreach (var prefab in FindAllComponentsInProject<GameObject>("Prefab"))
+            {
+                var hasLight = prefab.GetComponentInChildren<Light>(true)!=null;
+
+                if (hasLight)
+                {
+                    InstantiatePrefab(prefab, instantiatedPrefab =>
+                    {
+                        var lights = instantiatedPrefab.GetComponentsInChildren<Light>(true);
+
+                        foreach (var light in lights)
+                        {
+                            light.renderMode = LightRenderMode.ForceVertex;
+                        }
+
+                        return true;
+                    });
+                }
+            }
+            
+            AssetDatabase.Refresh();
+            AssetDatabase.SaveAssets();
         }
 
         [MenuItem("Tools/Remove shadowcasters static batching flag")]

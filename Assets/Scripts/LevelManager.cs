@@ -11,6 +11,7 @@ using Zenject;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
@@ -18,7 +19,6 @@ public class LevelManager : MonoBehaviour
 	public const int MaxLevelsCount = 14;
 	public const int NewGameLevelIndex = 1;
 
-	public GameObject[] levels;
 	public int[] levelSecurity;
 	public int[] levelCameraCount;
 	public int[] levelSmallNodeCount;
@@ -40,12 +40,11 @@ public class LevelManager : MonoBehaviour
 	public bool[] showSkyForLevel;
 	public bool[] showExteriorForLevel;
 	public bool[] showSaturnForLevel;
-	public NPCSubManager[] npcsm;
-	public Level[] levelScripts;
-	public GameObject[] geometryContainers;
-	public GameObject[] lightContainers;
-	public GameObject[] npcContainers;
-	public GameObject[] elevatorTargetDestinations;
+	public NPCSubManager npcsm;
+	public Level levelScript;
+	public GameObject geometryContainer;
+	public GameObject npcContainer;
+	public Vector3[] elevatorTargetDestinations;
 	public Material rtxEmissive;
 	public Mesh sphereMesh;
 	public SkyRotate skyRotate;
@@ -81,7 +80,6 @@ public class LevelManager : MonoBehaviour
 	public static SaveableObjectStringsStorage StaticObjectsSaveStrings { get; } = new();
 	public static SaveableObjectStringsStorage DynamicObjectsSavestrings { get; } = new();
 	public static int currentLevel = NewGameLevelIndex;
-	public static bool UseDynamicLevelsLoading => ScenesLoader.LoadedSceneName == ScenesLoader.DynamicLevelsSceneName;
 
 	void Awake () {
 		if (currentLevel < 0) {
@@ -112,11 +110,6 @@ public class LevelManager : MonoBehaviour
 		}
 	}
 
-	public bool LevelExists(int levelID)
-	{
-		return levelScripts[levelID] != null;
-	}
-	
 	public static bool LevNumInBounds(int levnum) {
 		return (levnum >=0 && levnum < MaxLevelsCount); // 14 levels
 	}
@@ -274,15 +267,7 @@ public class LevelManager : MonoBehaviour
 			return;
 		}
 
-		var useDynamicLevelsLoading = UseDynamicLevelsLoading;
-		
-		if (useDynamicLevelsLoading && !Const.StartingNewGame)
-		{
-			LoadLevel(levnum, targetPosition ?? Vector3.zero, changeSceneForced);
-			return;
-		}
-
-		if (!Const.StartingNewGame && !useDynamicLevelsLoading)
+		if (!Const.StartingNewGame)
 		{
 			LoadLevelAfterSceneChanges = true;
 			UnloadLevelDynamicObjects(currentLevel, true);
@@ -315,19 +300,19 @@ public class LevelManager : MonoBehaviour
 		_guiState.ClearOverButton();
 		if (targetPosition.x == 0 && targetPosition.y == 0 && targetPosition.z == 0) {
 			switch(levnum) {
-				case 0:  targetPosition = elevatorTargetDestinations[25].transform.position; break;
-				case 1:  targetPosition =  elevatorTargetDestinations[0].transform.position; break;
-				case 2:  targetPosition =  elevatorTargetDestinations[1].transform.position; break;
-				case 3:  targetPosition =  elevatorTargetDestinations[3].transform.position; break;
-				case 4:  targetPosition =  elevatorTargetDestinations[6].transform.position; break;
-				case 5:  targetPosition =  elevatorTargetDestinations[7].transform.position; break;
-				case 6:  targetPosition =  elevatorTargetDestinations[9].transform.position; break;
-				case 7:  targetPosition = elevatorTargetDestinations[17].transform.position; break;
-				case 8:  targetPosition = elevatorTargetDestinations[19].transform.position; break;
-				case 9:  targetPosition = elevatorTargetDestinations[21].transform.position; break;
-				case 10: targetPosition = elevatorTargetDestinations[22].transform.position; break;
-				case 11: targetPosition = elevatorTargetDestinations[23].transform.position; break;
-				case 12: targetPosition = elevatorTargetDestinations[24].transform.position; break;
+				case 0:  targetPosition = elevatorTargetDestinations[25]; break;
+				case 1:  targetPosition =  elevatorTargetDestinations[0]; break;
+				case 2:  targetPosition =  elevatorTargetDestinations[1]; break;
+				case 3:  targetPosition =  elevatorTargetDestinations[3]; break;
+				case 4:  targetPosition =  elevatorTargetDestinations[6]; break;
+				case 5:  targetPosition =  elevatorTargetDestinations[7]; break;
+				case 6:  targetPosition =  elevatorTargetDestinations[9]; break;
+				case 7:  targetPosition = elevatorTargetDestinations[17]; break;
+				case 8:  targetPosition = elevatorTargetDestinations[19]; break;
+				case 9:  targetPosition = elevatorTargetDestinations[21]; break;
+				case 10: targetPosition = elevatorTargetDestinations[22]; break;
+				case 11: targetPosition = elevatorTargetDestinations[23]; break;
+				case 12: targetPosition = elevatorTargetDestinations[24]; break;
 			}
 		}
 
@@ -340,7 +325,6 @@ public class LevelManager : MonoBehaviour
 		DynamicCulling.camPositions = new Dictionary<GameObject, Vector3>();
 		System.GC.Collect();
 		System.GC.WaitForPendingFinalizers();
-		levels[levnum].SetActive(true); // enable new level
 		if (currentLevel == 2 && AutoSplitterData.missionSplitID == 0) {
 			AutoSplitterData.missionSplitID++; // 1 - Medical split - we are now on level 2
 			Debug.Log("AutoSplitterData missionSplitID incremented: " + AutoSplitterData.missionSplitID.ToString());
@@ -368,7 +352,6 @@ public class LevelManager : MonoBehaviour
 		LoadLevelData(levnum); // Let this function check and load data if it isn't yet.
 		currentLevel = levnum; // Set current level to be the new level
 		DisableAllNonOccupiedLevelsExcept(currentLevel); // Unload last level.
-		levels[currentLevel].SetActive(true); // Load new level
 		PostLoadLevelSetupSystems();
 	}
 
@@ -393,20 +376,18 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public void DisableAllNonOccupiedLevelsExcept(int occupiedLevel) {
+		return;
+		/*
 		for (int i=0;i<levels.Length;i++) {
 			if (i == occupiedLevel) continue;
 
 			UnloadLevelData(i);
 			if (levels[i] != null) levels[i].SetActive(false);
-		}
+		}*/
 	}
 
 	public GameObject GetCurrentDynamicContainer() { // Does not return null
-		if (!LevNumInBounds(currentLevel)) {
-			return levelScripts[1].dynamicObjectsContainer;
-		}
-
-        return levelScripts[currentLevel].dynamicObjectsContainer;
+        return levelScript.dynamicObjectsContainer;
 	}
 
 	public GameObject GetCurrentGeometryContainer() { // Does not return null
@@ -422,11 +403,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public GameObject GetCurrentLightsStaticImmutableContainer() {
-		if (!LevNumInBounds(currentLevel)) {
-			return levelScripts[1].lightsStaticImmutable;
-		}
-		
-		return levelScripts[currentLevel].lightsStaticImmutable;
+		return levelScript.lightsStaticImmutable;
 	}
 	
 	public GameObject GetCurrentStaticImmutableContainer() { // Does not return null
@@ -454,43 +431,23 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public GameObject GetCurrentDoorsContainer() { // Does not return null
-		if (!LevNumInBounds(currentLevel)) {
-			return levelScripts[1].doorsStaticSaveable;
-		}
-
-		return levelScripts[currentLevel].doorsStaticSaveable;
+		return levelScript.doorsStaticSaveable;
 	}
 
 	public GameObject GetCurrentLightsContainer() { // Does not return null
-		if (!LevNumInBounds(currentLevel)) {
-			return levelScripts[1].lightsStaticImmutable;
-		}
-
-		return levelScripts[currentLevel].lightsStaticImmutable;
+		return levelScript.lightsStaticImmutable;
 	}
 	
 	public GameObject GetRequestedLightsStaticImmutableContainer(int index) {
-		if (!LevNumInBounds(index)) {
-			return levelScripts[1].lightsStaticImmutable;
-		}
-		
-		return levelScripts[index].lightsStaticImmutable;
+		return levelScript.lightsStaticImmutable;
 	}
 
 	public GameObject GetRequestedLevelDynamicContainer(int index) {
-		if (!LevNumInBounds(currentLevel)) {
-			return levelScripts[1].dynamicObjectsContainer; // Default to Medical level
-		}
-		
-        return levelScripts[index].dynamicObjectsContainer;
+        return levelScript.dynamicObjectsContainer;
 	}
 
 	public GameObject GetRequestedLevelNPCContainer(int index) {
-		if (!LevNumInBounds(currentLevel)) {
-			return npcContainers[1]; // Default to Medical level
-		}
-
-        return npcContainers[index];
+        return npcContainer;
 	}
 
 	public int GetInstantiateParent(GameObject go, bool isNPC,
@@ -508,11 +465,16 @@ public class LevelManager : MonoBehaviour
 
 		if (par == null) return -1;
 
-		for (int i=0; i < 14; i++) {
-			if (isNPC && par == npcContainers[i]) return i;
-			else if (levelScripts[i]!=null && par == levelScripts[i].dynamicObjectsContainer) return i;
+		if (isNPC && par == npcContainer)
+		{
+			return currentLevel;
 		}
 
+		if (levelScript && par == levelScript.dynamicObjectsContainer)
+		{
+			return currentLevel;
+		}
+		
 		return -1;
 	}
 
@@ -589,13 +551,14 @@ public class LevelManager : MonoBehaviour
 	}
 	
 	public void UnloadLevelGeometry(int curlevel) {
-		if (curlevel > (geometryContainers.Length - 1) || curlevel < 0 || !UseDynamicLevelsLoading)
+		return;
+		if (curlevel > MaxLevelsCount || curlevel < 0)
 		{
 			return;
 		}
 		
 		List<GameObject> deleteMes = new List<GameObject>();
-		Transform parent = geometryContainers[curlevel].transform;
+		Transform parent = geometryContainer.transform;
 		int children = parent.childCount;
 		for (int i=0;i<children;i++) deleteMes.Add(parent.GetChild(i).gameObject);
 		for (int i=0;i<deleteMes.Count;i++) {
@@ -604,8 +567,9 @@ public class LevelManager : MonoBehaviour
 	}
 	
 	public void LoadLevelGeometry(int curlevel) {
-
-		if (curlevel > (geometryContainers.Length - 1) || curlevel < 0 || !UseDynamicLevelsLoading)
+		/*
+		return;
+		if (curlevel > MaxLevelsCount || curlevel < 0)
 		{
 			return;
 		}
@@ -653,22 +617,24 @@ public class LevelManager : MonoBehaviour
 			for (int i=0;i<chunkLights.Count;i++) {
 				lit = chunkLights[i];
 				lit.gameObject.name = "ChunkLight_" + lit.gameObject.name;
-				lit.transform.parent = lightContainers[curlevel].transform;
+				lit.transform.parent = lightContainer.transform;
 // 				UnityEngine.Debug.Log("Moved light off of " + lit.gameObject.name);
 			}
 			
 			sf.Close();
-		}
+		}*/
 	}
 
 	public void UnloadLevelLights(int curlevel) {
-		if (curlevel > 12 || curlevel > (lightContainers.Length - 1) || curlevel < 0 || !UseDynamicLevelsLoading)
+		/*
+		return;
+		if (curlevel > MaxLevelsCount || curlevel < 0)
 		{
 			return;
 		}
 		
 		Component[] compArray = 
-		  lightContainers[curlevel].GetComponentsInChildren(typeof(Light),true);
+		  lightContainer.GetComponentsInChildren(typeof(Light),true);
 
 		GameObject go = null;
 		int litCount = compArray.Length;
@@ -690,12 +656,12 @@ public class LevelManager : MonoBehaviour
 
 			Destroy(go);
 		}
-		compArray = null;
+		compArray = null;*/
 	}
 
 	public void LoadLevelLights(int curlevel) {
-
-		if (curlevel > 12 || curlevel > (lightContainers.Length - 1) || curlevel < 0 || !UseDynamicLevelsLoading)
+		return;
+		if (curlevel > MaxLevelsCount  || curlevel < 0)
 		{
 			return;
 		}
@@ -747,7 +713,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public void UnloadLevelNPCs(int curlevel) {
-		GameObject go = npcContainers[curlevel];
+		GameObject go = npcContainer;
 		Component[] compArray = go.GetComponentsInChildren(typeof(SaveObject),
 														   true);
 
@@ -775,8 +741,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public void LoadLevelDynamicObjects(int curlevel) {
-		if (curlevel > (levelScripts.Length - 1)) return;
-		if (curlevel < 0) return;
+		if (levelScript==null || curlevel < 0) return;
 
 		string[] entries;
 // 		MeshRenderer mr;
@@ -861,7 +826,7 @@ public class LevelManager : MonoBehaviour
 	{
 		var staticObjectsStrings = StaticObjectsSaveStrings[levNum];
 		
-		if (UseDynamicLevelsLoading || staticObjectsStrings.Count == 0)
+		if (staticObjectsStrings.Count == 0)
 		{
 			return;
 		}
@@ -914,11 +879,8 @@ public class LevelManager : MonoBehaviour
 			}
 		}
 		
-		// LOAD 8.  Repopulate registries as needed that were on Awake.
-		for (var i = 0; i < npcsm.Length; i++ ) {
-			npcsm[i]?.RepopulateChildList();
-		}
-			
+		npcsm.RepopulateChildList();
+
 		if (_inventory.hasHardware[1]) {
 			// Go through all HealthManagers in the game and initialize the
 			// linked overlays now for Automap.  Done after instantiation.
@@ -953,12 +915,7 @@ public class LevelManager : MonoBehaviour
 	
 	private void SaveStaticObjects()
 	{
-		if (UseDynamicLevelsLoading)
-		{
-			return;
-		}
-		
-		var currentLevelData = levelScripts[currentLevel];
+		var currentLevelData = levelScript;
 		var saveStringsStorage = StaticObjectsSaveStrings[currentLevel];
 		saveStringsStorage.Clear();
 
@@ -977,7 +934,6 @@ public class LevelManager : MonoBehaviour
 	}
 	
 	void OnDestroy() {
-		levels = null;
 		ressurectionLocation = null;
 		ressurectionBayDoor = null;
 		sky = null;
@@ -988,10 +944,8 @@ public class LevelManager : MonoBehaviour
 		exterior_shield = null;
 		skyMR = null;
 		npcsm = null;
-		levelScripts = null;
-		geometryContainers = null;
-		lightContainers = null;
-		npcContainers = null;
+		levelScript = null;
+		npcContainer = null;
 		elevatorTargetDestinations = null;
 		rtxEmissive = null;
 		sphereMesh = null;

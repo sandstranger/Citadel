@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -8,6 +9,19 @@ namespace Citadel.Editor
 {
     internal static class Utils
     {
+        public static T[] GetComponentsInChildren<T>(this GameObject gameObject, bool includeInactive = false, bool includeSelf = false) where T : Component
+        {
+            var components = gameObject.GetComponentsInChildren<T>(includeInactive);
+
+            if (includeSelf)
+            {
+                var selfComponent = gameObject.GetComponent<T>();
+                return selfComponent!=null ? components.Prepend(selfComponent).ToArray() : components;
+            }
+
+            return components;
+        }
+        
         public static void RemoveStaticBatchingFlag(GameObject targetObject)
         {
             StaticEditorFlags currentFlags = GameObjectUtility.GetStaticEditorFlags(targetObject);
