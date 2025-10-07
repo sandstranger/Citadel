@@ -12,6 +12,25 @@ namespace Citadel.Android.Tools
 {
     internal static class AndroidTools
     {
+        [MenuItem("Tools/Debug/Print elev destinations world positions to console")]
+        private static void PrintElevDestinationsWorldPositionsToConsole()
+        {
+            var elevDestinations = Object.FindObjectsOfType<GameObject>(true)
+                .Where(gameObject => gameObject.name.StartsWith("info_elev_destination")).OrderBy(gameobject => gameobject.name).ToArray();
+
+            var result = new HashSet<string>();
+            
+            foreach (var elevDestination in elevDestinations)
+            {
+                result.Add($"{elevDestination.gameObject.name} world position" + elevDestination.transform.position);
+            }
+
+            if (result.Count > 0)
+            {
+                Debug.Log(string.Join(Environment.NewLine, result));
+            }
+        }
+        
         [MenuItem("Tools/Debug/Print all not static objects with meshes on selected Gameobject to console")]
         private static void PrintAllNotStaticObjects()
         {
