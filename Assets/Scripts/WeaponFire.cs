@@ -370,7 +370,7 @@ public class WeaponFire : MonoBehaviour {
 
 		if (_config!=null)
 		{
-			var currentLevel = LevelManager.currentLevel;
+			var currentLevel = LevelManager.CurrentLevel;
 			var fogDensity = 0.451f * (fogBaseDensityForLevel[currentLevel] + ((((float)fogFac)/255f) * fogBaseDensityForLevel[currentLevel]));
 			var fogColor = fogColorForLevel[currentLevel];
 			_config.UpdateFogSettings(fogDensity, fogColor);

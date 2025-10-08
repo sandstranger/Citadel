@@ -26,7 +26,7 @@ public class CyberAccess : MonoBehaviour {
 		_consts.UseTargets(gameObject,ud,target);
 		_consts.sprint(_consts.stringTable[441]); // Entering Cyberspace!
 		Vector3 entryPosition = new Vector3( 195.42000f, -13.44000f,  33.28000f);
-		switch(LevelManager.currentLevel) {
+		switch(LevelManager.CurrentLevel) {
 			case 0: entryPosition = new Vector3( 210.68340f,   2.81200f, -24.37800f); break;
 			case 1: entryPosition = new Vector3( 195.42000f, -13.44000f,  33.28000f); break;
 			case 2: 

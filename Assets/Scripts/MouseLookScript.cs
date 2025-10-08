@@ -202,8 +202,8 @@ public class MouseLookScript : MonoBehaviour {
 		if(_getInput.ToggleMode()) ToggleInventoryMode();
 
 		if (_consts.questData.SelfDestructActivated
-			&& LevelManager.currentLevel != 13   // Not Cyberspace
-			&& LevelManager.currentLevel != 9) { // Not the bridge, separated
+			&& LevelManager.CurrentLevel != 13   // Not Cyberspace
+			&& LevelManager.CurrentLevel != 9) { // Not the bridge, separated
 
 			if (randomShakeFinished < _pauseScript.relativeTime) {
 				randomShakeFinished = _pauseScript.relativeTime
@@ -390,7 +390,7 @@ public class MouseLookScript : MonoBehaviour {
 		cyberspaceReturnPoint = _playerMovement.transform.position;
 		cyberspaceReturnCameraLocalRotation = transform.localRotation.eulerAngles;
 		cyberspaceReturnPlayerCapsuleLocalRotation = playerCapsuleTransform.localRotation.eulerAngles;
-		cyberspaceReturnLevel = LevelManager.currentLevel;
+		cyberspaceReturnLevel = LevelManager.CurrentLevel;
 		_mfdManager.EnterCyberspace();
 		_levelManager.LoadLevel(13,cyberspaceRecallPoint);
 		_playerMovement.inCyberSpace = true;

@@ -665,19 +665,19 @@ public class Music : MonoBehaviour {
 
 		if (inCombat && !inZone && combatImpulseFinished < _pauseScript.relativeTime) {
 			inCombat = false;
-			PlayTrack(LevelManager.currentLevel,TrackType.Combat, MusicType.Override);
+			PlayTrack(LevelManager.CurrentLevel,TrackType.Combat, MusicType.Override);
 			combatImpulseFinished = _pauseScript.relativeTime + 20f;
 			return;
 		}
 
 		if (inZone) {
 			if (distortion) {
-				PlayTrack(LevelManager.currentLevel,TrackType.Distortion, MusicType.Override);
+				PlayTrack(LevelManager.CurrentLevel,TrackType.Distortion, MusicType.Override);
 				return;
 			}
 			
 			if (elevator) {
-				PlayTrack(LevelManager.currentLevel,TrackType.Elevator, MusicType.Override);
+				PlayTrack(LevelManager.CurrentLevel,TrackType.Elevator, MusicType.Override);
 				return;
 			}
 		}
@@ -687,14 +687,14 @@ public class Music : MonoBehaviour {
 				float remaining = curr.clip.length - curr.time;
 				if (remaining <= audBuffer) { // 50ms buffer before end
 					twoPlaying = !twoPlaying;
-					PlayTrack(LevelManager.currentLevel,TrackType.Walking, MusicType.Walking);
+					PlayTrack(LevelManager.CurrentLevel,TrackType.Walking, MusicType.Walking);
 				}
 			} else {
-				PlayTrack(LevelManager.currentLevel,TrackType.Walking, MusicType.Walking);
+				PlayTrack(LevelManager.CurrentLevel,TrackType.Walking, MusicType.Walking);
 			}
 		} else {
 			twoPlaying = false;
-			PlayTrack(LevelManager.currentLevel,TrackType.Walking, MusicType.Walking);
+			PlayTrack(LevelManager.CurrentLevel,TrackType.Walking, MusicType.Walking);
 		}
     }
     

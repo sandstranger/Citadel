@@ -766,7 +766,7 @@ public class DynamicCulling : MonoBehaviour {
         switch(type) {
           //  case 1: container = _levelManager.GetCurrentDynamicContainer(); break;
          //   case 2: container = _levelManager.GetCurrentDoorsContainer(); break;
-            case 3: container = _levelManager.GetRequestedLevelNPCContainer(LevelManager.currentLevel); break;
+            case 3: container = _levelManager.GetRequestedLevelNPCContainer(LevelManager.CurrentLevel); break;
          //   case 4: container = _levelManager.GetCurrentStaticSaveableContainer(); break;
          //   case 5: container = _levelManager.GetCurrentLightsContainer(); break;
         //    default: container = _levelManager.GetCurrentStaticImmutableContainer(); break;
@@ -998,7 +998,7 @@ public class DynamicCulling : MonoBehaviour {
         debugTex = new Texture2D(WORLDX,WORLDX);
         pixels = new Color32[WORLDX * WORLDX];
         string basePath = Utils.GetAppropriateDataPath();
-        string fileName = "worldcellvis_" + LevelManager.currentLevel.ToString() + ".png";
+        string fileName = "worldcellvis_" + LevelManager.CurrentLevel.ToString() + ".png";
 		Utils.ConfirmExistsMakeIfNot(basePath,fileName);
         visDebugImagePath = Utils.SafePathCombine(basePath,fileName);        
     }
@@ -1045,7 +1045,7 @@ public class DynamicCulling : MonoBehaviour {
                 
         // Setup and find all cullables and associate them with x,y coords.
         ClearCellList();
-        switch(LevelManager.currentLevel) { // PosToCellCoords -1 on just x
+        switch(LevelManager.CurrentLevel) { // PosToCellCoords -1 on just x
             // chunk.x + (Geometry.x + Level.x),0,chunk.z + (Geometry.z + Level.z)
             case 0: worldMin =  new Vector3( -38.40f + ( 0.00000f +    3.6000f),0f, -51.20f + (0f + 1f)); break;
             case 1: worldMin =  new Vector3( -76.80f + ( 0.00000f +   25.5600f),0f, -56.32f + (0f + -5.2f)); break;
@@ -1079,7 +1079,7 @@ public class DynamicCulling : MonoBehaviour {
                     }
                 }
                 
-                if (LevelManager.currentLevel == 10) {
+                if (LevelManager.CurrentLevel == 10) {
                     if ((x == 15 || x == 16) && y == 23) { // Fix up problem cells at odd angle where ddx doesn't work.
                         gridCells[x,y].visibleCellsFromHere[12,11] = true;
                     }
@@ -1292,7 +1292,7 @@ public class DynamicCulling : MonoBehaviour {
         
         for (int x=0;x<WORLDX;x++) {
             for (int y=0;y<WORLDX;y++) {
-                if (LevelManager.currentLevel == 5) {
+                if (LevelManager.CurrentLevel == 5) {
                     if ((x <= 15 && startX <= 15) || (y <= 9 && startY <= 9)
                         || (x >= 32 && startX >=32)
                         || (y == 31 && startY == 31 && x >= 27 && startX >= 27)
@@ -1562,8 +1562,8 @@ public class DynamicCulling : MonoBehaviour {
         Vector3 playerPos = _mouseLookScript.transform.position;
         float distSqrCheck = lodSqrDist;
         bool pidGood = false;
-        if (LevelManager.currentLevel > 9) distSqrCheck = 419.4304f; // (8 * 2.56f)^2, lower than normal due to foliage tanking performance
-        else if (LevelManager.currentLevel == 0 || LevelManager.currentLevel == 9) distSqrCheck = 1474.56f; // (15*2.56)^2, lower than normal due to high poly angled ceilings and pipe walls
+        if (LevelManager.CurrentLevel > 9) distSqrCheck = 419.4304f; // (8 * 2.56f)^2, lower than normal due to foliage tanking performance
+        else if (LevelManager.CurrentLevel == 0 || LevelManager.CurrentLevel == 9) distSqrCheck = 1474.56f; // (15*2.56)^2, lower than normal due to high poly angled ceilings and pipe walls
         for (int x=0;x<WORLDX;x++) {
             for (int y=0;y<WORLDX;y++) {
                 float sqrdist = 0f;
@@ -1876,7 +1876,7 @@ public class DynamicCulling : MonoBehaviour {
         
 //         if (mergeVisibleMeshes) UncombineMeshes(); // In lieu of the fact that this skyrockets the lighting calculations, not doing!
         if (_levelManager != null) {
-            if (LevelManager.currentLevel >= 13) return;
+            if (LevelManager.CurrentLevel >= 13) return;
         }
 
         skyVisibleToPlayer = false;
@@ -1955,7 +1955,7 @@ public class DynamicCulling : MonoBehaviour {
     }
 
     public void Cull(bool force) {
-        int lev = LevelManager.currentLevel;
+        int lev = LevelManager.CurrentLevel;
         if (_pauseScript.MenuActive()) return;
         if (_pauseScript.Paused()) return;
         if (!cullEnabled || lev == 13) return;

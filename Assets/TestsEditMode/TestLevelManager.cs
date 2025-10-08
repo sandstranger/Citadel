@@ -24,9 +24,9 @@ namespace Tests {
             LevelManager lev = go.AddComponent<LevelManager>();
             lev.ressurectionActive = new bool[14];
             for (int i=0; i<14; i++) lev.ressurectionActive[i] = false;
-            LevelManager.currentLevel = -1; // Test area
+            LevelManager.CurrentLevel = -1; // Test area
             lev.CyborgConversionToggleForCurrentLevel();
-            LevelManager.currentLevel = 0;
+            LevelManager.CurrentLevel = 0;
             bool prev = lev.ressurectionActive[0];
             lev.CyborgConversionToggleForCurrentLevel();
             // Should have early exited else will give oob exception.
@@ -36,7 +36,7 @@ namespace Tests {
             string msg = "Reactor cyborg conversion failed to toggle";
             
             prev = lev.ressurectionActive[1];
-            LevelManager.currentLevel = 1;
+            LevelManager.CurrentLevel = 1;
             lev.CyborgConversionToggleForCurrentLevel();
             check = lev.ressurectionActive[1] != prev
                     && lev.ressurectionActive[1];
@@ -44,7 +44,7 @@ namespace Tests {
             Assert.That(check,msg);
             
             prev = lev.ressurectionActive[6];
-            LevelManager.currentLevel = 6;
+            LevelManager.CurrentLevel = 6;
             lev.CyborgConversionToggleForCurrentLevel();
             check = lev.ressurectionActive[6] != prev
                     && lev.ressurectionActive[6]

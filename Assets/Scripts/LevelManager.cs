@@ -108,10 +108,10 @@ public class LevelManager : MonoBehaviour
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
 	public static SaveableObjectStringsStorage StaticObjectsSaveStrings { get; } = new();
 	public static SaveableObjectStringsStorage DynamicObjectsSavestrings { get; } = new();
-	public static int currentLevel = NewGameLevelIndex;
+	public static int CurrentLevel = NewGameLevelIndex;
 
 	void Awake () {
-		if (currentLevel < 0) {
+		if (CurrentLevel < 0) {
 			if (_consts == null) return;
 			if (_consts.player1CapsuleMainCameragGO == null) return;
 
@@ -121,7 +121,7 @@ public class LevelManager : MonoBehaviour
 			cam.useOcclusionCulling = false; // For debug whiteroom
 			return;
 		}
-		if (currentLevel < 0 || currentLevel > 12) return; // 12 because I don't think I support starting in cyberspace, 13, for testing.
+		if (CurrentLevel < 0 || CurrentLevel > 12) return; // 12 because I don't think I support starting in cyberspace, 13, for testing.
 
 		if (sky == null) Debug.Log("BUG: LevelManager missing manually assigned reference for sky.");
 		else sky.SetActive(true);
@@ -190,55 +190,55 @@ public class LevelManager : MonoBehaviour
 		// 0 = Sunlight only
 		// 1 = Sky + Sun + exterior + saturn
 		// -1 = Nothin much
-		skyMR.enabled = (on > 0 && showSkyForLevel[currentLevel]);
-		saturn.SetActive(on > 0 && showSaturnForLevel[currentLevel]);
-		exterior.SetActive(on > 0 && showExteriorForLevel[currentLevel]);
+		skyMR.enabled = (on > 0 && showSkyForLevel[CurrentLevel]);
+		saturn.SetActive(on > 0 && showSaturnForLevel[CurrentLevel]);
+		exterior.SetActive(on > 0 && showExteriorForLevel[CurrentLevel]);
 		if (on == 1) Debug.Log("SkyVisible passed a 1, sky + sunlight");
 		if (on == 0) Debug.Log("SkyVisible passed a 0, sunlight only");
 		if (on == -1) Debug.Log("SkyVisible passed a -1, nope");
 		sun.SetActive(_consts.GraphicsShadowMode >= 1 && on >= 0); // on == 0 is for Sunlight only!
-		sunSprite.SetActive(on > 0 && showSaturnForLevel[currentLevel]);
+		sunSprite.SetActive(on > 0 && showSaturnForLevel[CurrentLevel]);
 		if (_consts == null) return;
 		if (_consts.questData == null) return;
 		
-		exterior_shield.SetActive(on > 0 && showExteriorForLevel[currentLevel]
+		exterior_shield.SetActive(on > 0 && showExteriorForLevel[CurrentLevel]
 								  && _consts.questData.ShieldActivated);
 	}
 
 	public void CyborgConversionToggleForCurrentLevel() {
-		if (!LevNumInBounds(currentLevel)) return;
+		if (!LevNumInBounds(CurrentLevel)) return;
 	    
-		if (currentLevel == 6) {
-			if (ressurectionActive[currentLevel]) {
-				ressurectionActive[currentLevel] = false;
+		if (CurrentLevel == 6) {
+			if (ressurectionActive[CurrentLevel]) {
+				ressurectionActive[CurrentLevel] = false;
 				ressurectionActive[10] = false;
 				ressurectionActive[11] = false;
 				ressurectionActive[12] = false;
 			} else {
-				ressurectionActive[currentLevel] = true;
+				ressurectionActive[CurrentLevel] = true;
 				ressurectionActive[10] = true;
 				ressurectionActive[11] = true;
 				ressurectionActive[12] = true;
 			}
 		} else {
-			ressurectionActive[currentLevel] = !ressurectionActive[currentLevel]; // Toggle current level.
+			ressurectionActive[CurrentLevel] = !ressurectionActive[CurrentLevel]; // Toggle current level.
 		}
 	}
 
 	public bool RessurectPlayer() {
-		if (!ressurectionActive[currentLevel]) return false;
+		if (!ressurectionActive[CurrentLevel]) return false;
 
-		if (currentLevel == 10 ||currentLevel == 11 ||currentLevel == 12) {
-			LoadLevel(6,ressurectionLocation[currentLevel].position);
+		if (CurrentLevel == 10 ||CurrentLevel == 11 ||CurrentLevel == 12) {
+			LoadLevel(6,ressurectionLocation[CurrentLevel].position);
 			ressurectionBayDoor[6].ForceClose();
 		} else {
-			if (currentLevel <= 7 && currentLevel >= 0) {
-				ressurectionBayDoor[currentLevel].ForceClose();
+			if (CurrentLevel <= 7 && CurrentLevel >= 0) {
+				ressurectionBayDoor[CurrentLevel].ForceClose();
 			}
 
-			if (currentLevel >= 0 || currentLevel < 13) {
+			if (CurrentLevel >= 0 || CurrentLevel < 13) {
 				Transform plyr = _playerReference.playerCapsule.transform;
-				Vector3 spot = ressurectionLocation[currentLevel].position;
+				Vector3 spot = ressurectionLocation[CurrentLevel].position;
 				plyr.position = transform.TransformPoint(spot);
 			}
 		}
@@ -247,7 +247,7 @@ public class LevelManager : MonoBehaviour
 		// "BRAIN ACTIVITY SATISFACTORY..."            ya debatable right
 		// etc. etc.
 		_playerReference.playerDeathRessurectEffect.SetActive(true);
-		_music.PlayTrack(currentLevel,TrackType.Revive,MusicType.Override);
+		_music.PlayTrack(CurrentLevel,TrackType.Revive,MusicType.Override);
 		_playerMovement.ressurectingFinished = _pauseScript.relativeTime + 3f;
 		return true;
 	}
@@ -266,7 +266,7 @@ public class LevelManager : MonoBehaviour
 
 	// Make sure relevant data and objects are loaded in and present for the level.
 	public void LoadLevelData(int levnum) {
-		if (!LevNumInBounds(currentLevel)) { // In a test or editor space.
+		if (!LevNumInBounds(CurrentLevel)) { // In a test or editor space.
 			levelDataLoaded[levnum] = true;
 			return;
 		}
@@ -290,7 +290,7 @@ public class LevelManager : MonoBehaviour
 			return;
 		}
 
-		if (currentLevel == levnum && !changeSceneForced)
+		if (CurrentLevel == levnum && !changeSceneForced)
 		{
 			_consts.sprint(_consts.stringTable[9]);
 			return;
@@ -299,12 +299,12 @@ public class LevelManager : MonoBehaviour
 		if (!Const.StartingNewGame)
 		{
 			LoadLevelAfterSceneChanges = true;
-			UnloadLevelDynamicObjects(currentLevel, true);
+			UnloadLevelDynamicObjects(CurrentLevel, true);
 			SaveStaticObjects();
 		}
 
 		TargetPosition = targetPosition ?? Vector3.zero;
-		currentLevel = levnum;
+		CurrentLevel = levnum;
 		ObjectContainmentSystem.ClearLists();
 		ScenesLoader.LoadLevel(levnum);
 	}
@@ -317,7 +317,7 @@ public class LevelManager : MonoBehaviour
 		if (!LevNumInBounds(levnum)) { Debug.LogWarning("levnum out of bounds"); return; }
 
 		// NOTE: Check this first since the button for the current level has a null destination.  This is fine and expected.
-		if (currentLevel == levnum && !loadLevelForced)
+		if (CurrentLevel == levnum && !loadLevelForced)
 		{
 			_consts.sprint(_consts.stringTable[9]);
 			_lightDistanceCuller.Rebuild();
@@ -349,19 +349,19 @@ public class LevelManager : MonoBehaviour
  
 		// Return to level from cyberspace.
 		_playerReference.playerCapsule.transform.position = targetPosition;
-		currentLevel = levnum; // Set current level to be the new level
-		DisableAllNonOccupiedLevelsExcept(currentLevel);
+		CurrentLevel = levnum; // Set current level to be the new level
+		DisableAllNonOccupiedLevelsExcept(CurrentLevel);
 		DynamicCulling.camPositions = new Dictionary<GameObject, Vector3>();
 		System.GC.Collect();
 		System.GC.WaitForPendingFinalizers();
-		if (currentLevel == 2 && AutoSplitterData.missionSplitID == 0) {
+		if (CurrentLevel == 2 && AutoSplitterData.missionSplitID == 0) {
 			AutoSplitterData.missionSplitID++; // 1 - Medical split - we are now on level 2
 			Debug.Log("AutoSplitterData missionSplitID incremented: " + AutoSplitterData.missionSplitID.ToString());
 		}
 		
 		PostLoadLevelSetupSystems();
 		_lightDistanceCuller.Rebuild();
-		if (currentLevel != 13) {
+		if (CurrentLevel != 13) {
 			_dynamicCulling.Cull_Init();
 			System.GC.Collect();
 			System.GC.WaitForPendingFinalizers();
@@ -379,8 +379,8 @@ public class LevelManager : MonoBehaviour
 
 // 		Debug.Log("LevelManager LoadLevelFromSave()");
 		LoadLevelData(levnum); // Let this function check and load data if it isn't yet.
-		currentLevel = levnum; // Set current level to be the new level
-		DisableAllNonOccupiedLevelsExcept(currentLevel); // Unload last level.
+		CurrentLevel = levnum; // Set current level to be the new level
+		DisableAllNonOccupiedLevelsExcept(CurrentLevel); // Unload last level.
 		PostLoadLevelSetupSystems();
 	}
 
@@ -391,9 +391,9 @@ public class LevelManager : MonoBehaviour
 		_music.levelEntry = true;
 		_playerHealth.radiationArea = false;
 		_playerMovement.ladderState = 0;
-		LoadLevelData(currentLevel);
-		_automap.SetAutomapExploredReference(currentLevel);
-		_automap.automapBaseImage.overrideSprite = _automap.automapsBaseImages[currentLevel];
+		LoadLevelData(CurrentLevel);
+		_automap.SetAutomapExploredReference(CurrentLevel);
+		_automap.automapBaseImage.overrideSprite = _automap.automapsBaseImages[CurrentLevel];
 		_consts.ClearActiveAutomapOverlays(); // After other levels turned off.
 		_consts.ResetPauseLists();
 		SetSkyVisible(1);
@@ -496,12 +496,12 @@ public class LevelManager : MonoBehaviour
 
 		if (isNPC && par == npcContainer)
 		{
-			return currentLevel;
+			return CurrentLevel;
 		}
 
 		if (levelScript && par == levelScript.dynamicObjectsContainer)
 		{
-			return currentLevel;
+			return CurrentLevel;
 		}
 		
 		return -1;
@@ -527,9 +527,9 @@ public class LevelManager : MonoBehaviour
 
 	public int GetCurrentLevelSecurity() {
 		if (_consts.difficultyMission < 1) return 0;
-		if (!LevNumInBounds(currentLevel)) return 0;
+		if (!LevNumInBounds(CurrentLevel)) return 0;
 		if (superoverride) return 0; // tee hee we are SHODAN, no security blocks in place
-		return levelSecurity[currentLevel];
+		return levelSecurity[CurrentLevel];
 	}
 
 	// Typical level
@@ -538,30 +538,30 @@ public class LevelManager : MonoBehaviour
 	// 100% = 4x + 20y
 	// Assuming that a good camera percentage is 2-3%, CPU % would be about 10-15 each
 	public void ReduceCurrentLevelSecurity(SecurityType stype) {
-		if (!LevNumIsNonCyber(currentLevel)) return;
+		if (!LevNumIsNonCyber(CurrentLevel)) return;
 
 		float camScore = 4;
 		float nodeSmallScore = 10;
 		float nodeLargeScore = 27;
-		float secscoreTotal = (levelCameraCount[currentLevel] * camScore) + (levelSmallNodeCount[currentLevel] * nodeSmallScore) + (levelLargeNodeCount[currentLevel] * nodeLargeScore);
+		float secscoreTotal = (levelCameraCount[CurrentLevel] * camScore) + (levelSmallNodeCount[CurrentLevel] * nodeSmallScore) + (levelLargeNodeCount[CurrentLevel] * nodeLargeScore);
 		//secscoreTotal = 106 for medical level
 		float secDrop = camScore; // default to camScore
 		switch (stype) {
 			case SecurityType.None: return;
-			case SecurityType.Camera: secDrop = ((camScore/secscoreTotal) * 100); levelCameraDestroyedCount[currentLevel]++; break; // 1 camera divided by the total, so 2/ say (40+60) = 2/100 = 0.02, or 2% using the example numbers above
-			case SecurityType.NodeSmall: secDrop = ((nodeSmallScore/secscoreTotal) * 100); levelSmallNodeDestroyedCount[currentLevel]++; break;
-			case SecurityType.NodeLarge: secDrop = ((nodeLargeScore/secscoreTotal) * 100); levelLargeNodeDestroyedCount[currentLevel]++; break;
+			case SecurityType.Camera: secDrop = ((camScore/secscoreTotal) * 100); levelCameraDestroyedCount[CurrentLevel]++; break; // 1 camera divided by the total, so 2/ say (40+60) = 2/100 = 0.02, or 2% using the example numbers above
+			case SecurityType.NodeSmall: secDrop = ((nodeSmallScore/secscoreTotal) * 100); levelSmallNodeDestroyedCount[CurrentLevel]++; break;
+			case SecurityType.NodeLarge: secDrop = ((nodeLargeScore/secscoreTotal) * 100); levelLargeNodeDestroyedCount[CurrentLevel]++; break;
 		}
-		levelSecurity [currentLevel] -= (int)secDrop;
-		if (levelSecurity [currentLevel] < 0) levelSecurity [currentLevel] = 0;
-		if ((levelLargeNodeDestroyedCount[currentLevel] == levelLargeNodeCount[currentLevel]) && (levelSmallNodeDestroyedCount[currentLevel] == levelSmallNodeCount[currentLevel]) && (levelCameraDestroyedCount[currentLevel] == levelCameraCount[currentLevel])) {
-			levelSecurity[currentLevel] = 0;
+		levelSecurity [CurrentLevel] -= (int)secDrop;
+		if (levelSecurity [CurrentLevel] < 0) levelSecurity [CurrentLevel] = 0;
+		if ((levelLargeNodeDestroyedCount[CurrentLevel] == levelLargeNodeCount[CurrentLevel]) && (levelSmallNodeDestroyedCount[CurrentLevel] == levelSmallNodeCount[CurrentLevel]) && (levelCameraDestroyedCount[CurrentLevel] == levelCameraCount[CurrentLevel])) {
+			levelSecurity[CurrentLevel] = 0;
 		}
-		_consts.sprint(_consts.stringTable[306] + levelSecurity[currentLevel].ToString() + _consts.stringTable[307]);
+		_consts.sprint(_consts.stringTable[306] + levelSecurity[CurrentLevel].ToString() + _consts.stringTable[307]);
 
 		// Notify quest log if all nodes were destroyed
-		if (levelLargeNodeDestroyedCount[currentLevel] == levelLargeNodeCount[currentLevel]) {
-			if (_questLogNotesManager != null) _questLogNotesManager.NodesDestroyed(currentLevel);
+		if (levelLargeNodeDestroyedCount[CurrentLevel] == levelLargeNodeCount[CurrentLevel]) {
+			if (_questLogNotesManager != null) _questLogNotesManager.NodesDestroyed(CurrentLevel);
 		}
 	}
 
@@ -828,7 +828,7 @@ public class LevelManager : MonoBehaviour
 	public string Save() {
 		int i=0;
 		s1.Clear();
-		s1.Append(Utils.UintToString(LevelManager.currentLevel,"currentLevel"));
+		s1.Append(Utils.UintToString(LevelManager.CurrentLevel,"currentLevel"));
 		s1.Append(Utils.splitChar);
 		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(levelSecurity[i],"levelSecurity["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
 		for (i=0;i<14;i++) { s1.Append(Utils.UintToString(levelCameraDestroyedCount[i],"levelCameraDestroyedCount["+i.ToString()+"]")); s1.Append(Utils.splitChar); }
@@ -860,7 +860,7 @@ public class LevelManager : MonoBehaviour
 			return;
 		}
 
-		UnloadLevelNPCs(currentLevel);
+		UnloadLevelNPCs(CurrentLevel);
 		
 		var splitter = Convert.ToChar(SaveLoad.splitChar);
 		GameObject contnr = GetRequestedLevelNPCContainer(levNum);
@@ -945,7 +945,7 @@ public class LevelManager : MonoBehaviour
 	private void SaveStaticObjects()
 	{
 		var currentLevelData = levelScript;
-		var saveStringsStorage = StaticObjectsSaveStrings[currentLevel];
+		var saveStringsStorage = StaticObjectsSaveStrings[CurrentLevel];
 		saveStringsStorage.Clear();
 
 		SaveObjects(currentLevelData.staticObjectsSaveable);

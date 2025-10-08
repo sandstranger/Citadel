@@ -160,7 +160,7 @@ public class PlayerHealth : MonoBehaviour {
 			_mouseLookScript.DropHeldItem();
 			_mouseLookScript.ForceInventoryMode();
 		}	
-		int lindex = LevelManager.currentLevel != -1 ? LevelManager.currentLevel : 0;
+		int lindex = LevelManager.CurrentLevel != -1 ? LevelManager.CurrentLevel : 0;
 		hm.ClearOverlays();
 		if (_levelManager.ressurectionActive[lindex])
 			PlayerRessurect(); // Ressurection

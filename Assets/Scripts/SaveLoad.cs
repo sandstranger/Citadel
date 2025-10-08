@@ -169,7 +169,7 @@ public static class SaveLoad {
                    || ConsoleEmulator.ConstIndexIsNPC(constIndex)) {
 
             int saveID = Utils.GetIntFromString(entries[2],"SaveID");
-            GameObject container = levelManager.GetRequestedLevelDynamicContainer(LevelManager.currentLevel);
+            GameObject container = levelManager.GetRequestedLevelDynamicContainer(LevelManager.CurrentLevel);
 			GameObject newGO = consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,container,saveID);
 			PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(newGO,true);
 			if (newGO != null) SaveObject.Load(@const,levelManager,newGO,ref entries,lineNum,prefID);

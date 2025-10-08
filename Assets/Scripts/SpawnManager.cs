@@ -94,7 +94,7 @@ public class SpawnManager : MonoBehaviour {
 		if (spot.x == 0 && spot.y == 0 && spot.z == 0) return;
 
 		GameObject instGO = _consoleEmulator.SpawnDynamicObject(
-			index,LevelManager.currentLevel,false,null,-1
+			index,LevelManager.CurrentLevel,false,null,-1
 		);
 
 		if (instGO == null) {

@@ -699,7 +699,7 @@ public class Const : SingletonHelper<Const>
 		if (StartingNewGame)
 		{
 			StartingNewGame = false;
-			LevelManager.currentLevel = LevelManager.NewGameLevelIndex;
+			LevelManager.CurrentLevel = LevelManager.NewGameLevelIndex;
 			GoIntoGame();
 			_lightDistanceCuller.Rebuild();
 			ClearPrefabs(true);
@@ -710,7 +710,7 @@ public class Const : SingletonHelper<Const>
 		}
 		else if (LevelManager.LoadLevelAfterSceneChanges)
 		{
-			_levelManager.LoadLevel(LevelManager.currentLevel, LevelManager.TargetPosition, loadLevelForced: true);
+			_levelManager.LoadLevel(LevelManager.CurrentLevel, LevelManager.TargetPosition, loadLevelForced: true);
 		}
 	}
 	
@@ -1469,7 +1469,7 @@ CreateBlackTexture:
 	// - NewGameIndicator,  Game is no longer a new game, because it's started.
 	// - LoadGameIndicator, Game should have been loaded prior to entry.
 	public void GoIntoGame(Stopwatch loadTimer) {
-		_levelManager.LoadLevelData(LevelManager.currentLevel);
+		_levelManager.LoadLevelData(LevelManager.CurrentLevel);
 		Cursor.visible = true;
 		Utils.Deactivate(loadingScreen);
 		Utils.Deactivate(_mainMenuHandler.IntroVideo);
@@ -1548,7 +1548,7 @@ CreateBlackTexture:
 
 		var levelIndexFromSave = ReadLevelIndexFromSave(saveFileIndex);
 
-		if (levelIndexFromSave != LevelManager.currentLevel)
+		if (levelIndexFromSave != LevelManager.CurrentLevel)
 		{
 			_levelManager.ChangeGameScene(levelIndexFromSave);
 		}
@@ -1592,8 +1592,8 @@ CreateBlackTexture:
 		LevelManager.StaticObjectsSaveStrings.ResetSaveStrings();
 		var readFileList = ReadSave(saveFileIndex);
 		
-		_levelManager.UnloadLevelDynamicObjects(LevelManager.currentLevel,false); // Delete them all!
-		_levelManager.UnloadLevelNPCs(LevelManager.currentLevel); // Delete them all!
+		_levelManager.UnloadLevelDynamicObjects(LevelManager.CurrentLevel,false); // Delete them all!
+		_levelManager.UnloadLevelNPCs(LevelManager.CurrentLevel); // Delete them all!
 		loadPercentText.text = "Preparing level " + i.ToString();
 		yield return new WaitForSeconds(0.1f); // Update progress text.
 
@@ -1817,7 +1817,7 @@ CreateBlackTexture:
 					savID = Utils.GetIntFromString(entries[2],"SaveID");
 					bool isNpc = ConsoleEmulator.ConstIndexIsNPC(constdex);
 					bool isDynamicObject = ConsoleEmulator.ConstIndexIsDynamicObject(constdex);
-					bool levelExists = levID == LevelManager.currentLevel;
+					bool levelExists = levID == LevelManager.CurrentLevel;
 					bool saveObjectToStaticStrings = !isDynamicObject && !levelExists && i < (readFileList.Count - 1);
 
 					if (saveObjectToStaticStrings)
@@ -1831,7 +1831,7 @@ CreateBlackTexture:
 						SaveObject.Load(this,_levelManager,instGO,ref entries,i,prefID); // Load NPC.
 					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex) && !isNpc) {
 						// For DynamicObjects, if current level, go ahead and Instantiate new Prefabs, else add string to LevelManager's list for other levels.
-						if (levID == LevelManager.currentLevel) {
+						if (levID == LevelManager.CurrentLevel) {
 							contnr = _levelManager.GetRequestedLevelDynamicContainer(levID);
 							instGO = _consoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
 							PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
@@ -1864,7 +1864,7 @@ CreateBlackTexture:
 			
 			// OK we read in all the dynamic objects above into the savestrings
 			// list, now actaully instantiate them.
-			_levelManager.LoadLevelDynamicObjects(LevelManager.currentLevel);
+			_levelManager.LoadLevelDynamicObjects(LevelManager.CurrentLevel);
 			loadUpdateTimer.Stop();
 
 			_levelManager.npcsm.RepopulateChildList();
@@ -2022,7 +2022,7 @@ CreateBlackTexture:
 	}
 	
 	private void LockCPUScreenCode() {
-		switch (LevelManager.currentLevel) {
+		switch (LevelManager.CurrentLevel) {
 			case 1:
 				if (questData.lev1SecCodeLocked) return;
 

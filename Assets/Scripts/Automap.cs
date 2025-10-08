@@ -163,7 +163,7 @@ public class Automap : MonoBehaviour {
 		//automapLevelHomePositions[12] = new Vector2(  99.50f, 416.90f); // G4
 		//automapLevelHomePositions[13] = new Vector2(   0.00f,   0.00f);
 		initialized = true;
-		SetAutomapExploredReference(LevelManager.currentLevel);
+		SetAutomapExploredReference(LevelManager.CurrentLevel);
 	}
 
 	public void UpdateAutomap(Vector3 playerPosition) {
@@ -171,8 +171,8 @@ public class Automap : MonoBehaviour {
 		if (!initialized) Start();
 
 		if (inSideView) {
-			Utils.AssignImageOverride(automapSideLHImage,automapsSideImages[LevelManager.currentLevel]);
-			Utils.AssignImageOverride(automapSideRHImage,automapsSideImages[LevelManager.currentLevel]);
+			Utils.AssignImageOverride(automapSideLHImage,automapsSideImages[LevelManager.CurrentLevel]);
+			Utils.AssignImageOverride(automapSideRHImage,automapsSideImages[LevelManager.CurrentLevel]);
 			return;
 		} 
 		
@@ -200,9 +200,9 @@ public class Automap : MonoBehaviour {
 
 // 		if (automapUpdateFinished < _pauseScript.relativeTime) {
 			Utils.EnableImage(automapBaseImage);
-			if (LevelManager.currentLevel >= 0) {
+			if (LevelManager.CurrentLevel >= 0) {
 				Utils.AssignImageOverride(automapBaseImage,
-					automapsBaseImages[LevelManager.currentLevel]);
+					automapsBaseImages[LevelManager.CurrentLevel]);
 			}
 
 			float mapWidth = (Const.mapWorldMaxW - Const.mapWorldMaxE);
@@ -273,7 +273,7 @@ public class Automap : MonoBehaviour {
 
 				// Display hazards
 				for (int j=0;j<13;j++) {
-					if (j != LevelManager.currentLevel) {
+					if (j != LevelManager.CurrentLevel) {
 						Utils.DisableImage(automapsHazardOverlays[j]);
 						Utils.Deactivate(automapsHazardOverlays[j].gameObject);
 					} else {
@@ -309,7 +309,7 @@ public class Automap : MonoBehaviour {
 							&& tempVec2b.y < radiusSquared
 							&& (tempVec2b.x + tempVec2b.y) < radiusSquared) {
 							automapExplored[i] = true;
-							SetAutomapTileExplored(LevelManager.currentLevel,i);
+							SetAutomapTileExplored(LevelManager.CurrentLevel,i);
 							Utils.DisableImage(automapFoWTiles[i]);
 							Utils.Deactivate(automapFoWTiles[i].gameObject);
 						}
@@ -326,7 +326,7 @@ public class Automap : MonoBehaviour {
 	public void ActivateAutomapUI() {
 		Utils.EnableCamera(automapCamera);
 		Utils.Activate(automapCanvasGO);
-		ActivateLevelOverlayContainer(LevelManager.currentLevel);
+		ActivateLevelOverlayContainer(LevelManager.CurrentLevel);
 	}
 
 	public void DeactivateAutomapUI() {
@@ -485,8 +485,8 @@ public class Automap : MonoBehaviour {
 		automapNormalPlayerIconGORH.SetActive(false);
 		automapSideLH.SetActive(true);
 		automapSideRH.SetActive(true);
-		Utils.AssignImageOverride(automapSideLHImage,automapsSideImages[LevelManager.currentLevel]);
-		Utils.AssignImageOverride(automapSideRHImage,automapsSideImages[LevelManager.currentLevel]);
+		Utils.AssignImageOverride(automapSideLHImage,automapsSideImages[LevelManager.CurrentLevel]);
+		Utils.AssignImageOverride(automapSideRHImage,automapsSideImages[LevelManager.CurrentLevel]);
 	}
 
 	public void AutomapGoTop() {
@@ -619,7 +619,7 @@ public class Automap : MonoBehaviour {
 		for (j=0;j<4096;j++) { amp.automapExploredG1[j] = Utils.GetBoolFromString(entries[index],"automapExploredG1[" + j.ToString() + "]"); index++; }
 		for (j=0;j<4096;j++) { amp.automapExploredG2[j] = Utils.GetBoolFromString(entries[index],"automapExploredG2[" + j.ToString() + "]"); index++; }
 		for (j=0;j<4096;j++) { amp.automapExploredG4[j] = Utils.GetBoolFromString(entries[index],"automapExploredG4[" + j.ToString() + "]"); index++; }
-		amp.SetAutomapExploredReference(LevelManager.currentLevel);
+		amp.SetAutomapExploredReference(LevelManager.CurrentLevel);
 
 		amp.currentAutomapZoomLevel = Utils.GetIntFromString(entries[index],"currentAutomapZoomLevel"); index++;
 		if (amp.currentAutomapZoomLevel < 0) amp.currentAutomapZoomLevel = 0;
