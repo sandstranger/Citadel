@@ -21901,16 +21901,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 8900283260180457697}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfb4d413de9f1d541915329635c9f2bc, type: 3}
+  m_Script: {fileID: 11500000, guid: 946c0a34555a28e438f5da3cf715cd1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartObject: {fileID: 4768737362430660722}
+  StartObject: {fileID: 0}
   StartPosition: {x: 0, y: 0, z: 0}
-  EndObject: {fileID: 3117697646103728103}
+  EndObject: {fileID: 0}
   EndPosition: {x: 0, y: 0, z: 0}
   Generations: 6
-  Duration: 0.411
-  ChaosFactor: 0.39
+  Duration: 0.05
+  ChaosFactor: 0.15
   ManualMode: 0
   Rows: 1
   Columns: 1
