@@ -1,5 +1,4 @@
-Assets/Resources/Prefabs/Levels/** filter=lfs diff=lfs merge=lfs -text
-"Assets/Scenes/0-ReactorLevelScene/**" filter=lfs diff=lfs merge=lfs -text
+Assets/Scenes/0-ReactorLevelScene/**" filter=lfs diff=lfs merge=lfs -text
 "Assets/Scenes/1-MedicalLevelScene/**" filter=lfs diff=lfs merge=lfs -text
 "Assets/Scenes/2-ScienceLevelScene/**" filter=lfs diff=lfs merge=lfs -text
 "Assets/Scenes/3-MaintenanceLevelScene/**" filter=lfs diff=lfs merge=lfs -text
@@ -13,6 +12,7 @@ Assets/Resources/Prefabs/Levels/** filter=lfs diff=lfs merge=lfs -text
 "Assets/Scenes/11-BetaGroveLevelScene/**" filter=lfs diff=lfs merge=lfs -text
 "Assets/Scenes/12-DeltaGroveLevelScene/**" filter=lfs diff=lfs merge=lfs -text
 "Assets/Scenes/13-CyberspaceLevelScene/**" filter=lfs diff=lfs merge=lfs -text
+"Assets/Prefabs/Levels/**" filter=lfs diff=lfs merge=lfs -text
 Assets/Scenes/** !text !filter !merge !diff
 Assets/Prefabs/Levels/** !text !filter !merge !diff
 Assets/Resources/** !text !filter !merge !diff

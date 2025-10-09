@@ -301,6 +301,20 @@
       "dependencies": {},
       "hash": "d741912bfeaad8da4fe0f258f4f3eefe1fe7b3f3"
     },
+    "com.yasirkula.inspectplus": {
+      "version": "https://github.com/yasirkula/UnityInspectPlus.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "160da9f371f8fd02ea2b24acdb8e86bc6c627f20"
+    },
+    "com.yasirkula.simplefilebrowser": {
+      "version": "https://github.com/yasirkula/UnitySimpleFileBrowser.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "bce53b258059a5e6563e0be233f804a4f189649e"
+    },
     "com.yvesalbuquerque.autolod": {
       "version": "file:com.yvesalbuquerque.autolod",
       "depth": 0,
@@ -312,6 +326,13 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
+    },
+    "jp.co.cyberagent.smartaddresser": {
+      "version": "https://github.com/CyberAgentGameEntertainment/SmartAddresser.git?path=/Assets/SmartAddresser",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "5e8db1f7ed9831f0ce6e9a3dcd713ae2e63fe901"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",

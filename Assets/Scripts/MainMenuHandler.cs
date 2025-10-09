@@ -810,7 +810,7 @@ public class MainMenuHandler : MonoBehaviour {
 		// Initial path: default (Documents), Title: "Load File", submit button
 		// text: "Load"
 		fileBrowserOpen = true;
-		yield return FileBrowser.WaitForLoadDialog(true,false,
+		yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Folders,false,
 												   System.String.Empty,
 												   "Select Path","Select");
 		

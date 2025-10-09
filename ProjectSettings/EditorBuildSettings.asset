@@ -47,5 +47,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/13-CyberspaceLevelScene.unity
     guid: d336c0bea0dc59045ba67b106bf26a59
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.addressableassets: {fileID: 11400000, guid: a321debf06dcf2049b49e159f05665ca,
+      type: 2}
   m_UseUCBPForAssetBundles: 0
