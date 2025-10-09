@@ -20,11 +20,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 5f51e0b22aa8cb84b9f422576ce87ff9
-    m_Address: Packages/com.unity.postprocessing/PostProcessing/Gizmos/PostProcessLayer.png
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 76d76b9a7d71f0d45b349ef83b5d0e18
     m_Address: Assets/Settings/NewCitadelPPStack.asset
     m_ReadOnly: 0
