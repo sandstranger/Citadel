@@ -1,0 +1,233 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Materials
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Materials
+  m_GUID: cd1c31a672d1b3d46999afc4e5028dbd
+  m_SerializeEntries:
+  - m_GUID: 00c8328353e3dba449b5e3855add5a35
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_debug_view_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04c3480675e29a340808141e68d4cc8b
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr2_compute_luminance_pyramid_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0731dfbd04968084582397e48795d9d8
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_autogen_reactive_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0ac3112d79ef65e4eb6f4787ffe37fdd
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_prepare_reactivity_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 10b66892c68bbe1408580a330cccb381
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_luma_pyramid_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 15c74efa821aaf3429f92b8d5d9901d5
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr2_autogen_reactive_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 20b7864a7e7258946aaf0f1996febad3
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr2_lock_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 20e44016ed34b0d4b8de499d1b566c69
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_prepare_reactivity_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 251e663738905fa4d8817001682d802f
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_shading_change_pyramid_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2587b11e2d882c649ac7fd1a51f6dc8c
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr2_accumulate_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 28932314459baa6449098e1b5862470c
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_accumulate_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 38a518d5929d9134096f87f66f59a285
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr2_depth_clip_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ce00ba677bb7e14bb91772fd68bfe6b
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr_unity_common.cginc
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e953864b9b462f468b64a78463b84aa
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_rcas_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40815651f0f5d994cb73da9816a7ff9b
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr2_rcas_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 43f9d03e57211f8478e3388eecb8d5f8
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr2_rcas_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f59e5b9179d74844ae06a30ae1e0629
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_prepare_inputs_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 503052090415bdf4c9307ea6c5aa94b6
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_shading_change_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5060dfafe45aa67459629186ceb7464e
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr2_reconstruct_previous_depth_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5716b91fdaa4e9e439df6b96a796fe6e
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_autogen_reactive_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 630d959ddf3e02e4087e181b7d7cd7ed
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr2_compute_luminance_pyramid_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 660a3ee04f28e0a4a97dc5831c5a1de3
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/Shaders
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 67ee1b32ca5e4234db9f06984c783dee
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr2_autogen_reactive_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 68eed10cb1a8742438be0ba0c08d5b05
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_luma_instability_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6918056eedf3346e3aeb681fac20c458
+    m_Address: Assets/Shaders
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 75cdc6ef23f08ed498d4da511923fcea
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_tcr_autogen_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7aaf5cfff022de2499e9b0412f947f6c
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_rcas_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7e791d69a5be98247a93b63897bc64df
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr2_accumulate_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 877b3428f6073db41b9fc80bb6c6d4d7
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_tcr_autogen_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8a6fef31a72aae649803d98a0ced428d
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_shading_change_pyramid_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9a2bff2f97619ed4989d9b0577ba0641
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_shading_change_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a135306e6d1857e43a86ef20db2a47fe
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_luma_instability_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b207de122e2c4b844b89dcd7c5c77c80
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr2_depth_clip_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c3bf93953aee91541a1be089c2ed268f
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr2_lock_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c7220f38e87579a4788ddaabba0a6d97
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr2_reconstruct_previous_depth_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c9b45f0ae7673694ba57a4aadfe212e9
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_accumulate_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cb24a71d54164c54eb5e86839acd48c5
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_debug_view_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d253be05abcdc80428503d3e4cce3a36
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr3upscaler_luma_pyramid_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d96e2a0e75dd01d47a231e3c4d18be0c
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr2_tcr_autogen_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f6bb10da6010f8a479c9560de12f92f2
+    m_Address: Packages/fidelityfx.fsr/Shaders/shaders/ffx_fsr3upscaler_prepare_inputs_pass.hlsl
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8b1c27fb6a544b43b38903592240500
+    m_Address: Packages/fidelityfx.fsr/Shaders/ffx_fsr2_tcr_autogen_pass.compute
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fc8ebf6cbb52b944fb25215e8c1540da
+    m_Address: Assets/Materials
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 0aad2faf696034840b67a839e253afb2, type: 2}
+    - {fileID: 11400000, guid: 42a9e13959c79b443ad8417cacdf9eb2, type: 2}

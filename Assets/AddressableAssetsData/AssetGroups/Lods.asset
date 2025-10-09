@@ -15,8 +15,8 @@ MonoBehaviour:
   m_GroupName: Lods
   m_GUID: a1f066f256a50a4439c71f0cc6b9cfcf
   m_SerializeEntries:
-  - m_GUID: 5fa285b5caff2e5428f87d143bee6d10
-    m_Address: Assets/Meshes
+  - m_GUID: f6e2e3e5b8348f141bc699ae9aa8750d
+    m_Address: Assets/Meshes/Lods
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

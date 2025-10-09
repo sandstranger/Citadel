@@ -186,7 +186,7 @@ inline UnityGI FragmentGI (FragmentCommonData s, half occlusion, half4 i_ambient
     d.worldPos = s.posWorld;
     d.worldViewDir = -s.eyeVec;
     d.atten = atten;
-    #if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
+    #if defined(LIGHTMAP_ON)
         d.ambient = 0;
         d.lightmapUV = i_ambientOrLightmapUV;
     #else
@@ -473,9 +473,6 @@ VertexOutputDeferred vertDeferred(VertexInput v) {
         ambientOrLightmapUV.xy = v.uv1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
     #elif UNITY_SHOULD_SAMPLE_SH
         ambientOrLightmapUV.rgb = ShadeSHPerVertex(normalWorld, ambientOrLightmapUV.rgb);
-    #endif
-    #ifdef DYNAMICLIGHTMAP_ON
-        ambientOrLightmapUV.zw = v.uv2.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
     #endif
     o.ambientOrLightmapUV = ambientOrLightmapUV; // Single final write
     return o;

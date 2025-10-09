@@ -10,23 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Materials
+  m_Name: Animations
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
-  m_GroupName: Materials
-  m_GUID: cd1c31a672d1b3d46999afc4e5028dbd
+  m_GroupName: Animations
+  m_GUID: dd550d2f678b37f40ba6d67098ca1cd2
   m_SerializeEntries:
-  - m_GUID: 660a3ee04f28e0a4a97dc5831c5a1de3
-    m_Address: Packages/com.unity.postprocessing/PostProcessing/Shaders
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6918056eedf3346e3aeb681fac20c458
-    m_Address: Assets/Shaders
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fc8ebf6cbb52b944fb25215e8c1540da
-    m_Address: Assets/Materials
+  - m_GUID: 98b6d193c5ce0f147ac59f4a6a9b7924
+    m_Address: Assets/Animations
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -34,5 +24,5 @@ MonoBehaviour:
   m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 0aad2faf696034840b67a839e253afb2, type: 2}
-    - {fileID: 11400000, guid: 42a9e13959c79b443ad8417cacdf9eb2, type: 2}
+    - {fileID: 11400000, guid: 05d81feec7cda3e46ba2ec8ebce0bfe3, type: 2}
+    - {fileID: 11400000, guid: 564d69ad694bf794f84c594540949790, type: 2}

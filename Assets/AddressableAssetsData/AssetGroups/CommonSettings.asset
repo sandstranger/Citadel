@@ -25,6 +25,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d82512f9c8e5d4a4d938b575d47f88d4
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/PostProcessResources.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
   m_SchemaSet:

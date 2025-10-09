@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 24b88d72a65f71b4ca4f3b8fd7090164
   m_SerializeEntries:
   - m_GUID: 8435ed5a2532633418ac20ccc8eb3606
-    m_Address: Assets/Models
+    m_Address: Assets/Meshes/Models
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
