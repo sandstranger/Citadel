@@ -1,0 +1,26 @@
+{
+    "addressRuleErrors": [
+        {
+            "addressRuleId": "efd7bca2-386c-42fc-8243-3765b65df2b1",
+            "addressableAssetGroupGuid": "bf91a85ea39b209419d87aeba49f8174",
+            "addressableAssetGroupName": "CommonPrefabs",
+            "assetGroupErrors": [
+                {
+                    "assetGroupId": "35947b31-2517-45aa-931a-c6eac4794221",
+                    "assetGroupName": "Default Asset Group",
+                    "assetFilterErrors": [
+                        {
+                            "assetFilterId": "1a7f33d2-b27b-4dc3-9822-1944beb824e0",
+                            "assetFilterTypeName": "ObjectBasedAssetFilter",
+                            "errorMessages": [
+                                "There are null reference objects."
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "labelRuleErrors": [],
+    "versionRuleErrors": []
+}

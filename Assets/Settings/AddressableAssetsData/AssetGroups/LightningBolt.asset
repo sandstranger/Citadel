@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: LightningBolt
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: LightningBolt
+  m_GUID: 7e6c153c43cfb5b479c614231972064b
+  m_SerializeEntries:
+  - m_GUID: 2736bbc2f2c78a949957b0719c2992bd
+    m_Address: Assets/Plugins/LightningBolt/SimpleLightningBoltAnimatedPrefab.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7d93c1d55d3ebab4c9990e187b7d6d30
+    m_Address: Assets/Plugins/LightningBolt/Textures
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a9892f6a83fd8d4468ce0c8a3d09d3cd
+    m_Address: Assets/Plugins/LightningBolt/SimpleLightningBoltPrefab.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be0b7488e7fc09f40a96c106df4d461a
+    m_Address: Assets/Plugins/LightningBolt/LightningBoltMaterialAlphaBlend.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: db99378546970474d8e54ba6db10a9c4
+    m_Address: Assets/Plugins/LightningBolt/LightningBoltMaterialAnimatedAdditive.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e06ba9469eab2774f8c96527e1f9982e
+    m_Address: Assets/Plugins/LightningBolt/LightningBoltMaterialAdditive.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: d333f87fa1d60534c81199b9bc18964b, type: 2}
+    - {fileID: 11400000, guid: 5fc6b1baabe847740a97d2d63058094f, type: 2}

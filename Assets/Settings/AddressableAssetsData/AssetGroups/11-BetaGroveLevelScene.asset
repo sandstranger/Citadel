@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: 11-BetaGroveLevelScene
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: 11-BetaGroveLevelScene
+  m_GUID: 01ffe8ed5697760429fa9475206fab1d
+  m_SerializeEntries:
+  - m_GUID: 6d6e41b207222834fbdbb55a0a4edcc5
+    m_Address: Assets/Scenes/11-BetaGroveLevelScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 89b05e37eb27b6342a94e430ebb98704
+    m_Address: Assets/Scenes/11-BetaGroveLevelScene
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a12aeabf6233d7546aa2647d2f6f2d37
+    m_Address: Assets/Prefabs/Levels/Level_11
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 5e58337e0b8833247b7a65f33007da2e, type: 2}
+    - {fileID: 11400000, guid: 31446f9751c2fed42bf622e81bd554f0, type: 2}

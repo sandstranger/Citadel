@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: 3-MaintenanceLevelScene
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: 3-MaintenanceLevelScene
+  m_GUID: 3146e91d1fbed344ea08621c1354a5cb
+  m_SerializeEntries:
+  - m_GUID: 436787479f4cc514eaabab19caf081ed
+    m_Address: Assets/Prefabs/Levels/Level_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6613fe940626dfc4db900eb0fcdc98c3
+    m_Address: Assets/Scenes/3-MaintenanceLevelScene
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e3163167267d6a46bfb6adcf455e1e9
+    m_Address: Assets/Scenes/3-MaintenanceLevelScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 25cae796e7f0c3548ab003a03c1ba430, type: 2}
+    - {fileID: 11400000, guid: e92798dce2dac794090d397ac54a8d41, type: 2}

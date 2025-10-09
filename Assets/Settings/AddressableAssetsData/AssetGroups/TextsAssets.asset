@@ -15,8 +15,753 @@ MonoBehaviour:
   m_GroupName: TextsAssets
   m_GUID: dc8e3ab7c220ade4d86a319dbdb818ca
   m_SerializeEntries:
-  - m_GUID: 206ea66f930125f46932a643f81ae76f
-    m_Address: Assets/TextsAssets
+  - m_GUID: 0061b68bb27109731827c34dedc44632
+    m_Address: CitadelScene_staticssaveable_level1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 009c507869a67e74a9f8f1ab5d736fb4
+    m_Address: CitadelScene_lightssaveable_level6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 029f13ebcf142569f8f9bb0f08073159
+    m_Address: text_english.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 03896a7d4f4ed6464b463c405ad5d33d
+    m_Address: CitadelScene_dynamics_level8.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 055e59752c23adcce92d615cbe9dd43f
+    m_Address: CitadelScene_lights_level5.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 06051bad5df6a801abf796f26ff0e964
+    m_Address: logs_text_nihongo.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 072df5bb3456097deb3328c241949e14
+    m_Address: sav2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 07344d259f9d727f58c893ff7b296e7d
+    m_Address: CitadelScene_dynamics_level5.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a2e42ad1d56fd7d7927cb9b3d9cc75d
+    m_Address: CitadelScene_geometry_level6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0c67a14d85c35fd9099789cae8077525
+    m_Address: CitadelScene_lights_level3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 123e7267d46a9d0c8acaede283408df1
+    m_Address: CitadelScene_staticssaveable_level11.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 13309ed5a98f191329624e1ebb4e31b3
+    m_Address: CitadelScene_staticssaveable_level8.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1417b869bb60a914f93b0470e6541535
+    m_Address: SystemShockText_20150802.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1a39ecd19f1f4b4359c78d3c4ced84e0
+    m_Address: CitadelScene_npcs_level7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1ad5dd0113981d80381cb2ccb5edb2d6
+    m_Address: CitadelScene_staticobjects_level0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c1c5cfc2a762b5198436b131a5f4000
+    m_Address: logs_text_espanol.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1d89c946b2f07f4468bb62f4c1b8e2d1
+    m_Address: sav4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 20300c102f473b7f7854d8ab6a3c03c5
+    m_Address: CitadelScene_staticssaveable_level7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2112714f51e6626958578bbc32ee68f1
+    m_Address: CitadelScene_dynamics_level4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 213e88ccef41ce84ab39612d4ec1a253
+    m_Address: sav7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21a9973aff9976ee09092a4f867d923f
+    m_Address: CitadelScene_doors_level2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2263b2d93e8f204ff8b4e24e68503564
+    m_Address: damage_tables.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24b612b185db1f4cc892b5651dbfae71
+    m_Address: CitadelScene_dynamics_level13.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24c392b17a021ef7aba987c14456ef2c
+    m_Address: CitadelScene_doors_level10.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 26ab212ec6fcdde92b2eaf8d76e28422
+    m_Address: CitadelScene_lightssaveable_level7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 270acf559614fd16bb4e0ee09e63ad7e
+    m_Address: CitadelScene_lights_level4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2817e62a3f54d7ec5ae7331dcbd0f2c2
+    m_Address: CitadelScene_staticssaveable_level4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2e12e1fa503d69f3a9e184b7beac4e52
+    m_Address: CitadelScene_geometry_level11.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2efc61509f55fe31db971fb91c581fe2
+    m_Address: credits.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31111670ada0df319ad6f2622302b1b4
+    m_Address: CitadelScene_dynamics_level10.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 344053ab74c1f7100b830a2168f7cf79
+    m_Address: CitadelScene_npcs_level3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 36896fe2f00ed1098a69f005ee69d94f
+    m_Address: CitadelScene_staticssaveable_level9.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 36945d2a8070324aa888d1c523ae5628
+    m_Address: CitadelScene_lightssaveable_level3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 374d56bc3b0d14c608880242b4698d2b
+    m_Address: CitadelScene_doors_level7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3790a36563568d900be4ba56a0bb64c5
+    m_Address: logs_text_italiano.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 394102ce8e1e5c53ebce63be6814b76a
+    m_Address: CitadelScene_doors_level9.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3a696422c506e9b95bc050e4fa39cd4f
+    m_Address: CitadelScene_geometry_level2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ab684102e0d0418fbc4d9fea8765e2f
+    m_Address: CitadelScene_doors_level5.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d4a5e2ab241ea4f59a954e647117b4f
+    m_Address: CitadelScene_lightssaveable_level13.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3df068d68f046c19e9db81a922d5b048
+    m_Address: CitadelScene_staticobjects_level7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e4acfbba90a7bfb49c74a960295360e
+    m_Address: CitadelScene_lightssaveable_level2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 44e601cf00296013fb504ddad4fe9ee1
+    m_Address: CitadelScene_staticobjects_level12.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 451c5d9ec54a3effe850a20609f23079
+    m_Address: enemy_tables.csv
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 452bf3ddd9e05620ca7bfda90d14dc30
+    m_Address: CitadelScene_staticobjects_level4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 48eebab7f041c22fe9e7da9c2964d1ac
+    m_Address: CitadelScene_geometry_level12.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4917886e4b40f284f861e146f6e85861
+    m_Address: texture_derivation_hierarchy.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4ae532ed4aafad80eb449185e78d33fd
+    m_Address: CitadelScene_dynamics_level12.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50147f6abf72729adb8bd59a1f1adf3b
+    m_Address: CitadelScene_geometry_level10.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50ec1d1922110ae929c901983647156c
+    m_Address: text_nihongo.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5156cf618d45b4554a769b13a5f3ee78
+    m_Address: logs_text_portugues.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 519f18700cf93de4f9ecd41c49199318
+    m_Address: CitadelScene_dynamics_level2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 51a6fec9610b59e448f835ea17f9c731
+    m_Address: CitadelScene_doors_level3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53ac83263f22d4f0e84480b0f4584cb7
+    m_Address: CitadelScene_staticssaveable_level0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55235777d11559cfa81bdf77786dcdc7
+    m_Address: CitadelScene_lightssaveable_level12.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55664acdf2b64544397c4d6d06043860
+    m_Address: CitadelScene_lights_level11.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55df7bb0f2db55420b1f39f841028937
+    m_Address: CitadelScene_staticssaveable_level2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5670bfa10a60e5b7994d34591bbc775b
+    m_Address: CitadelScene_lightssaveable_level11.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 56e0b5b9f94ba2a81a6146da379f136a
+    m_Address: CitadelScene_staticobjects_level1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 57a976096c475f6e8ab848e39bd116f0
+    m_Address: CitadelScene_doors_level13.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5ee0c01d6adb0a43f8930f19e8912d9a
+    m_Address: CitadelScene_geometry_level4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5fdde435e16fe5a4fb303517f0027017
+    m_Address: CitadelScene_staticobjects_level9.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 60f12b0b23e02f737844f023b3caf0be
+    m_Address: CitadelScene_doors_level6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 62669f58affcd9c71ad1bef655f5f9b1
+    m_Address: CitadelScene_npcs_level4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6426315de2e6908ff8a3e119918d9e99
+    m_Address: CitadelScene_dynamics_level7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 652c91550153967c9883e50f024bad11
+    m_Address: CitadelScene_npcs_level5.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 66e52ada781b773a288a5d6598de0a0b
+    m_Address: CitadelScene_staticobjects_level2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 67b3098bfff3be5bca1e1083471897f9
+    m_Address: text_deutsch.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 692de1e409efc9f7086b6a7a33286946
+    m_Address: CitadelScene_lights_level10.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6a463ceab5bd972aaa5f44cd3416c0e0
+    m_Address: sav1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6bcad5105b4b8859585c46d010c81672
+    m_Address: CitadelScene_npcs_level11.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6cdfb3b0e8513f68d8b97432119ea880
+    m_Address: CitadelScene_npcs_level1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e10f38aea3c3611d91db2944e7d1b1c
+    m_Address: text_italiano.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e14ef55a9248252fbfdcca2757f4994
+    m_Address: CitadelScene_lightssaveable_level8.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 71a3033ba34b1c3488c55560ddcdc6e4
+    m_Address: MedipatchCheatSheet.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 728ae6837e9ad6da8982744cbff676ac
+    m_Address: CitadelScene_lightssaveable_level5.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 737127769191ad4f38de4e4f523b21cb
+    m_Address: CitadelScene_npcs_level8.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 74ca5bbc894884b19922b203911a10b1
+    m_Address: CitadelScene_npcs_level12.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7662177c367444e4aa3284e5770326ce
+    m_Address: CitadelScene_staticssaveable_level3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 77158181f5294692db8ea4933389d600
+    m_Address: CitadelScene_geometry_level5.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78252e8e6bfe55c47b0d2d8a6dc363a1
+    m_Address: ElevatorCheetSheet.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7bd1a0b06327b561182d8a56eddd7b8f
+    m_Address: CitadelScene_lights_level6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7e22ea9daa87cca70aac36523616f5bf
+    m_Address: CitadelScene_staticobjects_level8.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7ef097dd33b25fdceaf330a755c0a3e0
+    m_Address: CitadelScene_doors_level1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7f99879878a378b5e9a3514f9f0ade9b
+    m_Address: CitadelScene_dynamics_level3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 847508d23d8566914963eeb8d8791670
+    m_Address: CitadelScene_doors_level11.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 867bd07a561801020a3b5b555c5c4a19
+    m_Address: text_russkiy.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 872c4fd9ab806816781720b101f6d127
+    m_Address: sav5.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8a5654b35518cfd5d9858e7edae96f09
+    m_Address: CitadelScene_lights_level0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8add505c5a9dcc9a184cca818ace7b19
+    m_Address: CitadelScene_geometry_level8.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8bd80c83a827e549d9f164c5645554b4
+    m_Address: logs_text_deutsch.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8f489d72be978fee59d969dda3fd60e3
+    m_Address: CitadelScene_dynamics_level6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 902dfa65f5df94b52b7af208b4a890f5
+    m_Address: CitadelScene_staticssaveable_level12.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 910f932e280fdca8a8729cce750989cf
+    m_Address: CitadelScene_geometry_level3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 92481c94376935817b651d012dedd298
+    m_Address: sav6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9342e17708c89a360b5a64e912f3e0d8
+    m_Address: CitadelScene_staticssaveable_level13.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 945bdbaab3b12140ebe799a027f76e58
+    m_Address: CitadelScene_staticobjects_level10.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9a7fe21e9531727688571b7e26d3f30c
+    m_Address: logs_text_francais.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9afc3a4340e3dcb1993bfe6354fe794c
+    m_Address: CitadelScene_lights_level13.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9c0e424fb5be2d71a8f69c5259bf9b2d
+    m_Address: CitadelScene_doors_level4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f06e1a9ed1df30e78d4468b130a75df
+    m_Address: CitadelScene_staticobjects_level6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a4b2fe9d458185741aee7aa4ab978170
+    m_Address: text_portugues.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a74ff8cd0448e33cea01e41a89518f68
+    m_Address: CitadelHierarchyCounts.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7586b2c4d599e659bd74479c4d9fe12
+    m_Address: CitadelScene_staticobjects_level11.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a90c4f16638c76468b4c799608dd5583
+    m_Address: CitadelScene_staticobjects_level13.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aa1e0bd70c6c38223a715db49ee7acd5
+    m_Address: CitadelScene_npcs_level13.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ab0cddc3dd8370c4d8936992b6beda77
+    m_Address: CitadelScene_lightssaveable_level0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aca21396d7ad63f0f98f0dfd14518b84
+    m_Address: text_francais.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad08b03af4c9c0e6593771d440e080b0
+    m_Address: CitadelScene_lights_level7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad5a5917c5626f0dcbec488c911dc96c
+    m_Address: CitadelScene_lightssaveable_level10.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: adb8c1df75b1a69d98690e3946b26f7c
+    m_Address: CitadelScene_staticssaveable_level5.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: adc1949d6b3259dbe82f77a8ec06f569
+    m_Address: CitadelScene_dynamics_level1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ae839b03d4038fb328115042290bced1
+    m_Address: CitadelScene_dynamics_level9.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b00fb8cd171dac2c697a84ddf4f15d28
+    m_Address: CitadelScene_npcs_level10.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b0757454bab559c1583d770511217a90
+    m_Address: CitadelScene_staticssaveable_level10.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b0fd06409b81e80559eccad6d9b86066
+    m_Address: sav3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1a2daeda3224975f94a150ca3a1a86b
+    m_Address: CitadelScene_staticssaveable_level6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b281ae9fa29100e16ada89e65d064027
+    m_Address: CitadelScene_lights_level12.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b497d87acbe140b90b86d887efc6eb67
+    m_Address: CitadelScene_npcs_level2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b9e46eee423b8fc7ba9610edf6d880ef
+    m_Address: CitadelScene_geometry_level13.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bab84ba79a47a75bb842e8bce734275e
+    m_Address: CitadelScene_geometry_level9.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bba0e3fef82b92b638762c5bbf918fb8
+    m_Address: ng.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc94df444503dafbda446b2e972fe307
+    m_Address: CitadelScene_dynamics_level11.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bdcb4d7798a59701ca11bac7ad4952d1
+    m_Address: logs_text_english.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf36ad4ad3b8380a5893eec88efc7728
+    m_Address: text_espanol.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bfed383dd85c3f192906c73e19e3e4b6
+    m_Address: CitadelScene_geometry_level1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c4533fa8d587456358ffdb68a51a42b2
+    m_Address: CitadelScene_lightssaveable_level4.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c89e2e788d362830fa436e68a41274d4
+    m_Address: CitadelScene_doors_level0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cb081eca5e9b74d8ab622e22f6ee0a2e
+    m_Address: enemy_tables.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d00fbfb751cb07ffc9201adbd6891d1f
+    m_Address: CitadelScene_lightssaveable_level9.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0ef46ee5ee1464a48dcb500cec03662
+    m_Address: logs_text.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d5fa05b29d45e16999bdd09593f7dc77
+    m_Address: CitadelScene_dynamics_level0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d88e006c39f263bf1b4dc324cff31ef2
+    m_Address: introdone.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da5ab64e53b9bee1ba21c6214d85c7a6
+    m_Address: CitadelScene_geometry_level0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ddfc7a6ea5c8d2866beb63366665df36
+    m_Address: CitadelScene_lightssaveable_level1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: de1bc849934d712b7814d441475b13f5
+    m_Address: sav0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e3000b824191d640489fd1e55c19c1d6
+    m_Address: CitadelScene_geometry_level7.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e31ce80835e01c93685984c94937f68b
+    m_Address: CitadelScene_lights_level1.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e3ab478232fdff30e931f59f70e2982f
+    m_Address: CitadelScene_doors_level12.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef5068bddee9155ccbaeb0e602d285f3
+    m_Address: CitadelScene_lights_level2.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f171d1569fda93967b600094fb44268b
+    m_Address: CitadelScene_lights_level9.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f21c4fa2cc5114e1180b21d185a97698
+    m_Address: Config.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2a0bf75b2c8d55388669151ea0c5036
+    m_Address: CitadelScene_doors_level8.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f30ce2b429a081f678a734cb13d71e59
+    m_Address: CitadelScene_npcs_level9.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f3fca4a83daa5040aa04e950d8f8121c
+    m_Address: CitadelScene_npcs_level6.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4abdb3b9d242455f990daf0f1ec1082
+    m_Address: autosplitter_info.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f763fc27a614d2d7ca9875783f265b17
+    m_Address: logs_text_russkiy.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f825fe1be43700976a0917bd28109175
+    m_Address: CitadelScene_npcs_level0.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9d6766bc42479566abad75794629b05
+    m_Address: CitadelScene_staticobjects_level3.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fe25af4fbd64e1ef69f056800b856534
+    m_Address: CitadelScene_lights_level8.txt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: feef0432cfd0b7908a9be7e6676b4d70
+    m_Address: CitadelScene_staticobjects_level5.txt
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

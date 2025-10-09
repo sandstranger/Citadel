@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: 2-ScienceLevelScene
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: 2-ScienceLevelScene
+  m_GUID: 9eb95e5be1f59d4458cff32bdf607c66
+  m_SerializeEntries:
+  - m_GUID: 92093b59a573aae43bc8ee130c480cc8
+    m_Address: Assets/Prefabs/Levels/Level_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aeb85ee3b0182f448b66b5a15105f7b2
+    m_Address: Assets/Scenes/2-ScienceLevelScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b08c85f365797cf42bb879d4f6a3ea65
+    m_Address: Assets/Scenes/2-ScienceLevelScene
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 82e43c3288b3cd1439b0ec2795a1c563, type: 2}
+    - {fileID: 11400000, guid: 189ad3c4db38d854c8165ec4e217a123, type: 2}

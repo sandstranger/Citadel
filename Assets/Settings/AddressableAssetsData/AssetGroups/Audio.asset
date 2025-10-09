@@ -1,0 +1,98 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Audio
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Audio
+  m_GUID: c64d2dd62e537de4aa843cc1082aae34
+  m_SerializeEntries:
+  - m_GUID: 2d44a837c7ecddc48a8fd9770560ef14
+    m_Address: Assets/Audio/weapons
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2e84544357c3e2240a37defe6f9f77c8
+    m_Address: Assets/Audio/buttons
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40bd8b1625c884b4cbc337ff96e1a198
+    m_Address: Assets/Audio/shodan
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 508d90f2949f09848af02d38aaff86de
+    m_Address: Assets/Audio/physics
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 548924b8d3844c442b98a18c23c65857
+    m_Address: Assets/Audio/player
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 64557b760f11b97478af3d1366b1f71e
+    m_Address: Assets/Audio/logs
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 833da3bff8f63de4cbcae2c9721aa3c9
+    m_Address: Assets/Audio/vox
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c3dcf3377ccfc44cb70e8ef6e103752
+    m_Address: Assets/Audio/robots
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9235d64f435946a4d9a267ded79350e1
+    m_Address: Assets/Audio/destroy
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b618d4481e7d585429e9892eb2ad7e4e
+    m_Address: Assets/Audio/hud
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bb0104c601a8e0b499118c19d96ca059
+    m_Address: Assets/Audio/doors
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c068743ec5fc42f4f87a0e842766d100
+    m_Address: Assets/Audio/cyborgs
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d332cc73ff5459a48a17c2bc28e9b972
+    m_Address: Assets/Audio/ambient
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd2493dc37f96e24ba8b086feef938ae
+    m_Address: Assets/Audio/mutants
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e6ce5dd2239b27149999b0e344909143
+    m_Address: Assets/Audio/misc
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: d9af7449d1714a34db390cbe23bb14db, type: 2}
+    - {fileID: 11400000, guid: 87e579783949e7f47af3a5506f917ca2, type: 2}

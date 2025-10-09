@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: DefaultTextures
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: DefaultTextures
+  m_GUID: d7d530606c5ec9f439709908e2a3e19f
+  m_SerializeEntries:
+  - m_GUID: 38da3638e0c5cfc4cbafb133be6af039
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/Textures/SMAA
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 499867e2df2e54e4aad0b9333221f875
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/Textures/LUTs
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 67d9249960fda4c41b0a23a65573a8a2
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/Textures/SpectralLUTs
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 705e7922061713741885ae52a3e0bea4
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/Textures/LensDirt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a46f66b7c3fc33547bd9093e960d9ab1
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eeecf288e8ae5be4692977cae1a3e077
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f6c523f05ba1359418515f3ec5026960
+    m_Address: Assets/Textures/DefaultTextures
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 35e36c658802b2346b8ca9a81e629fcd, type: 2}
+    - {fileID: 11400000, guid: b61a8b5fb6862b14588a672db2bb2733, type: 2}

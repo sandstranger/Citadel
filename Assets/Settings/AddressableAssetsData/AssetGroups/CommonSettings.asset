@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: CommonSettings
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: CommonSettings
+  m_GUID: 70a4841a3ce22ab4db292c5b29a24cc7
+  m_SerializeEntries:
+  - m_GUID: 520bf8ebf7d35de4b84f6425bf9ac826
+    m_Address: Assets/Settings/LightingSettings/LightingSettings.lighting
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5f51e0b22aa8cb84b9f422576ce87ff9
+    m_Address: Packages/com.unity.postprocessing/PostProcessing/Gizmos/PostProcessLayer.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 76d76b9a7d71f0d45b349ef83b5d0e18
+    m_Address: Assets/Settings/NewCitadelPPStack.asset
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: c13d40337593abc4c8c48be80a7d2788, type: 2}
+    - {fileID: 11400000, guid: 12b79dadd76c5d7428ec25c2027d1adb, type: 2}

@@ -1,0 +1,3783 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: CommonPrefabs
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: CommonPrefabs
+  m_GUID: bf91a85ea39b209419d87aeba49f8174
+  m_SerializeEntries:
+  - m_GUID: 004eedaa5289cc447a492dbb4d9521d5
+    m_Address: chunk_exec3_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 005a85618a5274f4d9b8e915ba086ca5
+    m_Address: chunk_med1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0072496a6ce6d9f42b830964c2b79412
+    m_Address: item_logic_probe
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 009ff09ced68f564a9e795bafbbc8849
+    m_Address: weapon_grenademine_live
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 00ac7b7cb4729354f9992717bc85802b
+    m_Address: chunk_grove2_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 00d516eb4ebda2c4eaec9a993c3d4302
+    m_Address: item_beaker
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 01447ec79776b094b8e30b5bebdb60a8
+    m_Address: chunk_stor1_7d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 014c2ee95b666254fb7e2370a6ff1a98
+    m_Address: us_puz_keypad
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 01e16446e9804034f91189e484076ec2
+    m_Address: TargetIDInstance
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 01e67c2b34b4f514d87763d752c55167
+    m_Address: item_ammo_hornet
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 01eb6cdeba0aac24cb2adf6747bc28c2
+    m_Address: npc_virus_mutant
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 02003b978a9b2c848863f175bcdae585
+    m_Address: chunk_exec3_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0215a6aa91626fede9fe44d7b441a12f
+    m_Address: proj_cyberice_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 021ed711277e9774eaceef43539e6d53
+    m_Address: chunk_sci1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 02ff17933218d514298b241005cb7a44
+    m_Address: prop_grass3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 039d53baa98f81c40bf7652b6bed5ca8
+    m_Address: se_corpse_security
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 03b4f9e6f3b72a94b9cd6c84c9b5d57b
+    m_Address: chunk_sci1_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 03bb2f322b28a0e498e4601fa44476d3
+    m_Address: chunk_bridg2_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 03cbfd1720e054843b8f1feb3a09127c
+    m_Address: ef_particle_sec2rotmuzburst
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 03d2118d4a4b88b4f82f750035ca45ff
+    m_Address: clip_npc
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 040b3ddee2305b34f8617e90da190cea
+    m_Address: item_audiolog
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0440faa8f1c41c2b7baa7b14b1889e35
+    m_Address: ef_particle_ionhit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 046ae79275e3c684caba96a10a70d55e
+    m_Address: chunk_maint3_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04aca49363e9ba345be7871469124a3d
+    m_Address: chunk_med2_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04bdfc71cb62a6d45b71595e3f91a464
+    m_Address: chunk_flight1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0543cac2f1821d5469b3565406b39750
+    m_Address: chunk_reac1_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 05c40f1f53c8cc34ab94f59f8e2d4817
+    m_Address: npc_cyberguard
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 066cac313f9570a43a6ced13c685f364
+    m_Address: chunk_reac5_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0696c388861c97e42a5494e5b6a75b54
+    m_Address: func_switch2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 069e1cf04b52aff4ea42004d9a442409
+    m_Address: chunk_med2_1_slice32RH
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 073a8a3f33f2d994ca5006f93927ab40
+    m_Address: text_decal
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 093011ab12955d946aa744febca111dc
+    m_Address: prop_couch2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 093e155453a786d459fc574a208a25c4
+    m_Address: npc_maint_bot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a2a21e4c197d7541bba888b3a0ebeb8
+    m_Address: npc_cyborg_warrior
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0a90b520065e36044af03f9a3e5e63c2
+    m_Address: weapon_magpulse
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b2c3dfae6e2d384782f890cddab43cf
+    m_Address: decal_logo_medical
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0bab1b294094c554583cc71933a77ed3
+    m_Address: chunk_reac4_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0bc5fa87afedb4c4fbdb3836cf3aa640
+    m_Address: chunk_grove1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0bcb640afc23a7644a83d9da98a8a418
+    m_Address: item_healthkit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0c3ebd9bd177fc84e953b36e04830148
+    m_Address: chunk_exec4_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0c5c11f001b41644c8f5ecdad7a9ede3
+    m_Address: weapon_grenadegas_live
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0d01de5e2bb447f4685113ccffcceffd
+    m_Address: doorE
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0d59e4ea0d46b8140b3c0d140df0ca26
+    m_Address: item_ammo_rubber
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0d6c4158d8ebe2743af1b76b900ac872
+    m_Address: chunk_med1_7_slice96high
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0d912f2b38858144b8c798c976605a25
+    m_Address: BulletHoleScorchSmall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0daa5783e812128d79df66351e0e08db
+    m_Address: ef_particle_blasterhit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0db27fc066cd38943a64795e7d5b9de4
+    m_Address: item_chipset_interfacedemod
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0dd0cc9ea027c6b4c821a331d814bf91
+    m_Address: BulletHoleTinySpread
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0e46305eb30703a489bdcac00e35d202
+    m_Address: ef_mist
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0e588fb141206a84e8927dfc74dd4b2f
+    m_Address: prop_tv_on_a_post
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0eb4e9bd92a66194c9eed780683a1046
+    m_Address: chunk_exec4_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0ee0b492c03f5ec43bd0dae8800381e0
+    m_Address: chunk_stor1_6_slice128_up_lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0f3719e0366a9fc4a88c8143e3baee36
+    m_Address: prop_foliage_fernblueflower
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0f8f3d9ee7ae1a04baf896dd06f65ce9
+    m_Address: prop_desk01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1036653e838d11746811d28b5a90dd12
+    m_Address: chunk_maint2_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1058623a8e26317a3a326d63b9c3b3e1
+    m_Address: proj_magpulse_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 105d173e44a98b94b894a48d8a376ff0
+    m_Address: chunk_med2_8_half_top
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1091fd2f750c581439c28d3f1d432b40
+    m_Address: item_cyber_turbo
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1095c6a13686771499d0095f8115f0ad
+    m_Address: npc_mutant_cyborg
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 10d4fe0c580eb034f90af28c65d533dc
+    m_Address: ef_fragexplosion
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1171667430a8268489980bf4e6e617d3
+    m_Address: item_ammo_needle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 11f11f0978087364f83d8a901d3131c2
+    m_Address: item_access_card_std
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1211945269ab08a4cb9bac775b976a6d
+    m_Address: chunk_sec1_1c_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1218792853bb996bf9eb7c3a10f9b851
+    m_Address: proj_cyberreaver_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1273a106e9540cb43a82bb18c7044f8c
+    m_Address: item_testtube
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 127410b091af9d8498b6e0bd3e45c4d2
+    m_Address: chunk_flight2_2_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 13acc9b80afbdd24a959ce276ab33a52
+    m_Address: item_arm
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 147070bf836c4bd4a81c4a3a6d33921c
+    m_Address: prop_lamp
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 147a873050c8ce743a17432a0d58808b
+    m_Address: chunk_sci1_1_slice45_toplh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1544447840ad1604ebc08c057c45b06f
+    m_Address: logic_spawner
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 15fbe51713a8f0747ae47bcc361b8628
+    m_Address: ambient_fan
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 16d46dceff687ef48a7192e645d6a4ea
+    m_Address: ambient_machinevat_loop
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 16dc75f2ce5d1fa4389e0a8c896783a6
+    m_Address: CatchTrayNPCClip
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 170e699c8a9d03843bd8ef9aab363718
+    m_Address: chunk_sci2_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1759c6de059e743468781f48ca876e5b
+    m_Address: chunk_grove2_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1762e4925a62b1b4caf7f4c3cbe1c9e5
+    m_Address: trigger_cyberpush
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 17ea4b1586cc7f64ead7c0578c5acf42
+    m_Address: chunk_exec2_4_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 18121fd4f234ad64788c578307cf2491
+    m_Address: chunk_maint3_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1880abdf8a7caed4bb32139d7b684c42
+    m_Address: chunk_med1_3d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 18ea80a3c356c9847adc6f43101170a1
+    m_Address: chunk_eng2_1_slice384high
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1a0b40b1938acf74892cd290e8479450
+    m_Address: chunk_eng1_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1a1d732392e6dc74f83e02ff9361edef
+    m_Address: decal_bloodfonty
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1a51e89cb4a7eb44099d5244fdf4c99d
+    m_Address: decal_logo_bridge
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1a5e38252aca3d847ac2d09a5b20d298
+    m_Address: item_cyber_decoy
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b08f0ab47b89334a83944dec2b4fe61
+    m_Address: doorC
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b3f05660dfd7ed4bbfc585da4c5bf9b
+    m_Address: chunk_sec1_1b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b912d8cfd50a504392ac8250d01e5ad
+    m_Address: ambient_intake
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b924010a9e8ffc41acac34cb5438bae
+    m_Address: prop_xray
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c44f5fd27beadf48bb832e97d96451f
+    m_Address: chunk_reac2_1mirror
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c80d11436690074f986b7ba467abad9
+    m_Address: chunk_reac2_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1cdea1bb895e83a4bb10ae14de978ec2
+    m_Address: chunk_eng1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1df1dc0aa5124e7448197c527d8cf6d9
+    m_Address: item_access_card_medi
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e0c9dabf1c05a34086150a0e4904e57
+    m_Address: chunk_maint1_4b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e63f295031f29e4f8254ff12baa98e5
+    m_Address: ambient_generator_gas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1eaa3c7a0eeb3d840a156b05d9f547bb
+    m_Address: chunk_eng2_3d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1ead2d478dc9a33478118dacde9115d4
+    m_Address: item_hw_targetid
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1f01876255c8de511aa75721a63ad579
+    m_Address: us_retinalscanner
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1f2b27cd7510a2d46a1ce65f69d79385
+    m_Address: prop_shelves
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 200d2f9c5096b6c428836a817286aa0a
+    m_Address: chunk_eng1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 20ec907494db0eb46a0bf2c3b26fcc0a
+    m_Address: BulletHoleScorchLarge
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21340d5906baaaa43bace261b229c880
+    m_Address: prop_phys_cart
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21acfbb8e1257a043b46068e7fb654d8
+    m_Address: trigger_radiation
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2366dfdbc67327c4dbc36e9df195f51e
+    m_Address: doorK
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 23696e3d491756d429283cd3f24e74c3
+    m_Address: ambient_pipewater_loop
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 23842792212ed594fa43d25fbac74569
+    m_Address: chunk_med3_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 23ecf739be446f34fbc6128467840e00
+    m_Address: decal_logo_cyborg
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 244f6f467a22f894295f425f5ce28c7b
+    m_Address: decal_blood_splat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 244f77f5065fdb540994c338d9bf197e
+    m_Address: chunk_stor1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24763d6a823f6824f84b40c9b1c0de9d
+    m_Address: chunk_med1_9d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 25056f419c154bf4eaead3fc0db049a2
+    m_Address: chunk_eng1_7d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2512b0bace15efd46a1deb98b2828d15
+    m_Address: npc_cyborg_enforcer
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 252ebb098141f690e90275c0a39bb50e
+    m_Address: grovedome
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2560979c011971a4190dbb732e8fb54e
+    m_Address: chunk_sci3_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 256ed887faeb7274fb5a48ce37bf2d6b
+    m_Address: chunk_exec2_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 25b29e90ac596d04288b344f95ffd775
+    m_Address: prop_bed_neurosurgery
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 25e94f034f3fb223a9867f121cb49620
+    m_Address: us_puz_panel_gray_wire
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 25e9d8ef4efa841478feb5f3efb2bead
+    m_Address: npc_cybershodan
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 25f9d8bccf0f2114c9903510424e5494
+    m_Address: chunk_cyberpanel_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2644628044923c643a800e9987134ec4
+    m_Address: chunk_eng1_5_slice45rh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2672304e7fb3f3b4197f7a6378c161bc
+    m_Address: info_playsound
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 27245efc16093774ca9859ef2ca63ae7
+    m_Address: item_patch_genius
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 282247fae1a0fbe4e9ab14dd51841804
+    m_Address: weapon_grenadeearth_live
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 28dd1d98196980947932b97e0b5d73d5
+    m_Address: weapon_cyber_mine
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 28f53184e8e8c967bae592cbc0bf1748
+    m_Address: chunk_maint2_2_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 293b2a1b04fccfd43b40826162d2f012
+    m_Address: chunk_sci1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 296948f6d9b3a714f8d20e126bbcfa13
+    m_Address: sec_camera
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 299b3d49f76d84143aabcedab70979c8
+    m_Address: chunk_grove1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 29e1b2cb8e2abd743bc56ae724f78ea0
+    m_Address: chunk_reac2_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2b8a767d10eabd24a8b8329551c19ef5
+    m_Address: ef_particle_sec2muzburst
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2b931b006fb5fdc4f95c12cfe85ce6d8
+    m_Address: chunk_med1_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2ba2531240bdb9a498db2ed1d3fe5e09
+    m_Address: ambient_dishwasher
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2bcd6abcd3767c94aa8a450f40431e32
+    m_Address: prop_cyber_datafrag
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2c31a3a593937a740924019d2a86e9ca
+    m_Address: chunk_med2_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2c7df7f332695be42bca84fa10189834
+    m_Address: chunk_reac2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2d4326cfeb0bf904e88dfd589785f293
+    m_Address: chunk_med1_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2dd8a31fd406f8b4aa129c85c4a44840
+    m_Address: us_puz_panel_gray_grid
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2eb7450e24b2e3942920df35073128f6
+    m_Address: trigger_multiple
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2ef8ae980edac314693b8414c4f67343
+    m_Address: decal_logo_radhazard
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2f1d0de5847dc5142b68b68bcf7544bc
+    m_Address: Player
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2f700dca8822bec4fbd3808df363afc9
+    m_Address: chunk_maint1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3034ffe75bd70b8468bbb38ee4950368
+    m_Address: chunk_bridg1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 30b927cd69a91d84fbbbe4c17ae3ba76
+    m_Address: weapon_ionrifle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 30f83ed1b44b9e849a1dab310a4a42d9
+    m_Address: weapon_pistol
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31db8cca8c1823441ac951157db33361
+    m_Address: func_wall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 31f28a2af5a164446945f40ce2ad32bb
+    m_Address: chunk_fan1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 328a953f4f670be4f8fedca27ee70f5b
+    m_Address: chunk_reac2_1_slice45RH
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3329a6bb8e8b788458cf24c58b569d74
+    m_Address: chunk_med2_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 335ab61a7fb3ec449bd24f2b0ccc9c07
+    m_Address: chunk_reac3_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33bf0433e1e47b544b810a93130721b4
+    m_Address: us_paperlog
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33c2fff4ab5ade34996f005c0d567bfb
+    m_Address: chunk_cyberpanel
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33c684dd398a9164188ec63ffd4500f3
+    m_Address: chunk_reac3_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 33f11ae36266c9b4aa43f81fb9021e1e
+    m_Address: func_switchbroken1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3447ada4b43bf334f8735d17b648dc80
+    m_Address: item_ammo_teflon
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 344a311fdf3b9bc47949186016bc0ee4
+    m_Address: chunk_rad1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 34629b696580519419f80d6bb01fb3e9
+    m_Address: chunk_sec1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 34d17f5ad22e7c54e80e9074522b0d3c
+    m_Address: ef_particle_bloodspurtsmallgreen
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 353333585f23d92468e31328c8603820
+    m_Address: prop_puddle_grease
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 35544f053bdd4394f880b92ad29b7180
+    m_Address: item_ammo_hollow
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 359b3d69c9c35774798f9ace33bc8db7
+    m_Address: chunk_sec1_1c_slice64highrh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3626e0635abc9c84b921f48a280841bd
+    m_Address: chunk_eng2_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3666d3c78d7f0be4a9d9ff77ecbb6fe9
+    m_Address: se_corpse_blueshirt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 36715eb5e9ef79c44b02f459777e5f05
+    m_Address: chunk_reac3_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 36addfc943bbaf649ac62fca53306f75
+    m_Address: decal_painting1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 36f2658918d5e33af80280aa266400ba
+    m_Address: proj_magpulsenpc_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 37169c00d7251d049ac7d16636c64e76
+    m_Address: chunk_sec1_2b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 381e4599f4f927d4dbb605c48a4d2e1d
+    m_Address: us_relaypanel
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 382e426bef65c724a9245a55cd961437
+    m_Address: npc_cyborg_elite
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 394486b782c7aff4292026ea14228c27
+    m_Address: chunk_sci3_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39765509c70f38a4ca4322bb237bacad
+    m_Address: chunk_maint1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3a4889e0e4c07c94db66986f16b4cb49
+    m_Address: item_paper_wad
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3b24c2ea604bb2b45a130c511f14f86d
+    m_Address: prop_cpuscreen
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3c1d85e91629b954e9ef391108f23427
+    m_Address: prop_healingbed
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3ce2182ba22d4bf48b116e5e18f4dceb
+    m_Address: prop_broken_clock
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3d9cbfce42e9ddb41801e194cd2c9a6e
+    m_Address: weapon_flechette
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3dcb6a0ac061f214c8d7f7237fb48bfb
+    m_Address: info_gameend
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3dd4674ad44c45d4e8cb66f76477803a
+    m_Address: chunk_med2_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e7a330c40d9b9646b84c3487c1c06fd
+    m_Address: item_access_card_group1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3f9dd3f9c3e31f34e9f436fa686359f2
+    m_Address: item_patch_sight
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3fd27cf56387b9930b2be658d614fda3
+    m_Address: proj_enemshot6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 401d1382124c3204a9bc34889c837c02
+    m_Address: MobileJoyStick
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 408becd95df896942b840de6e60dffd7
+    m_Address: SystemsTesting
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40b6ab58669f0de45b18100c6f21abf8
+    m_Address: info_spawnpoint
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4129e00e56b1c0345a06d82aed1af117
+    m_Address: chunk_maint2_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 412d5ab52dc83c146a747e56184f39eb
+    m_Address: item_beverage
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4141e949bbcec5e42a8c7116e90d5f9f
+    m_Address: chunk_med1_1_slice128high
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 41c6b9bec6adf544a875ae6c391cbdb3
+    m_Address: decal_bloodfonte
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4215d78cfa317304d9d5a6a0909bec95
+    m_Address: chunk_exec4_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 42b67d4cf34c2e546af402ec8a0a3030
+    m_Address: prop_console01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 43057272542988d44b386f8d95058288
+    m_Address: decal_scorch4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 43057ce357af85d4e9278b373ea622bf
+    m_Address: chunk_stor1_7_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 43ae2cf682f8da143a0dba8069337a35
+    m_Address: chunk_maint3_1_slice32_rh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 44cfa0cf4201b124dba20f2b17f5499b
+    m_Address: chunk_flight1_5_slice45lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 450667f4837339542a42782c3d94e642
+    m_Address: se_corpse_torso
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 451c02a48b561dc4e8be18de2e77f14f
+    m_Address: chunk_eng1_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4551af2c97efdf440bbdb4f271f32338
+    m_Address: chunk_sci1_9d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 455e495838464fa4d8fdfd25eac6a2a0
+    m_Address: chunk_med1_7d_slice128
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4603e27e31f6d46448a1bc57a49ca9d1
+    m_Address: weapon_grenadeenergmine_live
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 463b415050105e44ba22548050e38d57
+    m_Address: chunk_eng1_6d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 470d553cec1b55143bdba0feb3b59850
+    m_Address: item_patch_reflex
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4752e15a930ae1143b4d3fdc103786c7
+    m_Address: chunk_reac2_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 47ba195f1377a574a832f029640156b5
+    m_Address: chunk_exec2_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 47cd77cd26ba8cc47b6d5306854c48b3
+    m_Address: prop_dexmissile
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4825ae0ff7f9acf44a10f1b0b7e17858
+    m_Address: item_ammo_magnesium
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4890b259a929cb940903bf424b204a6b
+    m_Address: npc_cyberram
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4b130b753bdffdb4ba49a16ea850897e
+    m_Address: chunk_eng2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4b731f0c5c8be30459e461d3034d60e6
+    m_Address: chunk_med1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4bb2a5dcf80099144834a31fc75185e6
+    m_Address: info_email
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4bccc8d1b9554344bace7f7768eff8bc
+    m_Address: chunk_lift1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c0337797e20bb24788740d67094408c
+    m_Address: chunk_crate_impenetrable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4c78deaf6cab16048a108b06d5bd66bf
+    m_Address: chunk_med1_8d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4d9d579c2186702458037f0ac64bb0e0
+    m_Address: prop_lift2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f53f5db8548f0743bcccc38492557b3
+    m_Address: item_cyber_integrity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4f9882b22e17548499772e4e8a985b5d
+    m_Address: chunk_grove1_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4fe50c74ef7e17e4886c7d134a5af375
+    m_Address: ambient_machine_loop2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5054749ff4c3d7546b40a87b380dfc67
+    m_Address: npc_exec_bot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50aa49506a7fe794ba5165485b373bba
+    m_Address: npc_autobomb
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 50b9f7ebb639dfe4d9f8b9d027031c89
+    m_Address: chunk_sci1_1_slice45_toprh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 51eb05cfef558d542ac4a31e20afff13
+    m_Address: chunk_eng2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 51f63b12249272847922c81f10ad7d74
+    m_Address: chunk_grove1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 51f7cb22ed426464592d0905e08dfe70
+    m_Address: item_hw_lantern
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 529a01cdb5b2d49458698cb07370f8b9
+    m_Address: ef_particle_sparkssmall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 52a3457049f78c84985ee2e49554d7ba
+    m_Address: weapon_grenadegas
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 531d5f3107a3db94e8756f94695c438f
+    m_Address: item_ammo_tranq
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5365c78c34820164a9180f2c099fd946
+    m_Address: chunk_med2_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53b2916daa9f31243946356bbde09a54
+    m_Address: chunk_sci3_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53eb799c47ae0864fbd8e6bdaafefb23
+    m_Address: chunk_bridg2_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5403b9fe02e1ac64a8ae25b0b166e8bd
+    m_Address: CatchTrayDefault
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 54531831da1e91c439c1e21e62f2b246
+    m_Address: prop_couch
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55379d4d8e8d5a04aa5c1bdc0e48314a
+    m_Address: item_skull
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5544d8fe9aa614b4ea2dbce52b76956f
+    m_Address: ambient_machine_loop1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55878926099343841a73e0bbbc14dd08
+    m_Address: doorJ
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55cf6279edd3e77498aa3ec8c03d045c
+    m_Address: weapon_mk3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 55ebd2b412e100f4aa01c68f9f3a8331
+    m_Address: chunk_eng1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5683aea354f400d44a823c1b4be180fa
+    m_Address: se_corpse_brownshirt
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 587c6a70801b0126d9eb2b8474c11a2e
+    m_Address: us_puz_panel_teal_wire
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 58b130964f23f324785468f3995e85f2
+    m_Address: trigger_counter
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 59012ac091a676d4b835e539943d0e95
+    m_Address: se_crate2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 598d135df2c399144991bd045802a08f
+    m_Address: decal_painting2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5993a7b9c86623345ba5ee48bd0e221a
+    m_Address: info_teleport_destination
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a0dce66b8573064d835327639e7ae30
+    m_Address: prop_puddle_oil
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a363400dc2e95243a105e977aba6ef3
+    m_Address: prop_puddle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a52369107ee3b04699d36862444b6d3
+    m_Address: us_puz_elevatorkeypad3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a67dcf1d2751dc469a6fe1a94d2fe27
+    m_Address: item_hw_ereader
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5a7d372ecf6279d4187a93fac1a154c0
+    m_Address: chunk_eng2_1_slice384highrh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5b0b972db64e1734596df2a5370551b9
+    m_Address: ambient_steam_loop
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5b36499eb0dd2e247b029d3d0ef97ee0
+    m_Address: ambient_pump2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5b524d32bbd6f7d43b2f708ae3725073
+    m_Address: item_cyber_recall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5b8c9d47a50e76146bc06433c56c1ccb
+    m_Address: decal_blood_words2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c5de3de4bfe6785ca954cd05fa0d733
+    m_Address: proj_enemshot4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5c8a5da4e4dcf6242933a03ad714808f
+    m_Address: chunk_sci1_6_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5cc1181669e179b47b74c33282dbba04
+    m_Address: chunk_reac4_1_slice45lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5cc707fb066ebe04ea62fe5cab9fad90
+    m_Address: us_puz_panel_teal_grid
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5cd3f400e30ec114c9af81b3b153fe59
+    m_Address: item_battery_icad
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5d284fa8bda14e044a84e6870aae0e77
+    m_Address: prop_bed_hospital
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5dc2a2b4d75cea947a37686932867715
+    m_Address: decal_logo_biohazard
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5e08e4a053cafec4ab94f8fecfc04bb8
+    m_Address: decal_scorchtiny
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5e8a9abc389830541a95e67844623f3d
+    m_Address: chunk_sci2_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5ef26966fed578c48b42e443b1a28141
+    m_Address: chunk_sci2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5f8f2f23be0fb4844ab9fdc124e57190
+    m_Address: doorL
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 604b6c31c859bd540abea6b8e22e5470
+    m_Address: doorD
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 607ea771f1b3d5a45a155f51c2cc76f2
+    m_Address: chunk_exec2_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 60bdc1c10fcd43147a2688ae2061e11e
+    m_Address: ambient_clicker
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 60e022c183b04b829876a1ee3c8e017e
+    m_Address: prop_vending1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 60ebf49d23fa3da4ca902f7c1bc6e7cf
+    m_Address: ambient_machine_go
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 61718889c03424a4eb1697d57c6fb20f
+    m_Address: chunk_reac2_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 61c5105929bfb484cbe548a196b5c548
+    m_Address: cheat_arsenal6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6215f6b6a1e64ce438f18a3b6d33afef
+    m_Address: ambient_drip_amb
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 625a15fe034b47d4cabd190e181fab40
+    m_Address: chunk_maint3_1_slice32_lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 62fd63bed7962a9499532fcbcc186235
+    m_Address: chunk_sci1_2_slice45rh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 63011385348da55418429eb248cb0e52
+    m_Address: sec_cpunode
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 636a54ad1108e3942bde1e2625e87463
+    m_Address: chunk_flight1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 636be78efb330b74f9f8abed222062f4
+    m_Address: item_access_card_admin
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 638289bfdbebbb04bb5e512157af5c73
+    m_Address: item_ammo_slug
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 63da1861675692b408b59c92b00fba93
+    m_Address: ambient_looping
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 641db38e9563888429cf89c35c29ccee
+    m_Address: chunk_reac2_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 64389b87aa937934eb4717145efe975b
+    m_Address: trigger_once
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 650a5ba61a555a846aeb179a4acf1918
+    m_Address: func_switch7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 652bd6311b9fe62ceb8b2c8c36da9090
+    m_Address: proj_cyberplayer_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65938d1292551701b8f513ddaef94394
+    m_Address: proj_plasmarifle_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 65e4efb10a5997142a6abe3d27140e41
+    m_Address: ambient_lathe
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 66346fd3ef5ebe943b11522f7b18070e
+    m_Address: chunk_exec2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6647cbddd18070d479a8524a8e8dc97e
+    m_Address: door_secret2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 678c8c335cc006445b381910f89ba2ac
+    m_Address: chunk_bridg2_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6804f9f733681c441b616bdd7ded3e62
+    m_Address: weapon_riotgun
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 688c9cb0f59f4a6428d23878a394570d
+    m_Address: item_ammo_standard
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 690cf1f533d899841bbfb22467b58202
+    m_Address: item_patch_detox
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 69dfb05e68d815b4f8ec0d20213181f6
+    m_Address: chunk_eng2_5_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6a18a76baad0f694b9ee503ae82c591a
+    m_Address: chunk_grove2_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6a476ca623da71c4db36a6d37a0cc95b
+    m_Address: ef_line_sparqbeam
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6aaad10c4fa681048b06c9b1099e404b
+    m_Address: chunk_exec2_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b85aa0c531cf5d429f77523eb1fdc87
+    m_Address: chunk_maint1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6b9f5461b42f1e37bab18d433316b53f
+    m_Address: proj_railnpc_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c6c954a6680847448f76e40b5fe8a8d
+    m_Address: cheat_arsenal8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6ddcc587191bdaa46915bc9d529a2677
+    m_Address: chunk_med1_7_slice14_64
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6de3a734c50818844af770cfd276ad4a
+    m_Address: decal_scorch1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6df9b8ffe72615c44817b5de959f6bc1
+    m_Address: chunk_sci2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e1a1bf5219025f4191f41bcbc5ba936
+    m_Address: chunk_eng2_1_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6f11560f2e1d8e44ab310653236cd002
+    m_Address: chunk_eng1_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6f19a4fdd5a2f6245a1bda5b347b1273
+    m_Address: prop_foliage_pinetreem
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6f9196c8a42042e41aac66c13f08580a
+    m_Address: item_hw_booster
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6fa26471cacce06449aea7e12eadbf22
+    m_Address: chunk_reac1_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6fc01e0796c395246aa271e5a38c2d3d
+    m_Address: chunk_sci1_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 700aaacf105b1924d90e16b83990a27b
+    m_Address: weapon_plasma
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 70ad3e5903645714a9cb7e514d225fd8
+    m_Address: chunk_maint2_4d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7112cee83982d3b3f83eb55c9f2c90fe
+    m_Address: prop_foliage_fernpoison
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 711b90128edfa844780a981f16144106
+    m_Address: chunk_grove2_9b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 712b2f40b6ee5ef47a1e44ab500bc88b
+    m_Address: ambient_lev3loop4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7189604075e6f5c4f8b3ff1cc2b83fe2
+    m_Address: prop_grate1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 720647caf315cad44b29a4227c91fd56
+    m_Address: proj_enemshot5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 723c3b287bc590540ac8bc42d7605435
+    m_Address: chunk_med2_2_half_bottom
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7249b8f2081f50a4db8c0bf542943892
+    m_Address: func_switch1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7250077a380ffd14ebc2d2881e5d135f
+    m_Address: chunk_reac1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 727c731bd2846d84b96368f2841ab86b
+    m_Address: prop_cyberport
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 72887587e67617f49badad8ffeac6224
+    m_Address: decal_logo_research
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 72a0e533a70d42e48bad05e574170ef8
+    m_Address: ef_sparkspits
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 73108d76f1d6cf74899d5a1efd2ee7ee
+    m_Address: prop_pipe
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 731ee5410f310de4591a784afc0389a6
+    m_Address: chunk_maint1_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7383bccffeba1ed4f9e186700ede6b41
+    m_Address: item_warecasing
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 73865ba863fbafc489d5a7c3c6a76726
+    m_Address: chunk_reac5_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 73cc8e8c56b70cb4b8899bfa04b1446c
+    m_Address: chunk_bridg1_1flipx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 74c4eb551d48e754c8d8f6e0e63aeb0f
+    m_Address: decal_bloodfontr
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 75dec36a0b0dd2944bcc0467af4a278a
+    m_Address: chunk_maint2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 76c46ea7426775f4d93e140951f8c2b5
+    m_Address: item_workerhelmet
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7765c97638df47947a551fe26cc065b3
+    m_Address: chunk_eng1_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7795e4e0cf27f104ea4f8e4ede14498b
+    m_Address: chunk_flight2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78282e1924fbd994b8dfc41d5f6ce6ee
+    m_Address: doorH
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 783f27ef9febd3e49b963045976fcf03
+    m_Address: chunk_maint1_9d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7840e21bb17c1e342b3faa6074b9b163
+    m_Address: chunk_stor1_6_slice192lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7887e532b60e6fa4e9bd4e6a9a6cea61
+    m_Address: chunk_maint2_1b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78945847daca99f429b6d7e51e4ad1f2
+    m_Address: prop_chair01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 78bfe192688beb24388e869403e2c36a
+    m_Address: ef_particle_bloodspurtsmallyellow
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 79296003ed3f35d4c848e57441e77058
+    m_Address: ambient_lev3loop3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 79ec086e696036c40813021fadb273eb
+    m_Address: chunk_grove2_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7a572e30c8e795849a61d62d7237c2e7
+    m_Address: chunk_sci3_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7a77b0ef8cea0cc92a0210b9ff32e852
+    m_Address: func_door_cyber
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7b08d4ddc4eb32948bb2be57548342e7
+    m_Address: func_switch3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7b67255b2ee135e409cf1d6a9a53c0a8
+    m_Address: chunk_sci1_2_slice45lh_up
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7b9b1587dac81af43aec5ea64d5c77e1
+    m_Address: chunk_reac2_1b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7c13d40e3924076429ac4c1fed3dfa4b
+    m_Address: chunk_reac6_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7c6f53d1cb314904395bc663cb40129c
+    m_Address: chunk_exec6_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7cd284ce28b008f4bae2d5d55c1fafd2
+    m_Address: npc_cyberdog
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7d5d35da9154e3841801e830f333ca72
+    m_Address: item_cyber_drill
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7d6c06a1e228ff944972ae4bcd7769c0
+    m_Address: chunk_maint2_5d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7db1f01eb2cc3c641b0b7522821f250d
+    m_Address: npc_humanoid_mutant
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7de55519bafb81f3f90ca9f1b5791036
+    m_Address: proj_cyberdog_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7e01cea11cd4b314a99fce6c8e761d32
+    m_Address: item_chipset_isolinear
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7e4ba50e8dd84944898c5cf14e876ffc
+    m_Address: chunk_med1_1_half_top
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7eaba92c22a9209419de505b36038da1
+    m_Address: chunk_med1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7f13c5d664e676d418e18fe18978dc22
+    m_Address: us_puz_panel_brown_grid
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7f9d0c1104cd3ec4d93c275cba61f57c
+    m_Address: prop_chandelier
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8084fc8f83590e1438dcdb3f41993c9e
+    m_Address: ef_particle_bloodspurttiny
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8095a569e21deb04daa8e034cd5d1e42
+    m_Address: prop_cyber_exit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 815726ff8a260b14db199272627c9e25
+    m_Address: weapon_blaster
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 81c20de9ed1660a4d957e3356de12dd0
+    m_Address: chunk_bridg1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 81d8ce960828d0a4aae0786ac40c89e5
+    m_Address: door_elevator3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 81f891fea4e22894b9cd0268cbc13aff
+    m_Address: chunk_flight2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 81ff783449099084ea22a475a84da879
+    m_Address: prop_grass2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 82206c12cac5135448ecf80502f95084
+    m_Address: chunk_med1_9d_ofs112_90
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8244ddbbcf99c194da6e0f53f136ba52
+    m_Address: prop_grate1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 825ebd5d7c3ab8447b2cb66051824711
+    m_Address: chunk_bridg2_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 828ee1c47c390cf49a88226c0a894dbf
+    m_Address: chunk_reac2_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 835861f9630a92a49b9b28c388249772
+    m_Address: decal_bloodfontg
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8484d9e28bafa9d4cac58c96dcfde41a
+    m_Address: item_access_card_purple
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8485228da00511d4c878d78e50fed171
+    m_Address: prop_charge_station
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 84c60f67cea0a164391c14937562635b
+    m_Address: chunk_eng1_5_slice45lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 84e4055855b637947a5e8d8a22b75057
+    m_Address: chunk_maint2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 865fc8425715108488debdd22231ac0a
+    m_Address: ambient_washing_machine
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 86720579d7189a444a36ea110d5d71e1
+    m_Address: decal_blood_die
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 867e2988a5ba0bc439dcbcd8a4037f66
+    m_Address: se_crate1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 878931def346b1348b67c1fbfd21162d
+    m_Address: decal_bloodfonth
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 87a234bf5df238842a58429fad079b0e
+    m_Address: chunk_sci2_5d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 88b73d8981fe2db4cb6b9b4db9c7260f
+    m_Address: CatchTrayClip
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 88c031714b1743f41bdf0288daf8f71d
+    m_Address: weapon_pipe
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8aabd949b0e87454a8275562dbbfc66c
+    m_Address: prop_microscope
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8ac18b023602aee4e9cd6717d4f0f782
+    m_Address: decal_logo_antenna
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8ba7eddaab7c82244a7ed393606cdf33
+    m_Address: chunk_stor1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c151305fc00c3e4baf16057d0151e65
+    m_Address: chunk_med2_8_slice32RH
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c4d0d2c5ec9c4d4f9be2069c9c05633
+    m_Address: decal_painting3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c5836bc4b606d84bbe82a67a44bf35c
+    m_Address: cheat_arsenal1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c78a0c85a97a994c9b5eb294275dd1f
+    m_Address: ambient_machine_humlonoise
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8caa4cf26d595724eb075e78cb29ae00
+    m_Address: item_hw_envirosuit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8cb1b2b77211d4f4389bee62b00e2d79
+    m_Address: item_battery
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8cdb8f4dfe09b9f459ff22f12796921c
+    m_Address: chunk_eng2_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8ce38f632cb9a854caa0f48c84d0f1a5
+    m_Address: chunk_reac3_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8d898e6c039ba2340b4aa192ff6a715c
+    m_Address: prop_phys_barrel_toxic
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8dbb24127140c4c4e8d588dcd1237b3a
+    m_Address: chunk_reac2_1_slice45LH_up
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8dd02a1de0981d541b7051a794630649
+    m_Address: cheat_arsenal9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8df2d3dc2def2b349bc6a16251e6e0ad
+    m_Address: weapon_skorpion
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e06262417517484eb8ccc22ea20c51f
+    m_Address: decal_logo_gears
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e31585e66acbda4789aaa2d754cc364
+    m_Address: env_sparkssmall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e6e8b00c0648344d93e5c3f1202f67a
+    m_Address: chunk_exec1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e8b7cc791c21464b9d926f09b470d56
+    m_Address: se_thermos
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8ed2e35d770a8c74badaef04cb9ba4ad
+    m_Address: weapon_rapier
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8f54e196b8bc16d49886f14cc86d34e8
+    m_Address: chunk_eng1_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8f5d7558450d68ee3a565d9acce892c7
+    m_Address: clip_objects
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8fd1465c4cecce140aa1398021942a11
+    m_Address: ambient_powerloom
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 903a8b63ab96b0f45b08bef4a82e94e1
+    m_Address: prop_phys_toolcart
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 906e4cb86c1040047a7a0765666722e5
+    m_Address: chunk_reac1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 910b22b0fb66ad64996e823162055932
+    m_Address: chunk_sec1_1c
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9127699ae07e4f14ca2fcef6e02495d0
+    m_Address: chunk_sci3_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9155dd30c28770746b6caa5ff0854189
+    m_Address: chunk_grove2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 917388eb3f1915646941b3332904cfc1
+    m_Address: ambient_compressor
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 91a505d4c225b574cb27dcb47ba60e96
+    m_Address: weapon_dartgun
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 920df5017eed80145bcffd68a0a08cde
+    m_Address: npc_cyborg_assassin
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 927a78469ba23c944884ccdecb2f366b
+    m_Address: item_cyber_keycard
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9296995037d37104fb1679fce7a9233d
+    m_Address: chunk_sci1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 929bfbb03f3af9a4980e971ddebfe768
+    m_Address: door_elevator1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 92af91a7c806be147a27867db374f79d
+    m_Address: chunk_stor1_6_slice128_up_rh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 92d9fd97ea503dd4aa77aeb1e2e4641f
+    m_Address: chunk_med2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9315853dc8f778a489193d6ed5a19768
+    m_Address: ambient_airhiss
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 94534e7c724069a438b41fcdf12a8fc7
+    m_Address: chunk_exec2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 947df588ae2cfcf48a3523c2bca6b8e9
+    m_Address: item_cyber_shield
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 956da1e17b2c83e499aa192bb9b7df8a
+    m_Address: ambient_lev3loop1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96812fbcfa3e14c44b60e798db374811
+    m_Address: weapon_railgun
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 968ea08b6e892b7228dbce784ebcebb8
+    m_Address: us_puz_panel_brown_wire
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96d65d618706f9348845f2feec5b5427
+    m_Address: CatchTrayInterDebris
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 96eb553b09f4b1f47bfb64e9ca1b883b
+    m_Address: chunk_sci2_1_slice45lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 972d657f67e3d854d8448127adb4f8bc
+    m_Address: ef_cyber_ice
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 97bbc6bf5e1a96845bd012f6deed665d
+    m_Address: item_cyber_data
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 97e2018de36bafb41a2f2e789924ac22
+    m_Address: decal_logo_security
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 97e7467879e70804abe56dcfe21fc423
+    m_Address: se_briefcase
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 98225ef82d577af47a6fa34f197ee6ae
+    m_Address: chunk_reac1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 98dd1f58777b8a847a273cb09b106fe4
+    m_Address: chunk_eng1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9910666a6a8442146a313acfaf63c9b5
+    m_Address: chunk_maint2_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 99519d133ab9b334eb474c6b4308694d
+    m_Address: ef_steam
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 995aceeb2e3d8514ba6223eba2a2a4fa
+    m_Address: npc_gorilla_tiger_mutant
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 99668c922166c7444a5c291409a72e6a
+    m_Address: decal_blood_stayaway
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9adad1588cc371e45bcbbcc05712c24d
+    m_Address: chunk_sci2_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9b1cb9fbe6b330f4fb4575047dee4b3d
+    m_Address: chunk_sec1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ba0cfcf39fed364bafdf4091783abe8
+    m_Address: prop_grass5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9bf8aefa4eebf9744817f5bdd7b4f34f
+    m_Address: weapon_grenadeconc_live
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9c3ac3eec4bd52f4da3c94c42dfa50d6
+    m_Address: chunk_teleporter
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ccd8ae85b2fa0147a7a425024a0bcd3
+    m_Address: chunk_flight1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9cd905a01a75ea54c966f5c02559cd6b
+    m_Address: decal_bloodsplat2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ce86c9c541ae8e4ca1a22ac6fcdb9c1
+    m_Address: chunk_reac1_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9d226cac35d99dd40af7407e39caa7ee
+    m_Address: chunk_reac3_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e49e9c6829bd2e4a81750907e5bfaeb
+    m_Address: item_ammo_slaglarge
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e5646362e4a41541b758e98b14aae6c
+    m_Address: chunk_reac1_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ed0aaf3346c7824e9cf28863bad918b
+    m_Address: us_puz_elevatorkeypad4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9edf78d0015065bcd8fa962c0dae9474
+    m_Address: prop_vending2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9ee178cce3bdff344b500b3a02ba5eca
+    m_Address: chunk_med1_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f1ca6a9075c54346b6499dc56fca3d6
+    m_Address: chunk_eng1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f46a587d28baef429d425f4332b1a86
+    m_Address: ef_particle_darthit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f51a3df4b3224c4b84c414a9f3ae897
+    m_Address: us_puz_elevatorkeypad2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f62053cf94937441ad65d0cefd89afa
+    m_Address: chunk_sec1_1c_slice64highlh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f622abea6fcacf43ae49b3e69fed522
+    m_Address: trigger_ladder
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fa6faf2ba9b9a8478db13706ef68bd5
+    m_Address: npc_plant_mutant
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9fa9254fbf97d234a88808d4a1c9e72c
+    m_Address: chunk_reac2_1_slice45LH
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a006840302588964b9a78ced198bb510
+    m_Address: item_hw_jumpjets
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a05761a0e157d5e4787952bbc0809e0c
+    m_Address: chunk_sec1_3_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a0694cfe8a834ae4db420d9cdbde6bac
+    m_Address: prop_bridgewall1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a0ad2d19e6c398e428ca652d9467da07
+    m_Address: logic_branch
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a12e5496103d2b3478ba1fd54cf498bd
+    m_Address: chunk_med1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a1fc5648edf6c8047932a791a52b772d
+    m_Address: weapon_grenadeconc
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a283ec0b436aa7e4ab9995b15c3d68b7
+    m_Address: prop_phys_barrel_radiation
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a28472565cd07e0d7b899da54a4b04a6
+    m_Address: us_puz_panel_blue_wire
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a3377b179203d6749801ff5d6a452bcf
+    m_Address: item_hw_system
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a40a2b76d1afe1d46a5366461bcca46e
+    m_Address: prop_console02
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a42c287f55fa42740b63ca5a8d85b319
+    m_Address: decal_scorch2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a43b79153e101c44fbbe1b515152a028
+    m_Address: chunk_med2_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a493596901f471c4791baa3660dd729c
+    m_Address: weapon_grenadeemp
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a4a8906901fbd15428c8e6e2fb2c680d
+    m_Address: info_screenshake
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a52f9f31ebc7f114a8210beaa18d43c5
+    m_Address: chunk_sci2_1_slice45rh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a55851956e3512d30b8d16ca37b11b29
+    m_Address: decal_logo_storage
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a5bb3740ff5f2d4428ab6dc4eecb9232
+    m_Address: item_patch_berserk
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a623504244d74ec448598475492dcc07
+    m_Address: info_note
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a65c78cb4af87664faf9b56e9c75fa6c
+    m_Address: npc_flier_bot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a7153bf13f56a7e41aa13bb8a0a5a16a
+    m_Address: se_crate4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a8669738339bca84fa1f116ad4c87f15
+    m_Address: chunk_flight1_2_slice45rh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a8851ea7b745a674ab3974a1128819b8
+    m_Address: door_elevator4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a90a2d1aa1f7c824490117c8be87cb56
+    m_Address: chunk_rad1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a90ae76d32df39447a15d569a61bc806
+    m_Address: chunk_med1_1_slice256
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a9633d0f8ff993348a928b3d8f885e61
+    m_Address: chunk_med1_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a9b985b9e11a9c549a6ae4d99357c2aa
+    m_Address: item_access_card_perdarcy
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a9f6845e4c122574387f84bd6e587193
+    m_Address: chunk_sci1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aaacca9e442165242b94804f63232d3b
+    m_Address: chunk_sci3_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aabb2112227a37749af0715041904d44
+    m_Address: item_access_card_eng
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ab0baa21e8065954e98b50ad888db131
+    m_Address: chunk_maint2_9_slice45RH
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: abd82d394353f1248924e07a350bd0b6
+    m_Address: item_ammo_splinter
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ac1f9c88a998a684aa354a3ba1d57927
+    m_Address: prop_sleeping_cables
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ac228883b6ea07e49877db82458dd9fc
+    m_Address: chunk_eng1_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad0392e2a489c92459240dc842af7658
+    m_Address: chunk_med2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad33a0e864deb5b4caed613d74bbd37d
+    m_Address: npc_cyborg_diego
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad38e5da661f37941b375a9a9a50ced4
+    m_Address: npc_zerog_mutant
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: adf4a5550fc81dd48acc2c5252852c3f
+    m_Address: chunk_stor1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ae42e3ea23547c2479111b037e3dc430
+    m_Address: chunk_white
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ae4ae7f821111da48b6d7a7b5d1786be
+    m_Address: decal_bloodfonta
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ae6de9c29d088fe45a876cd554e3aea6
+    m_Address: chunk_bridg1_4_slice32
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aea20b2bd83174a4087f94d8c4235691
+    m_Address: decal_posterbetterfuture
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aedc34d8b69832442be9d90f1f65aa59
+    m_Address: npc_servbot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af13aa7769e3f9541bacf1f79d5ef78d
+    m_Address: prop_desk02
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af1446db2c13a934ca5db98cb0b8e8b3
+    m_Address: chunk_reac2_1bmirror
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: af6ec48fedba5af48bd07dbe4ecafd51
+    m_Address: chunk_med1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: aff70c87f5dccf9459011382ad272a45
+    m_Address: chunk_maint2_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b00ce9f2b682dca45addf1872b613940
+    m_Address: chunk_sci2_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b0f1c871a0e3e0e409f8f022c068b1ff
+    m_Address: chunk_maint2_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1924614301b534459b5ac0a37b1f599
+    m_Address: us_puz_panel_red_grid
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1c0a00938e41f840adf064974db1597
+    m_Address: ambient_liquid_bubble
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1dfd73d327041944803f40d75b8c43a
+    m_Address: text_decalStopDSS1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b1fe3b4719e8994479ba04b38fdc471d
+    m_Address: chunk_grove2_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b2145080101148245a228e5de57abc20
+    m_Address: chunk_exec2_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b234e962d48568d4096c2da8fbe36314
+    m_Address: weapon_grenadeemp_live
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b2a1f6e06718500468f4c31f590a1b8d
+    m_Address: chunk_med2_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b2fb6b4f74ce6494b8fe15e71803046e
+    m_Address: info_elev_destination
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b36a738d7fd80474680a3bea4d73865c
+    m_Address: item_hw_sensaround
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b386afc48d5a3284981f1af487b58d10
+    m_Address: prop_foliage_fern
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b3c7170f061d64f4d91ceeaa01398eaa
+    m_Address: weapon_magnum
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b3cfbd08499777b49ae81033708658cf
+    m_Address: chunk_bridg1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b41863e544c15964ebe07f1e65cf3eb0
+    m_Address: item_access_card_groupB
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b42a3a32b45a9cf48bed7c9bbe9c210f
+    m_Address: prop_phys_barrel_chemical
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b4ad79a852c01774b8b0b2ebd7bbbb5f
+    m_Address: chunk_maint2_3d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b55fb2b46e4199d4fb5a4bd6c19751fc
+    m_Address: prop_foliage_bush
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b5730bc7f0f30b54fadc9d21207eb5d7
+    m_Address: item_head_female
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b60a738594552f64b90da3d770315be5
+    m_Address: info_ressurection_point
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b64080474355b0c45ac7649793d7a841
+    m_Address: chunk_flight1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b6af38c2625d46843841e49890530d72
+    m_Address: se_crate3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b7498aae09084054a9e4907a24cdbadc
+    m_Address: chunk_sci1_8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b799feb4a8efa3343bf7bcc5aeff4f3c
+    m_Address: item_isotopex22
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b7b907883b6424e4cad3baf5247af462
+    m_Address: func_switch8
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b7e1bbbb7933f8c4e8e1508adafa1fb7
+    m_Address: chunk_sci1_2_slice45lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b88b66f06264e454cbaf334cd567a704
+    m_Address: chunk_sci1_2_slice45rh_up
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b8aff1aaf268285419766eadcdadbc93
+    m_Address: chunk_exec4_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b8b5eccb9439c964ab9f5312e00a5902
+    m_Address: chunk_exec3_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b90ec8c193d8df244a9f6bf406f8180f
+    m_Address: prop_grate4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: baac135c7678077408fc7a9b8309d2c1
+    m_Address: chunk_med2_8_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bb9a9af4c574f1442a0f61d9502e72fb
+    m_Address: decal_logo_armory
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bbc9fc28ffab7b1498548d96b7dffea1
+    m_Address: func_forcebridge
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc212845a2985aa438f60d004a932cd3
+    m_Address: item_access_card_science
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc5e4ff9d23a3a140866fb380db0bc53
+    m_Address: npc_avian_mutant
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc68ee4feb3a6da48b91dbab7e81c14a
+    m_Address: se_crate5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc728b524ab78064fa73ee85ae5f0cdb
+    m_Address: chunk_med1_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bcbceb5c1147eb145aaa7bf1b8b1ad26
+    m_Address: chunk_bridg1_3_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bce16a7883c550a46b1e5cd2a3e50902
+    m_Address: chunk_reac1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bce379962f0b443478f32072fbf5587b
+    m_Address: func_switch5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bd1bb6f83d7c3774fb958b983d4f99bd
+    m_Address: sec_cpunode_small
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bd7ad45c9c5a19c429199a17a4a486ae
+    m_Address: prop_chair02
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bdb79e300411afc4198baca438d0a231
+    m_Address: ambient_gurgle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be3e02af2aea6d34aa98f99df4bef91e
+    m_Address: ef_particle_sparkssmallblue
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be670d8a801c82b459b45deb7998ffc0
+    m_Address: weapon_grenademine
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be6aa6de229e4274e8068f55d12c06b0
+    m_Address: BulletHoleTiny
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be6acd0cda071f14297c1cd9efbe21fd
+    m_Address: chunk_sci1_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be8ae41ab6ad9c645be4c65585f6c6a9
+    m_Address: chunk_eng1_5d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be98895ccf885494ebe3aac384d48054
+    m_Address: chunk_eng2_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bef656ac98804544180cfd12105274dc
+    m_Address: chunk_grove2_9c
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf3248437babd1947b1b1e61e0b86520
+    m_Address: prop_sparkingwire
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf572fd3c0034ce40bb3fe2fe776822c
+    m_Address: item_access_card_group3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf8e96e0b5d33bb45a3e7da7e990e1be
+    m_Address: line_sparqbeam
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bf9a23e2cba8e3149a4ffcd715f2a4a1
+    m_Address: chunk_reac3_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c01fe3fde66b6ca41806d946f1d33d64
+    m_Address: chunk_med2_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c0592f2acf726b865a37f346a4d930ea
+    m_Address: chunk_blockerflightbay
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c08448067cf2e1945b267bc25cd17d63
+    m_Address: ambient_machine_humamb7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c0c0c3c0ed74a7a4ea65a9282e6b6917
+    m_Address: item_hw_bio
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c162f4d9a5f228b4496f2b1c67a1cd6f
+    m_Address: chunk_grove2_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c17181163567a7947a46ab8bd608e96d
+    m_Address: item_hw_navunit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c17b799fbfbc8ad4eb5d827a671c867a
+    m_Address: item_ammo_slag
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c1f6bdac4a7f67e35a081a6aca79ea46
+    m_Address: us_puz_panel_red_wire
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c200b24346e18af41a762eb179cc2b3d
+    m_Address: prop_phys_pot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c20c3e07a74021542a76cd7f2446e7ec
+    m_Address: weapon_grenadeearth
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c2b0369809d2e28488d299018364c36b
+    m_Address: chunk_reac1_1_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c2d2292cbc45af4afb6168ad7d877191
+    m_Address: flightpods_exterior
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c333844f1a9c6d841a373ac7731cfcf7
+    m_Address: prop_vendingmachines1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c47ad49de8d211647b91d9e3c9fbe2ed
+    m_Address: doorB
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c48a497679200244b99f2520f4199a89
+    m_Address: item_ammo_magcart
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c532fdead96a61041802ff6df9f1d1fd
+    m_Address: ef_particle_bloodspurtsmall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c60a9a3439cc9c32c8326bbec26ce59f
+    m_Address: TestWarnSuppression
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c620653bdf9658241987a6481ba088ed
+    m_Address: BulletHoleSmall
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c67f3eb114d6ce54189062a7f29fa032
+    m_Address: item_hw_infrared
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c6d6050f61c2b3a42aa53346651faa78
+    m_Address: cheat_arsenal7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c6e7fe7d408ad1642878bff8e7848782
+    m_Address: chunk_reac1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c77c57ee157e4b1479b1f7d12a55c584
+    m_Address: chunk_flight1_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c83b1ee4058fdca4b80177c1f438d0c2
+    m_Address: chunk_flight2_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c8d75296430c3454e9c154f56fa29c3b
+    m_Address: chunk_maint1_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c9e7a6aab0e751342b2d0acbd31601c5
+    m_Address: chunk_grove2_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca707324bbc816e4ebca895191eece4f
+    m_Address: item_chipset_bitflag
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca755791c4fa7db4eadd36cdd9206912
+    m_Address: chunk_grove2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ca8becc5a2d096846b386c512304512e
+    m_Address: chunk_eng1_3d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cabffcf0848cc484daa3441a1aa2020f
+    m_Address: chunk_sci1_7d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cae959e4e627b1d4bba2f62da0abe640
+    m_Address: chunk_exec3_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: caed5bc744cb8804aa42f5938f569617
+    m_Address: prop_cyber_switch
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cbabae1ebf6fe8d42a9a24947f90889d
+    m_Address: chunk_eng2_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cbbae7bb590ff86048497a208cdb4d0e
+    m_Address: proj_rail_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cbc49edc4993d15408e24b02b51e4fb0
+    m_Address: doorF
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cbc74f100bbda3f42b3d896d055aeb2e
+    m_Address: chunk_exteriorpanel1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cbe3fb9fa65581647bc96c39db8e5336
+    m_Address: func_switch4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cc2e06bb20fc60d4b82ec5fc73e51b64
+    m_Address: chunk_grove1_2_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cc3855ad460dba842bcdc02c37566715
+    m_Address: chunk_reac2_1_slice45RH_up
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cc6516c482d34a648a219ba80b6f510e
+    m_Address: npc_invisomut
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cc8b7794ea5df6c4584ba64837ccbc88
+    m_Address: item_hw_shield
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cc93e235180aa3144a07afac394e3e27
+    m_Address: prop_grass4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cd4a31d2755af474c8f6ed3d05266cdc
+    m_Address: prop_chair04
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce0ce17038768fd488bb4e1e18ac74ac
+    m_Address: chunk_sci1_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce4dc3f84cf23ce448f2d3a8724750ad
+    m_Address: npc_hopper
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce5227565892026498252cc6cf83eca9
+    m_Address: chunk_sci2_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce8634b676e80ba42bc7e940428edf6b
+    m_Address: door_secret1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ceaaca4da3a4b67409a963c72b75fc53
+    m_Address: chunk_eng2_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cebb47b3ddac1aa47abaa51ba3f4811e
+    m_Address: item_access_card_security
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cecd5bf4f92d2744ba75f48c7a22148e
+    m_Address: chunk_reac3_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ced001b119be11682bb219a2e9983df1
+    m_Address: proj_throwingstar
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf08f7d477605e4498dde78cc5e1b91e
+    m_Address: cheat_arsenal3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf287010284c9a440a810022bd46f1a0
+    m_Address: chunk_med2_9
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cf504b5660a0f4f4b8c6ff2557372ee4
+    m_Address: prop_vendingmachines2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cfd054bf71a348341b45a88b7338206b
+    m_Address: line_blaster
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cff0e117f7004e43ca0e42c466a3f963
+    m_Address: proj_stungun_shot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cff2be8d831b8b44086ca480091d2ecb
+    m_Address: door_secret3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d042bf2d5da0619429b1e7bbf41b7b3f
+    m_Address: chunk_maint2_7d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0b445a9ada05d048a1bad96ba654f6d
+    m_Address: chunk_exec4_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d185e459881b4aa4e88786992c411a3c
+    m_Address: weapon_sparqbeam
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d186c7b8748e4444097b19e29c6510fe
+    m_Address: chunk_med1_9d_ofs144_90
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d2178989387bd3348b61aa40ad523ed6
+    m_Address: item_flask
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d25b924b551532647ba0174262a50d1a
+    m_Address: chunk_eng2_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d26e82a6692777c4eba331180371e6bd
+    m_Address: se_corpse_tan
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d27b28da303171644a76f6744fec5b0c
+    m_Address: chunk_sci1_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d287288da3713344194a47f809c551f3
+    m_Address: item_patch_medi
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d2c85cfe22eb13a4387ef091b09816f3
+    m_Address: chunk_grove1_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d364a3a30c32a8c45b735b0e04b33b95
+    m_Address: prop_gear_large
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d36deb718def9e3468c0f0ba67478ab2
+    m_Address: prop_cyber_decoy
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3fabe0d8d1532d499591a80c8b980f2
+    m_Address: decal_blood_resist
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d452d0448f21b4545982d02645e97580
+    m_Address: chunk_maint1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d515a9d3bdcfcb8408381a99eda394b3
+    m_Address: trigger_gravitylift
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d5832fc7836b1da40ac3ffd55c936e27
+    m_Address: line_ion
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d7cf52e0a476d444ab8865d48e617881
+    m_Address: chunk_sec1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d845c16231c040f4a8dd4d0c1060ecf3
+    m_Address: chunk_stor1_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d84804eea2cf65043bf4e9af0ae07938
+    m_Address: chunk_med1_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d8bfaa46deec2324584ffc73588e9c7b
+    m_Address: info_mission
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d9516e0235a6cff4e84537b589750d7f
+    m_Address: chunk_exec2_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d98216f6a48dd6040bbd94e4ffea54b4
+    m_Address: chunk_med1_1_slice192RH
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da03a9151d7250941830f7fb790e4cc4
+    m_Address: chunk_reac5_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da6f4dc095e576242ad68a0692d72096
+    m_Address: chunk_exec4_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da7229e21c3400a429e74027f3cd388e
+    m_Address: prop_bed
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da7470886e90d3a4b854446cdeb62138
+    m_Address: ef_particle_sparqhit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da941ed07c3e7fa4daf5492fc288e508
+    m_Address: npc_sec2_bot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: db79c77903ccfd74dabacef7a893438f
+    m_Address: ambient_mist
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dbd63e32b4003e341a5a58ff05836818
+    m_Address: logic_timer
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dc04128155492194bbc8096ceceae1e1
+    m_Address: weapon_grenadefrag
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dc7e016589865864793b4c1c40afadd8
+    m_Address: chunk_stor1_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dca50b51f4dded749a21908d9868c405
+    m_Address: us_puz_panel_blue_grid
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dcc7aa2e31cd0cd4a87b6758268547fb
+    m_Address: npc_cortex_reaver
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dcf327c78a1c9be47b914272c00f959d
+    m_Address: weapon_stungun
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd036eadbadd19a4f8a4d8a611fe8f26
+    m_Address: chunk_maint2_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd1a8f4c3e33df7458a303ba80e99bd8
+    m_Address: item_ammo_penetrator
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd24a38dafe90f74cb5959bbcb705d65
+    m_Address: prop_grate1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dd441f58962f9af42a86d90a158341c7
+    m_Address: chunk_black
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dda0e9714596ec043af2f777cdb68898
+    m_Address: chunk_blocker
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dda60b2da438c364bb7b40607956cba7
+    m_Address: ambient_icemaker
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ddd7b5b7156946c4589e2afbd53e9f89
+    m_Address: item_patch_staminup
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dea03f62a622fd140a4a0439c059e117
+    m_Address: chunk_maint2_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df1e7b2fe012660449e84e297a813811
+    m_Address: prop_bonepile1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df3dae3255e2f5f45b95b4d92d50f49d
+    m_Address: ef_particle_camerahit
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df5e3c08c5e5924479b2b055d1892c5d
+    m_Address: chunk_maint2_9_slice128_top
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df9f468b4639f984ea4cd301e06503e4
+    m_Address: doorA
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e0486e2e8e69aa64fa2f01b1b1cf5d01
+    m_Address: BulletHoleLarge
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e0a9eb49003810b428b26ecb1e7b437b
+    m_Address: npc_sec1_bot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e19ca685ea3ef3bf38b6f776335a1ddf
+    m_Address: prop_papers01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e250a3e260eea02408bbc86112105ff3
+    m_Address: chunk_maint1_3b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e2c298d87c1e9654f8451bb9494a1e71
+    m_Address: weapon_grenadenitro
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e2d01d0a64e4aaf418bb0d2d2be160cb
+    m_Address: prop_chair05
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e3b21b49e9ce0bd4eb850d2b8a0d30b1
+    m_Address: chunk_reac2_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e41e124717b442a4585bf31de75608c6
+    m_Address: prop_brokengun
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e43880d26fe13664db0b84dca85dc81a
+    m_Address: chunk_bridg1_3flipx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e4af71f6cc28f2d4bbc5298ad99f9d84
+    m_Address: chunk_maint3_1_slice45
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e5889562085b5e846973b6318dab827b
+    m_Address: item_severedhead
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e5d4d6a68fad0cd428dfa3021318a04c
+    m_Address: item_fireextinguisher
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e613a7303a5600a4881bd4c1cf87e3c9
+    m_Address: chunk_reac6_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e6a7340eb917f7c4683606e8c3b0bb8a
+    m_Address: chunk_bridg1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e71d57369be84ea49b5894171f7a5c08
+    m_Address: ambient_machgear_loop
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e7fa60bd85fbabd9bbe803ed0ef5a1d8
+    m_Address: proj_enemshot2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e809e4b8e786ae949a98f9ba029ecb3c
+    m_Address: info_cyborgconversion
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e8455baa7f4fd4c4e94fb0fc7cc87c7c
+    m_Address: chunk_flight1_1b
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e85d99a7d01cb754390a39226e9b64e3
+    m_Address: chunk_exec1_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e869d211b3a56fd4ca6079e6c9872b3b
+    m_Address: logic_relay
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e885f719fe66c474ab16583c5b648368
+    m_Address: trigger_music
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e88d7cc5ff8e3c0408bfbd5d579b32ed
+    m_Address: chunk_bridg1_4_slice32flipx
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e8958b5e77ba15c4a927618506aed0fa
+    m_Address: chunk_exec1_1d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea2ce817b3d3bd447842104508346e1a
+    m_Address: chunk_maint2_6d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea34a733658591a47b03c9bb45d6eefa
+    m_Address: chunk_reac4_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ea76223b130cb154dad5fd151c55fd62
+    m_Address: decal_scorch3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ead80b581c2db804d813937ce6eef932
+    m_Address: chunk_med2_3d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eb796573828de7f44aeffcfc6b560b56
+    m_Address: npc_cyborg_drone
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ebf51cec14ca148429de8ab19662fe0f
+    m_Address: npc_repairbot
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ec2636c5fa3d9994087fb2d130610c00
+    m_Address: prop_chair03
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ec6c29e1e98c89b4886987a19de49739
+    m_Address: chunk_med1_7d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: edb109f3bbac0624f8ed8d578ae0abdb
+    m_Address: prop_foliage_poisonbush1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ee3404f873c73fbb9806ade557ba053d
+    m_Address: prop_vending2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eedb45e23eb927641b3c1e81b2d5b9be
+    m_Address: cheat_arsenal4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef04dfb99cc0eda408e4b6b53db2c0b6
+    m_Address: chunk_sci3_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef133a1554de48c478458d1b1ab99c3d
+    m_Address: prop_clothes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef52e4d534b45064aa62dc05bf566bbf
+    m_Address: decal_postergenetics
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ef7fa348aac60c9468b2ebbc483f5771
+    m_Address: chunk_stor1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: efb0be1e80ad8344db97acbdb9839957
+    m_Address: ambient_machinea1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: efd481cc67634f744924e81c023350ba
+    m_Address: chunk_sci1_8d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eff585ae79866ef439bdea4c122baf01
+    m_Address: chunk_bridg2_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f0d5496634af0fd4eaa0710233e23723
+    m_Address: chunk_sci1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f17530c19f252a145ad26756841fad6e
+    m_Address: chunk_med1_7_slice45_320rh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f1953d8de20730f429a9c01481b8246f
+    m_Address: line_hopperbeam
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f1f90891c5a429b41a2dc657f251907e
+    m_Address: prop_light_emergsignal
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f21a6a9e6187fc944979c2ae7066231e
+    m_Address: chunk_maint1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2604d7e2fc09f141bd614c53a195585
+    m_Address: ambient_lev3loop2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2665c8be18487d47b1abfc93e314435
+    m_Address: chunk_med1_7_slice45_320lh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f28790541862f1547921d628a6c86423
+    m_Address: ambient_pump
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f2f4340d2c6909c44ae9303d1789a408
+    m_Address: chunk_maint1_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f360a4b0625d801469844f79f225e384
+    m_Address: weapon_grenadefrag_live
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f37c1a56ea8703d4397513e5fa0f41a7
+    m_Address: prop_skeleton
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4170d3a1a44d854e962be133654944b
+    m_Address: chunk_eng1_9d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f428e7f4f04174f4987040f92d8934c4
+    m_Address: ambient_machine_ambience
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f46dda9de23d10845a9649e1494416f5
+    m_Address: chunk_reac2_4_slice128lower
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f488188e6f7f3b34283261ae71b85c74
+    m_Address: prop_beaker_holder
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4b4b3332a744184ebf5debf90a9f16b
+    m_Address: item_ammo_rail
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4c1270a2d48108459f77e2bc0cef0c0
+    m_Address: chunk_grove1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4fa21d8f0f73d899bce5541d4538ba9
+    m_Address: prop_papers02
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f58a7ce9652fa254682959128fae625a
+    m_Address: doorI
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f5ac25de5b0729447998ef0c3bf91bf1
+    m_Address: item_cyber_game
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f5b4cd1d08de8084f9440ae2d9e73a04
+    m_Address: item_head_male
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f5ec42df8f9cfa14f8ce864e49ea7d99
+    m_Address: info_message
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f69b30b5c1945454dab3ee272446b711
+    m_Address: se_corpse_labcoat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f6e5f40785067cf42822877aca3c4a3d
+    m_Address: func_switch5broken
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f73bf191b3df07c46bae5b155d97d3ca
+    m_Address: ambient_liquid_lava2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f73c59f1b53a4c541bfa82ab9b43e77b
+    m_Address: prop_weapon_rack
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f75ccd7ae7893e74d9c312f1382a94d3
+    m_Address: chunk_bridg2_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f769aa4199f1ed546a624950f61231ab
+    m_Address: ef_spraydrips
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f7e1140baff7b584da61b8a37d803353
+    m_Address: npc_cyber_reaver
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f7f21afc6574b9d4a9170afba868beae
+    m_Address: cheat_arsenal2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f807605fa4509b042a38611205db3ece
+    m_Address: chunk_reac6_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8513172547d95940a93aff00f6099c8
+    m_Address: chunk_maint2_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8766551c8dbae74586109cd99aa3faf
+    m_Address: prop_table
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f88a9dae1077072449ad2f0d15d212e5
+    m_Address: ambient_rain
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f88ada74e3e05c4489e8cd7e5f6bc508
+    m_Address: doorG
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8cdad00fda06db4481cc5b735084a33
+    m_Address: chunk_bridg2_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8e0f87531b4ce84c859ae749c01b504
+    m_Address: se_corpse_eaten
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9247dffa34007640b8a3e17597d16cf
+    m_Address: chunk_grove1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f95f5a2f5c048784b9327bf0676d6f96
+    m_Address: item_cyber_pulser
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9677d48f9248f14390ba9ab72300b2a
+    m_Address: prop_computer
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f990d4d7bf4958446a3697e2455dc3f7
+    m_Address: chunk_stor1_6_slice192rh
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9cef3dcc1bc67a459c4445788d07d49
+    m_Address: chunk_maint1_6
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f9fb336701080ac4983aa789549f509b
+    m_Address: chunk_med2_9d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fa0f7813eba3be240af7a6268b61b5f0
+    m_Address: us_puz_elevatorkeypad
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fa26b282b719e0d4282a8692493c7551
+    m_Address: se_cabinet
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fa65cac19883fa34bb8088eb110cde41
+    m_Address: chunk_stor1_4
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: facf0be8e3817204384cb87c535bc7e8
+    m_Address: weapon_grenadenitro_live
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fb682da1975e731439a2caeb0077346a
+    m_Address: chunk_screen
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fc0d420ac1dfb188497f04b6a4e9de94
+    m_Address: fx_reverbzone
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fcb55ff35aa945e4099853b5bde4da3f
+    m_Address: prop_gear_small
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fce12dccaf5796148ae2ba15cb287c4c
+    m_Address: item_access_card_per5diego
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd0c6e35c4718429689d5629ef881f59
+    m_Address: prop_vending1_3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd2f51a0467684d458774446cf1897c0
+    m_Address: chunk_bridg2_7
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd6692f923434024fbad2af52eaea6d4
+    m_Address: chunk_bridg1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fd6e7082939bd08498e76bd68d40f9ce
+    m_Address: item_plastique
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fde7b2653b4b32a4787daea250c0db36
+    m_Address: chunk_flight1_5
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fdf45d275e1563a4e88c0a351099b72a
+    m_Address: us_isotopepanel
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fdf700e3422015947a806e8f1a74cdff
+    m_Address: door_elevator2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fdf883a4e6d2ff643a2ffb037a68ea59
+    m_Address: prop_grass1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fed97eda612b85e4b81a7f5d631bfb41
+    m_Address: chunk_exec1_2d
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ff1a06b2590e5fe16976312896104e56
+    m_Address: prop_vending1_2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 6c9aafa9d0a81424d8ccf95d0ed9cceb, type: 2}
+    - {fileID: 11400000, guid: a31b0110d22b491478a9cd929d279bba, type: 2}

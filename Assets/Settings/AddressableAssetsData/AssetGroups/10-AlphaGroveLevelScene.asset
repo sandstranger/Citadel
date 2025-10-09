@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: 10-AlphaGroveLevelScene
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: 10-AlphaGroveLevelScene
+  m_GUID: 7e89e08bec22831448a507054cd09fa1
+  m_SerializeEntries:
+  - m_GUID: 56a76d4e77c7adf4a8ee17db407df985
+    m_Address: Assets/Prefabs/Levels/Level_10
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8757d3d57495a7644a3aca1ee3156986
+    m_Address: Assets/Scenes/10-AlphaGroveLevelScene.unity
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: cd153d8a525c89f4893c60c87f386343
+    m_Address: Assets/Scenes/10-AlphaGroveLevelScene
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: c1c83ef75ddae714889269da87d2bce0, type: 2}
+    - {fileID: 11400000, guid: 1a6ba54253d70b64d809c91585972000, type: 2}
