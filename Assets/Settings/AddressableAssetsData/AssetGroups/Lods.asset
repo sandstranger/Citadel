@@ -10,14 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Default Local Group
+  m_Name: Lods
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
-  m_GroupName: Default Local Group
-  m_GUID: 1bc74299bd8cd02499b9cc98bf91bc17
-  m_SerializeEntries: []
+  m_GroupName: Lods
+  m_GUID: a1f066f256a50a4439c71f0cc6b9cfcf
+  m_SerializeEntries:
+  - m_GUID: 5fa285b5caff2e5428f87d143bee6d10
+    m_Address: Assets/Meshes
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: d9631435c68788d43a8e11b76f1e07cb, type: 2}
-    - {fileID: 11400000, guid: db27d72879ed75043acd9819b65134f3, type: 2}
+    - {fileID: 11400000, guid: 3e8df2d0489675844b9dcdb8696551fd, type: 2}
+    - {fileID: 11400000, guid: db3c482f93a28ef44978b658a46a59d3, type: 2}

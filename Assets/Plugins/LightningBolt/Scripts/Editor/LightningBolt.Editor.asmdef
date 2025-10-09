@@ -1,18 +1,14 @@
 {
-    "name": "Citadel",
+    "name": "LightningBolt.Editor",
     "rootNamespace": "",
     "references": [
-        "SimpleFileBrowser.Runtime",
-        "BetterStreamingAssets",
-        "Zenject",
-        "Unity.TextMeshPro",
-        "Unity.Postprocessing.Runtime",
-        "FidelityFX.FSR",
         "LightningBolt.Runtime"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
-    "allowUnsafeCode": true,
+    "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,

@@ -10,14 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Default Local Group
+  m_Name: TextsAssets
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
-  m_GroupName: Default Local Group
-  m_GUID: 1bc74299bd8cd02499b9cc98bf91bc17
-  m_SerializeEntries: []
+  m_GroupName: TextsAssets
+  m_GUID: dc8e3ab7c220ade4d86a319dbdb818ca
+  m_SerializeEntries:
+  - m_GUID: 206ea66f930125f46932a643f81ae76f
+    m_Address: Assets/TextsAssets
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 7230ffaaa7f85b340864ce292e7abc3a, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: d9631435c68788d43a8e11b76f1e07cb, type: 2}
-    - {fileID: 11400000, guid: db27d72879ed75043acd9819b65134f3, type: 2}
+    - {fileID: 11400000, guid: 0952669208cdf114e9e2097040031bcb, type: 2}
+    - {fileID: 11400000, guid: 6fb2462b985fa1f40bdca99d1e337a93, type: 2}

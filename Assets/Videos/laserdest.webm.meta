@@ -6,7 +6,7 @@ VideoClipImporter:
   frameRange: 0
   startFrame: -1
   endFrame: -1
-  colorSpace: 0
+  colorSpace: 3
   deinterlace: 0
   encodeAlpha: 0
   flipVertical: 0
