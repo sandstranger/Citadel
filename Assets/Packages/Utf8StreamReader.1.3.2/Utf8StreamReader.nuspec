@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Utf8StreamReader</id>
+    <version>1.3.2</version>
+    <authors>Cysharp</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>Icon.png</icon>
+    <projectUrl>https://github.com/Cysharp/Utf8StreamReader</projectUrl>
+    <description>Utf8 based StreamReader for high performance text processing.</description>
+    <copyright>© Cysharp, Inc.</copyright>
+    <tags>string</tags>
+    <repository type="git" url="https://github.com/Cysharp/Utf8StreamReader" commit="35e2361b7a67e0838b777262c4a7798da50206ca" />
+    <dependencies>
+      <group targetFramework="net6.0" />
+      <group targetFramework="net8.0" />
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="6.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
