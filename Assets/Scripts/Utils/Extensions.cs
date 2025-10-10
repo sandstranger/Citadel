@@ -19,7 +19,7 @@ namespace Citadel.Game
         {
             UniTaskCompletionSource taskCompletion = new UniTaskCompletionSource();
             
-            using (cancellationToken.Register(() => taskCompletion.TrySetCanceled(cancellationToken))) ;
+            using (cancellationToken.Register(() => taskCompletion.TrySetResult()));
 
             var completedResult = await UniTask.WhenAny(task, taskCompletion.Task);
 
@@ -40,7 +40,7 @@ namespace Citadel.Game
         {
             var tcs = new TaskCompletionSource<object>();
 
-            using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken))) ;
+            using (cancellationToken.Register(() => tcs.TrySetResult(null))) ;
 
             var completedTask = await Task.WhenAny(task, tcs.Task);
 

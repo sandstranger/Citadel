@@ -24,7 +24,7 @@ namespace Citadel.Game
 
     internal static class IResourcesLoaderExtensions
     {
-        public static async void LoadAssetAsync<T>(this IResourcesLoader resourcesLoader, string assetName,
+        public static async UniTaskVoid LoadAssetAsync<T>(this IResourcesLoader resourcesLoader, string assetName,
             Action<T> onAssetLoaded) where T : UnityEngine.Object
         {
             if (string.IsNullOrEmpty(assetName))
@@ -38,7 +38,7 @@ namespace Citadel.Game
             onAssetLoaded(loadedAsset);
         } 
 
-        public static async void InstantiateAsync(this IResourcesLoader resourcesLoader, string assetName, 
+        public static async UniTaskVoid InstantiateAsync(this IResourcesLoader resourcesLoader, string assetName, 
             Vector3 position, Quaternion rotation, Transform parentTransform, Action<GameObject> onPrefabInstantiated)
         {
             if (string.IsNullOrEmpty(assetName))
