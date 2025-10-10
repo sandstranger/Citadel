@@ -25,6 +25,11 @@ namespace Citadel.Game
         public async Task<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken) 
             where T : Object
         {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException(nameof(assetName));
+            }
+            
             try
             {
                 using (cancellationToken.Register(() => ReleaseAsset(assetName)));
@@ -39,6 +44,11 @@ namespace Citadel.Game
         
         public async Task<T> LoadAssetAsync<T>(string assetName) where T : Object
         {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException(nameof(assetName));
+            }
+            
             if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
             {
                 if (assetInfo.Handle.IsDone)
@@ -59,6 +69,11 @@ namespace Citadel.Game
         public async Task<GameObject> InstantiateAsync(string assetName, Vector3 position, Quaternion rotation,
             Transform parentTransform, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException(nameof(assetName));
+            }
+            
             try
             {
                 var prefab = await LoadAssetAsync<GameObject>(assetName, cancellationToken);
@@ -83,6 +98,11 @@ namespace Citadel.Game
         public async Task<GameObject> InstantiateAsync(string assetName, Vector3 position, Quaternion rotation,
             Transform parentTransform)
         {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException(nameof(assetName));
+            }
+            
             var prefab = await LoadAssetAsync<GameObject>(assetName);
             var prefabInstance = await Addressables.InstantiateAsync(prefab, position, 
                 rotation, parentTransform).Task;
@@ -92,6 +112,11 @@ namespace Citadel.Game
 
         public void ReleaseAsset(string assetName)
         {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException(nameof(assetName));
+            }
+            
             if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
             {
                 Addressables.Release(assetInfo.Handle);
