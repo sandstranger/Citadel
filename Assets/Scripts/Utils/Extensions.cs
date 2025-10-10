@@ -27,20 +27,11 @@ namespace Citadel.Game
             }
         }
     
-        public static async Task<T> WithCancellationAsync<T>(this Task<T> task, CancellationToken cancellationToken)
+        public static async Task<T> WithCancellationAsync<T>(this Task<T> genericTask, CancellationToken cancellationToken)
         {
-            var tcs = new TaskCompletionSource<object>();
-
-            using (cancellationToken.Register(() => tcs.TrySetCanceled(cancellationToken))) ;
-
-            var completedTask = await Task.WhenAny(task, tcs.Task);
-
-            if (completedTask == tcs.Task)
-            {
-                throw new OperationCanceledException(cancellationToken);
-            }
-
-            return await task;
+            Task baseTask = genericTask;
+            await baseTask.WithCancellationAsync(cancellationToken);
+            return await genericTask;
         }
 
         public static async Task WithCancellationAsync(this Task task, CancellationToken cancellationToken)
