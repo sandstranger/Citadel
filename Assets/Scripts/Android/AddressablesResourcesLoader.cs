@@ -65,8 +65,11 @@ namespace Citadel.Game
 
                 if (prefab is not null)
                 {
-                    return await InstantiateAsync(prefab, position, rotation, parentTransform)
-                        .WithCancellationAsync(cancellationToken);
+                    AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(prefab, position, rotation, parentTransform);
+                    using (cancellationToken.Register(() => handle.Release()));
+                    var prefabInstance = await handle.Task.WithCancellationAsync(cancellationToken);
+                    InjectExistingPrefab(prefabInstance);
+                    return prefabInstance;
                 }
             }
             catch (Exception e)
@@ -81,7 +84,10 @@ namespace Citadel.Game
             Transform parentTransform)
         {
             var prefab = await LoadAssetAsync<GameObject>(assetName);
-            return await InstantiateAsync(prefab, position, rotation, parentTransform);
+            var prefabInstance = await Addressables.InstantiateAsync(prefab, position, 
+                rotation, parentTransform).Task;
+            InjectExistingPrefab(prefabInstance);
+            return prefabInstance;
         }
 
         public void ReleaseAsset(string assetName)
@@ -109,15 +115,6 @@ namespace Citadel.Game
             ReleaseAllAssets();
         }
 
-        private async Task<GameObject> InstantiateAsync(GameObject prefab, Vector3 position, Quaternion rotation,
-            Transform parentTransform)
-        {
-            var prefabInstance = await Addressables.InstantiateAsync(prefab, position, 
-                rotation, parentTransform).Task;
-            InjectExistingPrefab(prefabInstance);
-            return prefabInstance;
-        }
-        
         private void InjectExistingPrefab(GameObject prefabInstance)
         {
             foreach (var component in prefabInstance.GetComponentsInChildren<MonoBehaviour>(true))
