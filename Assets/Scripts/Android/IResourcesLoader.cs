@@ -12,11 +12,15 @@ namespace Citadel.Game
 
         Task<T> LoadAssetAsync<T>(string assetName) where T : UnityEngine.Object;
 
+        T LoadAsset<T>(string assetName) where T : UnityEngine.Object;
+        
         Task<GameObject> InstantiateAsync (string assetName, Vector3 position, Quaternion rotation,
             Transform parentTransform, CancellationToken cancellationToken);
         
         Task<GameObject> InstantiateAsync (string assetName, Vector3 position, Quaternion rotation,
             Transform parentTransform );
+
+        GameObject Instantiate(string assetName, Vector3 position, Quaternion rotation, Transform parentTransform);
         
         void ReleaseAsset(string assetName);
 
@@ -69,21 +73,6 @@ namespace Citadel.Game
             Vector3 position, Quaternion rotation, Action<GameObject> onPrefabInstantiated)
         {
             resourcesLoader.InstantiateAsync(assetName, position, rotation,null, onPrefabInstantiated);
-        }
-
-        public static T LoadAsset<T>(this IResourcesLoader resourcesLoader, string assetName) where T : UnityEngine.Object
-        {
-            var loadAssetTask = resourcesLoader.LoadAssetAsync<T>(assetName);
-            loadAssetTask.SpinWait();
-            return loadAssetTask.Result;
-        }
-
-        public static GameObject Instantiate(this IResourcesLoader resourcesLoader, string assetName, Vector3 position,
-            Quaternion rotation, Transform parentTransform)
-        {
-            var instantiatePrefabTask = resourcesLoader.InstantiateAsync(assetName,position,rotation,parentTransform);
-            instantiatePrefabTask.SpinWait();
-            return instantiatePrefabTask.Result;
         }
 
         public static GameObject Instantiate(this IResourcesLoader resourcesLoader, string assetName,

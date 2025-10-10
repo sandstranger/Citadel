@@ -65,7 +65,7 @@ namespace Citadel.Game
             await handle.Task;
             return handle.Result;
         }
-        
+
         public async Task<GameObject> InstantiateAsync(string assetName, Vector3 position, Quaternion rotation,
             Transform parentTransform, CancellationToken cancellationToken)
         {
@@ -108,6 +108,45 @@ namespace Citadel.Game
                 rotation, parentTransform).Task;
             InjectExistingPrefab(prefabInstance);
             return prefabInstance;
+        }
+
+        public T LoadAsset<T>(string assetName) where T : Object
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException(nameof(assetName));
+            }
+            
+            if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
+            {
+                if (assetInfo.Handle.IsDone)
+                {
+                    return assetInfo.GetResult<T>();
+                }
+
+                assetInfo.Handle.WaitForCompletion();
+                return assetInfo.GetResult<T>();
+            }
+            
+            var handle = Addressables.LoadAssetAsync<T>(assetName);
+            _loadedAssets[assetName] = new AssetInfo(assetName, handle);
+            handle.WaitForCompletion();
+            return handle.Result;
+        }
+        
+        public GameObject Instantiate(string assetName, Vector3 position, Quaternion rotation, Transform parentTransform)
+        {
+            if (string.IsNullOrEmpty(assetName))
+            {
+                throw new ArgumentNullException(nameof(assetName));
+            }
+            
+            var prefab = LoadAsset<GameObject>(assetName);
+            var prefabInstanceTask = Addressables.InstantiateAsync(prefab, position, 
+                rotation, parentTransform);
+            prefabInstanceTask.WaitForCompletion();
+            InjectExistingPrefab(prefabInstanceTask.Result);
+            return prefabInstanceTask.Result;
         }
 
         public void ReleaseAsset(string assetName)
