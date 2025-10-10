@@ -74,14 +74,16 @@ namespace Citadel.Game
         public static T LoadAsset<T>(this IResourcesLoader resourcesLoader, string assetName) where T : UnityEngine.Object
         {
             var loadAssetTask = resourcesLoader.LoadAssetAsync<T>(assetName);
-            return loadAssetTask.ConfigureAwait(false).GetAwaiter().GetResult();
+            loadAssetTask.SpinWait();
+            return loadAssetTask.Result;
         }
 
         public static GameObject Instantiate(this IResourcesLoader resourcesLoader, string assetName, Vector3 position,
             Quaternion rotation, Transform parentTransform)
         {
             var instantiatePrefabTask = resourcesLoader.InstantiateAsync(assetName,position,rotation,parentTransform);
-            return instantiatePrefabTask.ConfigureAwait(false).GetAwaiter().GetResult();
+            instantiatePrefabTask.SpinWait();
+            return instantiatePrefabTask.Result;
         }
 
         public static GameObject Instantiate(this IResourcesLoader resourcesLoader, string assetName,
