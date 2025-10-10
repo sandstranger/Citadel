@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -8,19 +8,14 @@ namespace Citadel.Game
 {
     internal interface IResourcesLoader : IDisposable
     {
-        Task<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken) where T : UnityEngine.Object;
-
-        Task<T> LoadAssetAsync<T>(string assetName) where T : UnityEngine.Object;
+        UniTask<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken = default) where T : UnityEngine.Object;
 
         T LoadAsset<T>(string assetName) where T : UnityEngine.Object;
         
-        Task<GameObject> InstantiateAsync (string assetName, Vector3 position, Quaternion rotation,
-            Transform parentTransform, CancellationToken cancellationToken);
+        UniTask<GameObject> InstantiateAsync (string assetName, Vector3 position, Quaternion rotation,
+            Transform parentTransform = null, CancellationToken cancellationToken = default);
         
-        Task<GameObject> InstantiateAsync (string assetName, Vector3 position, Quaternion rotation,
-            Transform parentTransform );
-
-        GameObject Instantiate(string assetName, Vector3 position, Quaternion rotation, Transform parentTransform);
+        GameObject Instantiate(string assetName, Vector3 position, Quaternion rotation, Transform parentTransform = null);
         
         void ReleaseAsset(string assetName);
 
@@ -29,18 +24,6 @@ namespace Citadel.Game
 
     internal static class IResourcesLoaderExtensions
     {
-        public static Task<GameObject> InstantiateAsync (this IResourcesLoader resourcesLoader,string assetName, 
-            Vector3 position, Quaternion rotation, CancellationToken cancellationToken)
-        {
-            return resourcesLoader.InstantiateAsync(assetName, position, rotation, null, cancellationToken);
-        }
-
-        public static Task<GameObject> InstantiateAsync (this IResourcesLoader resourcesLoader,string assetName, Vector3 position,
-            Quaternion rotation)
-        {
-            return resourcesLoader.InstantiateAsync(assetName, position, rotation, null);
-        }
-
         public static async void LoadAssetAsync<T>(this IResourcesLoader resourcesLoader, string assetName,
             Action<T> onAssetLoaded) where T : UnityEngine.Object
         {
@@ -73,12 +56,6 @@ namespace Citadel.Game
             Vector3 position, Quaternion rotation, Action<GameObject> onPrefabInstantiated)
         {
             resourcesLoader.InstantiateAsync(assetName, position, rotation,null, onPrefabInstantiated);
-        }
-
-        public static GameObject Instantiate(this IResourcesLoader resourcesLoader, string assetName,
-            Vector3 position, Quaternion rotation)
-        {
-            return resourcesLoader.Instantiate(assetName, position, rotation, null);
         }
     }
 }

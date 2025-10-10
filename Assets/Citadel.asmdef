@@ -10,7 +10,9 @@
         "FidelityFX.FSR",
         "LightningBolt.Runtime",
         "Unity.Addressables",
-        "Unity.ResourceManager"
+        "Unity.ResourceManager",
+        "UniTask.Addressables",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

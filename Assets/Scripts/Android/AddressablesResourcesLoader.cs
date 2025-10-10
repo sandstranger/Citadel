@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -20,7 +20,7 @@ namespace Citadel.Game
         private readonly DiContainer _container;
         private readonly Dictionary<string, AssetInfo> _loadedAssets = new(DefaultAssetsCapacity);
         
-        public async Task<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken) 
+        public async UniTask<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken = default) 
             where T : Object
         {
             if (string.IsNullOrEmpty(assetName))
@@ -30,8 +30,29 @@ namespace Citadel.Game
             
             try
             {
-                using (cancellationToken.Register(() => ReleaseAsset(assetName)));
-                return await LoadAssetAsync<T>(assetName).WithCancellationAsync(cancellationToken);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    ReleaseAsset(assetName);
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+
+                using (cancellationToken.Register(() => ReleaseAsset(assetName))) ;
+                
+                if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
+                {
+                    if (assetInfo.Handle.IsDone)
+                    {
+                        return assetInfo.GetResult<T>();
+                    }
+
+                    await assetInfo.Handle.WithCancellation(cancellationToken, true);
+                    return assetInfo.GetResult<T>();
+                }
+            
+                var handle = Addressables.LoadAssetAsync<T>(assetName);
+                _loadedAssets[assetName] = new AssetInfo(assetName, handle);
+                await handle.WithCancellation(cancellationToken, true);
+                return handle.Result;
             }
             catch (OperationCanceledException e)
             {
@@ -40,32 +61,8 @@ namespace Citadel.Game
             }
         }
         
-        public async Task<T> LoadAssetAsync<T>(string assetName) where T : Object
-        {
-            if (string.IsNullOrEmpty(assetName))
-            {
-                throw new ArgumentNullException(nameof(assetName));
-            }
-            
-            if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
-            {
-                if (assetInfo.Handle.IsDone)
-                {
-                    return assetInfo.GetResult<T>();
-                }
-
-                await assetInfo.Handle.Task;
-                return assetInfo.GetResult<T>();
-            }
-            
-            var handle = Addressables.LoadAssetAsync<T>(assetName);
-            _loadedAssets[assetName] = new AssetInfo(assetName, handle);
-            await handle.Task;
-            return handle.Result;
-        }
-
-        public async Task<GameObject> InstantiateAsync(string assetName, Vector3 position, Quaternion rotation,
-            Transform parentTransform, CancellationToken cancellationToken)
+        public async UniTask<GameObject> InstantiateAsync(string assetName, Vector3 position, Quaternion rotation,
+            Transform parentTransform, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(assetName))
             {
@@ -74,13 +71,17 @@ namespace Citadel.Game
             
             try
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                
                 var prefab = await LoadAssetAsync<GameObject>(assetName, cancellationToken);
 
                 if (prefab is not null)
                 {
                     AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(prefab, position, rotation, parentTransform);
-                    using (cancellationToken.Register(() => handle.Release()));
-                    var prefabInstance = await handle.Task.WithCancellationAsync(cancellationToken);
+                    var prefabInstance = await handle.WithCancellation(cancellationToken,true);
                     InjectExistingPrefab(prefabInstance);
                     return prefabInstance;
                 }
@@ -91,21 +92,6 @@ namespace Citadel.Game
             }
 
             return null;
-        }
-
-        public async Task<GameObject> InstantiateAsync(string assetName, Vector3 position, Quaternion rotation,
-            Transform parentTransform)
-        {
-            if (string.IsNullOrEmpty(assetName))
-            {
-                throw new ArgumentNullException(nameof(assetName));
-            }
-            
-            var prefab = await LoadAssetAsync<GameObject>(assetName);
-            var prefabInstance = await Addressables.InstantiateAsync(prefab, position, 
-                rotation, parentTransform).Task;
-            InjectExistingPrefab(prefabInstance);
-            return prefabInstance;
         }
 
         public T LoadAsset<T>(string assetName) where T : Object

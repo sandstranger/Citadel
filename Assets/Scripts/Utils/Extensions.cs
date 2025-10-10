@@ -1,32 +1,34 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 namespace Citadel.Game
 {
     internal static class Extensions
     {
-        private static SynchronizationContext _unityContext;
-    
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void Initialize()
+        public static async UniTask<T> WithCancellationAsync<T>(this UniTask<T> genericTask,
+            CancellationToken cancellationToken)
         {
-            _unityContext = SynchronizationContext.Current;
+            UniTask baseTask = genericTask;
+            await baseTask.WithCancellationAsync(cancellationToken);
+            return genericTask.GetAwaiter().GetResult();
         }
-    
-        public static void SpinWait(this Task task)
+        
+        public static async UniTask WithCancellationAsync(this UniTask task, CancellationToken cancellationToken)
         {
-            if (SynchronizationContext.Current == _unityContext)
+            UniTaskCompletionSource taskCompletion = new UniTaskCompletionSource();
+            
+            using (cancellationToken.Register(() => taskCompletion.TrySetCanceled(cancellationToken))) ;
+
+            var completedResult = await UniTask.WhenAny(task, taskCompletion.Task);
+
+            if (completedResult == 1)
             {
-                WaitInMainThread(task);
-            }
-            else
-            {
-                _unityContext.Send(_ => WaitInMainThread(task), null);
+                throw new OperationCanceledException(cancellationToken);
             }
         }
-    
+        
         public static async Task<T> WithCancellationAsync<T>(this Task<T> genericTask, CancellationToken cancellationToken)
         {
             Task baseTask = genericTask;
@@ -45,36 +47,6 @@ namespace Citadel.Game
             if (completedTask == tcs.Task)
             {
                 throw new OperationCanceledException(cancellationToken);
-            }
-        }
-
-        internal static Task ToTask(this AsyncOperation asyncOperation)
-        {
-            var completionSource = new TaskCompletionSource<object>();
-            asyncOperation.completed += _ => completionSource.SetResult(null);
-            return completionSource.Task;
-        }
-        
-        private static void WaitInMainThread(Task task)
-        {
-            var frameCount = 0;
-            var spinWait = new SpinWait();
-        
-            while (!task.IsCompleted)
-            {
-                spinWait.SpinOnce();
-                frameCount++;
-            
-                if (frameCount % 10 == 0)
-                {
-                    UnityEngine.EventSystems.ExecuteEvents.Execute(null, null, 
-                        UnityEngine.EventSystems.ExecuteEvents.updateSelectedHandler);
-                }
-
-                if (frameCount > 10000)
-                {
-                    throw new TimeoutException("Task wait timeout in main thread");
-                }
             }
         }
     }
