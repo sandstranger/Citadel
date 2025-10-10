@@ -7,6 +7,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using ZLinq;
 
 // Found this here: https://github.com/liortal53/MissingReferencesUnity
 // by Lior Tal aka liortal53.  Sadly he did not have a readme or license in his

@@ -7,8 +7,7 @@ namespace Citadel.Game
 {
     internal static class Extensions
     {
-        public static async UniTask<T> WithCancellationAsync<T>(this UniTask<T> genericTask,
-            CancellationToken cancellationToken)
+        public static async UniTask<T> WithCancellationAsync<T>(this UniTask<T> genericTask, CancellationToken cancellationToken)
         {
             UniTask baseTask = genericTask;
             await baseTask.WithCancellationAsync(cancellationToken);

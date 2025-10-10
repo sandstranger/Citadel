@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using FidelityFX.FSR2;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using ZLinq;
 
 namespace Citadel.Game
 {
@@ -27,9 +27,8 @@ namespace Citadel.Game
 
         private static List<Dropdown.OptionData> BuildFsrQualityOptions()
         {
-            var fsr2QualityModes = Enum.GetValues(typeof(Fsr2.QualityMode)).OfType<Fsr2.QualityMode>().ToArray();
-            var dropDownOptions = new List<Dropdown.OptionData>(fsr2QualityModes.Length);
-
+            var dropDownOptions = new List<Dropdown.OptionData>();
+            var fsr2QualityModes = Enum.GetValues(typeof(Fsr2.QualityMode)).Cast<Fsr2.QualityMode>();
             foreach (var fsr2QualityMode in fsr2QualityModes)
             {
                 dropDownOptions.Add(new Dropdown.OptionData($"{QualityPrefix}{fsr2QualityMode}"));
