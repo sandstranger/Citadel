@@ -46,8 +46,6 @@ namespace Citadel.Game
             {
                 throw new OperationCanceledException(cancellationToken);
             }
-
-            await task;
         }
 
         internal static Task ToTask(this AsyncOperation asyncOperation)
