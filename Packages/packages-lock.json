@@ -7,6 +7,13 @@
       "dependencies": {},
       "hash": "103724d1001fc643412dbc089cccca3e2f07ce84"
     },
+    "com.madsbangh.easybuttons": {
+      "version": "https://github.com/madsbangh/EasyButtons.git#upm",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "73d2383899210da808a1b27329cdaa8000de557b"
+    },
     "com.oddworm.texture2darrayimportpipeline": {
       "version": "https://github.com/pschraut/UnityTexture2DArrayImportPipeline.git#1.5.0",
       "depth": 0,

@@ -8,7 +8,9 @@
         "Unity.TextMeshPro",
         "Unity.Postprocessing.Runtime",
         "FidelityFX.FSR",
-        "LightningBolt.Runtime"
+        "LightningBolt.Runtime",
+        "Unity.Addressables",
+        "Unity.ResourceManager"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

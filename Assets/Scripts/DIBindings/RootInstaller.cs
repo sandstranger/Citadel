@@ -72,6 +72,7 @@ namespace Citadel.Game
 
         public override void InstallBindings()
         {
+            Container.Bind<IResourcesLoader>().FromInstance(AddressablesResourcesLoader.Default).AsSingle();
             Container.Bind<AndroidConfig>().FromInstance(AndroidConfig.Default).AsSingle();
             Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>()
                 .FromInstance(_postProcessLayerStorages).AsSingle();
