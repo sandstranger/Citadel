@@ -72,7 +72,7 @@ namespace Citadel.Game
                     return prefabInstance;
                 }
             }
-            catch (Exception e)
+            catch (OperationCanceledException e)
             {
                 Debug.LogException(e);
             }
