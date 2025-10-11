@@ -20,7 +20,7 @@ namespace Citadel.Game
         private readonly DiContainer _container;
         private readonly Dictionary<string, AssetInfo> _loadedAssets = new(DefaultAssetsCapacity);
         
-        public async UniTask<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken = default) 
+        public async UniTask<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken) 
             where T : Object
         {
             if (string.IsNullOrEmpty(assetName))
@@ -36,7 +36,10 @@ namespace Citadel.Game
                     cancellationToken.ThrowIfCancellationRequested();
                 }
 
-                using (cancellationToken.Register(() => ReleaseAsset(assetName))) ;
+                if (cancellationToken.CanBeCanceled)
+                {
+                    using (cancellationToken.Register(() => ReleaseAsset(assetName)));
+                }
                 
                 if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
                 {
@@ -183,9 +186,7 @@ namespace Citadel.Game
                 Handle = handle;
             }
 
-            public AsyncOperationHandle<T> GetHandle<T>() where T : UnityEngine.Object => Handle.Convert<T>();
-            
-            public T GetResult<T>() where T : UnityEngine.Object => Handle.IsDone ? Handle.Convert<T>().Result : null;
+            public T GetResult<T>() where T : Object => Handle.IsDone ? Handle.Convert<T>().Result : null;
             
             public bool Equals(AssetInfo other) => AssetKey == other.AssetKey;
             

@@ -8,12 +8,12 @@ namespace Citadel.Game
 {
     internal interface IResourcesLoader : IDisposable
     {
-        UniTask<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken = default) where T : UnityEngine.Object;
+        UniTask<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken ) where T : UnityEngine.Object;
 
         T LoadAsset<T>(string assetName) where T : UnityEngine.Object;
         
         UniTask<GameObject> InstantiateAsync (string assetName, Vector3 position, Quaternion rotation,
-            Transform parentTransform = null, CancellationToken cancellationToken = default);
+            Transform parentTransform, CancellationToken cancellationToken);
         
         GameObject Instantiate(string assetName, Vector3 position, Quaternion rotation, Transform parentTransform = null);
         
@@ -24,6 +24,18 @@ namespace Citadel.Game
 
     internal static class IResourcesLoaderExtensions
     {
+        public static UniTask<T> LoadAssetAsync<T>(this IResourcesLoader resourcesLoader, string assetName)
+            where T : UnityEngine.Object
+        {
+            return resourcesLoader.LoadAssetAsync<T>(assetName, CancellationToken.None);
+        }
+
+        public static UniTask<GameObject> InstantiateAsync(this IResourcesLoader resourcesLoader, string assetName, Vector3 position, 
+            Quaternion rotation, Transform parentTransform = null)
+        {
+            return resourcesLoader.InstantiateAsync(assetName,position,rotation,parentTransform,CancellationToken.None);
+        }
+        
         public static async UniTaskVoid LoadAssetAsync<T>(this IResourcesLoader resourcesLoader, string assetName,
             Action<T> onAssetLoaded) where T : UnityEngine.Object
         {

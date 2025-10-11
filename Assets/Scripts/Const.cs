@@ -251,7 +251,6 @@ public class Const : SingletonHelper<Const>
 	}
 
 	[HideInInspector] public string playerName;
-	public AudioSource mainmenuMusic;
 	[HideInInspector] public int GraphicsResWidth;
 	[HideInInspector] public int GraphicsResHeight;
 	[HideInInspector] public bool GraphicsFullscreen;
@@ -2339,7 +2338,6 @@ CreateBlackTexture:
 		loadingScreen = null;
 		mainMenuInit = null;
 		statusBar = null;
-		mainmenuMusic = null;
 		InputCodeSettings = null;
 		InputCodes = null;
 		InputValues = null;

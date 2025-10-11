@@ -14,6 +14,8 @@ public sealed class Config
 	private const string AUDIO_MODE_KEY = "AudioSpeakerMode";
 	private static bool _configDataWasSetted = false;
 
+	[Inject(Id = "main_menu_music")]
+	private readonly AudioSource _mainMenuMusic;
 	[Inject]
 	private readonly MainMenuHandler _mainMenuHandler;
 	[Inject]
@@ -232,7 +234,7 @@ public sealed class Config
 	public void SetVolume() {
 		if (_mainMenuHandler.dataFound) {
 			AudioListener.volume = (_const.AudioVolumeMaster/100f);
-			_const.mainmenuMusic.volume = (_const.AudioVolumeMusic/100f);
+			_mainMenuMusic.volume = (_const.AudioVolumeMusic/100f);
 			if (_music != null) {
 				if (_music.SFXMain != null) _music.SFXMain.volume = (_const.AudioVolumeMusic/100f);
 				if (_music.SFXOverlay != null) _music.SFXOverlay.volume = (_const.AudioVolumeMusic/100f);
