@@ -1841,20 +1841,6 @@ public class Utils {
         return logFilePath;
     }
     
-    public static GameObject CreateSEGIEmitter(Const @consts,GameObject go, int curlevel, int lineNum, Light lit) {
-		GameObject segiEmitter = new GameObject("SEGIEmitter" + curlevel.ToString() + "." + lineNum.ToString());
-        segiEmitter.transform.parent = go.transform;
-        segiEmitter.transform.localPosition = new Vector3(0f,0f,0f);
-        MeshFilter mf = segiEmitter.AddComponent<MeshFilter>();
-        mf.sharedMesh = consts.sphereMesh;
-        MeshRenderer mR = segiEmitter.AddComponent<MeshRenderer>();
-        mR.material = consts.segiEmitterMaterial1;
-        mR.material.SetColor("_EmissionColor",new Color(lit.color.r * lit.intensity,lit.color.g * lit.intensity,lit.color.b * lit.intensity,1f));
-        segiEmitter.transform.localScale = new Vector3(Mathf.Max(lit.range * Const.segiVoxelSize,8f),Mathf.Max(lit.range * Const.segiVoxelSize,8f),Mathf.Max(lit.range * Const.segiVoxelSize,8f));
-        segiEmitter.layer = 2; // IgnoreRaycast
-        return segiEmitter;
-	}
-	
 	// Allows for checking if a value given is within the tolerance of a comparison value.
     public static bool InTol(float inVal, float compareVal, float epsilon) {
         return ((inVal > (compareVal - epsilon)) && (inVal < (compareVal + epsilon)));

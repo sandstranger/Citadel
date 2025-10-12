@@ -1,12 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using Zenject;
+using Random = UnityEngine.Random;
 
 public class TeleportFXStatic : MonoBehaviour {
 	public float intervalTime = 0.08f;
 	public float activeTime = 1f;
-	public Texture2D tempCursorTexture;
-	[HideInInspector] public Texture2D cursorTexture;
 	private float effectFinished;
 	private float flipTime;
 	private float randHolder;
@@ -14,14 +14,23 @@ public class TeleportFXStatic : MonoBehaviour {
 	private bool yFlipped = false;
 	private RectTransform rect;
 
+	[SerializeField]
+	private Sprite tempCursorTexture;
+
 	[Inject] private MouseCursor _mouseCursor;
 	[Inject] private PauseScript _pauseScript;
 
-	void OnEnable () {
-		cursorTexture = _mouseCursor.cursorImage; //store correct cursor
+	private Sprite _cursorImage;
+
+	private void Awake () {
+		_cursorImage = _mouseCursor.cursorImage; //store correct cursor
+		rect = GetComponent<RectTransform>();
+	}
+
+	private void OnEnable()
+	{
 		_mouseCursor.cursorImage = tempCursorTexture; //give dummy cursor to hide it
 		effectFinished = _pauseScript.relativeTime + activeTime;
-		rect = GetComponent<RectTransform>();
 		flipTime = _pauseScript.relativeTime + intervalTime;
 	}
 
@@ -46,7 +55,7 @@ public class TeleportFXStatic : MonoBehaviour {
 	}
 
 	void Deactivate () {
-		_mouseCursor.cursorImage = cursorTexture; //return to previous cursor
+		_mouseCursor.cursorImage = _cursorImage; //return to previous cursor
 		gameObject.SetActive(false);
 	}
 

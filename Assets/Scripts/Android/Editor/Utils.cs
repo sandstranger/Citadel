@@ -56,8 +56,19 @@ namespace Citadel.Editor
         public static IReadOnlyList<T> FindAllComponentsInProject<T>(string typeName) where T : Object
         {
             var guids = AssetDatabase.FindAssets($"t:{typeName}", new[] { "Assets" });
-            var components = new List<T>(guids.Length);
+            return FindComponents<T>(guids);
+        } 
 
+        public static IReadOnlyList<T> FindAllComponentsInProjectByName<T>(string name) where T : Object
+        {
+            var guids = AssetDatabase.FindAssets($"\"{name}\"", new[] { "Assets" });
+            return FindComponents<T>(guids);
+        }
+
+        private static IReadOnlyList<T> FindComponents<T>(IReadOnlyCollection<string> guids)  where T : Object
+        {
+            var components = new List<T>(guids.Count);
+            
             foreach (string guid in guids)
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Text;
+using Citadel.Game;
 using Zenject;
 
 public class ItemTabManager : MonoBehaviour {
@@ -17,16 +18,24 @@ public class ItemTabManager : MonoBehaviour {
 	public GameObject grenadeTimerSlider;
 	public GameObject grenadeTimerSliderSlider;
 
-	[Inject] private Const _consts;
-	[Inject] private MFDManager _mfdManager;
-	[Inject] private Inventory _inventory;
+	[Inject] private readonly Const _consts;
+	[Inject] private readonly MFDManager _mfdManager;
+	[Inject] private readonly Inventory _inventory;
+	[Inject] private readonly UsableIconsStorage _usableIconsStorage;
 	
+	private Text _textManagerText;
+	private Image _iconManagerImage;
+
+	private void Awake()
+	{
+		_textManagerText = textManager.GetComponent<Text>();
+		_iconManagerImage = iconManager.GetComponent<Image>();
+	}
+
 	public void Reset() {
 		eReaderSectionsContainer.SetActive(false);
-		iconManager.GetComponent<Image>().overrideSprite =
-			_consts.useableItemsIcons[0]; //nullsprite
-
-		textManager.GetComponent<Text>().text = System.String.Empty;
+		_iconManagerImage.overrideSprite = _usableIconsStorage.NullableIcon; //nullsprite
+		_textManagerText.text = System.String.Empty;
 		applyButton.SetActive(false);
 		vaporizeButton.SetActive(false);
 		useButton.SetActive(false);
@@ -41,11 +50,9 @@ public class ItemTabManager : MonoBehaviour {
 		grenadeTimerSlider.SetActive(false);
 		grenadeTimerSliderSlider.SetActive(false);
 		eReaderSectionsContainer.SetActive(true);
-		iconManager.GetComponent<Image>().overrideSprite =
-			_consts.useableItemsIcons[23]; //datareader
+		_iconManagerImage.overrideSprite = _usableIconsStorage.GetItemIcon(23); //datareader
 
-		textManager.GetComponent<Text>().text =
-			_consts.stringTable[349]; // MULTIMEDIA DATA READER
+		_textManagerText.text = _consts.stringTable[349]; // MULTIMEDIA DATA READER
 	}
 
 	public void SendItemDataToItemTab(int constIndex, int customIndex) {
@@ -76,21 +83,18 @@ public class ItemTabManager : MonoBehaviour {
 				default: ind = 37; break; // You're not Wong there
 			}
 
-			if (ind >= 0 && ind < 38) {
-				iconManager.GetComponent<Image>().overrideSprite =
+			if (ind is >= 0 and < 38) {
+				_iconManagerImage.overrideSprite =
 					_consts.logImages[ind];
 			} else {
-				iconManager.GetComponent<Image>().overrideSprite =
+				_iconManagerImage.overrideSprite =
 					_consts.logImages[0];
 			}
 		} else {
-			if (_consts.useableItemsIcons[constIndex] != null) {
-				iconManager.GetComponent<Image>().overrideSprite =
-					_consts.useableItemsIcons[constIndex]; //datareader
-			}
+			_iconManagerImage.overrideSprite = _usableIconsStorage.GetItemIcon(constIndex); 
 		}
 
-		textManager.GetComponent<Text>().text =
+		_textManagerText.text =
 			_consts.stringTable[constIndex + 326];
 
 		// Access Cards need special list enabled.

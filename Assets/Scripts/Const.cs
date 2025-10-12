@@ -45,8 +45,6 @@ public class Const : SingletonHelper<Const>
 	public float shadowThreshold = 0.03f;
 	//Item constants
 	public QuestBits questData;
-	public Texture2D[] useableItemsFrobIcons;
-    public Sprite[] useableItemsIcons;
 
 	//Audiolog constants
 	public string[] audiologNames;
@@ -293,7 +291,6 @@ public class Const : SingletonHelper<Const>
 	public GameObject eventSystem;
 	private static readonly GameObject[] _prefabs = new GameObject[768]; // Everything
 	public GameObject prefabFallback;
-	private static readonly Texture2D[] _textures = new Texture2D[39];
 	public Texture[] sequenceTextures;
 	public Text loadPercentText;
 	public Material[] genericMaterials;
@@ -302,17 +299,6 @@ public class Const : SingletonHelper<Const>
 	public bool editMode = false;
 	public bool noHUD = false;
 	
-	public Mesh sphereMesh;
-	public Mesh cubeMesh;
-	public Material segiEmitterMaterial1;
-	public Material segiEmitterMaterialRed;
-	public Material segiEmitterMaterialGreen;
-	public Material segiEmitterMaterialBlue;
-	public Material segiEmitterMaterialPurple;
-	public Material segiEmitterMaterialRedFaint;
-	public const float segiVoxelSize = 0.4f;
-	public const float segiReducedExposure = 0.52f;
-
 	// Irrelevant to inspector constants; automatically assigned during initialization or play.
 	[HideInInspector] public int AudioSpeakerMode;
 	[HideInInspector] public bool AudioReverb;
@@ -402,7 +388,6 @@ public class Const : SingletonHelper<Const>
 	public Material shadowCaster;
 	private int lastTargetRegistrySize = 0;
 
-	public static RaycastHit hitNull;	
 	public static bool StartingNewGame { get; private set; } = false;
 	private static int? _saveFileIndex;
 	
@@ -431,8 +416,8 @@ public class Const : SingletonHelper<Const>
 	[Inject] private readonly PlayerHealth _playerHealth;
 	[Inject] private readonly DynamicCulling _dynamicCulling;
 	[Inject] private readonly QuestLogNotesManager _questLogNotesManager;
-	[Inject] private readonly LightDistanceCuller _lightDistanceCuller; 
-	
+	[Inject] private readonly LightDistanceCuller _lightDistanceCuller;
+
 	private void Awake()
 	{
 		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
@@ -495,7 +480,6 @@ public class Const : SingletonHelper<Const>
 		LoadAudioLogMetaData();
 		LoadDamageTablesData();
 		LoadEnemyTablesData(); // Doing earlier, needed by AIController Start
-		LoadTextures();
 		versionString = "v0.99.93"; // Global CITADEL PROJECT VERSION
 		UnityEngine.Debug.Log("Citadel " + versionString
 							  + ": " + System.Environment.NewLine
@@ -1035,58 +1019,6 @@ CreateBlackTexture:
 		tex.SetPixels(pixels);
 		tex.Apply();
 		return tex;
-	}
-
-	private void LoadTextures() {
-		if (_textures.All(texture => texture == null))
-		{
-			_textures[0] = LoadTextureFromFile("worldedgesclosed_0.png");
-			_textures[1] = LoadTextureFromFile("worldedgesclosed_1.png");
-			_textures[2] = LoadTextureFromFile("worldedgesclosed_2.png");
-			_textures[3] = LoadTextureFromFile("worldedgesclosed_3.png");
-			_textures[4] = LoadTextureFromFile("worldedgesclosed_4.png");
-			_textures[5] = LoadTextureFromFile("worldedgesclosed_5.png");
-			_textures[6] = LoadTextureFromFile("worldedgesclosed_6.png");
-			_textures[7] = LoadTextureFromFile("worldedgesclosed_7.png");
-			_textures[8] = LoadTextureFromFile("worldedgesclosed_8.png");
-			_textures[9] = LoadTextureFromFile("worldedgesclosed_9.png");
-			_textures[10] = LoadTextureFromFile("worldedgesclosed_10.png");
-			_textures[11] = LoadTextureFromFile("worldedgesclosed_11.png");
-			_textures[12] = LoadTextureFromFile("worldedgesclosed_12.png");
-			_textures[13] = LoadTextureFromFile("worldcellopen_0.png");
-			_textures[14] = LoadTextureFromFile("worldcellopen_1.png");
-			_textures[15] = LoadTextureFromFile("worldcellopen_2.png");
-			_textures[16] = LoadTextureFromFile("worldcellopen_3.png");
-			_textures[17] = LoadTextureFromFile("worldcellopen_4.png");
-			_textures[18] = LoadTextureFromFile("worldcellopen_5.png");
-			_textures[19] = LoadTextureFromFile("worldcellopen_6.png");
-			_textures[20] = LoadTextureFromFile("worldcellopen_7.png");
-			_textures[21] = LoadTextureFromFile("worldcellopen_8.png");
-			_textures[22] = LoadTextureFromFile("worldcellopen_9.png");
-			_textures[23] = LoadTextureFromFile("worldcellopen_10.png");
-			_textures[24] = LoadTextureFromFile("worldcellopen_11.png");
-			_textures[25] = LoadTextureFromFile("worldcellopen_12.png");
-			_textures[26] = LoadTextureFromFile("worldcellskyvis_0.png");
-			_textures[27] = LoadTextureFromFile("worldcellskyvis_1.png");
-			_textures[28] = LoadTextureFromFile("worldcellskyvis_2.png");
-			_textures[29] = LoadTextureFromFile("worldcellskyvis_3.png");
-			_textures[30] = LoadTextureFromFile("worldcellskyvis_4.png");
-			_textures[31] = LoadTextureFromFile("worldcellskyvis_5.png");
-			_textures[32] = LoadTextureFromFile("worldcellskyvis_6.png");
-			_textures[33] = LoadTextureFromFile("worldcellskyvis_7.png");
-			_textures[34] = LoadTextureFromFile("worldcellskyvis_8.png");
-			_textures[35] = LoadTextureFromFile("worldcellskyvis_9.png");
-			_textures[36] = LoadTextureFromFile("worldcellskyvis_10.png");
-			_textures[37] = LoadTextureFromFile("worldcellskyvis_11.png");
-			_textures[38] = LoadTextureFromFile("worldcellskyvis_12.png");
-		}
-	}
-
-	public Sprite GetSpriteFromTexture(int useableItemIndex) {
-		//Texture2D tex = textures[usableItemIndex + 13];
-		Texture2D tex = useableItemsFrobIcons[useableItemIndex];
-		return Sprite.Create(tex, new Rect(0,0,tex.width,tex.height),
-							 new Vector2(0.5f,0.5f));
 	}
 
 	public string GetTargetID(int npcIndex) {
@@ -2315,8 +2247,6 @@ CreateBlackTexture:
 		ScenesLoader.OnSceneLoaded -= OnSceneLoaded;
 		ScenesLoader.OnStartLoadScene -= OnStartLoadScene;
 		questData = null;
-		useableItemsFrobIcons = null;
-		useableItemsIcons = null;
 		audiologNames = null;
 		audiologSenders = null;
 		audiologSubjects = null;
@@ -2355,14 +2285,6 @@ CreateBlackTexture:
 		loadPercentText = null;
 		genericMaterials = null;
 		ReverbRegister = null;
-		sphereMesh = null;
-		cubeMesh = null;
-		segiEmitterMaterial1 = null;
-		segiEmitterMaterialRed = null;
-		segiEmitterMaterialGreen = null;
-		segiEmitterMaterialBlue = null;
-		segiEmitterMaterialPurple = null;
-		segiEmitterMaterialRedFaint = null;
 		npcCount = null;
 		audioLogImagesRefIndicesLH = null;
 		audioLogImagesRefIndicesRH = null;

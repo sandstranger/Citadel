@@ -19,8 +19,8 @@ public class MouseCursor : MonoBehaviour {
 	public RectTransform centerMFDPanel;
 	public GameObject inventoryAddHelper;
     public float cursorSize = 24f;
-    public Texture2D cursorImage;
-	public RawImage cursorUIImage;
+    public Sprite cursorImage;
+	public Image cursorUIImage;
 	public Canvas canvas;
 	public Canvas cursorCanvas;
 	private RectTransform canvasRectTransform;
@@ -47,13 +47,13 @@ public class MouseCursor : MonoBehaviour {
 	public Text tooltipRightText;
 	public Text tooltipLiveGrenadeText;
 	public Handedness toolTipType;
-	public Texture2D cursorDefaultTexture;
-	public Texture2D cyberspaceCursor;
-	public Texture2D cursorLHTexture;
-	public Texture2D cursorRHTexture;
-	public Texture2D cursorDNTexture;
-	private Texture2D tooltipTexture;
-	public Texture2D cursorGUI;
+	public Sprite cursorDefaultTexture;
+	public Sprite cyberspaceCursor;
+	public Sprite cursorLHTexture;
+	public Sprite cursorRHTexture;
+	public Sprite cursorDNTexture;
+	private Sprite tooltipTexture;
+	public Sprite cursorGUI;
 	public RectTransform energySliderRect;
 	public float cursorScreenPercentage = 0.02f;
 	private float halfFactor = 0.5f;
@@ -70,7 +70,8 @@ public class MouseCursor : MonoBehaviour {
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private WeaponCurrent _weaponCurrent;
-
+	[Inject] private readonly UsableIconsStorage _usableIconsStorage;
+	
 	private void Awake() {
 		uiCameraCam = uiCamera.GetComponent<Camera>();
 		cursorSize = Screen.width * cursorScreenPercentage;
@@ -231,7 +232,7 @@ public class MouseCursor : MonoBehaviour {
 			DisableLiveGrenadeTooltip();
 			cursorImage = cursorGUI;
 			if (!cursorUIImage.gameObject.activeSelf) cursorUIImage.gameObject.SetActive(true);
-			if (cursorUIImage.texture != cursorImage) cursorUIImage.texture = cursorImage;
+			if (cursorUIImage.sprite != cursorImage) cursorUIImage.sprite = cursorImage;
 			return;
 		}
 
@@ -263,19 +264,15 @@ public class MouseCursor : MonoBehaviour {
 				
 				DisableLiveGrenadeTooltip();
 			} else {
-				if (_mouseLookScript.vmailActive) {
-					cursorImage = _consts.useableItemsFrobIcons[108]; // vmail
+				if (_mouseLookScript.vmailActive)
+				{
+					cursorImage = _usableIconsStorage.GetItemFrobIcon(108); // vmail
 				} else if (_guiState.isBlocking && !_mouseLookScript.holdingObject) {
-					if (toolTipHasText) {
-						cursorImage = tooltipTexture;
-					} else {						
-						cursorImage = cursorGUI;
-					}
+					cursorImage = toolTipHasText ? tooltipTexture : cursorGUI;
 				} else if (_mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0) {
-					cursorImage = _consts.useableItemsFrobIcons[_mouseLookScript.heldObjectIndex];
-				} else {
-					cursorImage = GetWeaponCursor();
-				}
+					cursorImage = _mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0 ? 
+						_usableIconsStorage.GetItemFrobIcon(_mouseLookScript.heldObjectIndex) : GetWeaponCursor();
+				} 
 			}
         } else {
 			// Shoot Mode Cursor
@@ -288,8 +285,9 @@ public class MouseCursor : MonoBehaviour {
 				cursorImage = cyberspaceCursor;
 				DisableLiveGrenadeTooltip();
 			} else {
-				if (_mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0) {
-					cursorImage = _consts.useableItemsFrobIcons[_mouseLookScript.heldObjectIndex];
+				if (_mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0)
+				{
+					cursorImage = _usableIconsStorage.GetItemFrobIcon(_mouseLookScript.heldObjectIndex);
 				} else {
 					cursorImage = GetWeaponCursor();
 				}
@@ -297,29 +295,12 @@ public class MouseCursor : MonoBehaviour {
         }
 		
 		// Actually set the cursor texure now:
-		if (cursorUIImage.texture != cursorImage) cursorUIImage.texture = cursorImage;
+		if (cursorUIImage.sprite != cursorImage) cursorUIImage.sprite = cursorImage;
 	}
 	
-	private Texture2D GetWeaponCursor() {
-		switch(_weaponCurrent.weaponIndex) {
-			case 36: return _consts.useableItemsFrobIcons[102]; // red
-			case 37: return _consts.useableItemsFrobIcons[107]; // blue
-			case 38: return _consts.useableItemsFrobIcons[102]; // red
-			case 39: return _consts.useableItemsFrobIcons[105]; // green
-			case 40: return _consts.useableItemsFrobIcons[107]; // blue
-			case 41: return _consts.useableItemsFrobIcons[103]; // orange
-			case 42: return _consts.useableItemsFrobIcons[103]; // orange
-			case 43: return _consts.useableItemsFrobIcons[102]; // red
-			case 44: return _consts.useableItemsFrobIcons[104]; // yellow
-			case 45: return _consts.useableItemsFrobIcons[102]; // red
-			case 46: return _consts.useableItemsFrobIcons[106]; // teal
-			case 47: return _consts.useableItemsFrobIcons[104]; // yellow
-			case 48: return _consts.useableItemsFrobIcons[102]; // red
-			case 49: return _consts.useableItemsFrobIcons[105]; // green
-			case 50: return _consts.useableItemsFrobIcons[107]; // blue
-			case 51: return _consts.useableItemsFrobIcons[106]; // teal
-			default: return _consts.useableItemsFrobIcons[105]; // green
-		}	
+	private Sprite GetWeaponCursor()
+	{
+		return _usableIconsStorage.GetWeaponCursor(_weaponCurrent.weaponIndex);
 	}
 
 	void UpdateSafeZone() {

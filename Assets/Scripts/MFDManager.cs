@@ -251,10 +251,17 @@ public class MFDManager : MonoBehaviour  {
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private WeaponCurrent _weaponCurrent;
+	[Inject] private readonly UsableIconsStorage _usableIconsStorage;
 
 	private static readonly StringBuilder s1 = new(100 * 1024);
 
-	private void Start() {
+	private readonly List<Image> _searchItemImagesLHComponents = new();
+	private readonly List<Image> _searchItemImagesRHComponents = new();
+	
+	private void Start() 
+	{
+		FillImageComponents(searchItemImagesLH,_searchItemImagesLHComponents);
+		FillImageComponents(searchItemImagesRH,_searchItemImagesRHComponents);
 		logFinished = _pauseScript.relativeTime;
 		logActive = false;
 		TabReset(true);
@@ -309,6 +316,14 @@ public class MFDManager : MonoBehaviour  {
 		}
 	}
 
+	private void FillImageComponents(IEnumerable<GameObject> images, ICollection<Image> targetImages)
+	{
+		foreach (var image in images)
+		{
+			targetImages.Add(image.GetComponent<Image>());
+		}
+	}
+	
 	void WeaponCycleDown() {
 		if (_mouseLookScript.inCyberSpace) {
 			// There's only two cyberspace weapons, up is down.
@@ -1020,9 +1035,8 @@ public class MFDManager : MonoBehaviour  {
 			for (int i=0;i<4;i++) {
 				if (contents[i] > -1) {
 					searchCloseButtonRH.SetActive(true);
-					searchItemImagesRH[i].SetActive(true);
-					searchItemImagesRH[i].GetComponent<Image>().overrideSprite = null;
-					searchItemImagesRH[i].GetComponent<Image>().overrideSprite = _consts.GetSpriteFromTexture(contents[i]);
+					_searchItemImagesRHComponents[i].gameObject.SetActive(true);
+					_searchItemImagesRHComponents[i].overrideSprite = _usableIconsStorage.GetItemFrobIcon(contents[i]);
 					searchContainerRH.contents[i] = contents[i];
 					searchContainerRH.customIndex[i] = customIndex[i];
 				}
@@ -1040,9 +1054,8 @@ public class MFDManager : MonoBehaviour  {
 			for (int i=0;i<4;i++) {
 				if (contents[i] > -1) {
 					searchCloseButtonLH.SetActive(true);
-					searchItemImagesLH[i].SetActive(true);
-					searchItemImagesLH[i].GetComponent<Image>().overrideSprite = null;
-					searchItemImagesLH[i].GetComponent<Image>().overrideSprite = _consts.GetSpriteFromTexture(contents[i]);
+					_searchItemImagesLHComponents[i].gameObject.SetActive(true);
+					_searchItemImagesLHComponents[i].overrideSprite = _usableIconsStorage.GetItemFrobIcon(contents[i]);
 					searchContainerLH.contents[i] = contents[i];
 					searchContainerLH.customIndex[i] = customIndex[i];
 				}
@@ -1422,10 +1435,11 @@ public class MFDManager : MonoBehaviour  {
 				noItemsTextRH.SetActive(false);
 				noItemsTextRH.GetComponent<Text>().enabled = false;
 				searchCloseButtonRH.SetActive(false);
-				for (int i=0;i<4;i++) {
-					searchItemImagesRH[i].SetActive(false);
-					searchItemImagesRH[i].GetComponent<Image>().overrideSprite = null;
-					searchItemImagesRH[i].GetComponent<Image>().overrideSprite = _consts.GetSpriteFromTexture(101);
+				for (int i=0;i<4;i++)
+				{
+					var image = _searchItemImagesRHComponents[i];
+					image.gameObject.SetActive(false);
+					image.overrideSprite = _usableIconsStorage.GetItemFrobIcon(101);
 					searchContainerRH.contents[i] = -1;
 					searchContainerRH.customIndex[i] = -1;
 				}
@@ -1438,10 +1452,11 @@ public class MFDManager : MonoBehaviour  {
 				noItemsTextLH.SetActive(false);
 				noItemsTextLH.GetComponent<Text>().enabled = false;
 				searchCloseButtonLH.SetActive(false);
-				for (int i=0;i<4;i++) {
-					searchItemImagesLH[i].SetActive(false);
-					searchItemImagesLH[i].GetComponent<Image>().overrideSprite = null;
-					searchItemImagesLH[i].GetComponent<Image>().overrideSprite = _consts.GetSpriteFromTexture(101);
+				for (int i=0;i<4;i++)
+				{
+					var image = _searchItemImagesLHComponents[i];
+					image.gameObject.SetActive(false);
+					image.overrideSprite = _usableIconsStorage.GetItemFrobIcon(101);
 					searchContainerLH.contents[i] = -1;
 					searchContainerLH.customIndex[i] = -1;
 				}
@@ -1626,11 +1641,11 @@ public class MFDManager : MonoBehaviour  {
 	public void SetWepInfo(int index) { // Expects usableItem index.
 		if (index >= 0) {
 			weptextRH.text = weptextLH.text = _consts.stringTable[index + 326];
-			iconRH.overrideSprite = iconLH.overrideSprite = _consts.useableItemsIcons[index];
+			iconRH.overrideSprite = iconLH.overrideSprite = _usableIconsStorage.GetItemIcon(index);
 		} else {
 			weptextRH.text = weptextLH.text = "";
-			iconRH.overrideSprite = _consts.useableItemsIcons[0]; // Nullsprite
-			iconLH.overrideSprite = _consts.useableItemsIcons[0]; // Nullsprite
+			iconRH.overrideSprite = _usableIconsStorage.NullableIcon;
+			iconLH.overrideSprite = _usableIconsStorage.NullableIcon;
 		}
 	}
 
@@ -2013,6 +2028,14 @@ public class MFDManager : MonoBehaviour  {
 		minigameCamera.SetActive(true);
 	}
 
+	private void SetSpriteToImage(Image image, int index, SearchButton searchButton,int[] contents, int[] customIndex)
+	{
+		image.gameObject.SetActive(true);
+		image.overrideSprite = _usableIconsStorage.GetItemFrobIcon(contents[index]);
+		searchButton.contents[index] = contents[index];
+		searchButton.customIndex[index] = customIndex[index];
+	}
+	
 	public static string Save(GameObject go) {
 		MFDManager mfd = go.GetComponent<MFDManager>();
 		var pauseScript = mfd._pauseScript;

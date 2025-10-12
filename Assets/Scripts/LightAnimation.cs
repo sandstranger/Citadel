@@ -28,7 +28,6 @@ public class LightAnimation : MonoBehaviour {
 	[HideInInspector] public Light animLight;
 	private float differenceInIntensity;
 	[HideInInspector] public float lerpValue; //save
-	private GameObject segiEmitter;
 	private static StringBuilder s1 = new StringBuilder(100);
 	private bool initialized = false;
 
@@ -41,10 +40,7 @@ public class LightAnimation : MonoBehaviour {
 		if (minIntensity < 0.01f) minIntensity = 0.01f;
 		animLight = GetComponent<Light>();
 		animLight.intensity = maxIntensity;
-	//	if (segiEmitter == null) segiEmitter = Utils.CreateSEGIEmitter(_consts,gameObject,LevelManager.currentLevel,0,animLight);
-		EnableSEGIEmitter();
 		animLight.intensity = minIntensity;
-		ScaleSEGIEmitter();
 		currentStep = 0;
 		lerpUp = true;
 		differenceInIntensity = (maxIntensity - minIntensity);
@@ -55,47 +51,19 @@ public class LightAnimation : MonoBehaviour {
 		} else {
 			noSteps = true;
 			animLight.intensity = maxIntensity;
-			ScaleSEGIEmitter();
 		}
 		
 		initialized = true;
 	}
 	
-	private void EnableSEGIEmitter() {
-		return;
-        if (segiEmitter == null) return;
-        
-        segiEmitter.SetActive(true);
-    }
-    
-    private void DisableSEGIEmitter() {
-	    return;
-        if (segiEmitter == null) return;
-        
-        segiEmitter.SetActive(false);
-    }
-    
-    public void ScaleSEGIEmitter() {
-	    return;
-        if (segiEmitter == null) return;
-		
-		float fac = (animLight.intensity - minIntensity) / maxIntensity;
-		segiEmitter.transform.localScale = new Vector3(Mathf.Min(animLight.range * Const.segiVoxelSize * fac,8f),
-													   Mathf.Min(animLight.range * Const.segiVoxelSize * fac,8f),
-													   Mathf.Min(animLight.range * Const.segiVoxelSize * fac,8f));
-    }
-
 	public void TurnOn() {
 		lightOn = true;
-		EnableSEGIEmitter();
 		animLight.intensity = maxIntensity;
-		ScaleSEGIEmitter();
 	}
 
 	public void TurnOff() {
 		lightOn = false;
 		animLight.intensity = minIntensity;
-		ScaleSEGIEmitter();
 	}
 
 	public void Toggle() {
@@ -115,7 +83,6 @@ public class LightAnimation : MonoBehaviour {
 						if (lerpTime < _pauseScript.relativeTime) {
 							if (animLight.intensity != maxIntensity) {
 								animLight.intensity = maxIntensity;
-								ScaleSEGIEmitter();
 							}
 							
 							lerpUp = false;
@@ -136,7 +103,6 @@ public class LightAnimation : MonoBehaviour {
 										lerpValue = minIntensity + (differenceInIntensity * (lerpValue));
 										if (animLight.intensity != lerpValue) {
 											animLight.intensity = lerpValue;
-											ScaleSEGIEmitter();
 										}
 									}
 								}
@@ -147,7 +113,6 @@ public class LightAnimation : MonoBehaviour {
 						if (lerpTime < _pauseScript.relativeTime) {
 							if (animLight.intensity != minIntensity) {
 								animLight.intensity = minIntensity;
-								ScaleSEGIEmitter();
 							}
 							
 							lerpUp = true;
@@ -171,7 +136,6 @@ public class LightAnimation : MonoBehaviour {
 										lerpValue = minIntensity + (differenceInIntensity * (1-lerpValue));
 										if (animLight.intensity != lerpValue) {
 											animLight.intensity = lerpValue;
-											ScaleSEGIEmitter();
 										}
 									}
 								}
@@ -183,14 +147,12 @@ public class LightAnimation : MonoBehaviour {
 					// Light is on but no steps so set to editor setting
 					if (animLight.intensity != maxIntensity) {
 						animLight.intensity = maxIntensity;
-						ScaleSEGIEmitter();
 					}
 				}
 			} else {
 				// Light is turned off.
 				if (animLight.intensity != minIntensity) {
 					animLight.intensity = minIntensity;
-					ScaleSEGIEmitter();
 				}
 			}
 		}
@@ -242,8 +204,6 @@ public class LightAnimation : MonoBehaviour {
 		la.stepTime = Utils.GetFloatFromString(entries[index],"stepTime"); index++; // Not a timer, current time amount
 		la.lerpStartTime = Utils.LoadRelativeTimeDifferential(la._pauseScript,entries[index],"lerpStartTime"); index++;
 		la.animLight.enabled = Utils.GetBoolFromString(entries[index],"light.enabled"); index++;
-		la.EnableSEGIEmitter();
-		la.ScaleSEGIEmitter();
 		return index;
 	}
 }

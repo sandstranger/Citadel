@@ -10,6 +10,7 @@ namespace Citadel.Game
     {
         private static RootInstaller _instance;
 
+        [SerializeField] private UsableIconsStorage _usableIconsStorage;
         [SerializeReference] private AudioSource _mainmenuMusic;
         [SerializeField] private PlayerReferenceManager _playerReference;
         [SerializeField] private BiomonitorGraphSystem _biomonitorGraphSystem;
@@ -73,7 +74,8 @@ namespace Citadel.Game
 
         public override void InstallBindings()
         {
-            Container.BindInstance(_mainmenuMusic).AsSingle().WithConcreteId("main_menu_music");
+            Container.Bind<AudioSource>().WithId("main_menu_music").FromInstance(_mainmenuMusic).AsSingle();
+            Container.Bind<UsableIconsStorage>().FromInstance(_usableIconsStorage).AsSingle();
             Container.Bind<IResourcesLoader>().FromInstance(AddressablesResourcesLoader.Default).AsSingle();
             Container.Bind<AndroidConfig>().FromInstance(AndroidConfig.Default).AsSingle();
             Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>()

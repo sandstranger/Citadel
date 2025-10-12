@@ -22,7 +22,6 @@ public class ForceBridge : MonoBehaviour {
 	private AudioSource SFX;
 	private const float tickTime = 0.05f;
 	private bool initialized = false;
-	[HideInInspector] public GameObject segiEmitter;
 	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
 
 	[Inject] private Const _consts;
@@ -53,12 +52,10 @@ public class ForceBridge : MonoBehaviour {
 		if (!activated) {
 			Utils.DisableMeshRenderer(mr);
 			Utils.DisableBoxCollider(bCol);
-			Utils.Deactivate(segiEmitter);
 		}
 		
 		SetColorMaterial();
 		initialized = true;
-		if (segiEmitter == null) segiEmitter = CreateSEGIEmitterCube();
 	}
 
 	public void SetColorMaterial() {
@@ -78,7 +75,6 @@ public class ForceBridge : MonoBehaviour {
 
 		tickFinished = _pauseScript.relativeTime + tickTime;
 		if (activated) {
-			Utils.Activate(segiEmitter);
 			if (lerping) {
 				float sx = transform.localScale.x;
 				float sy = transform.localScale.y;
@@ -112,7 +108,6 @@ public class ForceBridge : MonoBehaviour {
 				if ((sx < 0.08f || sy < 0.08f || sz < 0.08f)) {
 					Utils.DisableMeshRenderer(mr);
 					Utils.DisableBoxCollider(bCol);
-					Utils.Deactivate(segiEmitter);
 					lerping = false;
 				}
 			}
@@ -125,7 +120,6 @@ public class ForceBridge : MonoBehaviour {
 		if (!isSilent) Utils.PlayOneShotSavable(SFX,_consts.sounds[102]);
 		Utils.EnableMeshRenderer(mr);
 		Utils.EnableBoxCollider(bCol);
-		Utils.Activate(segiEmitter);
 		activated = true;
 		lerping = true;
 		float sx = activatedScaleX;
@@ -141,7 +135,6 @@ public class ForceBridge : MonoBehaviour {
 		if (!activated) return; // already there
 
 		if (!isSilent) Utils.PlayOneShotSavable(SFX,_consts.sounds[102]);
-		if (segiEmitter != null) segiEmitter.SetActive(false);
 		activated = false;
 		lerping = true;
 	}
@@ -154,41 +147,6 @@ public class ForceBridge : MonoBehaviour {
 		}
 	}
 	
-	private GameObject CreateSEGIEmitterCube() {
-		GameObject segiEmitter = new GameObject("ForceBridgeSEGIEmitter_"  + LevelManager.CurrentLevel.ToString() + "." + gameObject.name);
-        segiEmitter.transform.parent = transform;
-        segiEmitter.transform.localPosition = new Vector3(0f,0f,0f);
-		segiEmitter.transform.localScale = new Vector3(1f,1f,1f); // Parent scales it
-        MeshFilter mf = segiEmitter.AddComponent<MeshFilter>();
-        mf.sharedMesh = _consts.cubeMesh;
-        MeshRenderer mR = segiEmitter.AddComponent<MeshRenderer>();
-        mR.material = _consts.segiEmitterMaterial1;
-		switch (fieldColor) {
-			case ForceFieldColor.Red:      mR.sharedMaterial = _consts.segiEmitterMaterialRed;  break;
-			case ForceFieldColor.Green:    mR.sharedMaterial = _consts.segiEmitterMaterialGreen;  break;
-			case ForceFieldColor.Blue:     mR.sharedMaterial = _consts.segiEmitterMaterialBlue;  break;
-			case ForceFieldColor.Purple:   mR.sharedMaterial = _consts.segiEmitterMaterialPurple; break;
-			case ForceFieldColor.RedFaint: mR.sharedMaterial = _consts.segiEmitterMaterialRedFaint;  break;
-		}
-
-        segiEmitter.layer = 2; // IgnoreRaycast
-        return segiEmitter;
-	}
-	
-	void OnDestroy() {
-		// Delete the SEGI emitters
-		int childCount = transform.childCount;
-		for (int j = 0; j < childCount; j++) {
-			Transform child = transform.GetChild(j);
-			MeshRenderer mr = child.GetComponent<MeshRenderer>();
-			if (mr != null && mr.material != null && child.gameObject.layer == 2) {
-				Material mat = mr.material;
-				mr.material = null; // Clear reference
-				Destroy(mat); // Destroy the material instance
-			}
-		}
-	}
-
 	public static string Save(GameObject go) {
 		ForceBridge fb = go.GetComponent<ForceBridge>();
 		if (fb == null) {

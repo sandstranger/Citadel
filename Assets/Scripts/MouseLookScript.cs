@@ -115,7 +115,8 @@ public class MouseLookScript : MonoBehaviour {
 	[Inject] private WeaponFire _weaponFire;
 	[Inject] private WeaponCurrent _weaponCurrent;
 	[Inject] private DynamicCulling _dynamicCulling;
-
+	[Inject] private readonly UsableIconsStorage _usableIconsStorage;
+	
 	private static readonly StringBuilder s1 = new StringBuilder(500 * 1024);
     
     void Start (){
@@ -1341,10 +1342,12 @@ public class MouseLookScript : MonoBehaviour {
 		SearchableItem curSearchScript = currentSearchItem.GetComponent<SearchableItem>();
 		if (curSearchScript.searchableInUse) {
 			for (int i=0;i<4;i++) {
-				if (curSearchScript.contents[i] >= 0) {
-					_mouseCursor.cursorImage = _consts.useableItemsFrobIcons[curSearchScript.contents[i]];
-					heldObjectIndex = curSearchScript.contents[i];
-					heldObjectCustomIndex = curSearchScript.customIndex[i];
+				if (curSearchScript.contents[i] >= 0)
+				{
+					_mouseCursor.cursorImage = _usableIconsStorage.GetItemFrobIcon(curSearchScript.contents[i]);
+					var objectIndex = curSearchScript.contents[i];
+					heldObjectIndex = objectIndex;
+					heldObjectCustomIndex = objectIndex;
 					curSearchScript.contents[i] = -1;
 					curSearchScript.customIndex[i] = -1;
 					if (heldObjectIndex != -1) holdingObject = true;

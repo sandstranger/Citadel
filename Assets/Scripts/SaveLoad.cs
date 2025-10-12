@@ -1050,7 +1050,6 @@ public static class SaveLoad {
         lit.shadowNearPlane = 0.02f; // Force all to match the player camera value of 1 chunk texel.
         lit.layerShadowCullDistances = shadCullArray;
         lit.cullingMask = litCullingMask;
-        Utils.CreateSEGIEmitter(@consts,go,curlevel,lineNum,lit);
         return go;
     }
 

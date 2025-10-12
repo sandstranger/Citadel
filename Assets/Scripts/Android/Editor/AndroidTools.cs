@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Citadel.Game;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -13,6 +14,32 @@ namespace Citadel.Android.Tools
 {
     internal static class AndroidTools
     {
+        [MenuItem("Tools/Fill Usable Icons")]
+        private static void FillUsableIcons()
+        {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+            
+            var consts = Object.FindFirstObjectByType<Const>();
+
+            var usableIconsStorage = Editor.Utils.FindAllComponentsInProject<UsableIconsStorage>().Single();
+            
+/*            usableIconsStorage.UsableItemsIcons.Clear();
+            usableIconsStorage.UsableItemsFrobIcons.Clear();
+            
+            foreach (var frobIcon in consts.useableItemsFrobIcons)
+            {
+                usableIconsStorage.UsableItemsFrobIcons.Add(Editor.Utils.FindAllComponentsInProjectByName<Sprite>(frobIcon.name).First());
+            }
+
+            foreach (var frobIcon in consts.useableItemsIcons)
+            {
+                usableIconsStorage.UsableItemsIcons.Add(Editor.Utils.FindAllComponentsInProjectByName<Sprite>(frobIcon.name).First());
+            }*/
+        }
+        
         [MenuItem("Tools/Debug/Print elev destinations world positions to console")]
         private static void PrintElevDestinationsWorldPositionsToConsole()
         {

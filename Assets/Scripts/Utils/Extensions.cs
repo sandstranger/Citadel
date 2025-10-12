@@ -9,6 +9,13 @@ namespace Citadel.Game
     {
         public static async UniTask<T> WithCancellationAsync<T>(this UniTask<T> genericTask, CancellationToken cancellationToken)
         {
+            if (!cancellationToken.CanBeCanceled)
+            {
+                return await genericTask;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            
             UniTask baseTask = genericTask;
             await baseTask.WithCancellationAsync(cancellationToken);
             return genericTask.GetAwaiter().GetResult();
@@ -16,6 +23,13 @@ namespace Citadel.Game
         
         public static async UniTask WithCancellationAsync(this UniTask task, CancellationToken cancellationToken)
         {
+            if (!cancellationToken.CanBeCanceled)
+            {
+                await task;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            
             UniTaskCompletionSource taskCompletion = new UniTaskCompletionSource();
             
             using (cancellationToken.Register(() => taskCompletion.TrySetResult()));
@@ -30,6 +44,13 @@ namespace Citadel.Game
         
         public static async Task<T> WithCancellationAsync<T>(this Task<T> genericTask, CancellationToken cancellationToken)
         {
+            if (!cancellationToken.CanBeCanceled)
+            {
+                return await genericTask;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            
             Task baseTask = genericTask;
             await baseTask.WithCancellationAsync(cancellationToken);
             return await genericTask;
@@ -37,6 +58,13 @@ namespace Citadel.Game
 
         public static async Task WithCancellationAsync(this Task task, CancellationToken cancellationToken)
         {
+            if (!cancellationToken.CanBeCanceled)
+            {
+                await task;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+
             var tcs = new TaskCompletionSource<object>();
 
             using (cancellationToken.Register(() => tcs.TrySetResult(null))) ;
