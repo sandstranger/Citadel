@@ -5,13 +5,13 @@ using UnityEngine.UI;
 
 public class QuestLogNotesManager : MonoBehaviour
 {
+	private const string NeuroSurgeryDoorName = "doorA_neurosurgery451";
 	private const string DoorTo7Name = "door_elevator1_toLevel7";
 	
 	public GameObject[] notes;
 	public Text[] labels;
 	public Toggle[] checkBoxes;
 	public GameObject label15_StrikeThru;
-	public Door neuroSurgeryDoor;
 
 	// 0 - Destroy level 1 nodes.					...Later add:  Code is #.		DONE, CHECK DONE
 	// 1 - Destroy level 2 nodes.					...Later add:  Code is #.		DONE, CHECK DONE
@@ -51,7 +51,7 @@ public class QuestLogNotesManager : MonoBehaviour
 	}
 
 	public void NotifyDoorUnlock(Door d) {
-		if (d == neuroSurgeryDoor) {
+		if (d is not null && d.gameObject.name == NeuroSurgeryDoorName) {
 			checkBoxes[6].isOn = true; // Escape neurosurgery suite.
 			_inventory.hasNewNotes = true;
 		}
