@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Citadel.Game;
 using Zenject;
 
 public class ImageSequenceTextureArray : MonoBehaviour {
@@ -29,8 +30,9 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 	private int frameCounterGlow = 0;
 	private PrefabIdentifier pid;
 
-	[Inject] private Const _consts;
-	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Const _consts;
+	[Inject] private readonly PauseScript _pauseScript;
+	[Inject] private readonly TexturesStorage _texturesStorage;
 
 	void Awake() {
 		//Get a reference to the Material of the game object this script is attached to.
@@ -69,8 +71,7 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 		} else {
 			if (lightContainer != null) lightContainer.SetActive(false);
 			screenDestroyed = true;
-			goMaterial.mainTexture = _consts.sequenceTextures[5]; // End frame of destroyed texture
-			goMaterial.SetTexture("_EmissionMap", _consts.sequenceTextures[5]);
+			SetTextureToAllProperties(_texturesStorage.GetSequencesTexture(5));
 		}
 	}
 
@@ -873,8 +874,7 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 
 			//Set the material's texture to the current value of the frameCounter variable
 			if (frameCounter >= 0 && frameCounter <= 5) {
-				goMaterial.mainTexture = _consts.sequenceTextures[frameCounter]; // 0 thru 5
-				goMaterial.SetTexture("_EmissionMap", _consts.sequenceTextures[frameCounter]);
+				SetTextureToAllProperties(_texturesStorage.GetSequencesTexture(frameCounter));
 			}
 			return;
 		}
@@ -908,8 +908,8 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 		if (constArrayLookupGlow != null) {
 			if (constArrayLookupGlow.Length > 0) {
 				if (frameCounterGlow < constArrayLookupGlow.Length) {
-					if (constArrayLookupGlow[frameCounterGlow] < _consts.sequenceTextures.Length && constArrayLookupGlow[frameCounterGlow] >= 0) {
-						goMaterial.SetTexture("_EmissionMap", _consts.sequenceTextures[constArrayLookupGlow[frameCounterGlow]]);
+					if (constArrayLookupGlow[frameCounterGlow] < _texturesStorage.SequencesTexturesCount && constArrayLookupGlow[frameCounterGlow] >= 0) {
+						SetEmissionMapTexture(_texturesStorage.GetSequencesTexture(constArrayLookupGlow[frameCounterGlow]));
 					}
 				}
 			}
@@ -919,16 +919,21 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 
 		if (constArrayLookup != null) {
 			if (constArrayLookup.Length > 0 && frameCounter < constArrayLookup.Length) {
-				if (constArrayLookup[frameCounter] < _consts.sequenceTextures.Length && constArrayLookup[frameCounter] >= 0) {
-					if (goMaterial.mainTexture != _consts.sequenceTextures[constArrayLookup[frameCounter]]) goMaterial.mainTexture = _consts.sequenceTextures[constArrayLookup[frameCounter]];
-					if (pid != null) {
-						if (pid.constIndex == 279) {
-							goMaterial.SetTexture("_EmissionMap", _consts.sequenceTextures[constArrayLookup[frameCounter]]);
-						}
+				if (constArrayLookup[frameCounter] < _texturesStorage.SequencesTexturesCount && constArrayLookup[frameCounter] >= 0) {
+					var texture = _texturesStorage.GetSequencesTexture(constArrayLookup[frameCounter]);
+					if (goMaterial.mainTexture != texture)
+					{
+						SetMainTexture(texture);
+					}
+
+					if (pid != null && pid.constIndex == 279)
+					{
+						SetEmissionMapTexture(texture);
 					}
 				}
 			}
 		}
+		
 	}
 	
 	void OnDestroy() {
@@ -936,5 +941,21 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 		pid = null;
 		SFX = null;
 		Destroy(goMaterial);
+	}
+
+	private void SetEmissionMapTexture(Texture texture)
+	{
+		goMaterial.SetTexture("_EmissionMap", texture);
+	}
+
+	private void SetMainTexture(Texture texture)
+	{
+		goMaterial.mainTexture = texture;
+	}
+	
+	private void SetTextureToAllProperties(Texture texture)
+	{
+		SetMainTexture(texture);
+		SetEmissionMapTexture(texture);
 	}
 }

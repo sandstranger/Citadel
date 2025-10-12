@@ -286,12 +286,10 @@ public class Const : SingletonHelper<Const>
 	public float[] reloadTime;
 
 	public Material[] screenCodes;
-	public Sprite[] logImages;
 
 	public GameObject eventSystem;
 	private static readonly GameObject[] _prefabs = new GameObject[768]; // Everything
 	public GameObject prefabFallback;
-	public Texture[] sequenceTextures;
 	public Text loadPercentText;
 	public Material[] genericMaterials;
 	public GameObject[] ReverbRegister;
@@ -2279,9 +2277,7 @@ CreateBlackTexture:
 		stringTable = null;
 		reloadTime = null;
 		screenCodes = null;
-		logImages = null;
 		eventSystem = null;
-		sequenceTextures = null;
 		loadPercentText = null;
 		genericMaterials = null;
 		ReverbRegister = null;

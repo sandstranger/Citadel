@@ -7,8 +7,6 @@ using Citadel.Game;
 using Zenject;
 
 public class ItemTabManager : MonoBehaviour {
-    public GameObject iconManager;
-    public GameObject textManager;
 	public GameObject vaporizeButton;
 	public GameObject applyButton;
 	public GameObject useButton;
@@ -18,20 +16,16 @@ public class ItemTabManager : MonoBehaviour {
 	public GameObject grenadeTimerSlider;
 	public GameObject grenadeTimerSliderSlider;
 
+	[SerializeField]
+	private Text _textManagerText;
+	[SerializeField]
+	private Image _iconManagerImage;
+
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly MFDManager _mfdManager;
 	[Inject] private readonly Inventory _inventory;
 	[Inject] private readonly TexturesStorage _texturesStorage;
 	
-	private Text _textManagerText;
-	private Image _iconManagerImage;
-
-	private void Awake()
-	{
-		_textManagerText = textManager.GetComponent<Text>();
-		_iconManagerImage = iconManager.GetComponent<Image>();
-	}
-
 	public void Reset() {
 		eReaderSectionsContainer.SetActive(false);
 		_iconManagerImage.overrideSprite = _texturesStorage.NullableItemIcon; //nullsprite
@@ -83,12 +77,12 @@ public class ItemTabManager : MonoBehaviour {
 				default: ind = 37; break; // You're not Wong there
 			}
 
-			if (ind is >= 0 and < 38) {
-				_iconManagerImage.overrideSprite =
-					_consts.logImages[ind];
-			} else {
-				_iconManagerImage.overrideSprite =
-					_consts.logImages[0];
+			if (ind is >= 0 and < 38)
+			{
+				_iconManagerImage.overrideSprite = _texturesStorage.GetLogSprite(ind);
+			} else
+			{
+				_iconManagerImage.overrideSprite = _texturesStorage.GetLogSprite(0);
 			}
 		} else {
 			_iconManagerImage.overrideSprite = _texturesStorage.GetItemIcon(constIndex); 

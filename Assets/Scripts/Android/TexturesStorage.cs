@@ -18,21 +18,17 @@ namespace Citadel.Game
         [SerializeField]
         private List<Sprite> _usableItemsIcons = new();
 
-        public List<Texture> SequenceTextures => _sequenceTextures;
-
-        public List<Sprite> LOGImages => _logImages;
-
+        public int SequencesTexturesCount => _sequenceTextures.Count;
+        
         public Sprite NullableItemIcon => _usableItemsIcons[0];
-            
-        public Sprite GetItemFrobIcon(int iconIndex)
-        {
-            return _usableItemsFrobIcons[iconIndex];
-        }
 
-        public Sprite GetItemIcon(int iconIndex)
-        {
-            return _usableItemsIcons[iconIndex];
-        }
+        public Sprite GetLogSprite(int position) => _logImages[position];
+
+        public Texture GetSequencesTexture(int position) => _sequenceTextures[position];
+        
+        public Sprite GetItemFrobIcon(int iconIndex) => _usableItemsFrobIcons[iconIndex];
+
+        public Sprite GetItemIcon(int iconIndex) => _usableItemsIcons[iconIndex];
         
         public Sprite GetWeaponCursor(int weaponIndex) {
             switch(weaponIndex) {
