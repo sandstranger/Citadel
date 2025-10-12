@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Citadel.Game
@@ -5,9 +6,9 @@ namespace Citadel.Game
     internal sealed class MaterialPropertyHelper
     {
         private readonly Renderer _renderer;
-        private readonly MaterialPropertyBlock _materialPropertyBlock = new MaterialPropertyBlock();
+        private readonly MaterialPropertyBlock _materialPropertyBlock = new();
 
-        public MaterialPropertyHelper(Renderer renderer) => _renderer = renderer;
+        public MaterialPropertyHelper(Renderer renderer) => _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
 
         public Texture GetTexture(string textureName) => HasValue(textureName) ? _materialPropertyBlock.GetTexture(textureName) : null;
         

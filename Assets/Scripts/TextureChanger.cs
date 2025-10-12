@@ -64,7 +64,7 @@ public class TextureChanger : MonoBehaviour {
 		{
 			if (renderer != null)
 			{
-				result.Add(new MaterialPropertyHelper(rMainLod0));
+				result.Add(new MaterialPropertyHelper(renderer));
 			}
 		}
 	}
