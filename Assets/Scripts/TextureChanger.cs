@@ -15,7 +15,7 @@ public class TextureChanger : MonoBehaviour {
 	/*[DTValidator.Optional] */public Renderer rMainLod2;
 	public bool useGlow;
 
-	private List<MaterialPropertyHelper> _materialPropertyHelpers;
+	private IReadOnlyCollection<MaterialPropertyHelper> _materialPropertyHelpers;
 	
 	public void Awake()
 	{
@@ -50,7 +50,7 @@ public class TextureChanger : MonoBehaviour {
 		currentTexture = !currentTexture;
 	}
 
-	private List<MaterialPropertyHelper> BuildMaterialPropertyHelpers()
+	private IReadOnlyCollection<MaterialPropertyHelper> BuildMaterialPropertyHelpers()
 	{
 		var result = new List<MaterialPropertyHelper>();
 		
