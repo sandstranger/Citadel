@@ -24,7 +24,7 @@ namespace Citadel.Android.Tools
             
             var consts = Object.FindFirstObjectByType<Const>();
 
-            var usableIconsStorage = Editor.Utils.FindAllComponentsInProject<UsableIconsStorage>().Single();
+            var usableIconsStorage = Editor.Utils.FindAllComponentsInProject<TexturesStorage>().Single();
             
 /*            usableIconsStorage.UsableItemsIcons.Clear();
             usableIconsStorage.UsableItemsFrobIcons.Clear();

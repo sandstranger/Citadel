@@ -115,7 +115,7 @@ public class MouseLookScript : MonoBehaviour {
 	[Inject] private WeaponFire _weaponFire;
 	[Inject] private WeaponCurrent _weaponCurrent;
 	[Inject] private DynamicCulling _dynamicCulling;
-	[Inject] private readonly UsableIconsStorage _usableIconsStorage;
+	[Inject] private readonly TexturesStorage _texturesStorage;
 	
 	private static readonly StringBuilder s1 = new StringBuilder(500 * 1024);
     
@@ -1344,7 +1344,7 @@ public class MouseLookScript : MonoBehaviour {
 			for (int i=0;i<4;i++) {
 				if (curSearchScript.contents[i] >= 0)
 				{
-					_mouseCursor.cursorImage = _usableIconsStorage.GetItemFrobIcon(curSearchScript.contents[i]);
+					_mouseCursor.cursorImage = _texturesStorage.GetItemFrobIcon(curSearchScript.contents[i]);
 					var objectIndex = curSearchScript.contents[i];
 					heldObjectIndex = objectIndex;
 					heldObjectCustomIndex = objectIndex;

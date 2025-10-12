@@ -10,7 +10,7 @@ public class ItemIconManager : MonoBehaviour {
 	private Image _image;
 	
 	[Inject]
-	private readonly UsableIconsStorage _usableIconsStorage;
+	private readonly TexturesStorage _texturesStorage;
 
 	private void Awake()
 	{
@@ -19,7 +19,7 @@ public class ItemIconManager : MonoBehaviour {
 
 	public void SetItemIcon (int index) {
         if (index >= 0) {
-            _image.overrideSprite = _usableIconsStorage.GetItemIcon(index);
+            _image.overrideSprite = _texturesStorage.GetItemIcon(index);
         }
 	}
 }

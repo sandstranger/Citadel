@@ -251,17 +251,23 @@ public class MFDManager : MonoBehaviour  {
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private WeaponCurrent _weaponCurrent;
-	[Inject] private readonly UsableIconsStorage _usableIconsStorage;
+	[Inject] private readonly TexturesStorage _texturesStorage;
 
 	private static readonly StringBuilder s1 = new(100 * 1024);
 
 	private readonly List<Image> _searchItemImagesLHComponents = new();
 	private readonly List<Image> _searchItemImagesRHComponents = new();
-	
+
+	private Text _noItemsTextLHText;
+	private Text _noItemsTextRHText;
+
 	private void Start() 
 	{
+		_noItemsTextRHText = noItemsTextRH.GetComponent<Text>();
+		_noItemsTextLHText = noItemsTextLH.GetComponent<Text>();
 		FillImageComponents(searchItemImagesLH,_searchItemImagesLHComponents);
 		FillImageComponents(searchItemImagesRH,_searchItemImagesRHComponents);
+		
 		logFinished = _pauseScript.relativeTime;
 		logActive = false;
 		TabReset(true);
@@ -1029,16 +1035,13 @@ public class MFDManager : MonoBehaviour  {
 			headerText_textRH.text = head;
 			if (numberFoundContents <= 0) {
 				noItemsTextRH.SetActive(true);
-				noItemsTextRH.GetComponent<Text>().enabled = true;
+				_noItemsTextRHText.enabled = false;
 				return;
 			}
 			for (int i=0;i<4;i++) {
 				if (contents[i] > -1) {
 					searchCloseButtonRH.SetActive(true);
-					_searchItemImagesRHComponents[i].gameObject.SetActive(true);
-					_searchItemImagesRHComponents[i].overrideSprite = _usableIconsStorage.GetItemFrobIcon(contents[i]);
-					searchContainerRH.contents[i] = contents[i];
-					searchContainerRH.customIndex[i] = customIndex[i];
+					SetSpriteToImage(_searchItemImagesRHComponents[i],i,searchContainerRH, contents,customIndex);
 				}
 			}
 			searchCloseButtonRH.SetActive(true);
@@ -1048,16 +1051,13 @@ public class MFDManager : MonoBehaviour  {
 			headerText_textLH.text = head;
 			if (numberFoundContents <= 0) {
 				noItemsTextLH.SetActive(true);
-				noItemsTextLH.GetComponent<Text>().enabled = true;
+				_noItemsTextLHText.enabled = true;
 				return;
 			}
 			for (int i=0;i<4;i++) {
 				if (contents[i] > -1) {
 					searchCloseButtonLH.SetActive(true);
-					_searchItemImagesLHComponents[i].gameObject.SetActive(true);
-					_searchItemImagesLHComponents[i].overrideSprite = _usableIconsStorage.GetItemFrobIcon(contents[i]);
-					searchContainerLH.contents[i] = contents[i];
-					searchContainerLH.customIndex[i] = customIndex[i];
+					SetSpriteToImage(_searchItemImagesLHComponents[i],i,searchContainerLH,contents,customIndex);
 				}
 			}
 			searchCloseButtonLH.SetActive(true);
@@ -1433,13 +1433,13 @@ public class MFDManager : MonoBehaviour  {
 				headerText_textRH.enabled = false;
 				headerText_textRH.text = System.String.Empty;
 				noItemsTextRH.SetActive(false);
-				noItemsTextRH.GetComponent<Text>().enabled = false;
+				_noItemsTextRHText.enabled = false;
 				searchCloseButtonRH.SetActive(false);
 				for (int i=0;i<4;i++)
 				{
 					var image = _searchItemImagesRHComponents[i];
 					image.gameObject.SetActive(false);
-					image.overrideSprite = _usableIconsStorage.GetItemFrobIcon(101);
+					image.overrideSprite = _texturesStorage.GetItemFrobIcon(101);
 					searchContainerRH.contents[i] = -1;
 					searchContainerRH.customIndex[i] = -1;
 				}
@@ -1450,13 +1450,13 @@ public class MFDManager : MonoBehaviour  {
 				headerText_textLH.enabled = false;
 				headerText_textLH.text = System.String.Empty;
 				noItemsTextLH.SetActive(false);
-				noItemsTextLH.GetComponent<Text>().enabled = false;
+				_noItemsTextLHText.enabled = false;
 				searchCloseButtonLH.SetActive(false);
 				for (int i=0;i<4;i++)
 				{
 					var image = _searchItemImagesLHComponents[i];
 					image.gameObject.SetActive(false);
-					image.overrideSprite = _usableIconsStorage.GetItemFrobIcon(101);
+					image.overrideSprite = _texturesStorage.GetItemFrobIcon(101);
 					searchContainerLH.contents[i] = -1;
 					searchContainerLH.customIndex[i] = -1;
 				}
@@ -1641,11 +1641,11 @@ public class MFDManager : MonoBehaviour  {
 	public void SetWepInfo(int index) { // Expects usableItem index.
 		if (index >= 0) {
 			weptextRH.text = weptextLH.text = _consts.stringTable[index + 326];
-			iconRH.overrideSprite = iconLH.overrideSprite = _usableIconsStorage.GetItemIcon(index);
+			iconRH.overrideSprite = iconLH.overrideSprite = _texturesStorage.GetItemIcon(index);
 		} else {
 			weptextRH.text = weptextLH.text = "";
-			iconRH.overrideSprite = _usableIconsStorage.NullableIcon;
-			iconLH.overrideSprite = _usableIconsStorage.NullableIcon;
+			iconRH.overrideSprite = _texturesStorage.NullableItemIcon;
+			iconLH.overrideSprite = _texturesStorage.NullableItemIcon;
 		}
 	}
 
@@ -2031,7 +2031,7 @@ public class MFDManager : MonoBehaviour  {
 	private void SetSpriteToImage(Image image, int index, SearchButton searchButton,int[] contents, int[] customIndex)
 	{
 		image.gameObject.SetActive(true);
-		image.overrideSprite = _usableIconsStorage.GetItemFrobIcon(contents[index]);
+		image.overrideSprite = _texturesStorage.GetItemFrobIcon(contents[index]);
 		searchButton.contents[index] = contents[index];
 		searchButton.customIndex[index] = customIndex[index];
 	}

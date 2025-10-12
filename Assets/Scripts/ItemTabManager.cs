@@ -21,7 +21,7 @@ public class ItemTabManager : MonoBehaviour {
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly MFDManager _mfdManager;
 	[Inject] private readonly Inventory _inventory;
-	[Inject] private readonly UsableIconsStorage _usableIconsStorage;
+	[Inject] private readonly TexturesStorage _texturesStorage;
 	
 	private Text _textManagerText;
 	private Image _iconManagerImage;
@@ -34,7 +34,7 @@ public class ItemTabManager : MonoBehaviour {
 
 	public void Reset() {
 		eReaderSectionsContainer.SetActive(false);
-		_iconManagerImage.overrideSprite = _usableIconsStorage.NullableIcon; //nullsprite
+		_iconManagerImage.overrideSprite = _texturesStorage.NullableItemIcon; //nullsprite
 		_textManagerText.text = System.String.Empty;
 		applyButton.SetActive(false);
 		vaporizeButton.SetActive(false);
@@ -50,7 +50,7 @@ public class ItemTabManager : MonoBehaviour {
 		grenadeTimerSlider.SetActive(false);
 		grenadeTimerSliderSlider.SetActive(false);
 		eReaderSectionsContainer.SetActive(true);
-		_iconManagerImage.overrideSprite = _usableIconsStorage.GetItemIcon(23); //datareader
+		_iconManagerImage.overrideSprite = _texturesStorage.GetItemIcon(23); //datareader
 
 		_textManagerText.text = _consts.stringTable[349]; // MULTIMEDIA DATA READER
 	}
@@ -91,7 +91,7 @@ public class ItemTabManager : MonoBehaviour {
 					_consts.logImages[0];
 			}
 		} else {
-			_iconManagerImage.overrideSprite = _usableIconsStorage.GetItemIcon(constIndex); 
+			_iconManagerImage.overrideSprite = _texturesStorage.GetItemIcon(constIndex); 
 		}
 
 		_textManagerText.text =

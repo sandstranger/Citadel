@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Citadel.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Citadel.Game
@@ -10,7 +11,7 @@ namespace Citadel.Game
     {
         private static RootInstaller _instance;
 
-        [SerializeField] private UsableIconsStorage _usableIconsStorage;
+        [FormerlySerializedAs("_usableIconsStorage")] [SerializeField] private TexturesStorage texturesStorage;
         [SerializeReference] private AudioSource _mainmenuMusic;
         [SerializeField] private PlayerReferenceManager _playerReference;
         [SerializeField] private BiomonitorGraphSystem _biomonitorGraphSystem;
@@ -75,7 +76,7 @@ namespace Citadel.Game
         public override void InstallBindings()
         {
             Container.Bind<AudioSource>().WithId("main_menu_music").FromInstance(_mainmenuMusic).AsSingle();
-            Container.Bind<UsableIconsStorage>().FromInstance(_usableIconsStorage).AsSingle();
+            Container.Bind<TexturesStorage>().FromInstance(texturesStorage).AsSingle();
             Container.Bind<IResourcesLoader>().FromInstance(AddressablesResourcesLoader.Default).AsSingle();
             Container.Bind<AndroidConfig>().FromInstance(AndroidConfig.Default).AsSingle();
             Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>()

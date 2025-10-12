@@ -70,7 +70,7 @@ public class MouseCursor : MonoBehaviour {
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private WeaponCurrent _weaponCurrent;
-	[Inject] private readonly UsableIconsStorage _usableIconsStorage;
+	[Inject] private readonly TexturesStorage _texturesStorage;
 	
 	private void Awake() {
 		uiCameraCam = uiCamera.GetComponent<Camera>();
@@ -266,12 +266,12 @@ public class MouseCursor : MonoBehaviour {
 			} else {
 				if (_mouseLookScript.vmailActive)
 				{
-					cursorImage = _usableIconsStorage.GetItemFrobIcon(108); // vmail
+					cursorImage = _texturesStorage.GetItemFrobIcon(108); // vmail
 				} else if (_guiState.isBlocking && !_mouseLookScript.holdingObject) {
 					cursorImage = toolTipHasText ? tooltipTexture : cursorGUI;
 				} else if (_mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0) {
 					cursorImage = _mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0 ? 
-						_usableIconsStorage.GetItemFrobIcon(_mouseLookScript.heldObjectIndex) : GetWeaponCursor();
+						_texturesStorage.GetItemFrobIcon(_mouseLookScript.heldObjectIndex) : GetWeaponCursor();
 				} 
 			}
         } else {
@@ -287,7 +287,7 @@ public class MouseCursor : MonoBehaviour {
 			} else {
 				if (_mouseLookScript.holdingObject && _mouseLookScript.heldObjectIndex >= 0)
 				{
-					cursorImage = _usableIconsStorage.GetItemFrobIcon(_mouseLookScript.heldObjectIndex);
+					cursorImage = _texturesStorage.GetItemFrobIcon(_mouseLookScript.heldObjectIndex);
 				} else {
 					cursorImage = GetWeaponCursor();
 				}
@@ -300,7 +300,7 @@ public class MouseCursor : MonoBehaviour {
 	
 	private Sprite GetWeaponCursor()
 	{
-		return _usableIconsStorage.GetWeaponCursor(_weaponCurrent.weaponIndex);
+		return _texturesStorage.GetWeaponCursor(_weaponCurrent.weaponIndex);
 	}
 
 	void UpdateSafeZone() {

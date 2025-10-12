@@ -3,16 +3,26 @@ using UnityEngine;
 
 namespace Citadel.Game
 {
-    [CreateAssetMenu(fileName = "UsableIcons", menuName = "ScriptableObjects/Create UsableIconsScriptableObject", order = 1)]
-    public sealed class UsableIconsStorage : ScriptableObject
+    [CreateAssetMenu(fileName = "TexturesStorage", menuName = "ScriptableObjects/Create TexturesStorageScriptableObject", order = 1)]
+    public sealed class TexturesStorage : ScriptableObject
     {
+        [SerializeField] 
+        private List<Texture> _sequenceTextures = new();
+
         [SerializeField]
-        private List<Sprite> _usableItemsFrobIcons = new List<Sprite>();
+        private List<Sprite> _logImages = new();
         
         [SerializeField]
-        private List<Sprite> _usableItemsIcons = new List<Sprite>();
+        private List<Sprite> _usableItemsFrobIcons = new();
+        
+        [SerializeField]
+        private List<Sprite> _usableItemsIcons = new();
 
-        public Sprite NullableIcon => _usableItemsIcons[0];
+        public List<Texture> SequenceTextures => _sequenceTextures;
+
+        public List<Sprite> LOGImages => _logImages;
+
+        public Sprite NullableItemIcon => _usableItemsIcons[0];
             
         public Sprite GetItemFrobIcon(int iconIndex)
         {
