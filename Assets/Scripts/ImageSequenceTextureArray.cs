@@ -24,7 +24,6 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 	private bool screenDestroyedDone = false; // Delay ending animation for a few destroy frames.
 	private bool screenDestroyFirstFrame = true;
 	private MeshRenderer mR;
-	private Material goMaterial;
 	private Light lit;
 	private int frameCounter = 0; //An integer to advance frames
 	private int frameCounterGlow = 0;
@@ -33,12 +32,14 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly PauseScript _pauseScript;
 	[Inject] private readonly TexturesStorage _texturesStorage;
+	
+	private MaterialPropertyHelper _materialPropertyHelper;
 
 	void Awake() {
 		//Get a reference to the Material of the game object this script is attached to.
 		mR = GetComponent<MeshRenderer>();
+		_materialPropertyHelper = new MaterialPropertyHelper(mR);
 		if (mR == null) { this.gameObject.SetActive(false); return; }
-		this.goMaterial = this.GetComponent<Renderer>().material;
 		SFX = GetComponent<AudioSource>();
 		pid = GetComponent<PrefabIdentifier>();
 		if (lightContainer != null) {
@@ -921,7 +922,7 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 			if (constArrayLookup.Length > 0 && frameCounter < constArrayLookup.Length) {
 				if (constArrayLookup[frameCounter] < _texturesStorage.SequencesTexturesCount && constArrayLookup[frameCounter] >= 0) {
 					var texture = _texturesStorage.GetSequencesTexture(constArrayLookup[frameCounter]);
-					if (goMaterial.mainTexture != texture)
+					if (_materialPropertyHelper.GetMainTexture() != texture)
 					{
 						SetMainTexture(texture);
 					}
@@ -937,20 +938,18 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 	}
 	
 	void OnDestroy() {
-		goMaterial = null;
 		pid = null;
 		SFX = null;
-		Destroy(goMaterial);
 	}
 
 	private void SetEmissionMapTexture(Texture texture)
 	{
-		goMaterial.SetTexture("_EmissionMap", texture);
+		_materialPropertyHelper.SetEmissionTexture(texture);
 	}
 
 	private void SetMainTexture(Texture texture)
 	{
-		goMaterial.mainTexture = texture;
+		_materialPropertyHelper.SetMainTexture(texture);
 	}
 	
 	private void SetTextureToAllProperties(Texture texture)

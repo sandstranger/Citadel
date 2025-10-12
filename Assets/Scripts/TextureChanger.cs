@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Citadel.Game;
 using UnityEngine;
 
 public class TextureChanger : MonoBehaviour {
@@ -14,29 +15,60 @@ public class TextureChanger : MonoBehaviour {
 	/*[DTValidator.Optional] */public Renderer rMainLod2;
 	public bool useGlow;
 
-	public void Awake() {
-		if (startAlternate) {
+	private List<MaterialPropertyHelper> _materialPropertyHelpers;
+	
+	public void Awake()
+	{
+		_materialPropertyHelpers = BuildMaterialPropertyHelpers();
+		
+		if (startAlternate) 
+		{
 			currentTexture = true;
-			if (rMainLod0 != null) { rMainLod0.material.mainTexture = mainTexture2; if (useGlow) rMainLod0.material.SetTexture("_EmissionMap", mainTextureGlow2); }
-			if (rMainLod1 != null) { rMainLod1.material.mainTexture = mainTexture2; if (useGlow) rMainLod1.material.SetTexture("_EmissionMap", mainTextureGlow2); }
-			if (rMainLod2 != null) { rMainLod2.material.mainTexture = mainTexture2; if (useGlow) rMainLod2.material.SetTexture("_EmissionMap", mainTextureGlow2); }
+			foreach (var materialProperty in _materialPropertyHelpers)
+			{
+				materialProperty.SetMainTexture(mainTexture2);
+				if (useGlow)
+				{
+					materialProperty.SetEmissionTexture(mainTextureGlow2);
+				}
+			}
 		}
 	}
 
     public void Toggle() {
-		if (currentTexture) {
-			if (rMainLod0 != null) { rMainLod0.material.mainTexture = mainTexture; if (useGlow) rMainLod0.material.SetTexture("_EmissionMap", mainTextureGlow); }
-			if (rMainLod1 != null) { rMainLod1.material.mainTexture = mainTexture; if (useGlow) rMainLod1.material.SetTexture("_EmissionMap", mainTextureGlow); }
-			if (rMainLod2 != null) { rMainLod2.material.mainTexture = mainTexture; if (useGlow) rMainLod2.material.SetTexture("_EmissionMap", mainTextureGlow); }
-		} else {
-			if (rMainLod0 != null) { rMainLod0.material.mainTexture = mainTexture2; if (useGlow) rMainLod0.material.SetTexture("_EmissionMap", mainTextureGlow2); }
-			if (rMainLod1 != null) { rMainLod1.material.mainTexture = mainTexture2; if (useGlow) rMainLod1.material.SetTexture("_EmissionMap", mainTextureGlow2); }
-			if (rMainLod2 != null) { rMainLod2.material.mainTexture = mainTexture2; if (useGlow) rMainLod2.material.SetTexture("_EmissionMap", mainTextureGlow2); }
-		}
-
+	    
+	    foreach (var materialProperty in _materialPropertyHelpers)
+	    {
+		    materialProperty.SetMainTexture(currentTexture ? mainTexture : mainTexture2);
+		    
+		    if (useGlow)
+		    {
+			    materialProperty.SetEmissionTexture(currentTexture ? mainTextureGlow : mainTextureGlow2);
+		    }
+	    }
+	    
 		currentTexture = !currentTexture;
 	}
 
+	private List<MaterialPropertyHelper> BuildMaterialPropertyHelpers()
+	{
+		var result = new List<MaterialPropertyHelper>();
+		
+		AddValue(rMainLod0);
+		AddValue(rMainLod1);
+		AddValue(rMainLod2);
+
+		return result;
+		
+		void AddValue(Renderer renderer)
+		{
+			if (renderer != null)
+			{
+				result.Add(new MaterialPropertyHelper(rMainLod0));
+			}
+		}
+	}
+    
 	public static string Save(GameObject go) {
 		TextureChanger tex = go.GetComponent<TextureChanger>();
 		return Utils.BoolToString(tex.currentTexture,"currentTexture");
