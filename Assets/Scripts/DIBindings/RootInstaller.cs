@@ -11,7 +11,8 @@ namespace Citadel.Game
     {
         private static RootInstaller _instance;
 
-        [FormerlySerializedAs("_usableIconsStorage")] [SerializeField] private TexturesStorage texturesStorage;
+        [SerializeField] 
+        private TexturesStorage texturesStorage;
         [SerializeReference] private AudioSource _mainmenuMusic;
         [SerializeField] private PlayerReferenceManager _playerReference;
         [SerializeField] private BiomonitorGraphSystem _biomonitorGraphSystem;
