@@ -69,7 +69,7 @@ namespace Citadel.Android.Tools
                 {
                     AutoLOD.RemoveLODs(prefabInstance);
 
-                    var meshFilters = prefabInstance.GetComponentsInChildren<MeshRenderer>(true, true)
+                    var meshFilters = Citadel.Game.Extensions.GetComponentsInChildren<MeshRenderer>(prefabInstance, true, true)
                         .Select(render => render.GetComponent<MeshFilter>()).Where(mesh => mesh!=null && mesh.sharedMesh!=null).ToArray();
                     
                     AutoLOD.GenerateLODs(prefabInstance);
@@ -136,8 +136,9 @@ namespace Citadel.Android.Tools
                 return false;
             }
 
-            var meshFilters = gameObject.GetComponentsInChildren<MeshRenderer>(true, true).Select(meshRender => 
-                meshRender.GetComponent<MeshFilter>()).Where(meshFilter => meshFilter!=null && meshFilter.sharedMesh!=null).ToArray();
+            var meshFilters = Game.Extensions.GetComponentsInChildren<MeshRenderer>(gameObject, true, true)
+                .Select(meshRender => 
+                    meshRender.GetComponent<MeshFilter>()).Where(meshFilter => meshFilter!=null && meshFilter.sharedMesh!=null).ToArray();
 
             return (meshFilters.Length > 0 && 
                     !meshFilters.Any(mesh => mesh.sharedMesh.name.Contains("med1_1_")) && meshFilters.Any(meshFilter => meshFilter.sharedMesh.GetTrianglesCount() >= MinMeshTrianglesCountToGenerateLods));

@@ -24,7 +24,7 @@ public class ItemTabManager : MonoBehaviour {
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly MFDManager _mfdManager;
 	[Inject] private readonly Inventory _inventory;
-	[Inject] private readonly TexturesStorage _texturesStorage;
+	[Inject] private readonly ITexturesStorage _texturesStorage;
 	
 	public void Reset() {
 		eReaderSectionsContainer.SetActive(false);

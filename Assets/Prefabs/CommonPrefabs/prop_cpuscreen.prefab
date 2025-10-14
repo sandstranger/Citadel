@@ -29,12 +29,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 889810240990601995}
+  serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
   m_LocalPosition: {x: -50.477, y: 2.454, z: -42.607}
   m_LocalScale: {x: 1.2800004, y: 1.28, z: 1.2800004}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!33 &876910290511212447
 MeshFilter:
@@ -55,10 +56,17 @@ MeshRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -80,9 +88,11 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &917066030117507467
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -91,9 +101,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 889810240990601995}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 1.0000002, y: 1, z: 0.1}
   m_Center: {x: 0, y: 0, z: 0.05}
 --- !u!114 &6416620954606664142
@@ -122,6 +140,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 0
+  _screenCodes:
+  - MainTexture: {fileID: 0}
+    EmissionTexture: {fileID: 0}
+  - MainTexture: {fileID: 2800000, guid: 1204f87d26f69e14b934647b853e1449, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: f88ae40cfd9dc7d4784ed141edf65f79, type: 3}
+  - MainTexture: {fileID: 2800000, guid: 35e0a912c39321344b5f3d9cd2a64cfe, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: 35e0a912c39321344b5f3d9cd2a64cfe, type: 3}
+  - MainTexture: {fileID: 2800000, guid: b27fa67d45872ee429c93e609955cc4c, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: b27fa67d45872ee429c93e609955cc4c, type: 3}
+  - MainTexture: {fileID: 2800000, guid: f942bf9b8c645fc48bd488310709b0c4, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: f942bf9b8c645fc48bd488310709b0c4, type: 3}
+  - MainTexture: {fileID: 2800000, guid: 98a0ca9f24d163143ab22e302ca6c4ef, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: 98a0ca9f24d163143ab22e302ca6c4ef, type: 3}
+  - MainTexture: {fileID: 2800000, guid: ba0115cd2187fae4e96136b7ee2c21bd, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: ba0115cd2187fae4e96136b7ee2c21bd, type: 3}
+  - MainTexture: {fileID: 2800000, guid: 89d54b586907136439dcf3108d159388, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: 89d54b586907136439dcf3108d159388, type: 3}
+  - MainTexture: {fileID: 2800000, guid: 818097590f3605147a0dfbf18857043a, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: 818097590f3605147a0dfbf18857043a, type: 3}
+  - MainTexture: {fileID: 2800000, guid: 0c983535b3dbc3a4daebf107beb104c8, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: 0c983535b3dbc3a4daebf107beb104c8, type: 3}
+  - MainTexture: {fileID: 2800000, guid: 8664dcb5be4803542af525315744fdfc, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: 8664dcb5be4803542af525315744fdfc, type: 3}
 --- !u!114 &-5538850694168179310
 MonoBehaviour:
   m_ObjectHideFlags: 0

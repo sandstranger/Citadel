@@ -297,6 +297,12 @@ MonoBehaviour:
   stopReturnsToNormal: 1
   timeBetweenFlashes: 0.35
   lit: {fileID: 0}
+  _normalTextures:
+    MainTexture: {fileID: 2800000, guid: 5f16445133acf5a448190ebe13a2b237, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: e553fb6d9d6756e42be2b5576b4b80ec, type: 3}
+  _alternateTextures:
+    MainTexture: {fileID: 2800000, guid: 67ff92d9b2cfc2446b00065ce99228e9, type: 3}
+    EmissionTexture: {fileID: 2800000, guid: 0074267e9091fc042a0f4334c7a3645d, type: 3}
 --- !u!114 &-2200736438896835209
 MonoBehaviour:
   m_ObjectHideFlags: 0

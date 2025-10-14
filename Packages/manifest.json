@@ -24,6 +24,7 @@
     "com.unity.toolchain.linux-x86_64": "2.0.10",
     "com.unity.ugui": "2.0.0",
     "com.whinarn.unitymeshsimplifier": "https://github.com/Whinarn/UnityMeshSimplifier.git",
+    "com.yasirkula.assetusagedetector": "https://github.com/yasirkula/UnityAssetUsageDetector.git",
     "com.yasirkula.inspectplus": "https://github.com/yasirkula/UnityInspectPlus.git",
     "com.yasirkula.simplefilebrowser": "https://github.com/yasirkula/UnitySimpleFileBrowser.git",
     "jp.co.cyberagent.smartaddresser": "https://github.com/CyberAgentGameEntertainment/SmartAddresser.git?path=/Assets/SmartAddresser",

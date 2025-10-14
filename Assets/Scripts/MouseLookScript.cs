@@ -115,7 +115,7 @@ public class MouseLookScript : MonoBehaviour {
 	[Inject] private WeaponFire _weaponFire;
 	[Inject] private WeaponCurrent _weaponCurrent;
 	[Inject] private DynamicCulling _dynamicCulling;
-	[Inject] private readonly TexturesStorage _texturesStorage;
+	[Inject] private readonly ITexturesStorage _texturesStorage;
 	
 	private static readonly StringBuilder s1 = new StringBuilder(500 * 1024);
     

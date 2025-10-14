@@ -126,6 +126,12 @@ MonoBehaviour:
   mainSwitchMaterial: {fileID: 2100000, guid: 50c0d6a417d072f43b30416cf81711d1, type: 2}
   alternateSwitchMaterial: {fileID: 2100000, guid: e1aaf9003e39a8049a3b18670ecf318a,
     type: 2}
+  _mainSwitchTexture: {fileID: 2800000, guid: f0156aa1b6b184f4298091dce58f659a, type: 3}
+  _alternateSwitchTexture: {fileID: 2800000, guid: e623a3396b12b6e4eb4bcfebb0a7e25a,
+    type: 3}
+  _glowDnEmissionTexture: {fileID: 0}
+  _glowUpEmissionTexture: {fileID: 2800000, guid: 15ccc6bdfcc6919408a8931e9667574d,
+    type: 3}
   anim: {fileID: 0}
   delayFinished: 0
   tickFinished: 0

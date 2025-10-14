@@ -1,3 +1,4 @@
+using Citadel.Game;
 using UnityEngine;
 
 [ExecuteAlways] // Allow updates in the Editor
@@ -6,12 +7,19 @@ public class ImposterRenderer : MonoBehaviour {
     public int yawSteps = 8;  // Number of slices per horizontal ring (e.g., 8 for 45° increments)
     public int pitchSteps = 7; // Number of vertical rings (e.g., -60° to 60°)
     private Renderer objRenderer;
+    private MaterialPropertyHelper _materialPropertyHelper;
 
-    void Awake()
+    private void Awake()
     {
         objRenderer = GetComponent<Renderer>();
-        if (objRenderer == null)
+        if (objRenderer is null)
+        {
             Debug.LogError("No Renderer component found on this GameObject!");
+        }
+        else
+        {
+            _materialPropertyHelper = new MaterialPropertyHelper(objRenderer);
+        }
     }
 
     void Update()
@@ -42,10 +50,6 @@ public class ImposterRenderer : MonoBehaviour {
             return;
         }
 
-        // Assign the selected texture to the material
-        if (objRenderer != null)
-        {
-            objRenderer.material.mainTexture = slices[sliceIndex];
-        }
+        _materialPropertyHelper?.SetMainTexture(slices[sliceIndex]);
     }
 }

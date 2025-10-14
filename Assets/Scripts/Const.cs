@@ -285,8 +285,6 @@ public class Const : SingletonHelper<Const>
 	public readonly HashSet<TextLocalization> TextLocalizationRegister = new();
 	public float[] reloadTime;
 
-	public Material[] screenCodes;
-
 	public GameObject eventSystem;
 	private static readonly GameObject[] _prefabs = new GameObject[768]; // Everything
 	public GameObject prefabFallback;
@@ -2276,7 +2274,6 @@ CreateBlackTexture:
 		_targetnameRegister.Clear();
 		stringTable = null;
 		reloadTime = null;
-		screenCodes = null;
 		eventSystem = null;
 		loadPercentText = null;
 		genericMaterials = null;

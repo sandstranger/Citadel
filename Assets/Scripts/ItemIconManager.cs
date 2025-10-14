@@ -10,7 +10,7 @@ public class ItemIconManager : MonoBehaviour {
 	private Image _image;
 	
 	[Inject]
-	private readonly TexturesStorage _texturesStorage;
+	private readonly ITexturesStorage _texturesStorage;
 
 	private void Awake()
 	{

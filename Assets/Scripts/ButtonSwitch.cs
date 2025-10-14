@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
+using Citadel.Game;
 using Zenject;
 
 public class ButtonSwitch : MonoBehaviour {
@@ -21,15 +23,17 @@ public class ButtonSwitch : MonoBehaviour {
 	public int lockedMessageLingdex = 193; // save
 	public bool active; // save
 
-	// External references, optional depending on (changeMatOnActive
-	// || blinkWhenActive)
-	/*[DTValidator.Optional] */public Material mainSwitchMaterial;
-	/*[DTValidator.Optional] */public Material alternateSwitchMaterial;
-
+	[SerializeField]
+	private Texture _mainSwitchTexture;
+	[SerializeField]
+	private Texture _alternateSwitchTexture;
+	[SerializeField]
+	private Texture _glowDnEmissionTexture;
+	[SerializeField]
+	private Texture _glowUpEmissionTexture;
+	
 	// Internal references
 	private AudioSource SFXSource;
-	private MeshRenderer mRenderer; // Optional depending on (changeMatOnActive
-	                                // || blinkWhenActive)
 	[HideInInspector] public Animator anim;
 	private GameObject player; // Set on use, no need for initialization check.
 	private const float tickTime = 1.5f;
@@ -42,11 +46,14 @@ public class ButtonSwitch : MonoBehaviour {
 	[HideInInspector] public string currentClipName; // save
 
 	[Inject]
-	private LevelManager _levelManager;
-	[Inject] private Const _consts;
-	[Inject] private MFDManager _mfdManager;
-	[Inject] private PauseScript _pauseScript;
-
+	private readonly LevelManager _levelManager;
+	[Inject] private readonly Const _consts;
+	[Inject] private readonly MFDManager _mfdManager;
+	[Inject] private readonly PauseScript _pauseScript;
+	private Color _normalColor;
+	private readonly List<MaterialPropertyHelper> _materialPropertyHelpers = new();
+	private readonly List<MeshRenderer> _renderers = new();
+	
 	private static readonly StringBuilder s1 = new StringBuilder(100 * 1024);
 
 	public void Awake() {
@@ -56,8 +63,15 @@ public class ButtonSwitch : MonoBehaviour {
 		if (SFXSource == null) {
 		    Debug.Log("BUG: ButtonSwitch missing component for SFXSource");
 		} else SFXSource.playOnAwake = false;
+
+		_renderers.AddRange(this.GetComponentsInChildren<MeshRenderer>(includeSelf: true));
+		_normalColor = _renderers[0].sharedMaterial.color;
 		
-		mRenderer = GetComponent<MeshRenderer>();
+		foreach (var renderer in _renderers)
+		{
+			_materialPropertyHelpers.Add(new MaterialPropertyHelper(renderer));
+		}
+		
 		delayFinished = 0; // prevent using targets on awake
 		if (animateModel) {
 			anim = GetComponent<Animator>();
@@ -133,30 +147,29 @@ public class ButtonSwitch : MonoBehaviour {
 		}
 	}
 
-	void ToggleMaterial() {
-		if (mRenderer == null) mRenderer = GetComponent<MeshRenderer>();
-		if (alternateOn)
-			mRenderer.material = alternateSwitchMaterial;
-		else
-			mRenderer.material = mainSwitchMaterial;
+	void ToggleMaterial() 
+	{
+		UpdateButtonTextures(alternateOn);
 	}
 
-	public void SetMaterialToAlternate() {
-		if (!blinkWhenActive) return;
-
-		if (mRenderer == null) mRenderer = GetComponent<MeshRenderer>();
-		if (mRenderer.material != alternateSwitchMaterial) {
-		    mRenderer.material = alternateSwitchMaterial;
+	public void SetMaterialToAlternate() 
+	{
+		if (!blinkWhenActive)
+		{
+			return;
 		}
+
+		UpdateButtonTextures(true);
 	}
 
-	public void SetMaterialToNormal() {
-		if (!blinkWhenActive) return;
-
-		if (mRenderer == null) mRenderer = GetComponent<MeshRenderer>();
-		if (mRenderer.material != mainSwitchMaterial) {
-		    mRenderer.material = mainSwitchMaterial;
+	public void SetMaterialToNormal() 
+	{
+		if (!blinkWhenActive)
+		{
+			return;
 		}
+
+		UpdateButtonTextures(false);
 	}
 
 	void Update() {
@@ -173,14 +186,31 @@ public class ButtonSwitch : MonoBehaviour {
 		if (blinkWhenActive) {
 			if (active) {
 				if (tickFinished < _pauseScript.relativeTime) {
-					if (mRenderer.isVisible) {
-						if (alternateOn) SetMaterialToAlternate();
-						else SetMaterialToNormal();
+					if (_renderers.Any(renderer => renderer.isVisible)) 
+					{
+						if (alternateOn)
+						{
+							SetMaterialToAlternate();
+						}
+						else
+						{
+							SetMaterialToNormal();
+						}
 					}
 					alternateOn = !alternateOn;
 					tickFinished = _pauseScript.relativeTime + tickTime;
 				}
 			}
+		}
+	}
+
+	private void UpdateButtonTextures(bool enableButton)
+	{
+		foreach (var materialHelper in _materialPropertyHelpers)
+		{
+			materialHelper.SetMainTexture(enableButton ? _alternateSwitchTexture : _mainSwitchTexture);
+			materialHelper.SetEmissionColor(enableButton ? Color.white : _normalColor);
+			materialHelper.SetEmissionTexture(enableButton ? _glowUpEmissionTexture : _glowDnEmissionTexture);
 		}
 	}
 

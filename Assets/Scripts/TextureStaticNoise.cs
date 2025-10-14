@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Citadel.Game;
 using Zenject;
 
 public class TextureStaticNoise : MonoBehaviour {
@@ -10,6 +11,7 @@ public class TextureStaticNoise : MonoBehaviour {
 	private bool initialized = false;
 
 	[Inject] private PauseScript _pauseScript;
+	private MaterialPropertyHelper _materialPropertyHelper;
 
 	void Awake () { Initialize(); }
 	void OnEnable () { Initialize(); }
@@ -19,7 +21,8 @@ public class TextureStaticNoise : MonoBehaviour {
 		initialized = true;
 		texture = new Texture2D(resolution, resolution, TextureFormat.RGB24, true);
 		texture.name = "ProceduralStatic";
-		GetComponent<MeshRenderer>().material.mainTexture = texture;
+		_materialPropertyHelper = new MaterialPropertyHelper(GetComponent<MeshRenderer>());
+		_materialPropertyHelper.SetMainTexture(texture);
 		FillTexture();
 		updateTime = _pauseScript.relativeTime + interval;
 	}

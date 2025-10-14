@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
+using Citadel.Game;
 using Zenject;
 
 public class CodeScreen : MonoBehaviour {
@@ -7,12 +9,15 @@ public class CodeScreen : MonoBehaviour {
     private MeshRenderer mr;
     private int matIndex = 0;
     private float tickFinished;
-    
-    [Inject] private Const _consts;
-    [Inject] private PauseScript _pauseScript;
+
+    [Inject] private readonly ITexturesStorage _texturesStorage;
+    [Inject] private readonly Const _consts;
+    [Inject] private readonly PauseScript _pauseScript;
+    private MaterialPropertyHelper _materialPropertyHelper;
 
     void Start() {
         mr = GetComponent<MeshRenderer>();
+        _materialPropertyHelper = new MaterialPropertyHelper(mr);
         tickFinished = _pauseScript.relativeTime + 0.3f;
     }
     
@@ -75,6 +80,8 @@ public class CodeScreen : MonoBehaviour {
 			    break;
 		}
 		
-		mr.material = (_consts.screenCodes[matIndex]);
+        var screen = _texturesStorage.GetScreenCode(matIndex);
+        _materialPropertyHelper.SetMainTexture(screen);
+        _materialPropertyHelper.SetEmissionTexture(screen);
     }
 }

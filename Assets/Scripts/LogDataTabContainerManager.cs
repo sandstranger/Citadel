@@ -13,7 +13,7 @@ public class LogDataTabContainerManager : MonoBehaviour {
 	public Image logImage;
 
 	[Inject] private readonly Const _consts;
-	[Inject] private readonly TexturesStorage _texturesStorage;
+	[Inject] private readonly ITexturesStorage _texturesStorage;
 	
 	public void SendLogData(int referenceIndex, bool isRH) {
 		//Debug.Log("SendLogData received referenceIndex of " + referenceIndex.ToString());

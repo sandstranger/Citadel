@@ -251,7 +251,7 @@ public class MFDManager : MonoBehaviour  {
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private WeaponCurrent _weaponCurrent;
-	[Inject] private readonly TexturesStorage _texturesStorage;
+	[Inject] private readonly ITexturesStorage _texturesStorage;
 
 	private static readonly StringBuilder s1 = new(100 * 1024);
 

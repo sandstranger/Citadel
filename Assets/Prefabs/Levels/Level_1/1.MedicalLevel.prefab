@@ -42971,6 +42971,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8684139747343658672, guid: f1f90891c5a429b41a2dc657f251907e,
         type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8684139747343658672, guid: f1f90891c5a429b41a2dc657f251907e,
+        type: 3}
       propertyPath: m_Lightmapping
       value: 1
       objectReference: {fileID: 0}

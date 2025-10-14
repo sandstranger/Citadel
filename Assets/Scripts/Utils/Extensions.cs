@@ -2,11 +2,39 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
+using ZLinq;
 
 namespace Citadel.Game
 {
-    internal static class Extensions
+    public static class Extensions
     {
+        public static T[] GetComponentsInChildren<T>(this Component component, bool includeInactive = false, bool includeSelf = false) where T : Component
+        {
+            return component.gameObject.GetComponentsInChildren<T>(includeInactive,includeSelf);
+        }
+
+        public static T[] GetComponentsInChildren<T>(this GameObject gameObject, bool includeInactive = false, bool includeSelf = false) where T : Component
+        {
+            var components = gameObject.GetComponentsInChildren<T>(includeInactive);
+
+            if (includeSelf)
+            {
+                var selfComponent = gameObject.GetComponent<T>();
+                return selfComponent!=null ? components.Prepend(selfComponent).ToArray() : components;
+            }
+
+            return components;
+        }
+        
+        public static void CallIfNotNull(this UnityEngine.Object component, Action action)
+        {
+            if (component != null)
+            {
+                action.Invoke();
+            }
+        }
+        
         public static async UniTask<T> WithCancellationAsync<T>(this UniTask<T> genericTask, CancellationToken cancellationToken)
         {
             if (!cancellationToken.CanBeCanceled)

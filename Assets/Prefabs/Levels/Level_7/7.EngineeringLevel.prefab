@@ -16013,6 +16013,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 662269688059799937, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 1399304133632837272, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
         type: 3}
       propertyPath: m_Lightmapping
@@ -16087,6 +16092,11 @@ PrefabInstance:
         type: 3}
       propertyPath: alreadyInstalledMessageLingdex
       value: 605
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505049002264215478, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 6512414593765072101, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
         type: 3}
@@ -16218,9 +16228,15 @@ MonoBehaviour:
   startAlternate: 0
   currentTexture: 0
   rMainLod0: {fileID: 3753027767848358266}
-  rMainLod1: {fileID: 0}
+  rMainLod1: {fileID: 2428620310096920042}
   rMainLod2: {fileID: 0}
   useGlow: 0
+--- !u!23 &2428620310096920042 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3766905760800328947, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1581482108021403929}
+  m_PrefabAsset: {fileID: 0}
 --- !u!23 &3753027767848358266 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: 2443171221073240163, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
@@ -17386,6 +17402,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 662269688059799937, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 1399304133632837272, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
         type: 3}
       propertyPath: m_Lightmapping
@@ -17475,6 +17496,11 @@ PrefabInstance:
         type: 3}
       propertyPath: alreadyInstalledMessageLingdex
       value: 605
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505049002264215478, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 6512414593765072101, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
         type: 3}
@@ -17602,12 +17628,18 @@ MonoBehaviour:
   startAlternate: 0
   currentTexture: 0
   rMainLod0: {fileID: 4167460122912975543}
-  rMainLod1: {fileID: 0}
+  rMainLod1: {fileID: 3203349568916948519}
   rMainLod2: {fileID: 0}
   useGlow: 0
 --- !u!4 &1750948769909860365 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 35667058736767705, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1743501777821649620}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &3203349568916948519 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3766905760800328947, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
     type: 3}
   m_PrefabInstance: {fileID: 1743501777821649620}
   m_PrefabAsset: {fileID: 0}
@@ -17853,6 +17885,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 662269688059799937, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 1399304133632837272, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
         type: 3}
       propertyPath: m_Lightmapping
@@ -17927,6 +17964,11 @@ PrefabInstance:
         type: 3}
       propertyPath: alreadyInstalledMessageLingdex
       value: 605
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505049002264215478, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 6512414593765072101, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
         type: 3}
@@ -18052,12 +18094,18 @@ MonoBehaviour:
   startAlternate: 0
   currentTexture: 0
   rMainLod0: {fileID: 4113448274132551411}
-  rMainLod1: {fileID: 0}
+  rMainLod1: {fileID: 3221403019085752931}
   rMainLod2: {fileID: 0}
   useGlow: 0
 --- !u!4 &1768985766050546761 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 35667058736767705, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1797503799977993872}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &3221403019085752931 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3766905760800328947, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
     type: 3}
   m_PrefabInstance: {fileID: 1797503799977993872}
   m_PrefabAsset: {fileID: 0}
@@ -32522,6 +32570,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 662269688059799937, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 1399304133632837272, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
         type: 3}
       propertyPath: m_Lightmapping
@@ -32611,6 +32664,11 @@ PrefabInstance:
         type: 3}
       propertyPath: alreadyInstalledMessageLingdex
       value: 605
+      objectReference: {fileID: 0}
+    - target: {fileID: 6505049002264215478, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 6512414593765072101, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
         type: 3}
@@ -32743,7 +32801,7 @@ MonoBehaviour:
   startAlternate: 0
   currentTexture: 0
   rMainLod0: {fileID: 7013723876643140796}
-  rMainLod1: {fileID: 0}
+  rMainLod1: {fileID: 8427535795532470316}
   rMainLod2: {fileID: 0}
   useGlow: 0
 --- !u!23 &7013723876643140796 stripped
@@ -32825,6 +32883,12 @@ MonoBehaviour:
   lockElevatorPad: 0
   alreadyDisabledThisGOOnceEver: 0
   doorToggle: 0
+--- !u!23 &8427535795532470316 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3766905760800328947, guid: 381e4599f4f927d4dbb605c48a4d2e1d,
+    type: 3}
+  m_PrefabInstance: {fileID: 4661828092719420639}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4685032398624741575
 PrefabInstance:
   m_ObjectHideFlags: 0

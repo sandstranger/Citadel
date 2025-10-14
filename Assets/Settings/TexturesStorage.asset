@@ -12,6 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e457620c3c3cd78459b520d3229bac8c, type: 3}
   m_Name: TexturesStorage
   m_EditorClassIdentifier: Citadel::Citadel.Game.TexturesStorage
+  _screenCodes:
+  - {fileID: 2800000, guid: f88ae40cfd9dc7d4784ed141edf65f79, type: 3}
+  - {fileID: 2800000, guid: 35e0a912c39321344b5f3d9cd2a64cfe, type: 3}
+  - {fileID: 2800000, guid: b27fa67d45872ee429c93e609955cc4c, type: 3}
+  - {fileID: 2800000, guid: f942bf9b8c645fc48bd488310709b0c4, type: 3}
+  - {fileID: 2800000, guid: 98a0ca9f24d163143ab22e302ca6c4ef, type: 3}
+  - {fileID: 2800000, guid: ba0115cd2187fae4e96136b7ee2c21bd, type: 3}
+  - {fileID: 2800000, guid: 89d54b586907136439dcf3108d159388, type: 3}
+  - {fileID: 2800000, guid: 818097590f3605147a0dfbf18857043a, type: 3}
+  - {fileID: 2800000, guid: 0c983535b3dbc3a4daebf107beb104c8, type: 3}
+  - {fileID: 2800000, guid: 8664dcb5be4803542af525315744fdfc, type: 3}
   _sequenceTextures:
   - {fileID: 2800000, guid: a230ee8ac8c66714e9f441a96707355b, type: 3}
   - {fileID: 2800000, guid: c0a7c0960569ec64c91278e8dc5026fc, type: 3}

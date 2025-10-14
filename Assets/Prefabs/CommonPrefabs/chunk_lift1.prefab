@@ -236,7 +236,7 @@ MonoBehaviour:
   startAlternate: 0
   currentTexture: 0
   rMainLod0: {fileID: 23872187296325730}
-  rMainLod1: {fileID: 0}
+  rMainLod1: {fileID: 871812839006698145}
   rMainLod2: {fileID: 0}
   useGlow: 1
 --- !u!114 &799390188345262781

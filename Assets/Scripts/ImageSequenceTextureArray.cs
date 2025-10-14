@@ -31,7 +31,7 @@ public class ImageSequenceTextureArray : MonoBehaviour {
 
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly PauseScript _pauseScript;
-	[Inject] private readonly TexturesStorage _texturesStorage;
+	[Inject] private readonly ITexturesStorage _texturesStorage;
 	
 	private MaterialPropertyHelper _materialPropertyHelper;
 

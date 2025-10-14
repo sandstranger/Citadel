@@ -1,11 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Citadel.Game;
 using Zenject;
 using UnityEngine;
 
 public class MaterialFlash : MonoBehaviour {
-	public Material normalMat;
-	public Material alternateMat;
 	public bool startFlashing = false;
 	public bool startNormal = true;
 	public bool stopReturnsToNormal = true;
@@ -17,13 +17,18 @@ public class MaterialFlash : MonoBehaviour {
 	private bool changeDone = false;
 	private bool normal = true;
 
+	[SerializeField]
+	private TexturesInfo _normalTextures;
+	[SerializeField]
+	private TexturesInfo _alternateTextures;
+	
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
+	private MaterialPropertyHelper _materialPropertyHelper;
 	
 	void Start () {
 		meshR = GetComponent<MeshRenderer>();
-		if (normalMat == null) Debug.Log("BUG: MaterialFlash.cs has a null normal material!  Assign your materials!");
-		if (alternateMat == null) Debug.Log("BUG: MaterialFlash.cs has a null alternate material!  Assign your materials!");
+		_materialPropertyHelper = new MaterialPropertyHelper(meshR);
 
 		if (startFlashing) isFlashing = true;
 		flashFinished = Time.time;
@@ -31,7 +36,7 @@ public class MaterialFlash : MonoBehaviour {
 		normal = true;
 		if (!startNormal) {
 			if (lit != null) lit.enabled = true;
-			meshR.material = alternateMat;
+			UpdateTextures(true);
 			normal = false;
 		}
 	}
@@ -45,11 +50,11 @@ public class MaterialFlash : MonoBehaviour {
 					flashFinished = Time.time + timeBetweenFlashes;
 					if (normal) {
 						if (lit != null) lit.enabled = true;
-						meshR.material = alternateMat;
+						UpdateTextures(true);
 						normal = !normal;
 					} else {
 						if (lit != null) lit.enabled = false;
-						meshR.material = normalMat;
+						UpdateTextures(false);
 						normal = !normal;
 					}
 				}
@@ -57,7 +62,7 @@ public class MaterialFlash : MonoBehaviour {
 				if (stopReturnsToNormal && !changeDone) {
 					if (lit != null) lit.enabled = false;
 					changeDone = true;
-					meshR.material = normalMat;
+					UpdateTextures(false);
 				}
 			}
 		}
@@ -69,5 +74,19 @@ public class MaterialFlash : MonoBehaviour {
 
 	public void StopFlashing() {
 		isFlashing = false;
+	}
+
+	private void UpdateTextures(bool useAlternateTextures)
+	{
+		var texturesInfo = useAlternateTextures ? _alternateTextures : _normalTextures;
+		_materialPropertyHelper.SetMainTexture(texturesInfo.MainTexture);
+		_materialPropertyHelper.SetEmissionTexture(texturesInfo.EmissionTexture);
+	}
+
+	[Serializable]
+	private struct TexturesInfo
+	{
+		public Texture MainTexture;
+		public Texture EmissionTexture;
 	}
 }

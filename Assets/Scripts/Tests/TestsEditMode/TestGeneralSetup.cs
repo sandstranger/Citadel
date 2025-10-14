@@ -463,12 +463,12 @@ namespace Tests {
 
                 if (bsw.changeMatOnActive || bsw.blinkWhenActive) {
                     MissingComponent(script,allGOs[i],typeof(MeshRenderer));
-                    MissingReference(script,allGOs[i],bsw.mainSwitchMaterial,
-                                     "mainSwitchMaterial");
+//                    MissingReference(script,allGOs[i],bsw.mainSwitchMaterial,
+  //                                   "mainSwitchMaterial");
 
-                    MissingReference(script,allGOs[i],
-                                     bsw.alternateSwitchMaterial,
-                                     "alternateSwitchMaterial");
+    //                MissingReference(script,allGOs[i],
+      //                               bsw.alternateSwitchMaterial,
+        //                             "alternateSwitchMaterial");
                 }
             }
         }

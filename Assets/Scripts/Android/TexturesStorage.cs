@@ -4,8 +4,11 @@ using UnityEngine;
 namespace Citadel.Game
 {
     [CreateAssetMenu(fileName = "TexturesStorage", menuName = "ScriptableObjects/Create TexturesStorageScriptableObject", order = 1)]
-    public sealed class TexturesStorage : ScriptableObject
+    public sealed class TexturesStorage : ScriptableObject, ITexturesStorage
     {
+        [SerializeField] 
+        private List<Texture> _screenCodes = new();
+        
         [SerializeField] 
         private List<Texture> _sequenceTextures = new();
 
@@ -22,6 +25,8 @@ namespace Citadel.Game
         
         public Sprite NullableItemIcon => _usableItemsIcons[0];
 
+        public Texture GetScreenCode(int index) => _screenCodes[index];
+        
         public Sprite GetLogSprite(int position) => _logImages[position];
 
         public Texture GetSequencesTexture(int position) => _sequenceTextures[position];

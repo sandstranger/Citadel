@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Citadel.Game;
 using Zenject;
 using UnityEngine;
 
@@ -15,14 +16,15 @@ public class CyberWall : MonoBehaviour {
 	private const float centerAlphaMinimum = 0.02f;
 	private const float centerAlphaMaximum = 1f;
 	private float centerAlphaCurrent = 0.02f;
-	private Material cyberwall;
+	private const string CenterAlphaPropertyName = "_CenterAlpha";
 
-	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly PauseScript _pauseScript;
+	private MaterialPropertyHelper _materialPropertyHelper;
 
 	void Start() {
-		cyberwall = mr.material;
+		_materialPropertyHelper = new MaterialPropertyHelper(mr);
 		centerAlphaCurrent = centerAlphaMinimum;
-		cyberwall.SetFloat("_CenterAlpha",centerAlphaCurrent);
+		_materialPropertyHelper.SetFloat(CenterAlphaPropertyName,centerAlphaCurrent);
 		tickFinished = Time.time + 2f;
 		//_consts.AddCyberPanelToRegistry(this);
 		//wasTouching = false;
@@ -34,7 +36,7 @@ public class CyberWall : MonoBehaviour {
 				if (centerAlphaCurrent > centerAlphaMinimum) {
 					centerAlphaCurrent -= 0.05f;
 					if (centerAlphaCurrent < centerAlphaMinimum) centerAlphaCurrent = centerAlphaMinimum;
-					cyberwall.SetFloat("_CenterAlpha",centerAlphaCurrent);
+					_materialPropertyHelper.SetFloat(CenterAlphaPropertyName,centerAlphaCurrent);
 				}
 
 				// if (currentCollisions.Any()) {

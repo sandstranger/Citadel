@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Citadel.Game;
 using Zenject;
 using UnityEngine;
 
@@ -8,17 +10,26 @@ public class MaterialChanger : MonoBehaviour {
 	[HideInInspector] public bool alreadyDone = false;
 	public int levelIndex = 0;
 
-	[Inject] private Const _consts;
+	[Inject] private readonly Const _consts;
+	[Inject] private readonly ITexturesStorage _texturesStorage;
 	
+	private MaterialPropertyHelper _materialPropertyHelper;
+	private static readonly WaitForSeconds _waitForSeconds = new WaitForSeconds(0.2f);
+
+	private void Awake()
+	{
+		_materialPropertyHelper = new MaterialPropertyHelper(GetComponent<MeshRenderer>());
+	}
+
 	IEnumerator SetMaterialFromCode(int index){
-        yield return new WaitForSeconds(0.2f); // give Const a time to populate it's questdata
+        yield return _waitForSeconds; // give Const a time to populate it's questdata
 		switch (index) {
-			case 1: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev1SecCode]); break;
-			case 2: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev2SecCode]); break;
-			case 3: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev3SecCode]); break;
-			case 4: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev4SecCode]); break;
-			case 5: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev5SecCode]); break;
-			case 6: GetComponent<MeshRenderer> ().material = (_consts.screenCodes[_consts.questData.lev6SecCode]); break;
+			case 1: UpdateTextures(_consts.questData.lev1SecCode); break;
+			case 2: UpdateTextures(_consts.questData.lev2SecCode); break;
+			case 3: UpdateTextures(_consts.questData.lev3SecCode); break;
+			case 4: UpdateTextures(_consts.questData.lev4SecCode); break;
+			case 5: UpdateTextures(_consts.questData.lev5SecCode); break;
+			case 6: UpdateTextures(_consts.questData.lev6SecCode); break;
 		}
 		alreadyDone = true;
 	}
@@ -31,6 +42,13 @@ public class MaterialChanger : MonoBehaviour {
 		StartCoroutine(SetMaterialFromCode(levelIndex));
 	}
 
+	private void UpdateTextures(int index)
+	{
+		var texture = _texturesStorage.GetScreenCode(index);
+		_materialPropertyHelper.SetMainTexture(texture);
+		_materialPropertyHelper.SetEmissionTexture(texture);
+	}
+	
 	public static string Save(GameObject go) {
 		MaterialChanger mch = go.GetComponent<MaterialChanger>();
 		return Utils.BoolToString(mch.alreadyDone,"alreadyDone"); // and much already yet remaining

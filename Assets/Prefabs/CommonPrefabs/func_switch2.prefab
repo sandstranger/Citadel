@@ -32,12 +32,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 130754}
+  serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071067}
   m_LocalPosition: {x: -4.4929314, y: 3.4231453, z: 26.778479}
   m_LocalScale: {x: 0.039800353, y: 0.03980034, z: 0.03980034}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3326190
 MeshFilter:
@@ -58,11 +59,17 @@ MeshRenderer:
   m_CastShadows: 2
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -84,6 +91,7 @@ MeshRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
@@ -116,6 +124,12 @@ MonoBehaviour:
   mainSwitchMaterial: {fileID: 2100000, guid: bf2cd5bd02251ae4981a0c572b635c13, type: 2}
   alternateSwitchMaterial: {fileID: 2100000, guid: e16c3e56b38f64f4bb6d4ac0e64c23cb,
     type: 2}
+  _mainSwitchTexture: {fileID: 2800000, guid: 402327059aa4aa740ba9d345c0ae4e9b, type: 3}
+  _alternateSwitchTexture: {fileID: 2800000, guid: baee504af2f451d4eabac6efa18f3a20,
+    type: 3}
+  _glowDnEmissionTexture: {fileID: 0}
+  _glowUpEmissionTexture: {fileID: 2800000, guid: 135300692958ebc4baecb01100ea38c3,
+    type: 3}
   anim: {fileID: 0}
   delayFinished: 0
   tickFinished: 0
@@ -129,9 +143,17 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 130754}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
   m_Size: {x: 1.1907951, y: 15.999997, z: 15.999997}
   m_Center: {x: -0.6088825, y: 0, z: 0.00012207031}
 --- !u!82 &8205424
@@ -145,6 +167,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

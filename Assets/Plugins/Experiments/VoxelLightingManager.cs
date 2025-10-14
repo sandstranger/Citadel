@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Diagnostics;
 using System.Collections.Generic;
+using Citadel.Game;
 
 public class VoxelLightingManager : MonoBehaviour {
     public MeshRenderer mr;
@@ -34,10 +35,13 @@ public class VoxelLightingManager : MonoBehaviour {
     private int voxelWorldMax;
     private Texture2D debugTex;
     private Vector3[,] colorBuffer;
-    private Material matDebug;
+    private MaterialPropertyHelper _matDebugPropertyHelper;
 
     // Light Voxel
-    public class Loxel {
+    public class Loxel
+    {
+        public MeshRenderer Renderer;
+        public MaterialPropertyHelper MaterialPropertyHelper;
         public Vector3 globalPos;
         public Vector3 normal;
         public Vector3 up;
@@ -55,7 +59,9 @@ public class VoxelLightingManager : MonoBehaviour {
         public float range;
     }
 
-    void Start() {
+    void Start()
+    {
+        _matDebugPropertyHelper = new MaterialPropertyHelper(mr);
         voxelRenderResolutionHalf = voxelRenderResolution / 2f;
         colorBuffer = new Vector3[voxelRenderResolution,voxelRenderResolution];
         float halfAngRadians = Mathf.Deg2Rad * (voxelFOV * 0.5f);
@@ -203,9 +209,7 @@ public class VoxelLightingManager : MonoBehaviour {
             if (i == debugVoxelIndex) {
                 UnityEngine.Debug.Log("Painting debugTex for i " + debugVoxelIndex.ToString());
                 debugTex.Apply();
-                matDebug = new Material(Shader.Find("Unlit/Texture"));
-                matDebug.mainTexture = debugTex;
-                mr.material = matDebug;
+                _matDebugPropertyHelper.SetMainTexture(debugTex);
             }
 
             for (int y=0;y<voxelRenderResolution;y++) {
@@ -297,6 +301,7 @@ public class VoxelLightingManager : MonoBehaviour {
                     lox.diffuse = voxelColors[x * width + y];
                     lox.directLighting = lox.ambientPass1 = lox.ambientPass2 = lox.ambientPass3 = Color.black;
                     lox.debugCube = cube;
+                    lox.Renderer = cube.GetComponent<MeshRenderer>();
                     lox.chunkObjectIndex = c;
                     lox.chunkIndex = chunkIndex;
                     lox.voxelIndex = Voxels.Count;
@@ -304,8 +309,13 @@ public class VoxelLightingManager : MonoBehaviour {
                     lox.right = -tr.forward; // Blue axis, flipped due to card facing down in rotation 0,0,0
                     lox.spotAngle = 0f;
                     lox.range = 0f;
+                    if (lox.Renderer is not null)
+                    {
+                        lox.MaterialPropertyHelper = new MaterialPropertyHelper(lox.Renderer);
+                    }
                     Voxels.Add(lox);
                     AddVoxel(lox);
+
                 }
             }
         }

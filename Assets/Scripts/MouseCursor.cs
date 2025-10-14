@@ -70,7 +70,7 @@ public class MouseCursor : MonoBehaviour {
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private WeaponCurrent _weaponCurrent;
-	[Inject] private readonly TexturesStorage _texturesStorage;
+	[Inject] private readonly ITexturesStorage _texturesStorage;
 	
 	private void Awake() {
 		uiCameraCam = uiCamera.GetComponent<Camera>();
