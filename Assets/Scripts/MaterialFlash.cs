@@ -11,7 +11,6 @@ public class MaterialFlash : MonoBehaviour {
 	public bool stopReturnsToNormal = true;
 	public float timeBetweenFlashes = 0.35f;
 	public Light lit;
-	private MeshRenderer meshR;
 	private bool isFlashing = false;
 	private float flashFinished; // Visual only, using Time.time
 	private bool changeDone = false;
@@ -24,11 +23,13 @@ public class MaterialFlash : MonoBehaviour {
 	
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
-	private MaterialPropertyHelper _materialPropertyHelper;
+	private readonly List<MaterialPropertyHelper> _materialPropertyHelpers = new();
 	
 	void Start () {
-		meshR = GetComponent<MeshRenderer>();
-		_materialPropertyHelper = new MaterialPropertyHelper(meshR);
+		foreach (var renderer in this.GetComponentsInChildren<MeshRenderer>(includeSelf: true))
+		{
+			_materialPropertyHelpers.Add(new MaterialPropertyHelper(renderer));
+		}
 
 		if (startFlashing) isFlashing = true;
 		flashFinished = Time.time;
@@ -79,8 +80,11 @@ public class MaterialFlash : MonoBehaviour {
 	private void UpdateTextures(bool useAlternateTextures)
 	{
 		var texturesInfo = useAlternateTextures ? _alternateTextures : _normalTextures;
-		_materialPropertyHelper.SetMainTexture(texturesInfo.MainTexture);
-		_materialPropertyHelper.SetEmissionTexture(texturesInfo.EmissionTexture);
+		foreach (var materialPropertyHelper in _materialPropertyHelpers)
+		{
+			materialPropertyHelper.SetMainTexture(texturesInfo.MainTexture);
+			materialPropertyHelper.SetEmissionTexture(texturesInfo.EmissionTexture);
+		}
 	}
 
 	[Serializable]
