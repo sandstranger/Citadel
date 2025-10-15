@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e457620c3c3cd78459b520d3229bac8c, type: 3}
   m_Name: TexturesStorage
   m_EditorClassIdentifier: Citadel::Citadel.Game.TexturesStorage
+  _blockedBySecuritySprites:
+  - {fileID: 21300000, guid: aad7709aaf7996342a473edca1ac7f99, type: 3}
+  - {fileID: 21300000, guid: d8886a136cd7e0e4ebc4d6ce0ada49b3, type: 3}
+  - {fileID: 21300000, guid: a9e06762c7783be47b145826358ee951, type: 3}
+  - {fileID: 21300000, guid: 53db4afd8567abe46aa291ec5ad97164, type: 3}
+  - {fileID: 21300000, guid: 207da1cd33c19cf4eaefe70ac8154db2, type: 3}
   _screenCodes:
   - {fileID: 2800000, guid: f88ae40cfd9dc7d4784ed141edf65f79, type: 3}
   - {fileID: 2800000, guid: 35e0a912c39321344b5f3d9cd2a64cfe, type: 3}

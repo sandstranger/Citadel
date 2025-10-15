@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Citadel.Game
@@ -6,6 +7,9 @@ namespace Citadel.Game
     [CreateAssetMenu(fileName = "TexturesStorage", menuName = "ScriptableObjects/Create TexturesStorageScriptableObject", order = 1)]
     public sealed class TexturesStorage : ScriptableObject, ITexturesStorage
     {
+        [SerializeField]
+        private List<Sprite> _blockedBySecuritySprites = new();
+        
         [SerializeField] 
         private List<Texture> _screenCodes = new();
         
@@ -21,10 +25,14 @@ namespace Citadel.Game
         [SerializeField]
         private List<Sprite> _usableItemsIcons = new();
 
+        public IReadOnlyList<Sprite> BlockedBySecuritySprites => _blockedBySecuritySprites;
+        
         public int SequencesTexturesCount => _sequenceTextures.Count;
         
         public Sprite NullableItemIcon => _usableItemsIcons[0];
 
+        public Sprite GetBlockedBySecuritySprite(int index) => _blockedBySecuritySprites[index];
+        
         public Texture GetScreenCode(int index) => _screenCodes[index];
         
         public Sprite GetLogSprite(int position) => _logImages[position];
