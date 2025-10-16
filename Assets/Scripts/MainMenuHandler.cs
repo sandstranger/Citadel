@@ -278,7 +278,6 @@ public class MainMenuHandler : MonoBehaviour {
 		IntroVideo.SetActive(false);
 		ClearVideoRT();
 		IntroVideoContainer.SetActive(false);
-		_consts.WriteDatForIntroPlayed(false);
 		BackGroundMusic.clip = _music.titleMusic;
 		if (gameObject.activeSelf && dataFound) BackGroundMusic.Play();
 	}
@@ -883,7 +882,6 @@ public class MainMenuHandler : MonoBehaviour {
 	}
 
 	public void PlayIntro() {
-		_consts.WriteDatForIntroPlayed(false);
 		IntroVideoContainer.SetActive(true);
 		IntroVideo.SetActive(true);
 		introPlayer.Play();
@@ -1069,7 +1067,6 @@ public class MainMenuHandler : MonoBehaviour {
 
 	IEnumerator quitFunction () { // Handle exiting from menu option
 		BackGroundMusic.Stop();
-		_consts.WriteDatForIntroPlayed(false);
 		saltTheFries.SetActive(true);
 		yield return new WaitForSeconds(0.75f);
 		#if UNITY_EDITOR
@@ -1081,12 +1078,7 @@ public class MainMenuHandler : MonoBehaviour {
 	}
 	
 	void OnApplicationQuit() { // Handle X button close
-		#if UNITY_EDITOR
-			UnityEditor.EditorApplication.isPlaying = false;
-		#endif
-		_consts.WriteDatForIntroPlayed(false);
 		_config.SaveConfigToPlayerPrefs();
-		Utils.CopyLogFiles(false);
 	}
 	
 	void OnDestroy() {

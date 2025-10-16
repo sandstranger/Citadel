@@ -319,7 +319,6 @@ public class Const : SingletonHelper<Const>
 	[HideInInspector] public bool gameFinished = false; // Global constants
 	[HideInInspector] public float justSavedTimeStamp;
 	[HideInInspector] public float savedReminderTime = 7f; // human short-term memory length
-	[HideInInspector] public bool introNotPlayed = false;
 	[HideInInspector] public const float doubleClickTime = 0.500f;
 	[HideInInspector] public const float frobDistance = 4.9f;
 	[HideInInspector] public const float elevatorPadUseDistance = 2f;
@@ -421,6 +420,11 @@ public class Const : SingletonHelper<Const>
 
 	private void Awake()
 	{
+		if (StartingNewGame)
+		{
+			loadingScreen.SetActive(true);
+		}
+		
 		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
 		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
 		
@@ -433,7 +437,6 @@ public class Const : SingletonHelper<Const>
 		player1CapsuleMainCameragGO = _playerReference.playerCapsuleMainCamera;
 		player1TargettingPos = player1CapsuleMainCameragGO.transform;
 		player1PlayerMovementScript = player1Capsule.GetComponent<PlayerMovement>();
-		CheckIfNewGame();
 		LoadTextForLanguage(0); // Initialize with US English (index 0)
 		// Force Initialize all TextLocalization so language loaded from config
 		// is set properly.
@@ -765,50 +768,7 @@ public class Const : SingletonHelper<Const>
 			return;
 		}
 	}
-
-	private void CheckIfNewGame () {
-		string readline; // variable to hold each string read in from the file
-		int currentline = 0;
-		string dr;
-		string fileName = "ng.dat";
-		string basePath = Utils.GetAppropriateDataPath();
-		Utils.ConfirmExistsMakeIfNot(basePath, fileName);
-		dr = Utils.SafePathCombine(basePath, fileName);
-
-		if (!File.Exists(dr)) {
-			UnityEngine.Debug.Log(fileName + " not found nor recreated");
-			return;
-		}
-
-		StreamReader dataReader = new StreamReader(dr,Encoding.ASCII);
-		using (dataReader) {
-			do {
-				readline = dataReader.ReadLine(); // Read the next line
-				if (currentline == 1) introNotPlayed = readline.Equals("1");
-				currentline++;
-			} while (!dataReader.EndOfStream);
-
-			dataReader.Close();
-			return;
-		}
-	}
-
-	public void WriteDatForIntroPlayed(bool setIntroNotPlayed) {
-		// Write bit to file
-		// No need to confirm it exists as StreamWriter will make it if not.
-		string basePath = Utils.GetAppropriateDataPath();
-		string dr = Utils.SafePathCombine(basePath,"ng.dat");
-		StreamWriter sw = new StreamWriter(dr,false,Encoding.ASCII);
-		if (sw != null) {
-			using (sw) {
-				sw.WriteLine(Utils.BoolToStringConfig(setIntroNotPlayed));
-				sw.Close();
-			}
-		}
-
-		introNotPlayed = setIntroNotPlayed;
-	}
-
+	
 	private void LoadEnemyTablesData() {
 		int numberOfNPCs = 29;
 		nameForNPC = new string[numberOfNPCs];
@@ -1356,7 +1316,6 @@ public class Const : SingletonHelper<Const>
 	// 7. Go into the game.  Player now has normal control.
 	public void NewGame() {
 		//UnityEngine.Debug.Log("Starting new game!");
-		WriteDatForIntroPlayed(false);
 		StartingNewGame = true;
 		loadingScreen.SetActive(true);
 		_levelManager.ChangeGameScene(LevelManager.NewGameLevelIndex, changeSceneForced: true);
@@ -1368,7 +1327,7 @@ public class Const : SingletonHelper<Const>
 	//                      time after launching the game).
 	// - NewGameIndicator,  Game is no longer a new game, because it's started.
 	// - LoadGameIndicator, Game should have been loaded prior to entry.
-	public async UniTaskVoid GoIntoGame(Stopwatch loadTimer) {
+	public async UniTask GoIntoGame(Stopwatch loadTimer) {
 		await _levelManager.LoadLevelData(LevelManager.CurrentLevel);
 		Cursor.visible = true;
 		Utils.Deactivate(loadingScreen);
@@ -1387,7 +1346,6 @@ public class Const : SingletonHelper<Const>
 		Utils.Activate(player1CapsuleMainCameragGO.transform.parent.gameObject);
 		Utils.Activate(player1CapsuleMainCameragGO);
 		Utils.EnableCamera(_mouseLookScript.playerCamera);
-		WriteDatForIntroPlayed(false);
 		if (loadTimer == null) {
 			sprint(stringTable[197]);
 		} else {
@@ -1442,10 +1400,8 @@ public class Const : SingletonHelper<Const>
 		_saveFileIndex = null;
 		ShowLoading();
 		StartingNewGame = false;
-		introNotPlayed = false;
 		_saveFileIndex = saveFileIndex;
-		WriteDatForIntroPlayed(introNotPlayed); // reset
-
+	
 		var levelIndexFromSave = ReadLevelIndexFromSave(saveFileIndex);
 
 		if (levelIndexFromSave != LevelManager.CurrentLevel)
@@ -1835,7 +1791,7 @@ public class Const : SingletonHelper<Const>
 		loadTimer.Stop();
 		loading = false;
 		loadPercentText.text = "";
-		GoIntoGame(loadTimer);
+		yield return GoIntoGame(loadTimer);
 		_lightDistanceCuller.Rebuild();
 	}
 

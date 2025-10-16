@@ -71,7 +71,6 @@ public class Music : MonoBehaviour {
 				if (index == 0) {
 					titleMusic = audioClip;
 					titleMusic.LoadAudioData();
-					await UniTask.WaitUntil(() => titleMusic.loadState != AudioDataLoadState.Loaded);
 					PlayMenuMusic();
 				} else if (index == 1) {
 					creditsMusic = audioClip;
