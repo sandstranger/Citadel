@@ -26,7 +26,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dd9a81373f9ac4a4eacb6af1067401ba
-    m_Address: Assets/Scenes/5-FlightDeckLevelScene.unity
+    m_Address: 5-FlightDeckLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

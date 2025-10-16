@@ -6,7 +6,9 @@ using ModestTree;
 using ModestTree.Util;
 using Zenject.Internal;
 #if !NOT_UNITY3D
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 #endif
 
 namespace Zenject
@@ -1782,6 +1784,111 @@ namespace Zenject
 
             return gameObj;
         }
+        internal async UniTask<(GameObject prefabInstance, bool shouldMakeActive)> CreateAndParentPrefabAsync(
+            UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo,
+            InjectContext context)
+        {
+            Assert.That(prefab != null, "Null prefab found when instantiating game object");
+
+            Assert.That(!AssertOnNewGameObjects,
+                "Given DiContainer does not support creating new game objects");
+
+            FlushBindings();
+
+            var prefabAsGameObject = GetPrefabAsGameObject(prefab);
+
+            var prefabWasActive = prefabAsGameObject.activeSelf;
+
+            bool shouldMakeActive = prefabWasActive;
+
+            var parent = GetTransformGroup(gameObjectBindInfo, context);
+
+            Transform initialParent;
+#if !UNITY_EDITOR
+            if (prefabWasActive)
+            {
+                prefabAsGameObject.SetActive(false);
+            }
+#else
+            if (prefabWasActive)
+            {
+                initialParent = ZenUtilInternal.GetOrCreateInactivePrefabParent();
+            }
+            else
+#endif
+            {
+                if (parent != null)
+                {
+                    initialParent = parent;
+                }
+                else
+                {
+                    // This ensures it gets added to the right scene instead of just the active scene
+                    initialParent = ContextTransform;
+                }
+            }
+
+            bool positionAndRotationWereSet;
+            GameObject gameObj;
+
+#if ZEN_INTERNAL_PROFILING
+            using (ProfileTimers.CreateTimedBlock("GameObject.Instantiate"))
+#endif
+            {
+                if (gameObjectBindInfo.Position.HasValue && gameObjectBindInfo.Rotation.HasValue)
+                {
+                    gameObj = await Addressables.InstantiateAsync(
+                        gameObjectBindInfo.AddressablesAssetName, gameObjectBindInfo.Position.Value, gameObjectBindInfo.Rotation.Value, initialParent).Task;
+                    positionAndRotationWereSet = true;
+                }
+                else if (gameObjectBindInfo.Position.HasValue)
+                {
+                    gameObj = await Addressables.InstantiateAsync(
+                        gameObjectBindInfo.AddressablesAssetName, gameObjectBindInfo.Position.Value, prefabAsGameObject.transform.rotation, initialParent).Task;
+                    positionAndRotationWereSet = true;
+                }
+                else if (gameObjectBindInfo.Rotation.HasValue)
+                {
+                    gameObj = await Addressables.InstantiateAsync(
+                        gameObjectBindInfo.AddressablesAssetName, prefabAsGameObject.transform.position, gameObjectBindInfo.Rotation.Value, initialParent).Task;
+                    positionAndRotationWereSet = true;
+                }
+                else
+                {
+                    gameObj = await Addressables.InstantiateAsync(gameObjectBindInfo.AddressablesAssetName, initialParent).Task;
+                    positionAndRotationWereSet = false;
+                }
+            }
+
+#if !UNITY_EDITOR
+            if (prefabWasActive)
+            {
+                prefabAsGameObject.SetActive(true);
+            }
+#else
+            if (prefabWasActive)
+            {
+                gameObj.SetActive(false);
+
+                if (parent == null)
+                {
+                    gameObj.transform.SetParent(ContextTransform, positionAndRotationWereSet);
+                }
+            }
+#endif
+
+            if (gameObj.transform.parent != parent)
+            {
+                gameObj.transform.SetParent(parent, positionAndRotationWereSet);
+            }
+
+            if (gameObjectBindInfo.Name != null)
+            {
+                gameObj.name = gameObjectBindInfo.Name;
+            }
+
+            return (gameObj,shouldMakeActive);
+        }
 
         public GameObject CreateEmptyGameObject(string name)
         {
@@ -2030,6 +2137,18 @@ namespace Zenject
                     Rotation = rotation
                 });
         }
+        public UniTask<GameObject> InstantiatePrefabAsync(
+            UnityEngine.Object prefab,string assetName, Vector3 position, Quaternion rotation, Transform parentTransform)
+        {
+            return InstantiatePrefabAsync(
+                prefab, new GameObjectCreationParameters
+                {
+                    AddressablesAssetName = assetName,
+                    ParentTransform = parentTransform,
+                    Position = position,
+                    Rotation = rotation
+                });
+        }
 
         // Create a new game object from a prefab and fill in dependencies for all children
         public GameObject InstantiatePrefab(
@@ -2054,6 +2173,30 @@ namespace Zenject
             }
 
             return gameObj;
+        } 
+        
+        public async UniTask<GameObject> InstantiatePrefabAsync(
+            UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo)
+        {
+            FlushBindings();
+
+            bool shouldMakeActive;
+            var prefabInstanceData= await CreateAndParentPrefabAsync(
+                prefab, gameObjectBindInfo, null);
+            
+            InjectGameObject(prefabInstanceData.prefabInstance);
+
+            if (prefabInstanceData.shouldMakeActive && !IsValidating)
+            {
+#if ZEN_INTERNAL_PROFILING
+                using (ProfileTimers.CreateTimedBlock("User Code"))
+#endif
+                {
+                    prefabInstanceData.prefabInstance.SetActive(true);
+                }
+            }
+
+            return prefabInstanceData.prefabInstance;
         }
 
         // Create a new game object from a resource path and fill in dependencies for all children

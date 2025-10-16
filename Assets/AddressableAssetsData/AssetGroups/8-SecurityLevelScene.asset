@@ -21,7 +21,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 440beb94ea0624640a02e9c95d32ca28
-    m_Address: Assets/Scenes/8-SecurityLevelScene.unity
+    m_Address: 8-SecurityLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

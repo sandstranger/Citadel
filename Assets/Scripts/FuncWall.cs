@@ -27,8 +27,9 @@ public class FuncWall : MonoBehaviour {
 	private float distanceLeft; // Only ever used right away, not saved.
 	private static StringBuilder s1 = new StringBuilder(100 * 500);
 
-	[Inject] private Const _consts;
-	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Const _consts;
+	[Inject] private readonly PauseScript _pauseScript;
+	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	public void InitializeFromLoad() {
 		rbody = GetComponent<Rigidbody>();
@@ -243,7 +244,7 @@ public class FuncWall : MonoBehaviour {
 			// Assumption here is that we are loading to a freshly instantiated
 			// func_wall prefab and that there are no children chunks on the
 			// mover_target GameObject yet.
-			GameObject childGO = RootInstaller.InstantiatePrefab(@const.GetPrefab(chunkdex),
+			GameObject childGO = @const.ResourcesLoader.InstantiatePrefab(chunkdex,
 				go.transform.localPosition, // 0's, transform is below
 				@const.quaternionIdentity);
 			childGO.transform.SetParent(go.transform); // Set parent prior

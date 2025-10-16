@@ -21,7 +21,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6b94d5a87f148324391fb61651f53a5a
-    m_Address: Assets/Scenes/1-MedicalLevelScene.unity
+    m_Address: 1-MedicalLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

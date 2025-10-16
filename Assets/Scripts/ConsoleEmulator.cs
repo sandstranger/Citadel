@@ -37,6 +37,7 @@ public sealed class ConsoleEmulator {
 	[Inject] private readonly PauseScript _pauseScript;
 	[Inject] private readonly PlayerMovement _playerMovement;
 	[Inject] private readonly WeaponCurrent _weaponCurrent;
+	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	public void ConsoleUpdate() {
         if (_getInput.Console()) _playerMovement.ToggleConsole();
@@ -1493,23 +1494,7 @@ Generic Materials (_consts.genericMaterials[])
 
 		void InstantiatePrefab()
 		{
-			var prefab = _consts.GetPrefab(val);
-#if UNITY_EDITOR
-			if (spawnObjectAsPrefab && forcedContainer != null)
-			{
-				go = PrefabUtility.InstantiatePrefab(prefab, forcedContainer.transform) as GameObject;
-				go.transform.position = spawnPos;
-				go.transform.rotation = _consts.quaternionIdentity;
-			}
-			else
-			{
-				go = RootInstaller.InstantiatePrefab(prefab,spawnPos,
-					_consts.quaternionIdentity) as GameObject;
-			}
-#else
-			go = RootInstaller.InstantiatePrefab(prefab,spawnPos,
-				_consts.quaternionIdentity) as GameObject;
-#endif
+			go = _resourcesLoader.InstantiatePrefab(val, spawnPos, _consts.quaternionIdentity);
 		}
 	}
 

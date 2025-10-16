@@ -21,7 +21,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8757d3d57495a7644a3aca1ee3156986
-    m_Address: Assets/Scenes/10-AlphaGroveLevelScene.unity
+    m_Address: 10-AlphaGroveLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

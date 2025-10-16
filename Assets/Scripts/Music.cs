@@ -4,6 +4,7 @@ using System.IO;
 using System.Diagnostics;
 using System;
 using Citadel.Game;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -44,9 +45,10 @@ public class Music : MonoBehaviour {
 	private string musicRPath;
 	private string musicRLoopedPath;
 
-	[Inject] private Const _consts;
-	[Inject] private MainMenuHandler _mainMenuHandler;
-	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Const _consts;
+	[Inject] private readonly MainMenuHandler _mainMenuHandler;
+	[Inject] private readonly PauseScript _pauseScript;
+	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	private void Awake() {
 		clipFinished = Time.time;
@@ -59,68 +61,10 @@ public class Music : MonoBehaviour {
 	}
 
 	IEnumerator LoadHelper(string fName, MusicResourceType type, int index) {
-		tempClip = null;
-		string basePath = Utils.GetAppropriateDataPath();
-		string fPath = type == MusicResourceType.Looped
-							   ? Utils.SafePathCombine(basePath,"music","looped",fName)
-							   : Utils.SafePathCombine(basePath,"music",fName);
-
-		string fPathMp3 = fPath + ".mp3";
-		string fPathWave = fPath + ".wav";
-		bool isAndroidOrMacOS = (Application.platform == RuntimePlatform.Android
-								 || Application.platform == RuntimePlatform.OSXEditor
-								 || Application.platform == RuntimePlatform.OSXPlayer);
-
-		bool wavExists = false;
-		if (!isAndroidOrMacOS) wavExists = File.Exists(fPathWave); // Don't bother checking on Android or MacOS.
-
-		bool mp3Exists = false;
-		if (!isAndroidOrMacOS) mp3Exists = File.Exists(fPathMp3);
-
-		if ((!wavExists && !mp3Exists) || isAndroidOrMacOS) {
-			if (type == MusicResourceType.Looped) {
-				tempClip = (AudioClip)Resources.Load("StreamingAssetsRecovery/music/looped/" + fName);
-			} else {
-				tempClip = (AudioClip)Resources.Load("StreamingAssetsRecovery/music/" + fName);
-			}
-		} else {
-			if (!wavExists && mp3Exists) {
-				string url = string.Format("file://{0}", fPathMp3);
-				using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.MPEG)) {
-					yield return uwr.SendWebRequest();
-					if (uwr.result == UnityWebRequest.Result.Success) {
-						tempClip = DownloadHandlerAudioClip.GetContent(uwr);
-						tempClip.name = fName;
-					}
-				}
-			} else {
-				// Load .wav file.
-				string url = string.Format("file://{0}", fPathWave);
-				using (UnityWebRequest uwr = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV)) {
-					yield return uwr.SendWebRequest();
-					if (uwr.result == UnityWebRequest.Result.Success) {
-						tempClip = DownloadHandlerAudioClip.GetContent(uwr);
-						tempClip.name = fName;
-					}
-				}
-			}
-		}
-
-		if (tempClip == null) {
-			UnityEngine.Debug.LogWarning("Unable to load " + fName);
-			if (type == MusicResourceType.Looped) {
-				tempClip = (AudioClip)Resources.Load(
-					"StreamingAssetsRecovery/music/looped/" + fName
-				);
-			} else {
-				tempClip = (AudioClip)Resources.Load(
-					"StreamingAssetsRecovery/music/" + fName
-				);
-			}
-			
-			yield break;
-		}
-
+		var audioToPlayTask = _resourcesLoader.LoadAssetAsync<AudioClip>(fName).AsTask();
+		yield return audioToPlayTask;
+		tempClip = audioToPlayTask.Result;
+		
 		switch (type) {
 			case MusicResourceType.Menu:
 				if (index == 0) {

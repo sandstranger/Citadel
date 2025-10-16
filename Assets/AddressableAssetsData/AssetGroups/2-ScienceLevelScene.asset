@@ -21,7 +21,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: aeb85ee3b0182f448b66b5a15105f7b2
-    m_Address: Assets/Scenes/2-ScienceLevelScene.unity
+    m_Address: 2-ScienceLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

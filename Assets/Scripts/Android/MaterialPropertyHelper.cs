@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Citadel.Game
@@ -6,11 +7,12 @@ namespace Citadel.Game
     public sealed class MaterialPropertyHelper
     {
         private readonly Renderer _renderer;
+        private readonly Dictionary<string, Texture> _textures = new();
         private readonly MaterialPropertyBlock _materialPropertyBlock = new();
 
         public MaterialPropertyHelper(Renderer renderer) => _renderer = renderer ?? throw new ArgumentNullException(nameof(renderer));
 
-        public Texture GetTexture(string textureName) => HasValue(textureName) ? _materialPropertyBlock.GetTexture(textureName) : null;
+        public Texture GetTexture(string textureName) => _textures.GetValueOrDefault(textureName);
         
         public bool HasValue (string propertyName) => _materialPropertyBlock.HasProperty(propertyName);
 
@@ -28,8 +30,13 @@ namespace Citadel.Game
 
         public void SetTexture(string propertyName, Texture value)
         {
-            _materialPropertyBlock.SetTexture(propertyName, value);
-            _renderer.SetPropertyBlock(_materialPropertyBlock);
+            if (value != null)
+            {
+                _materialPropertyBlock.SetTexture(propertyName, value);
+                _renderer.SetPropertyBlock(_materialPropertyBlock);
+            }
+            
+            _textures[propertyName] = value;
         }
     }
 

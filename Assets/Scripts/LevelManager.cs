@@ -398,10 +398,8 @@ public class LevelManager : MonoBehaviour
 		_consts.ResetPauseLists();
 		SetSkyVisible(1);
 		_config.SetLanguage(); // Update all translatable text.
-		_consts.ClearPrefabs();
 		System.GC.Collect();
 		System.GC.WaitForPendingFinalizers();
-		Resources.UnloadUnusedAssets();
 	}
 
 	public void DisableAllNonOccupiedLevelsExcept(int occupiedLevel) {

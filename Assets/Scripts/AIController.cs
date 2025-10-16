@@ -140,6 +140,7 @@ public class AIController : MonoBehaviour {
 	[Inject] private PlayerMovement _playerMovement;
 	[Inject] private WeaponFire _weaponFire;
 	[Inject] private DynamicCulling _dynamicCulling;
+	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	public float Tranquilize(float amount, bool energy) {
 		float tranqSecs = amount;
@@ -1210,7 +1211,7 @@ public class AIController : MonoBehaviour {
 
 		if (!hasLaser) return;
 
-		GameObject laz = RootInstaller.InstantiatePrefab(_consts.GetPrefab(408),transform.position,
+		GameObject laz = _resourcesLoader.InstantiatePrefab(408,transform.position,
 									 _consts.quaternionIdentity) as GameObject;
 
 		if (laz == null) return; // No laser!
@@ -1331,7 +1332,6 @@ public class AIController : MonoBehaviour {
 		}
 
 		beachball = _consoleEmulator.SpawnDynamicObject(masterIndex,-1);
-		if (beachball == null) beachball = _consts.GetPrefab(370); // Frag
 		beachball.tag = "NPC";
 		beachball.layer = 24; // NPCBullet
 		ProjectileEffectImpact pei = 

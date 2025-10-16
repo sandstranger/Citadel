@@ -71,6 +71,7 @@ public class HealthManager : MonoBehaviour {
 	[Inject] private Music _music;
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private PlayerHealth _playerHealth;
+	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
 	
@@ -698,7 +699,7 @@ public class HealthManager : MonoBehaviour {
 		for (int i=0;i<4;i++) {
 			if (searchableItem.contents[i] < 0) continue;
 
-			GameObject tossObject = RootInstaller.InstantiatePrefab(_consts.GetPrefab(searchableItem.contents[i] + 307),
+			GameObject tossObject = _resourcesLoader.InstantiatePrefab(searchableItem.contents[i] + 307,
 				transform.position,_consts.quaternionIdentity);
 
 			if (tossObject != null) {

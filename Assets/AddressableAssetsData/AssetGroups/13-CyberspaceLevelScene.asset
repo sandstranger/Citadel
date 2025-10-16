@@ -26,7 +26,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d336c0bea0dc59045ba67b106bf26a59
-    m_Address: Assets/Scenes/13-CyberspaceLevelScene.unity
+    m_Address: 13-CyberspaceLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

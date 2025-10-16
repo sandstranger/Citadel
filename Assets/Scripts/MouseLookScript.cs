@@ -65,7 +65,6 @@ public class MouseLookScript : MonoBehaviour {
     private float currentZRotation;
     private string mlookstring1;
     [HideInInspector,Inject] public Camera playerCamera;
-    private GameObject heldObject;
 	private Quaternion tempQuat;
 	private Vector3 tempVec;
     private RaycastHit tempHit;
@@ -116,6 +115,9 @@ public class MouseLookScript : MonoBehaviour {
 	[Inject] private WeaponCurrent _weaponCurrent;
 	[Inject] private DynamicCulling _dynamicCulling;
 	[Inject] private readonly ITexturesStorage _texturesStorage;
+	[Inject] private readonly IResourcesLoader _resourcesLoader;
+	
+	private int _prefabIndexToInstantiate;
 	
 	private static readonly StringBuilder s1 = new StringBuilder(500 * 1024);
     
@@ -1178,13 +1180,11 @@ public class MouseLookScript : MonoBehaviour {
 			return;
 		}
 
-		if (!grenadeActive) heldObject = _consts.GetPrefab(heldObjectIndex + 307); // heldObject is set by UseGrenade() so don't override here.
-		if (heldObject == null) {
-			_consts.sprint("BUG: Object "+heldObjectIndex.ToString()+" not assigned, vaporized.",player);
-			ResetHeldItem();
-			return;
+		if (!grenadeActive)
+		{
+			_prefabIndexToInstantiate = heldObjectIndex + 307;
 		}
-
+		
 		GameObject tossObject = null;
 		bool freeObjectInPoolFound = false;
 		GameObject levelDynamicContainer = _levelManager.GetCurrentDynamicContainer();
@@ -1215,7 +1215,7 @@ public class MouseLookScript : MonoBehaviour {
 				}
 			} else {
 				// Debug.Log("WARNING: Failed to get freeObjectInPool for object " + heldObject.ToString() + "being dropped! MouseLookScript DropHeldItem.",player);
-				tossObject = RootInstaller.InstantiatePrefab(heldObject,(transform.position + (transform.forward * tossOffset)),
+				tossObject = _resourcesLoader.InstantiatePrefab(_prefabIndexToInstantiate,(transform.position + (transform.forward * tossOffset)),
 					_consts.quaternionIdentity);  //effect
 				if (tossObject == null) {
 					_consts.sprint("BUG: Failed to instantiate object being dropped!",player);
@@ -1246,7 +1246,7 @@ public class MouseLookScript : MonoBehaviour {
 			// Throw an active grenade
 			grenadeActive = false;
 			_mfdManager.mouseClickHeldOverGUI = true; // Prevent shooting it.
-			tossObject = RootInstaller.InstantiatePrefab(heldObject,(transform.position + (transform.forward * tossOffset)),
+			tossObject = _resourcesLoader.InstantiatePrefab(_prefabIndexToInstantiate,(transform.position + (transform.forward * tossOffset)),
 				_consts.quaternionIdentity);  //effect
 			if (tossObject == null) {
 				_consts.sprint("BUG: Failed to instantiate object being dropped!",player);
@@ -1400,13 +1400,13 @@ public class MouseLookScript : MonoBehaviour {
 					 + _consts.stringTable[320],player); // activated, grenade is LIVE!
 
 		switch(index) { // Subtract one from the correct grenade inventory
-			case 7:  heldObject = _consts.GetPrefab(370); _inventory.RemoveGrenade(0); break; // Frag
-			case 8:  heldObject = _consts.GetPrefab(372); _inventory.RemoveGrenade(3); break; // Concussion
-			case 9:  heldObject = _consts.GetPrefab(387); _inventory.RemoveGrenade(1); break; // EMP
-			case 10: heldObject = _consts.GetPrefab(389); _inventory.RemoveGrenade(6); break; // Earth Shaker
-			case 11: heldObject = _consts.GetPrefab(402); _inventory.RemoveGrenade(4); break; // Land Mine
-			case 12: heldObject = _consts.GetPrefab(403); _inventory.RemoveGrenade(5); break; // Nitropak
-			case 13: heldObject = _consts.GetPrefab(404); _inventory.RemoveGrenade(2); break; // Gas
+			case 7:  _prefabIndexToInstantiate = 370; _inventory.RemoveGrenade(0); break; // Frag
+			case 8:  _prefabIndexToInstantiate = 372; _inventory.RemoveGrenade(3); break; // Concussion
+			case 9:  _prefabIndexToInstantiate = 387; _inventory.RemoveGrenade(1); break; // EMP
+			case 10: _prefabIndexToInstantiate = 389; _inventory.RemoveGrenade(6); break; // Earth Shaker
+			case 11: _prefabIndexToInstantiate = 402; _inventory.RemoveGrenade(4); break; // Land Mine
+			case 12: _prefabIndexToInstantiate = 403; _inventory.RemoveGrenade(5); break; // Nitropak
+			case 13: _prefabIndexToInstantiate = 404; _inventory.RemoveGrenade(2); break; // Gas
 		}
 		_mfdManager.ResetItemTab();
 		PutObjectInHand(index,-1,0,0,false,true);

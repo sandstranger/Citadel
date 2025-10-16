@@ -105,6 +105,7 @@ public class WeaponFire : MonoBehaviour {
 	[Inject] private PlayerMovement _playerMovement;
 	[Inject] private WeaponCurrent _weaponCurrent;
 	[Inject] private readonly Config _config;
+	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	// Not needed on Const as this only exists in one unique place on player.
 	private float[] driftForWeapon = new float[16]{5f,0f,15f,50f,0f,0f,0f,8f,
@@ -878,27 +879,27 @@ public class WeaponFire : MonoBehaviour {
 
 		// Add bullethole
 		tempVec = tempHit.normal * 0.16f;
-		GameObject holetype = _consts.GetPrefab(522);
+		int prefabIndex = 522;
 		switch(wep16index) {
-			case 0:  holetype = _consts.GetPrefab(518); break;
-			case 1:  holetype = _consts.GetPrefab(520); break;
-			case 2:  holetype = _consts.GetPrefab(522); break;
-			case 3:  holetype = _consts.GetPrefab(521); break;
-			case 4:  holetype = _consts.GetPrefab(519); break;
-			case 5:  holetype = _consts.GetPrefab(520); break;
-			case 6:  holetype = _consts.GetPrefab(522); break;
-			case 7:  holetype = _consts.GetPrefab(518); break;
-			case 8:  holetype = _consts.GetPrefab(519); break;
-			case 9:  holetype = _consts.GetPrefab(521); break;
-			case 10: holetype = _consts.GetPrefab(519); break;
-			case 11: holetype = _consts.GetPrefab(519); break;
-			case 12: holetype = _consts.GetPrefab(523); break;
-			case 13: holetype = _consts.GetPrefab(518); break;
-			case 14: holetype = _consts.GetPrefab(520); break;
-			case 15: holetype = _consts.GetPrefab(520); break;
+			case 0:  prefabIndex = 518; break;
+			case 1:  prefabIndex = 520; break;
+			case 2:  prefabIndex = 522; break;
+			case 3:  prefabIndex = 521; break;
+			case 4:  prefabIndex = 519; break;
+			case 5:  prefabIndex = 520; break;
+			case 6:  prefabIndex = 522; break;
+			case 7:  prefabIndex = 518; break;
+			case 8:  prefabIndex = 519; break;
+			case 9:  prefabIndex = 521; break;
+			case 10: prefabIndex = 519; break;
+			case 11: prefabIndex = 519; break;
+			case 12: prefabIndex = 523; break;
+			case 13: prefabIndex = 518; break;
+			case 14: prefabIndex = 520; break;
+			case 15: prefabIndex = 520; break;
 		}
 
-		GameObject impactMark = RootInstaller.InstantiatePrefab(holetype,
+		GameObject impactMark = _resourcesLoader.InstantiatePrefab(prefabIndex,
 			(tempHit.point + tempVec),
 			Quaternion.LookRotation(tempHit.normal*-1,Vector3.up),
 			hitGO.transform);
@@ -949,7 +950,7 @@ public class WeaponFire : MonoBehaviour {
         else  if (wep16index == 4) laserIndex = 407; // Yellow laser for ion
 
 		GameObject dynamicObjectsContainer = _levelManager.GetCurrentDynamicContainer();
-		GameObject lasertracer = RootInstaller.InstantiatePrefab(_consts.GetPrefab(laserIndex),transform.position,_consts.quaternionIdentity) as GameObject;
+		GameObject lasertracer = _resourcesLoader.InstantiatePrefab(laserIndex,transform.position,_consts.quaternionIdentity) as GameObject;
 
 		// Temporary object only, no need to save or mark as instantiated.
 		if (lasertracer != null) {
@@ -996,7 +997,7 @@ public class WeaponFire : MonoBehaviour {
 		bool showAttitude = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1;
 		bool showName = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1;
 
-		GameObject idFrame = RootInstaller.InstantiatePrefab(_consts.GetPrefab(736), hm.transform.position, _consts.quaternionIdentity) as GameObject;
+		GameObject idFrame = _resourcesLoader.InstantiatePrefab(736, hm.transform.position, _consts.quaternionIdentity) as GameObject;
 		if (idFrame == null) return;
 
 		TargetID tid = idFrame.GetComponent<TargetID>();

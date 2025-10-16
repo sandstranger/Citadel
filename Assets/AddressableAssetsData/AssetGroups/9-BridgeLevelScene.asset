@@ -26,7 +26,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dc3184c5317ee45489871b06463239e0
-    m_Address: Assets/Scenes/9-BridgeLevelScene.unity
+    m_Address: 9-BridgeLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

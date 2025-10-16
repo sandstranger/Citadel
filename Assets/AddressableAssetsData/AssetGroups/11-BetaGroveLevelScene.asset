@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 01ffe8ed5697760429fa9475206fab1d
   m_SerializeEntries:
   - m_GUID: 6d6e41b207222834fbdbb55a0a4edcc5
-    m_Address: Assets/Scenes/11-BetaGroveLevelScene.unity
+    m_Address: 11-BetaGroveLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

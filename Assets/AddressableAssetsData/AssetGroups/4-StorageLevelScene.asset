@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: c5b1624347175714dbfccbdae00e5021
   m_SerializeEntries:
   - m_GUID: 20c25d38ccb7eb944911f2018291ca01
-    m_Address: Assets/Scenes/4-StorageLevelScene.unity
+    m_Address: 4-StorageLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

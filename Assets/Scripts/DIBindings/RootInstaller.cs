@@ -9,6 +9,8 @@ namespace Citadel.Game
 {
     internal sealed class RootInstaller : MonoInstaller
     {
+        public const string MainAudioSourceName = "main_menu_music";
+        
         private static RootInstaller _instance;
 
         [SerializeField] 
@@ -76,7 +78,7 @@ namespace Citadel.Game
 
         public override void InstallBindings()
         {
-            Container.Bind<AudioSource>().WithId("main_menu_music").FromInstance(_mainmenuMusic).AsSingle();
+            Container.Bind<AudioSource>().WithId(MainAudioSourceName).FromInstance(_mainmenuMusic).AsSingle();
             Container.Bind<ITexturesStorage>().FromInstance(texturesStorage).AsSingle();
             Container.Bind<IResourcesLoader>().FromInstance(AddressablesResourcesLoader.Default).AsSingle();
             Container.Bind<AndroidConfig>().FromInstance(AndroidConfig.Default).AsSingle();
@@ -114,6 +116,8 @@ namespace Citadel.Game
             Container.BindInstance(_weaponCurrent).AsSingle();
             Container.BindInstance(_questLogNotesManager).AsSingle();
 
+            Container.Inject(AddressablesResourcesLoader.Default);
+            
             _itemsToInject.Add(_playerReference);
             _itemsToInject.Add(_biomonitorGraphSystem);
             _itemsToInject.Add(_playerEnergy);

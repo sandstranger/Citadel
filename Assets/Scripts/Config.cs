@@ -14,7 +14,7 @@ public sealed class Config
 	private const string AUDIO_MODE_KEY = "AudioSpeakerMode";
 	private static bool _configDataWasSetted = false;
 
-	[Inject(Id = "main_menu_music")]
+	[Inject(Id = RootInstaller.MainAudioSourceName)]
 	private readonly AudioSource _mainMenuMusic;
 	[Inject]
 	private readonly MainMenuHandler _mainMenuHandler;

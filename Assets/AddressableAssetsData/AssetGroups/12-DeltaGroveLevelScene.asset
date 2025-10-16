@@ -21,7 +21,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f369606cbb7e8cd4dadf577f13761326
-    m_Address: Assets/Scenes/12-DeltaGroveLevelScene.unity
+    m_Address: 12-DeltaGroveLevelScene
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

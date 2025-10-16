@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -47,15 +48,14 @@ namespace Citadel.Game
                     {
                         return assetInfo.GetResult<T>();
                     }
-
+                    
                     await assetInfo.Handle.WithCancellation(cancellationToken, true);
                     return assetInfo.GetResult<T>();
                 }
             
                 var handle = Addressables.LoadAssetAsync<T>(assetName);
                 _loadedAssets[assetName] = new AssetInfo(assetName, handle);
-                await handle.WithCancellation(cancellationToken, true);
-                return handle.Result;
+                return await handle.WithCancellation(cancellationToken, true);
             }
             catch (OperationCanceledException e)
             {
@@ -65,7 +65,7 @@ namespace Citadel.Game
         }
         
         public async UniTask<GameObject> InstantiateAsync(string assetName, Vector3 position, Quaternion rotation,
-            Transform parentTransform, CancellationToken cancellationToken = default)
+            Transform parentTransform, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(assetName))
             {
@@ -83,10 +83,7 @@ namespace Citadel.Game
 
                 if (prefab is not null)
                 {
-                    AsyncOperationHandle<GameObject> handle = Addressables.InstantiateAsync(prefab, position, rotation, parentTransform);
-                    var prefabInstance = await handle.WithCancellation(cancellationToken,true);
-                    InjectExistingPrefab(prefabInstance);
-                    return prefabInstance;
+                    return await _container.InstantiatePrefabAsync(prefab,assetName, position, rotation, parentTransform);
                 }
             }
             catch (OperationCanceledException e)
@@ -95,45 +92,6 @@ namespace Citadel.Game
             }
 
             return null;
-        }
-
-        public T LoadAsset<T>(string assetName) where T : Object
-        {
-            if (string.IsNullOrEmpty(assetName))
-            {
-                throw new ArgumentNullException(nameof(assetName));
-            }
-            
-            if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
-            {
-                if (assetInfo.Handle.IsDone)
-                {
-                    return assetInfo.GetResult<T>();
-                }
-
-                assetInfo.Handle.WaitForCompletion();
-                return assetInfo.GetResult<T>();
-            }
-            
-            var handle = Addressables.LoadAssetAsync<T>(assetName);
-            _loadedAssets[assetName] = new AssetInfo(assetName, handle);
-            handle.WaitForCompletion();
-            return handle.Result;
-        }
-        
-        public GameObject Instantiate(string assetName, Vector3 position, Quaternion rotation, Transform parentTransform)
-        {
-            if (string.IsNullOrEmpty(assetName))
-            {
-                throw new ArgumentNullException(nameof(assetName));
-            }
-            
-            var prefab = LoadAsset<GameObject>(assetName);
-            var prefabInstanceTask = Addressables.InstantiateAsync(prefab, position, 
-                rotation, parentTransform);
-            prefabInstanceTask.WaitForCompletion();
-            InjectExistingPrefab(prefabInstanceTask.Result);
-            return prefabInstanceTask.Result;
         }
 
         public void ReleaseAsset(string assetName)
@@ -166,14 +124,6 @@ namespace Citadel.Game
             ReleaseAllAssets();
         }
 
-        private void InjectExistingPrefab(GameObject prefabInstance)
-        {
-            foreach (var component in prefabInstance.GetComponentsInChildren<MonoBehaviour>(true))
-            {
-                _container.Inject(component);
-            }
-        }
-        
         private readonly struct AssetInfo : IEquatable<AssetInfo>
         {
             public readonly string AssetKey;

@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using ZLinq;
 
@@ -25,49 +24,6 @@ namespace Citadel.Game
             }
 
             return components;
-        }
-        
-        public static void CallIfNotNull(this UnityEngine.Object component, Action action)
-        {
-            if (component != null)
-            {
-                action.Invoke();
-            }
-        }
-        
-        public static async UniTask<T> WithCancellationAsync<T>(this UniTask<T> genericTask, CancellationToken cancellationToken)
-        {
-            if (!cancellationToken.CanBeCanceled)
-            {
-                return await genericTask;
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            
-            UniTask baseTask = genericTask;
-            await baseTask.WithCancellationAsync(cancellationToken);
-            return genericTask.GetAwaiter().GetResult();
-        }
-        
-        public static async UniTask WithCancellationAsync(this UniTask task, CancellationToken cancellationToken)
-        {
-            if (!cancellationToken.CanBeCanceled)
-            {
-                await task;
-            }
-
-            cancellationToken.ThrowIfCancellationRequested();
-            
-            UniTaskCompletionSource taskCompletion = new UniTaskCompletionSource();
-            
-            using (cancellationToken.Register(() => taskCompletion.TrySetResult()));
-
-            var completedResult = await UniTask.WhenAny(task, taskCompletion.Task);
-
-            if (completedResult == 1)
-            {
-                throw new OperationCanceledException(cancellationToken);
-            }
         }
         
         public static async Task<T> WithCancellationAsync<T>(this Task<T> genericTask, CancellationToken cancellationToken)
