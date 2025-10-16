@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System;
 using Citadel.Game;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using UnityEngine;
 
@@ -208,7 +209,7 @@ public class FuncWall : MonoBehaviour {
 	// ->->chunk_somechunk3   exist yet on a freshly instantiated prefab.
 	// ->->etc. etc.
 	// ->info_target         This is a relative offset position creator
-	public static int Load(Const @const,GameObject go, ref string[] entries, int index) {
+	public static async UniTask<int> Load(Const @const,GameObject go, string[] entries, int index) {
 		float readFloatx, readFloaty, readFloatz;
 		FuncWall fw = go.GetComponent<FuncWall>(); // Fairweather we are
 												   // having. Vague Quake
@@ -244,7 +245,7 @@ public class FuncWall : MonoBehaviour {
 			// Assumption here is that we are loading to a freshly instantiated
 			// func_wall prefab and that there are no children chunks on the
 			// mover_target GameObject yet.
-			GameObject childGO = @const.ResourcesLoader.InstantiatePrefab(chunkdex,
+			GameObject childGO = await @const.ResourcesLoader.InstantiatePrefabAsync(chunkdex,
 				go.transform.localPosition, // 0's, transform is below
 				@const.quaternionIdentity);
 			childGO.transform.SetParent(go.transform); // Set parent prior

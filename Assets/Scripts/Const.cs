@@ -7,8 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading.Tasks;
 using Citadel.Game;
 using Citadel.SceneManagement;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
@@ -1366,8 +1368,8 @@ public class Const : SingletonHelper<Const>
 	//                      time after launching the game).
 	// - NewGameIndicator,  Game is no longer a new game, because it's started.
 	// - LoadGameIndicator, Game should have been loaded prior to entry.
-	public void GoIntoGame(Stopwatch loadTimer) {
-		_levelManager.LoadLevelData(LevelManager.CurrentLevel);
+	public async UniTaskVoid GoIntoGame(Stopwatch loadTimer) {
+		await _levelManager.LoadLevelData(LevelManager.CurrentLevel);
 		Cursor.visible = true;
 		Utils.Deactivate(loadingScreen);
 		Utils.Deactivate(_mainMenuHandler.IntroVideo);
@@ -1530,7 +1532,9 @@ public class Const : SingletonHelper<Const>
 
 			// Read in global states, difficulties, and quest mission bits.
 			entries = readFileList[2].Split(Utils.splitCharChar);
-			index = _levelManager.Load(ref entries,index);
+			var loadLevelTask = _levelManager.Load(entries, index);
+			yield return loadLevelTask;
+			index = loadLevelTask.Result;
 			index = questData.Load(ref entries,index);
 			index = _questLogNotesManager.Load(ref entries,index);
 			difficultyCombat = Utils.GetIntFromString(entries[index],"difficultyCombat"); index++;
@@ -1631,7 +1635,7 @@ public class Const : SingletonHelper<Const>
 						
 						entries = readFileList[i].Split(Utils.splitCharChar);
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
-						SaveObject.Load(this,_levelManager,currentGameObjectInScene,ref entries,i,prefID);
+						yield return SaveObject.Load(this,_levelManager,currentGameObjectInScene, entries,i,prefID);
 						wasLoaded = true;
 						alreadyCheckedThisSaveableGameObjectInScene[j] = true; // Huge time saver right here!
 						break;
@@ -1718,22 +1722,28 @@ public class Const : SingletonHelper<Const>
 					bool levelExists = levID == LevelManager.CurrentLevel;
 					bool saveObjectToStaticStrings = !isDynamicObject && !levelExists && i < (readFileList.Count - 1);
 
+					Task<GameObject> taskToWait = null;
+					
 					if (saveObjectToStaticStrings)
 					{
 						LevelManager.StaticObjectsSaveStrings[levID].Add(readFileList[i]);
 					}
 					else if (isNpc && levelExists) {
 						contnr = _levelManager.GetRequestedLevelNPCContainer(levID);
-						instGO = _consoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
+						taskToWait = _consoleEmulator.SpawnDynamicObject(constdex, levID, false, contnr, savID).AsTask();
+						yield return taskToWait;
+						instGO = taskToWait.Result;
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-						SaveObject.Load(this,_levelManager,instGO,ref entries,i,prefID); // Load NPC.
+						yield return SaveObject.Load(this,_levelManager,instGO, entries,i,prefID); // Load NPC.
 					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex) && !isNpc) {
 						// For DynamicObjects, if current level, go ahead and Instantiate new Prefabs, else add string to LevelManager's list for other levels.
 						if (levID == LevelManager.CurrentLevel) {
 							contnr = _levelManager.GetRequestedLevelDynamicContainer(levID);
-							instGO = _consoleEmulator.SpawnDynamicObject(constdex,levID,false,contnr,savID);
+							taskToWait = _consoleEmulator.SpawnDynamicObject(constdex, levID, false, contnr, savID).AsTask();
+							yield return taskToWait;
+							instGO = taskToWait.Result;
 							PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-							SaveObject.Load(this,_levelManager,instGO,ref entries,i,prefID); // Load NPC.
+							yield return SaveObject.Load(this,_levelManager,instGO, entries,i,prefID); // Load NPC.
 						} else {
 							if (levID < LevelManager.DynamicObjectsSavestrings.Count && levID >= 0) { // levID < 14
 								if (i < (readFileList.Count - 1) && readFileList.Count > 0 && i >= 0) {
@@ -1762,7 +1772,7 @@ public class Const : SingletonHelper<Const>
 			
 			// OK we read in all the dynamic objects above into the savestrings
 			// list, now actaully instantiate them.
-			_levelManager.LoadLevelDynamicObjects(LevelManager.CurrentLevel);
+			yield return _levelManager.LoadLevelDynamicObjects(LevelManager.CurrentLevel);
 			loadUpdateTimer.Stop();
 
 			_levelManager.npcsm.RepopulateChildList();

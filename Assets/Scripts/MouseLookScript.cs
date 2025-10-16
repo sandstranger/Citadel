@@ -6,6 +6,7 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
 using Citadel.Game;
+using Cysharp.Threading.Tasks;
 using Zenject;
 
 public class MouseLookScript : MonoBehaviour {
@@ -161,7 +162,7 @@ public class MouseLookScript : MonoBehaviour {
 		_dynamicCulling.Cull(false); // Update dynamic culling system.
 	}
 
-	void Update() {
+	async void Update() {
 		// Allow quick load straight from the menu or pause.
 		if (Input.GetKeyUp(f9)) {
 			if (inCyberSpace) {
@@ -254,10 +255,10 @@ public class MouseLookScript : MonoBehaviour {
 		}
 
 		if (!inventoryMode) Mouselook(); // Only do mouselook in Shoot Mode.
-		if(_getInput.Use()) Frob(); // Frob what is under our cursor.
+		if(_getInput.Use()) await Frob(); // Frob what is under our cursor.
 	}
 
-	public void Frob() {
+	public async UniTask Frob() {
 		if (vmailActive && !inCyberSpace) {
 			_inventory.DeactivateVMail(); vmailActive = false;
 			return;
@@ -267,7 +268,7 @@ public class MouseLookScript : MonoBehaviour {
 			if (dropFinished < Time.time) {
 				currentButton = null; // Force this to reset.
 				if (holdingObject) {
-					if (!FrobWithHeldObject()) DropHeldItem();
+					if (!FrobWithHeldObject()) await DropHeldItem();
 				} else FrobEmptyHanded();
 			}
 		} else {
@@ -1172,7 +1173,7 @@ public class MouseLookScript : MonoBehaviour {
 		firstTimePickup = false;
 	}
 
-	public void DropHeldItem() {
+	public async UniTask DropHeldItem() {
 		dropFinished = Time.time + 0.2f; // Prevent immediate regrab at high fps
 		if (heldObjectIndex < 0 || heldObjectIndex > 110) { 
 			Debug.Log("BUG: Attempted to DropHeldItem with index out of bounds (<0 or >110) and heldObjectIndex = " + heldObjectIndex.ToString(),player);
@@ -1215,7 +1216,7 @@ public class MouseLookScript : MonoBehaviour {
 				}
 			} else {
 				// Debug.Log("WARNING: Failed to get freeObjectInPool for object " + heldObject.ToString() + "being dropped! MouseLookScript DropHeldItem.",player);
-				tossObject = _resourcesLoader.InstantiatePrefab(_prefabIndexToInstantiate,(transform.position + (transform.forward * tossOffset)),
+				tossObject = await _resourcesLoader.InstantiatePrefabAsync(_prefabIndexToInstantiate,(transform.position + (transform.forward * tossOffset)),
 					_consts.quaternionIdentity);  //effect
 				if (tossObject == null) {
 					_consts.sprint("BUG: Failed to instantiate object being dropped!",player);
@@ -1246,7 +1247,7 @@ public class MouseLookScript : MonoBehaviour {
 			// Throw an active grenade
 			grenadeActive = false;
 			_mfdManager.mouseClickHeldOverGUI = true; // Prevent shooting it.
-			tossObject = _resourcesLoader.InstantiatePrefab(_prefabIndexToInstantiate,(transform.position + (transform.forward * tossOffset)),
+			tossObject = await _resourcesLoader.InstantiatePrefabAsync(_prefabIndexToInstantiate,(transform.position + (transform.forward * tossOffset)),
 				_consts.quaternionIdentity);  //effect
 			if (tossObject == null) {
 				_consts.sprint("BUG: Failed to instantiate object being dropped!",player);

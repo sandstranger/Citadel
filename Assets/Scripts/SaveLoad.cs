@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEditor;
@@ -154,15 +155,15 @@ public static class SaveLoad {
         }
     }
     
-    public static GameObject LoadPrefab(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager,
-        ref string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null, GameObject lightsParent = null) {
+    public static async UniTask<GameObject> LoadPrefab(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager,
+        string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null, GameObject lightsParent = null) {
         if (!(entries[0].Contains("constIndex"))) { // [sic], need to fix light file to start with constIndex:7777
             return LoadLight(@const,levelManager,entries,lineNum,curlevel, lightsParent);
         }
 
         int constIndex = Utils.GetIntFromString(entries[0],"constIndex");
         if (ConsoleEmulator.ConstIndexIsGeometry(constIndex)) {
-            return LoadGeometry(@const,consoleEmulator,entries,lineNum,curlevel, levelGeometryParent);
+            return await LoadGeometry(@const,consoleEmulator,entries,lineNum,curlevel, levelGeometryParent);
         } else if (ConsoleEmulator.ConstIndexIsDynamicObject(constIndex)
                    || ConsoleEmulator.ConstIndexIsDoor(constIndex)
                    || ConsoleEmulator.ConstIndexIsStaticObjectSaveable(constIndex)
@@ -170,12 +171,12 @@ public static class SaveLoad {
 
             int saveID = Utils.GetIntFromString(entries[2],"SaveID");
             GameObject container = levelManager.GetRequestedLevelDynamicContainer(LevelManager.CurrentLevel);
-			GameObject newGO = consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,container,saveID);
+			GameObject newGO = await consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,container,saveID);
 			PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(newGO,true);
-			if (newGO != null) SaveObject.Load(@const,levelManager,newGO,ref entries,lineNum,prefID);
+			if (newGO != null) await SaveObject.Load(@const,levelManager,newGO,entries,lineNum,prefID);
 			return newGO;
         } else if (ConsoleEmulator.ConstIndexIsStaticObjectImmutable(constIndex)) {
-            return LoadStaticImmutable(@const,consoleEmulator,entries,lineNum,curlevel);
+            return await LoadStaticImmutable(@const,consoleEmulator,entries,lineNum,curlevel);
         } else {
             // Something went wrong, rebuild the line and print it.
             StringBuilder s1 = new StringBuilder(100 * 500);
@@ -411,7 +412,7 @@ public static class SaveLoad {
         return s1.ToString();
     }
 
-    private static GameObject LoadStaticImmutable(Const @const,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel) {
+    private static async UniTask<GameObject> LoadStaticImmutable(Const @const,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel) {
         if (entries.Length <= 1) { 
             Debug.Log("Can't load static immutable from line "
                       + lineNum.ToString() + ", line had only one or no "
@@ -426,7 +427,7 @@ public static class SaveLoad {
             return null;
         }
 
-        GameObject go = consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,null,0);
+        GameObject go = await consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,null,0);
         index = Utils.LoadTransform(go.transform,ref entries,index);
         if (constIndex == 552) { // prop_cyber_datafrag
             CyberDataFragment cybfrag = go.GetComponent<CyberDataFragment>();
@@ -682,7 +683,7 @@ public static class SaveLoad {
         return s1.ToString();
     }
 
-    private static GameObject LoadGeometry(Const consts,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null) {
+    private static async UniTask<GameObject> LoadGeometry(Const consts,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null) {
         if (entries.Length <= 1) { 
             Debug.Log("Can't load geometry from line " + lineNum.ToString()
                       + ", line had only one or no entries[]");
@@ -696,7 +697,7 @@ public static class SaveLoad {
             return null;
         }
 
-        GameObject chunk = consoleEmulator.SpawnDynamicObject(constdex,curlevel,false,levelGeometryParent,0, true);
+        GameObject chunk = await consoleEmulator.SpawnDynamicObject(constdex,curlevel,false,levelGeometryParent,0, true);
         if (chunk == null) return null;
 
         if (levelGeometryParent != null)

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Text;
 using Citadel.Game;
 using Citadel.SceneManagement;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using Random = UnityEngine.Random;
 
@@ -462,7 +463,7 @@ public class WeaponFire : MonoBehaviour {
 			case 6:
 				// Pipe or Laser Rapier, attack without prejudice.
 				// isSilent == false here so play normal SFX.
-				FireWeapon(wepdex, false); 
+				yield return FireWeapon(wepdex, false); 
 				break;
 			case 10: goto case 15;
 			case 14: goto case 15;
@@ -479,7 +480,7 @@ public class WeaponFire : MonoBehaviour {
 						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
 						_consts.sprint(11);
 					} else {
-						FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
+						yield return FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
 					}
 				} else {
 					_consts.sprint(207); // Not enough energy to fire weapon.
@@ -490,7 +491,7 @@ public class WeaponFire : MonoBehaviour {
 				if (_inventory.wepLoadedWithAlternate[_weaponCurrent.weaponCurrent]) {
 					if (_weaponCurrent.currentMagazineAmount2[_weaponCurrent.weaponCurrent] > 0
 						|| _weaponCurrent.bottomless) {
-						FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
+						yield return FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
 					} else {
 						Utils.PlayUIOneShotSavable(_consts,238); // noammo
 						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
@@ -498,7 +499,7 @@ public class WeaponFire : MonoBehaviour {
 				} else {
 					if (_weaponCurrent.currentMagazineAmount[_weaponCurrent.weaponCurrent] > 0
 						|| _weaponCurrent.bottomless) {
-						FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
+						yield return FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
 					} else {
 						Utils.PlayUIOneShotSavable(_consts,238); // noammo
 						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
@@ -581,13 +582,13 @@ public class WeaponFire : MonoBehaviour {
 // 		}
 	}
 
-	public void FireCyberWeapon() {
+	public async UniTaskVoid FireCyberWeapon() {
 		if (cyberWeaponAttackFinished < _pauseScript.relativeTime) {
 			if (_inventory.isPulserNotDrill) {
 				if (_inventory.hasSoft[1]) {
 					// Fire pulser
 					_consts.shotsFired++;
-					if (_inventory.hasSoft[1]) FireCyberBeachball(true,railgunShotForce,492);
+					if (_inventory.hasSoft[1]) await FireCyberBeachball(true,railgunShotForce,492);
 					Utils.PlayUIOneShotSavable(_consts,258); // wpulser
 					cyberWeaponAttackFinished = _pauseScript.relativeTime + 0.08f;
 				}
@@ -595,7 +596,7 @@ public class WeaponFire : MonoBehaviour {
 				if (_inventory.hasSoft[0]) {
 					// Fire I.C.E. drill
 					_consts.shotsFired++;
-					if (_inventory.hasSoft[0]) FireCyberBeachball(false,plasmaShotForce,495);
+					if (_inventory.hasSoft[0]) await FireCyberBeachball(false,plasmaShotForce,495);
 					Utils.PlayUIOneShotSavable(_consts,241); // wdrill baby drill
 					cyberWeaponAttackFinished = _pauseScript.relativeTime + 0.5f;
 				}
@@ -603,10 +604,10 @@ public class WeaponFire : MonoBehaviour {
 		}
 	}
 
-	void FireCyberBeachball(bool isPulser, float shoveForce, int prefabID) {
+	async UniTask FireCyberBeachball(bool isPulser, float shoveForce, int prefabID) {
         // Create and hurl a beachball-like object.  On the developer commentary they said that the projectiles act
         // like a beachball for collisions with enemies, but act like a baseball for walls/floor to prevent hitting corners
-        GameObject beachball = _consoleEmulator.SpawnDynamicObject(prefabID,-1);
+        GameObject beachball = await _consoleEmulator.SpawnDynamicObject(prefabID,-1);
         if (beachball != null) {
 			damageData.damage = 10f * _inventory.softVersions[0];
 			if (isPulser) {
@@ -631,7 +632,7 @@ public class WeaponFire : MonoBehaviour {
 	}
 
     // index is used to get recoil down at the bottom and pass along ref for damageData, otherwise the cases use _weaponCurrent.weaponIndex
-    void FireWeapon(int index, bool isSilent) {
+    async UniTask FireWeapon(int index, bool isSilent) {
 		_playerHealth.makingNoise = true;
 		_playerHealth.noiseFinished = _pauseScript.relativeTime + 0.5f;
 		GameObject smoke = null;
@@ -639,7 +640,7 @@ public class WeaponFire : MonoBehaviour {
             case 36:
                 //Mark3 Assault Rifle
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,251); // wmarksman
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashMK3.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeMK3,muzFlashMK3.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
@@ -651,7 +652,7 @@ public class WeaponFire : MonoBehaviour {
 				blasterSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Blaster fired with energy setting of " + blasterSetting.ToString());
 				if (!isSilent) Utils.PlayUIOneShotSavable(_consts,239); // wblaster
-				if (DidRayHit(index)) HitScanFire(index);
+				if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashBlaster.SetActive(true);
                 if (overloadEnabled) {
                     _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
@@ -663,13 +664,13 @@ public class WeaponFire : MonoBehaviour {
             case 38:
                 //SV-23 Dartgun
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,240); // wdartgun
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashDartgun.SetActive(true);
                 break;
             case 39:
                 //AM-27 Flechette
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,243); // wflechette
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashFlechette.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeFlechette,muzFlashFlechette.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
@@ -681,7 +682,7 @@ public class WeaponFire : MonoBehaviour {
 				ionSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Ion rifle fired with energy setting of " + ionSetting.ToString());
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,245); // wion
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashIonBeam.SetActive(true);
                 if (overloadEnabled) {
                     _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
@@ -701,7 +702,7 @@ public class WeaponFire : MonoBehaviour {
             case 43:
                 //Magnum 2100
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,249); // wmagnum
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashMagnum.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeMagnum,muzFlashMagnum.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
@@ -711,13 +712,13 @@ public class WeaponFire : MonoBehaviour {
             case 44:
                 //SB-20 Magpulse
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,250); // wmagpulse
-                FireMagpulse(index);
+                await FireMagpulse(index);
 				muzFlashMagpulse.SetActive(true);
                 break;
             case 45:
                 //ML-41 Pistol
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,255); // wpistol
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashPistol.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokePistol,muzFlashPistol.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
@@ -729,7 +730,7 @@ public class WeaponFire : MonoBehaviour {
 				plasmaSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Plasma rifle fired with energy setting of " + plasmaSetting.ToString());
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,257); // wplasma
-                FirePlasma(index);
+                await FirePlasma(index);
 				muzFlashPlasma.SetActive(true);
                 if (overloadEnabled) {
                     _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
@@ -741,7 +742,7 @@ public class WeaponFire : MonoBehaviour {
             case 47:
                 //MM-76 Railgun
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,259); // wrailgun
-                FireRailgun(index);
+                await FireRailgun(index);
 				muzFlashRailgun.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeRailgun,muzFlashRailgun.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
@@ -751,7 +752,7 @@ public class WeaponFire : MonoBehaviour {
             case 48:
                 //DC-05 Riotgun
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,262); // wriotgun
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashRiotgun.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeRiotgun,muzFlashRiotgun.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
@@ -761,7 +762,7 @@ public class WeaponFire : MonoBehaviour {
             case 49:
                 //RF-07 Skorpion
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,263); // wskorpion
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashSkorpion.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeSkorpion,muzFlashSkorpion.transform.position,_consts.quaternionIdentity) as GameObject;
 				smoke.transform.parent = reloadContainer;
@@ -772,7 +773,7 @@ public class WeaponFire : MonoBehaviour {
                 //Sparq Beam
 				sparqSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,264); // wsparq
-                if (DidRayHit(index)) HitScanFire(index);
+                if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashSparq.SetActive(true);
                 if (overloadEnabled) {
                     _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
@@ -785,7 +786,7 @@ public class WeaponFire : MonoBehaviour {
                 //DH-07 Stungun
 				stungunSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
                 if (!isSilent) Utils.PlayUIOneShotSavable(_consts,265); // wstungun
-                FireStungun(index);
+                await FireStungun(index);
 				muzFlashStungun.SetActive(true);
                 if (overloadEnabled) {
                     _inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] = 100f;
@@ -865,7 +866,7 @@ public class WeaponFire : MonoBehaviour {
         return false;
     }
 
-	void CreateStandardImpactMarks(int wep16index) {
+	async UniTask CreateStandardImpactMarks(int wep16index) {
 		// Don't create bullet holes on objects that move
 		if (tempHit.collider == null) return;
 		if (tempHit.collider.transform.gameObject == null) return;
@@ -899,7 +900,7 @@ public class WeaponFire : MonoBehaviour {
 			case 15: prefabIndex = 520; break;
 		}
 
-		GameObject impactMark = _resourcesLoader.InstantiatePrefab(prefabIndex,
+		GameObject impactMark = await _resourcesLoader.InstantiatePrefabAsync(prefabIndex,
 			(tempHit.point + tempVec),
 			Quaternion.LookRotation(tempHit.normal*-1,Vector3.up),
 			hitGO.transform);
@@ -931,7 +932,7 @@ public class WeaponFire : MonoBehaviour {
         }
     }
 
-    void CreateBeamImpactEffects(int wep16index) {
+    async UniTask CreateBeamImpactEffects(int wep16index) {
 		int impactConstdex = 731; // Cyan for sparqbeam
 		if (wep16index == 1) {
 			impactConstdex = 739;  //Red laser for blaster
@@ -939,18 +940,18 @@ public class WeaponFire : MonoBehaviour {
 			impactConstdex = 740; // Yellow laser for ion
         }
 
-        GameObject impact = _consoleEmulator.SpawnDynamicObject(impactConstdex);
+        GameObject impact = await _consoleEmulator.SpawnDynamicObject(impactConstdex);
 		impact.transform.SetPositionAndRotation(tempHit.point,Quaternion.FromToRotation(Vector3.up, tempHit.normal));
 		impact.SetActive(true);
     }
 
-    void CreateBeamEffects(int wep16index) {
+    async UniTask CreateBeamEffects(int wep16index) {
         int laserIndex = 405; // Turquoise/Pale-Teal for sparq
         if (wep16index == 1) laserIndex = 406;  //Red laser for blaster
         else  if (wep16index == 4) laserIndex = 407; // Yellow laser for ion
 
 		GameObject dynamicObjectsContainer = _levelManager.GetCurrentDynamicContainer();
-		GameObject lasertracer = _resourcesLoader.InstantiatePrefab(laserIndex,transform.position,_consts.quaternionIdentity) as GameObject;
+		GameObject lasertracer = await _resourcesLoader.InstantiatePrefabAsync(laserIndex,transform.position,_consts.quaternionIdentity) as GameObject;
 
 		// Temporary object only, no need to save or mark as instantiated.
 		if (lasertracer != null) {
@@ -986,7 +987,7 @@ public class WeaponFire : MonoBehaviour {
 	}
 
 	// TargetID Instance
-	public void CreateTargetIDInstance(float dmgFinal, HealthManager hm, float tranq) {
+	public async UniTaskVoid CreateTargetIDInstance(float dmgFinal, HealthManager hm, float tranq) {
 		 if (hm == null || !hm.isNPC || hm.health <= 0f) return;
 		if (!_inventory.hasHardware[4] && tranq <= 0f && dmgFinal > 0f) return;
 		if (hm.linkedTargetID != null) return; // Let SendDamageReceive handle updates
@@ -997,7 +998,7 @@ public class WeaponFire : MonoBehaviour {
 		bool showAttitude = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1;
 		bool showName = _inventory.hasHardware[4] && _inventory.hardwareVersion[4] > 1;
 
-		GameObject idFrame = _resourcesLoader.InstantiatePrefab(736, hm.transform.position, _consts.quaternionIdentity) as GameObject;
+		GameObject idFrame = await _resourcesLoader.InstantiatePrefabAsync(736, hm.transform.position, _consts.quaternionIdentity);
 		if (idFrame == null) return;
 
 		TargetID tid = idFrame.GetComponent<TargetID>();
@@ -1099,7 +1100,7 @@ public class WeaponFire : MonoBehaviour {
     // Hitscan Weapons
     //----------------------------------------------------------------------------------------------------------
     // Guns and laser beams, used by most weapons
-    void HitScanFire(int wep16Index) {
+    async UniTask HitScanFire(int wep16Index) {
         damageData.other = tempHit.transform.gameObject;
 		tempHM = Utils.GetMainHealthManager(tempHit);
 		if (tempHM != null) {
@@ -1109,7 +1110,7 @@ public class WeaponFire : MonoBehaviour {
 		}
 
         if (wep16Index == 1 || wep16Index == 4 || wep16Index == 14) {
-            CreateBeamImpactEffects(wep16Index); // laser burst effect overrides standard blood spurts/robot sparks
+            await CreateBeamImpactEffects(wep16Index); // laser burst effect overrides standard blood spurts/robot sparks
         } else {
             CreateStandardImpactEffects(); // standard blood spurts/robot sparks
 
@@ -1135,7 +1136,7 @@ public class WeaponFire : MonoBehaviour {
         } else {
             damageData.isOtherNPC = false;
 			if (damageData.other.CompareTag("Geometry")) {
-				CreateStandardImpactMarks(wep16Index);
+				await CreateStandardImpactMarks(wep16Index);
 			}
         }
         damageData.hit = tempHit;
@@ -1188,7 +1189,7 @@ public class WeaponFire : MonoBehaviour {
 
         // Draw a laser beam for beam weapons
         if (wep16Index == 1 || wep16Index == 4 || wep16Index == 14) {
-			CreateBeamEffects(wep16Index);
+			await CreateBeamEffects(wep16Index);
 		}
     }
 
@@ -1236,7 +1237,7 @@ public class WeaponFire : MonoBehaviour {
 
 		CreateStandardImpactEffects();
 		if (damageData.other.CompareTag("Geometry")) {
-			CreateStandardImpactMarks(index16);
+			yield return CreateStandardImpactMarks(index16);
 		}
 
 		if (tempHM == null) {
@@ -1383,17 +1384,17 @@ public class WeaponFire : MonoBehaviour {
 
     // Projectile weapons
     //-------------------------------------------------------------------------
-    void FirePlasma(int index16) { FireBeachball(index16,plasmaShotForce,485); }
-    void FireRailgun(int index16) { FireBeachball(index16,railgunShotForce,484); }
-    void FireMagpulse(int index16) { FireBeachball(index16,magpulseShotForce,482); }
-    void FireStungun(int index16) { FireBeachball(index16,stungunShotForce,483); }
+    UniTask FirePlasma(int index16) { return FireBeachball(index16,plasmaShotForce,485); }
+    UniTask FireRailgun(int index16) { return FireBeachball(index16,railgunShotForce,484); }
+    UniTask FireMagpulse(int index16) { return FireBeachball(index16,magpulseShotForce,482); }
+    UniTask FireStungun(int index16) { return FireBeachball(index16,stungunShotForce,483); }
 
-	void FireBeachball(int index16, float shoveForce, int prefabID) {
+	async UniTask FireBeachball(int index16, float shoveForce, int prefabID) {
         // Create and hurl a beachball-like object.  On the developer
 		// commentary they said that the projectiles act like a beachball for
 		// collisions with enemies, but act like a baseball for walls/floor to
 		// prevent hitting corners.
-        GameObject beachball = _consoleEmulator.SpawnDynamicObject(prefabID,1);
+        GameObject beachball = await _consoleEmulator.SpawnDynamicObject(prefabID,1);
         if (beachball != null) {
 			if (CurrentWeaponUsesEnergy()) {
                 damageData.damage = DamageForPower(index16);

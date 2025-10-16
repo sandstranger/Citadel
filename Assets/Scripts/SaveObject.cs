@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using UnityEngine;
 //#if UNITY_EDITOR
@@ -179,7 +180,7 @@ public class SaveObject : MonoBehaviour {
 	}
 
 	// Called after prefab has been instantiated.
-	public static void Load(Const consts,LevelManager levelManager,GameObject go, ref string[] entries, int lineNum,
+	public static async UniTask Load(Const consts,LevelManager levelManager,GameObject go, string[] entries, int lineNum,
 							PrefabIdentifier prefID) {
 
 		if (prefID == null) { 
@@ -245,7 +246,7 @@ public class SaveObject : MonoBehaviour {
 													  index =               TargetIO.Load(go,ref entries,index); break;
 			case SaveableType.Switch:                 index =           ButtonSwitch.Load(go,ref entries,index);
 													  index =               TargetIO.Load(go,ref entries,index); break;
-			case SaveableType.FuncWall:               index =               FuncWall.Load(consts,go.transform.GetChild(0).gameObject,ref entries,index);
+			case SaveableType.FuncWall:               index =               await FuncWall.Load(consts,go.transform.GetChild(0).gameObject, entries,index);
 													  index =               TargetIO.Load(go.transform.GetChild(0).gameObject,ref entries,index); break;
 			case SaveableType.TeleDest:               index =          TeleportTouch.Load(go,ref entries,index); break;
 			case SaveableType.LBranch:                index =            LogicBranch.Load(go,ref entries,index);

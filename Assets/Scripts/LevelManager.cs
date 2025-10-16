@@ -5,8 +5,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Citadel.Game;
 using Citadel.SceneManagement;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -265,7 +267,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	// Make sure relevant data and objects are loaded in and present for the level.
-	public void LoadLevelData(int levnum) {
+	public async UniTask LoadLevelData(int levnum) {
 		if (!LevNumInBounds(CurrentLevel)) { // In a test or editor space.
 			levelDataLoaded[levnum] = true;
 			return;
@@ -273,11 +275,10 @@ public class LevelManager : MonoBehaviour
 		if (levelDataLoaded[levnum]) return; // Already loaded.
 
 // 		Debug.Log("Loading level data for " + levnum.ToString());
-		LoadLevelLights(levnum);
 		LoadLevelGeometry(levnum);
-		LoadStaticObjects(levnum);
-		LoadLevelDynamicObjects(levnum);
-		_music.LoadLevelMusic(levnum);
+		await LoadStaticObjects(levnum);
+		await LoadLevelDynamicObjects(levnum);
+		await _music.LoadLevelMusic(levnum);
 		levelDataLoaded[levnum] = true;
 		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + SaveLoad.numLightsWithShadows.ToString());
 	}
@@ -360,13 +361,6 @@ public class LevelManager : MonoBehaviour
 		}
 		
 		PostLoadLevelSetupSystems();
-		_lightDistanceCuller.Rebuild();
-		if (CurrentLevel != 13) {
-			_dynamicCulling.Cull_Init();
-			System.GC.Collect();
-			System.GC.WaitForPendingFinalizers();
-			StartCoroutine(DelayedCull());
-		}
 	}
 	
 	public IEnumerator DelayedCull() {
@@ -374,24 +368,24 @@ public class LevelManager : MonoBehaviour
 		_dynamicCulling.CullCore(); // For Level 10, visible screen with camera view can't update until cams awake.
 	}
 
-	public void LoadLevelFromSave(int levnum) {
-		if (!LevNumInBounds(levnum)) return;
+	public UniTask LoadLevelFromSave(int levnum) {
+		if (!LevNumInBounds(levnum)) return UniTask.CompletedTask;
 
 // 		Debug.Log("LevelManager LoadLevelFromSave()");
-		LoadLevelData(levnum); // Let this function check and load data if it isn't yet.
+	//	LoadLevelData(levnum); // Let this function check and load data if it isn't yet.
 		CurrentLevel = levnum; // Set current level to be the new level
 		DisableAllNonOccupiedLevelsExcept(CurrentLevel); // Unload last level.
-		PostLoadLevelSetupSystems();
+		return PostLoadLevelSetupSystems();
 	}
 
-	private void PostLoadLevelSetupSystems() {
+	private async UniTask PostLoadLevelSetupSystems() {
 		_music.inCombat = false;
 		_music.SFXMain.Stop();
 		_music.SFXOverlay.Stop();
 		_music.levelEntry = true;
 		_playerHealth.radiationArea = false;
 		_playerMovement.ladderState = 0;
-		LoadLevelData(CurrentLevel);
+		await LoadLevelData(CurrentLevel);
 		_automap.SetAutomapExploredReference(CurrentLevel);
 		_automap.automapBaseImage.overrideSprite = _automap.automapsBaseImages[CurrentLevel];
 		_consts.ClearActiveAutomapOverlays(); // After other levels turned off.
@@ -686,37 +680,6 @@ public class LevelManager : MonoBehaviour
 		compArray = null;*/
 	}
 
-	public void LoadLevelLights(int curlevel) {
-		return;
-		if (curlevel > MaxLevelsCount  || curlevel < 0)
-		{
-			return;
-		}
-
-		string lName = "CitadelScene_lights_level"+curlevel.ToString()+".txt";
-		StreamReader sf = Utils.ReadStreamingAsset(lName);
-		if (sf == null) {
-			UnityEngine.Debug.Log("Lights input file path invalid");
-			return;
-		}
-
-		string readline;
-		List<string> readFileList = new List<string>();
-		int lineNum = 0;
-		char splitter = Convert.ToChar(SaveLoad.splitChar);
-		using (sf) {
-			do {
-				readline = sf.ReadLine();
-				if (readline == null) break;
-				
-				string[] entries = readline.Split(splitter);
-				SaveLoad.LoadPrefab(_consts,_consoleEmulator,this,ref entries,lineNum,curlevel);
-				lineNum++;
-			} while (!sf.EndOfStream);
-			sf.Close();
-		}
-	}
-
 	public void UnloadLevelDynamicObjects(int curlevel, bool saveExisting) {
 		_lightDistanceCuller.Clear();
 		Transform tr = GetRequestedLevelDynamicContainer(curlevel).transform;
@@ -767,7 +730,7 @@ public class LevelManager : MonoBehaviour
 		compArray = null;
 	}
 
-	public void LoadLevelDynamicObjects(int curlevel) {
+	public async UniTask LoadLevelDynamicObjects(int curlevel) {
 		if (levelScript==null || curlevel < 0) return;
 
 		string[] entries;
@@ -778,7 +741,7 @@ public class LevelManager : MonoBehaviour
 			entries = DynamicObjectsSavestrings[curlevel][i].Split(splitter);
 			if (entries.Length <= 1) continue;
 			
-			dynGO = SaveLoad.LoadPrefab(_consts,_consoleEmulator,this,ref entries,0,curlevel);
+			dynGO = await SaveLoad.LoadPrefab(_consts,_consoleEmulator,this, entries,0,curlevel);
 			if (dynGO == null) continue;
 
 			int constIndex = Utils.GetIntFromString(entries[0],"constIndex");
@@ -837,10 +800,10 @@ public class LevelManager : MonoBehaviour
 		return s1.ToString();
 	}
 
-	public int Load(ref string[] entries, int index) {
+	public async Task<int> Load(string[] entries, int index) {
 		int i = 0;
 		int levelNum = Utils.GetIntFromString(entries[index],"currentLevel"); index++;
-		LoadLevelFromSave(levelNum);
+		await LoadLevelFromSave(levelNum);
 		for (i=0;i<14;i++) {levelSecurity[i] = Utils.GetIntFromString(entries[index],"levelSecurity[" + i.ToString() + "]"); index++; }
 		for (i=0;i<14;i++) { levelCameraDestroyedCount[i] = Utils.GetIntFromString(entries[index],"levelCameraDestroyedCount[" + i.ToString() + "]"); index++; }
 		for (i=0;i<14;i++) { levelSmallNodeDestroyedCount[i] = Utils.GetIntFromString(entries[index],"levelSmallNodeDestroyedCount[" + i.ToString() + "]"); index++; }
@@ -849,7 +812,7 @@ public class LevelManager : MonoBehaviour
 		return index;
 	}
 
-	private void LoadStaticObjects(int levNum)
+	private async UniTask LoadStaticObjects(int levNum)
 	{
 		var staticObjectsStrings = StaticObjectsSaveStrings[levNum];
 		
@@ -874,9 +837,9 @@ public class LevelManager : MonoBehaviour
 			
 			if (isNpc)
 			{
-				var instGO = _consoleEmulator.SpawnDynamicObject(constIndex,levNum,false,contnr,savID);
+				var instGO = await _consoleEmulator.SpawnDynamicObject(constIndex,levNum,false,contnr,savID);
 				PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-				SaveObject.Load(_consts,this,instGO,ref entries,0,prefID); // Load NPC.
+				await SaveObject.Load(_consts,this,instGO, entries,0,prefID); // Load NPC.
 			}
 			else
 			{
@@ -898,7 +861,7 @@ public class LevelManager : MonoBehaviour
 					if (currentSaveObjectInScene.SaveID == savID && currentSaveObjectInScene.SaveID != 0)
 					{
 						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene, true);
-						SaveObject.Load(_consts,this,currentGameObjectInScene, ref entries, i, prefID);
+						await SaveObject.Load(_consts,this,currentGameObjectInScene, entries, i, prefID);
 						alreadyCheckedThisInstantiableGameObjectInScene[i] = true; // Huge time saver right here!
 						break;
 					}

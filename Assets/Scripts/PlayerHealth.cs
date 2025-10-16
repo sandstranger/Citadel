@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Text;
 using Citadel.Game;
+using Cysharp.Threading.Tasks;
 using Zenject;
 
 public class PlayerHealth : MonoBehaviour {
@@ -66,13 +67,13 @@ public class PlayerHealth : MonoBehaviour {
 		initialRadiation = 0f;
 	}
 
-	void Update() {
+	async void Update() {
 		if (_pauseScript.Paused() || _pauseScript.MenuActive()) return;
 
 		if (noiseFinished < _pauseScript.relativeTime) makingNoise = false;
 		if (hm.health <= 0f) {
 			if (!playerDead) PlayerDying();
-			else PlayerDead();
+			else await PlayerDead();
 			return;
 		}
 
@@ -155,9 +156,9 @@ public class PlayerHealth : MonoBehaviour {
 		}
 	}
 	
-	void PlayerDead() {
+	async UniTask PlayerDead() {
 		if (_mouseLookScript.heldObjectIndex != -1) {
-			_mouseLookScript.DropHeldItem();
+			await _mouseLookScript.DropHeldItem();
 			_mouseLookScript.ForceInventoryMode();
 		}	
 		int lindex = LevelManager.CurrentLevel != -1 ? LevelManager.CurrentLevel : 0;

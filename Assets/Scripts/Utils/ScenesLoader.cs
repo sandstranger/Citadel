@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 
@@ -38,18 +38,14 @@ namespace Citadel.SceneManagement
             SceneManager.activeSceneChanged += (_,scene ) => OnActiveSceneChanged?.Invoke(scene.name);
         }
 
-        public static async void LoadLevel(int level)
+        public static async UniTaskVoid LoadLevel(int level)
         {
             if (level < _levelScenesNames.Length)
             {
-                await LoadScene(_levelScenesNames[level]);
+                var sceneName = _levelScenesNames[level];
+                OnStartLoadScene?.Invoke(sceneName);
+                await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single).Task;
             }
-        }
-        
-        private static async Task LoadScene(string sceneName)
-        {
-            OnStartLoadScene?.Invoke(sceneName);
-            await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single).Task;
         }
     }
 }

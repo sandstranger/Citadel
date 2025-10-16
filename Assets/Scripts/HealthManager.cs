@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Citadel.Game;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using UnityEngine;
 using UnityEngine.UI;
@@ -691,7 +692,7 @@ public class HealthManager : MonoBehaviour {
 		HideSelf(); // Can't deactivate parent as gibs are children!
     }
 
-	void DropSearchables() {
+	private async UniTaskVoid DropSearchables() {
 		if (searchableItem == null) return;
 
 		_mfdManager.NotifySearchThatSearchableWasDestroyed();
@@ -699,7 +700,7 @@ public class HealthManager : MonoBehaviour {
 		for (int i=0;i<4;i++) {
 			if (searchableItem.contents[i] < 0) continue;
 
-			GameObject tossObject = _resourcesLoader.InstantiatePrefab(searchableItem.contents[i] + 307,
+			GameObject tossObject = await _resourcesLoader.InstantiatePrefabAsync(searchableItem.contents[i] + 307,
 				transform.position,_consts.quaternionIdentity);
 
 			if (tossObject != null) {

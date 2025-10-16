@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -58,7 +59,7 @@ namespace Citadel.Android.Tools
             }
         }
         
-        private static void LoadLevelGeometry(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager, 
+        private static async UniTask LoadLevelGeometry(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager, 
             int curlevel, GameObject levelGeometryParent, GameObject lightsParent ) {
             if (curlevel < 0) return;
 		
@@ -84,7 +85,7 @@ namespace Citadel.Android.Tools
 
                     string[] entries = readline.Split(splitter);
 				
-                    go = SaveLoad.LoadPrefab(@const,consoleEmulator,levelManager,ref entries,lineNum,curlevel, levelGeometryParent, lightsParent);
+                    go = await SaveLoad.LoadPrefab(@const,consoleEmulator,levelManager, entries,lineNum,curlevel, levelGeometryParent, lightsParent);
                     if (go != null)
                     {
                         go.transform.SetParent(levelGeometryParent.transform,false);
@@ -122,7 +123,7 @@ namespace Citadel.Android.Tools
             }
         }
         
-        private static void LoadLevelLights(Const @const,ConsoleEmulator consoleEmulator, 
+        private static async UniTask LoadLevelLights(Const @const,ConsoleEmulator consoleEmulator, 
             LevelManager levelManager,int curlevel,GameObject lightParent) {
             if (curlevel > MaxLevels) return;
             if (curlevel < 0) return;
@@ -143,8 +144,8 @@ namespace Citadel.Android.Tools
                     if (readline == null) break;
 				
                     string[] entries = readline.Split(splitter);
-                    var light = SaveLoad.LoadPrefab(@const,consoleEmulator, 
-                        levelManager,ref entries,lineNum,curlevel, null, lightParent);
+                    var light = await SaveLoad.LoadPrefab(@const,consoleEmulator, 
+                        levelManager, entries,lineNum,curlevel, null, lightParent);
                     var lightComponent = light.GetComponent<Light>();
                     lightComponent.enabled = true;
                     lightComponent.lightmapBakeType = LightmapBakeType.Mixed;

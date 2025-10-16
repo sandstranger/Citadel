@@ -4,7 +4,8 @@
     "references": [
         "Citadel",
         "Unity.AutoLOD",
-        "Unity.AutoLOD.Editor"
+        "Unity.AutoLOD.Editor",
+        "UniTask"
     ],
     "includePlatforms": [
         "Editor"

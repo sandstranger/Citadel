@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Citadel.Game;
 using Citadel.SceneManagement;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using Zenject;
 using UnityEngine;
@@ -1398,7 +1399,7 @@ Generic Materials (_consts.genericMaterials[])
 98 text_3dgoldunlit
 99 text_3dgoldunlitoverlay
 */
-	public GameObject SpawnDynamicObject(int val, int lev, bool cheat,
+	public async UniTask<GameObject> SpawnDynamicObject(int val, int lev, bool cheat,
 												GameObject forcedContainer,
 												int saveID, bool spawnObjectAsPrefab = false) {
 		if (!ConstIndexInBounds(val)) {
@@ -1424,13 +1425,13 @@ Generic Materials (_consts.genericMaterials[])
 		GameObject go = null;
 		if (ConstIndexIsGeometry(val)) {
 			if (_consts.editMode || !cheat) {
-				InstantiatePrefab();
+				go = await InstantiatePrefab();
 			} else {
 				_consts.sprint("Indices 0 through 306 (level geometry chunks) "
 							 + "not possible when not on edit mode!");
 			}
 		} else {
-			InstantiatePrefab();
+			go = await InstantiatePrefab();
 		}
 
 		if (go != null) {
@@ -1492,23 +1493,23 @@ Generic Materials (_consts.genericMaterials[])
 		}
 		return go;
 
-		void InstantiatePrefab()
+		UniTask<GameObject> InstantiatePrefab()
 		{
-			go = _resourcesLoader.InstantiatePrefab(val, spawnPos, _consts.quaternionIdentity);
+			return _resourcesLoader.InstantiatePrefabAsync(val, spawnPos, _consts.quaternionIdentity);
 		}
 	}
 
-	public GameObject SpawnDynamicObject(int val, int lev, bool cheat,
+	public UniTask<GameObject> SpawnDynamicObject(int val, int lev, bool cheat,
 												int saveID) {
 		return SpawnDynamicObject(val, lev, cheat, null, saveID);
 	}
 
-	public GameObject SpawnDynamicObject(int val, int saveID) {
+	public UniTask<GameObject> SpawnDynamicObject(int val, int saveID) {
 		return SpawnDynamicObject(val,LevelManager.CurrentLevel,false,null,
 								  saveID);
 	}
 	
-	public GameObject SpawnDynamicObject(int val) {
+	public UniTask<GameObject> SpawnDynamicObject(int val) {
 		return SpawnDynamicObject(val,LevelManager.CurrentLevel,false,null,-1);
 	}
 }

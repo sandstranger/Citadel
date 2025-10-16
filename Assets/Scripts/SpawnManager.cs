@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using UnityEngine;
 
@@ -85,7 +86,7 @@ public class SpawnManager : MonoBehaviour {
 		}
 	}
 
-	void Spawn(int index) {
+	async UniTaskVoid Spawn(int index) {
 		if (_consts.difficultyCombat == 0) return; // Not on combat diff 0
 
 		Debug.Log("Spawning new enemy " + index.ToString());
@@ -93,7 +94,7 @@ public class SpawnManager : MonoBehaviour {
 		Vector3 spot = GetRandomLocation();
 		if (spot.x == 0 && spot.y == 0 && spot.z == 0) return;
 
-		GameObject instGO = _consoleEmulator.SpawnDynamicObject(
+		GameObject instGO = await _consoleEmulator.SpawnDynamicObject(
 			index,LevelManager.CurrentLevel,false,null,-1
 		);
 

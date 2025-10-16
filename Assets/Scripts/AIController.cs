@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Citadel.Game;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -1201,7 +1202,7 @@ public class AIController : MonoBehaviour {
 		return true;
     }
 
-	void MakeLaserEffect(int attackNum) {
+	private async UniTaskVoid MakeLaserEffect(int attackNum) {
 		bool hasLaser = false;
 		switch(attackNum) {
 			case 1: hasLaser = _consts.hasLaserOnAttack1ForNPC[index]; break;
@@ -1211,8 +1212,8 @@ public class AIController : MonoBehaviour {
 
 		if (!hasLaser) return;
 
-		GameObject laz = _resourcesLoader.InstantiatePrefab(408,transform.position,
-									 _consts.quaternionIdentity) as GameObject;
+		GameObject laz = await _resourcesLoader.InstantiatePrefabAsync(408,transform.position,
+			_consts.quaternionIdentity);
 
 		if (laz == null) return; // No laser!
 
@@ -1295,7 +1296,7 @@ public class AIController : MonoBehaviour {
 	// something that can be hurt.
 	//   attackNum corresponds to the correct lookup table
 	//   attackNum of 1 = Attack1, 2 = Attack2, 3 = Attack3
-	void ProjectileLaunched(int attackNum) {
+	private async UniTaskVoid ProjectileLaunched(int attackNum) {
 		if (attackNum < 1 || attackNum > 3) attackNum = 3;
 		MuzzleBurst(attackNum);
 		tempVec = GetDirectionRayToEnemy(targettingPosition, attackNum);
@@ -1331,7 +1332,7 @@ public class AIController : MonoBehaviour {
 				break;
 		}
 
-		beachball = _consoleEmulator.SpawnDynamicObject(masterIndex,-1);
+		beachball = await _consoleEmulator.SpawnDynamicObject(masterIndex,-1);
 		beachball.tag = "NPC";
 		beachball.layer = 24; // NPCBullet
 		ProjectileEffectImpact pei = 
