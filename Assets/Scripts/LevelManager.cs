@@ -279,7 +279,7 @@ public class LevelManager : MonoBehaviour
 		await LoadStaticObjects(levnum);
 		await LoadLevelDynamicObjects(levnum);
 		await _music.LoadLevelMusic(levnum);
-		_resourcesLoader.ReleaseAllAssets();
+		await _resourcesLoader.ReleaseAllAssetsAsync();
 		_levelDataLoaded = true;
 		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + SaveLoad.numLightsWithShadows.ToString());
 	}
@@ -308,7 +308,7 @@ public class LevelManager : MonoBehaviour
 		TargetPosition = targetPosition ?? Vector3.zero;
 		CurrentLevel = levnum;
 		ObjectContainmentSystem.ClearLists();
-		ScenesLoader.LoadLevel(levnum);
+		ScenesLoader.LoadLevelAsync(levnum);
 	}
 	
 	public void LoadLevel(int levnum, Vector3 targetPosition, bool loadLevelForced = false)

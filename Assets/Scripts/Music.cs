@@ -63,43 +63,36 @@ public class Music : MonoBehaviour {
 		combatImpulseFinished = Time.time + 5f;
 	}
 
-	private async UniTask LoadTrackAsync(string fName, MusicResourceType type, int index) {
+	private async UniTask LoadTrackAsync(string fName, MusicResourceType type, int index) 
+	{
 		AudioClip audioClip = await _resourcesLoader.LoadAssetAsync<AudioClip>(fName);
 		
 		switch (type) {
 			case MusicResourceType.Menu:
 				if (index == 0) {
 					titleMusic = audioClip;
-					titleMusic.LoadAudioData();
 					PlayMenuMusic();
 				} else if (index == 1) {
 					creditsMusic = audioClip;
-					creditsMusic.LoadAudioData();
 				}
 				break;
 			case MusicResourceType.Level:
 				_levelMusic[index] = audioClip;
-				audioClip.LoadAudioData();
 				break;
 			case MusicResourceType.Revive:
 				levelMusicRevive = audioClip;
-				levelMusicRevive.LoadAudioData();
 				break;
 			case MusicResourceType.Death:
 				levelMusicDeath = audioClip;
-				levelMusicDeath.LoadAudioData();
 				break;
 			case MusicResourceType.Elevator:
 				levelMusicElevator = audioClip;
-				levelMusicElevator.LoadAudioData();
 				break;
 			case MusicResourceType.Distortion:
 				levelMusicDistortion = audioClip;
-				levelMusicDistortion.LoadAudioData();
 				break;
 			case MusicResourceType.Looped:
 				levelMusicLooped = audioClip;
-				levelMusicLooped.LoadAudioData();
 				break;
 		}
 	}
@@ -124,7 +117,8 @@ public class Music : MonoBehaviour {
 		return LoadLevelMusicActualAsync(levnum);
 	}
 	
-	private async UniTask LoadLevelMusicActualAsync(int levnum) {
+	private async UniTask LoadLevelMusicActualAsync(int levnum)
+	{
 		_isReadyToPlay = false;
 		levelMusicRevive = null;
 		levelMusicDeath = null;

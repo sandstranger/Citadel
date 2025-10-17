@@ -7,8 +7,7 @@ namespace Citadel.SceneManagement
 {
     internal static class ScenesLoader
     {
-        public const string DynamicLevelsSceneName = "CitadelScene";
-        
+        public const int MainGameSceneIndex = 1;
         public static event Action<string> OnStartLoadScene;
         public static event Action<string> OnSceneLoaded;
         public static event Action<string> OnActiveSceneChanged; 
@@ -38,13 +37,13 @@ namespace Citadel.SceneManagement
             SceneManager.activeSceneChanged += (_,scene ) => OnActiveSceneChanged?.Invoke(scene.name);
         }
 
-        public static async UniTaskVoid LoadLevel(int level)
+        public static async UniTaskVoid LoadLevelAsync(int level)
         {
             if (level < _levelScenesNames.Length)
             {
                 var sceneName = _levelScenesNames[level];
                 OnStartLoadScene?.Invoke(sceneName);
-                await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single).ToUniTask();
+                await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             }
         }
     }

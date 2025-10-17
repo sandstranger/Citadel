@@ -48,17 +48,28 @@ namespace Citadel.Game
                     {
                         return assetInfo.GetResult<T>();
                     }
-                    
-                    await assetInfo.Handle.WithCancellation(cancellationToken, true);
+
+                    if (cancellationToken.CanBeCanceled)
+                    {
+                        await assetInfo.Handle.WithCancellation(cancellationToken, true);
+                    }
+                    else
+                    {
+                        await assetInfo.Handle;
+                    }
+
                     return assetInfo.GetResult<T>();
                 }
             
                 var handle = Addressables.LoadAssetAsync<T>(assetName);
                 _loadedAssets[assetName] = new AssetInfo(assetName, handle);
-                return await handle.WithCancellation(cancellationToken, true);
+                return cancellationToken.CanBeCanceled
+                    ? await handle.WithCancellation(cancellationToken, true)
+                    : await handle;
             }
             catch (OperationCanceledException e)
             {
+                ReleaseAsset(assetName);
                 Debug.LogException(e);
                 return null;
             }
@@ -83,7 +94,7 @@ namespace Citadel.Game
 
                 if (prefab is not null)
                 {
-                    return await _container.InstantiatePrefabAsync(prefab,assetName, position, rotation, parentTransform);
+                    return await _container.InstantiatePrefabAsync(prefab,assetName, position, rotation, parentTransform,cancellationToken);
                 }
             }
             catch (OperationCanceledException e)
@@ -108,7 +119,7 @@ namespace Citadel.Game
             }
         }
 
-        public void ReleaseAllAssets()
+        public async UniTask ReleaseAllAssetsAsync()
         {
             foreach (var assetInfo in _loadedAssets.Values)
             {
@@ -116,12 +127,12 @@ namespace Citadel.Game
             }
 
             _loadedAssets.Clear();
-            Resources.UnloadUnusedAssets();
+            await Resources.UnloadUnusedAssets();
         }
         
         public void Dispose()
         {
-            ReleaseAllAssets();
+            ReleaseAllAssetsAsync();
         }
 
         private readonly struct AssetInfo : IEquatable<AssetInfo>

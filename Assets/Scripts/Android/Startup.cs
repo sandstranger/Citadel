@@ -5,6 +5,6 @@ namespace Citadel.Game
 { 
     internal sealed class Startup : MonoBehaviour
     {
-        private void Start() => ScenesLoader.LoadLevel(1); 
+        private void Start() => ScenesLoader.LoadLevelAsync(ScenesLoader.MainGameSceneIndex); 
     }
 }

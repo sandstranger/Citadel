@@ -6,9 +6,11 @@ using ModestTree;
 using ModestTree.Util;
 using Zenject.Internal;
 #if !NOT_UNITY3D
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 #endif
 
 namespace Zenject
@@ -1786,7 +1788,7 @@ namespace Zenject
         }
         internal async UniTask<(GameObject prefabInstance, bool shouldMakeActive)> CreateAndParentPrefabAsync(
             UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo,
-            InjectContext context)
+            InjectContext context, CancellationToken cancellationToken = default)
         {
             Assert.That(prefab != null, "Null prefab found when instantiating game object");
 
@@ -1835,29 +1837,37 @@ namespace Zenject
             using (ProfileTimers.CreateTimedBlock("GameObject.Instantiate"))
 #endif
             {
+                AsyncOperationHandle<GameObject> taskToWait = default;
+                
                 if (gameObjectBindInfo.Position.HasValue && gameObjectBindInfo.Rotation.HasValue)
                 {
-                    gameObj = await Addressables.InstantiateAsync(
-                        gameObjectBindInfo.AddressablesAssetName, gameObjectBindInfo.Position.Value, gameObjectBindInfo.Rotation.Value, initialParent).Task;
+                    taskToWait = Addressables.InstantiateAsync(
+                        gameObjectBindInfo.AddressablesAssetName, gameObjectBindInfo.Position.Value,
+                        gameObjectBindInfo.Rotation.Value, initialParent);
+
                     positionAndRotationWereSet = true;
                 }
                 else if (gameObjectBindInfo.Position.HasValue)
                 {
-                    gameObj = await Addressables.InstantiateAsync(
-                        gameObjectBindInfo.AddressablesAssetName, gameObjectBindInfo.Position.Value, prefabAsGameObject.transform.rotation, initialParent).Task;
+                    taskToWait = Addressables.InstantiateAsync(
+                        gameObjectBindInfo.AddressablesAssetName, gameObjectBindInfo.Position.Value, prefabAsGameObject.transform.rotation, initialParent);
+
                     positionAndRotationWereSet = true;
                 }
                 else if (gameObjectBindInfo.Rotation.HasValue)
                 {
-                    gameObj = await Addressables.InstantiateAsync(
-                        gameObjectBindInfo.AddressablesAssetName, prefabAsGameObject.transform.position, gameObjectBindInfo.Rotation.Value, initialParent).Task;
+                    taskToWait = Addressables.InstantiateAsync(
+                        gameObjectBindInfo.AddressablesAssetName, prefabAsGameObject.transform.position, gameObjectBindInfo.Rotation.Value, initialParent);
                     positionAndRotationWereSet = true;
                 }
                 else
                 {
-                    gameObj = await Addressables.InstantiateAsync(gameObjectBindInfo.AddressablesAssetName, initialParent).Task;
+                    taskToWait = Addressables.InstantiateAsync(gameObjectBindInfo.AddressablesAssetName, initialParent);
                     positionAndRotationWereSet = false;
                 }
+                
+                gameObj = cancellationToken.CanBeCanceled ? await taskToWait.WithCancellation(cancellationToken, true) :
+                    await taskToWait;
             }
 
 #if !UNITY_EDITOR
@@ -2138,7 +2148,7 @@ namespace Zenject
                 });
         }
         public UniTask<GameObject> InstantiatePrefabAsync(
-            UnityEngine.Object prefab,string assetName, Vector3 position, Quaternion rotation, Transform parentTransform)
+            UnityEngine.Object prefab,string assetName, Vector3 position, Quaternion rotation, Transform parentTransform, CancellationToken cancellationToken = default)
         {
             return InstantiatePrefabAsync(
                 prefab, new GameObjectCreationParameters
@@ -2147,7 +2157,7 @@ namespace Zenject
                     ParentTransform = parentTransform,
                     Position = position,
                     Rotation = rotation
-                });
+                },cancellationToken);
         }
 
         // Create a new game object from a prefab and fill in dependencies for all children
@@ -2176,13 +2186,13 @@ namespace Zenject
         } 
         
         public async UniTask<GameObject> InstantiatePrefabAsync(
-            UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo)
+            UnityEngine.Object prefab, GameObjectCreationParameters gameObjectBindInfo,CancellationToken cancellationToken = default)
         {
             FlushBindings();
 
             bool shouldMakeActive;
             var prefabInstanceData= await CreateAndParentPrefabAsync(
-                prefab, gameObjectBindInfo, null);
+                prefab, gameObjectBindInfo, null,cancellationToken);
             
             InjectGameObject(prefabInstanceData.prefabInstance);
 

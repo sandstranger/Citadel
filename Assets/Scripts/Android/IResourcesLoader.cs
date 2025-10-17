@@ -16,7 +16,7 @@ namespace Citadel.Game
 
         void ReleaseAsset(string assetName);
 
-        void ReleaseAllAssets();
+        UniTask ReleaseAllAssetsAsync();
     }
 
     internal static class IResourcesLoaderExtensions
