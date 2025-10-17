@@ -55499,7 +55499,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 130262, guid: 3ce2182ba22d4bf48b116e5e18f4dceb, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 18
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 466400, guid: 3ce2182ba22d4bf48b116e5e18f4dceb, type: 3}
       propertyPath: m_RootOrder
