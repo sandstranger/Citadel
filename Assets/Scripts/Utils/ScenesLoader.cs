@@ -44,7 +44,7 @@ namespace Citadel.SceneManagement
             {
                 var sceneName = _levelScenesNames[level];
                 OnStartLoadScene?.Invoke(sceneName);
-                await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single).Task;
+                await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single).ToUniTask();
             }
         }
     }

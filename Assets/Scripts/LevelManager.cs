@@ -52,7 +52,7 @@ public class LevelManager : MonoBehaviour
 	public Material pipe_maint2_3_coolant;
 	
 	private bool getValparsed;
-	private bool[] levelDataLoaded;
+	private bool _levelDataLoaded = false;
 	private int getValreadInt;
 	private float getValreadFloat;
 	private static readonly StringBuilder s1 = new(200*1024);
@@ -105,6 +105,7 @@ public class LevelManager : MonoBehaviour
 	[Inject] private readonly DynamicCulling _dynamicCulling;
 	[Inject] private readonly QuestLogNotesManager _questLogNotesManager;
 	[Inject] private readonly LightDistanceCuller _lightDistanceCuller;
+	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	public static bool LoadLevelAfterSceneChanges { get; private set; }
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
@@ -131,8 +132,7 @@ public class LevelManager : MonoBehaviour
 		SetSkyVisible(1);
 		if (ressurectionBayDoor.Length != 8) Debug.Log("BUG: LevelManager ressurectionBayDoor array length not equal to 8.");
 		Time.timeScale = Const.defaultTimeScale;
-		levelDataLoaded = new bool[MaxLevelsCount];
-		for (int i=0;i<MaxLevelsCount;i++) levelDataLoaded[i] = false;
+		_levelDataLoaded = false;
 
 		if (Const.StartingNewGame)
 		{
@@ -257,29 +257,30 @@ public class LevelManager : MonoBehaviour
 	// Make sure that unneeded objects are unloaded
 	public void UnloadLevelData(int levnum) {
 		if (!LevNumIsNonCyber(levnum)) return; // In a test or editor space.
-		if (!levelDataLoaded[levnum]) return; // Already cleared.
+		if (!_levelDataLoaded) return; // Already cleared.
 
 		UnloadLevelLights(levnum);
 		UnloadLevelGeometry(levnum);
  		UnloadLevelDynamicObjects(levnum,true);
-		levelDataLoaded[levnum] = false;
+		_levelDataLoaded = false;
 		SaveLoad.numLightsWithShadows = 0;
 	}
 
 	// Make sure relevant data and objects are loaded in and present for the level.
 	public async UniTask LoadLevelData(int levnum) {
 		if (!LevNumInBounds(CurrentLevel)) { // In a test or editor space.
-			levelDataLoaded[levnum] = true;
+			_levelDataLoaded = true;
 			return;
 		}
-		if (levelDataLoaded[levnum]) return; // Already loaded.
+		if (_levelDataLoaded) return; // Already loaded.
 
 // 		Debug.Log("Loading level data for " + levnum.ToString());
 		LoadLevelGeometry(levnum);
 		await LoadStaticObjects(levnum);
 		await LoadLevelDynamicObjects(levnum);
 		await _music.LoadLevelMusic(levnum);
-		levelDataLoaded[levnum] = true;
+		_resourcesLoader.ReleaseAllAssets();
+		_levelDataLoaded = true;
 		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + SaveLoad.numLightsWithShadows.ToString());
 	}
 
@@ -363,11 +364,6 @@ public class LevelManager : MonoBehaviour
 		PostLoadLevelSetupSystems();
 	}
 	
-	public IEnumerator DelayedCull() {
-		yield return new WaitForSeconds(0.5f);
-		_dynamicCulling.CullCore(); // For Level 10, visible screen with camera view can't update until cams awake.
-	}
-
 	public UniTask LoadLevelFromSave(int levnum) {
 		if (!LevNumInBounds(levnum)) return UniTask.CompletedTask;
 

@@ -420,11 +420,7 @@ public class Const : SingletonHelper<Const>
 
 	private void Awake()
 	{
-		if (StartingNewGame)
-		{
-			loadingScreen.SetActive(true);
-		}
-		
+		loadingScreen.SetActive(StartingNewGame);
 		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
 		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
 		
