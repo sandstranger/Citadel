@@ -92,6 +92,11 @@ namespace Citadel.Game
                 
                 var prefab = await LoadAssetAsync<GameObject>(assetName, cancellationToken);
 
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                
                 if (prefab is not null)
                 {
                     return await _container.InstantiatePrefabAsync(prefab,assetName, position, rotation, parentTransform,cancellationToken);

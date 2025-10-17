@@ -33,8 +33,11 @@ namespace Citadel.Game
                 return await genericTask;
             }
 
-            cancellationToken.ThrowIfCancellationRequested();
-            
+            if (cancellationToken.IsCancellationRequested)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             Task baseTask = genericTask;
             await baseTask.WithCancellationAsync(cancellationToken);
             return await genericTask;
@@ -47,8 +50,11 @@ namespace Citadel.Game
                 await task;
             }
 
-            cancellationToken.ThrowIfCancellationRequested();
-
+            if (cancellationToken.IsCancellationRequested)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+            
             var tcs = new TaskCompletionSource<object>();
 
             using (cancellationToken.Register(() => tcs.TrySetResult(null))) ;
