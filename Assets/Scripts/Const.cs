@@ -219,9 +219,10 @@ public class Const : SingletonHelper<Const>
 	public StatusBarTextDecay statusBar;
 
 	private static int _difficultyCombat = 2;
-	public static int _difficultyMission = 2;
-	public static int _difficultyPuzzle = 2;
-	public static int _difficultyCyber = 2;
+	private static int _difficultyMission = 2; 
+	private static int _difficultyPuzzle = 2;
+	private static int _difficultyCyber = 2;
+	private static string _playerName;
 
 	public bool QuitAfterSavingDone { get; set; } = false;
 
@@ -249,8 +250,13 @@ public class Const : SingletonHelper<Const>
 		get => _difficultyCyber;
 		set => _difficultyPuzzle = value;
 	}
+	
+	public string playerName
+	{
+		get => _playerName;
+		set => _playerName = value;
+	}
 
-	[HideInInspector] public string playerName;
 	[HideInInspector] public int GraphicsResWidth;
 	[HideInInspector] public int GraphicsResHeight;
 	[HideInInspector] public bool GraphicsFullscreen;
@@ -420,7 +426,6 @@ public class Const : SingletonHelper<Const>
 
 	private void Awake()
 	{
-		loadingScreen.SetActive(StartingNewGame);
 		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
 		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
 		
@@ -485,7 +490,7 @@ public class Const : SingletonHelper<Const>
 							  + ": " + System.Environment.NewLine
 							  + "Start of C# Game Code, Welcome back Hacker!");
 	}
-
+	
 	public bool RaycastBudgetExceeded() {
 		return (numberOfRaycastsThisFrame > maxRaycastsPerFrame);
 	}
@@ -595,14 +600,14 @@ public class Const : SingletonHelper<Const>
 		prb.Clear();
 		psys.Clear();
 		panimsList.Clear();
-		PauseRigidbody[] prbTemp = FindObjectsOfType<PauseRigidbody>();
+		PauseRigidbody[] prbTemp = FindObjectsByType<PauseRigidbody>(FindObjectsSortMode.None);
 		for (int i=0;i<prbTemp.Length;i++) prb.Add(prbTemp[i]);
 
 		 // P.P.S. PP. That's funny right there.  ...What?  I have kids.
-		PauseParticleSystem[] ppses = FindObjectsOfType<PauseParticleSystem>();
+		PauseParticleSystem[] ppses = FindObjectsByType<PauseParticleSystem>(FindObjectsSortMode.None);
 		for (int i=0;i<ppses.Length;i++) psys.Add(ppses[i]);
 
-		PauseAnimation[] panims = FindObjectsOfType<PauseAnimation>();
+		PauseAnimation[] panims = FindObjectsByType<PauseAnimation>(FindObjectsSortMode.None);
 		for (int i=0;i<panims.Length;i++) panimsList.Add(panims[i]);
 
 		ObjectContainmentSystem.FindAllFloorGOs();
@@ -681,6 +686,8 @@ public class Const : SingletonHelper<Const>
 		
 		if (StartingNewGame)
 		{
+			loadingScreen.SetActive(true);
+			_mainMenuHandler.OnNewGameStarted();
 			StartingNewGame = false;
 			LevelManager.CurrentLevel = LevelManager.NewGameLevelIndex;
 			GoIntoGame();

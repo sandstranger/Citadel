@@ -32,9 +32,14 @@ public class FuncWall : MonoBehaviour {
 	[Inject] private readonly PauseScript _pauseScript;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
-	public void InitializeFromLoad() {
+	private void Awake()
+	{
 		rbody = GetComponent<Rigidbody>();
 		SFXSource = GetComponent<AudioSource>();
+	}
+
+	public void InitailizeFromLoad()
+	{
 		rbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
 		rbody.isKinematic = true;
 		rbody.useGravity = false;
@@ -47,7 +52,7 @@ public class FuncWall : MonoBehaviour {
 		targetPositionY = targetPosition.transform.localPosition.y;
 		tempVec = (transform.position - targetPosition.transform.position);
 		float distTotal = Vector3.Distance(startPosition,
-										   targetPosition.transform.position);
+			targetPosition.transform.position);
 
 		tempVec = -tempVec.normalized;
 		if (currentState == FuncStates.AjarMovingTarget) {
@@ -72,7 +77,7 @@ public class FuncWall : MonoBehaviour {
 		tempVec += transform.position;
 		transform.position = tempVec;
 	}
-
+	
 	public void Targetted (UseData ud) {
 		switch (currentState) {
 			case FuncStates.Start:            MoveTarget(); break;
@@ -265,7 +270,7 @@ public class FuncWall : MonoBehaviour {
 			}
 			index = Utils.LoadSubActivatedGOState(childGO,ref entries,index);
 		}
-		fw.InitializeFromLoad();
+		fw.InitailizeFromLoad();
 
 		return index;
 	}

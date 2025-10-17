@@ -23,6 +23,10 @@ public class PauseScript : MonoBehaviour {
 	[HideInInspector] public bool previousInvMode = true;
 	public float relativeTime;
 	public float absoluteTime;
+
+	[SerializeField] 
+	private GameObject _loadingScreen;
+
 	private readonly List<AmbientRegistration> _ambientRegistry = new();
 	[Inject] private ConsoleEmulator _consoleEmulator;
 	[Inject] private Const _consts;
@@ -199,7 +203,13 @@ public class PauseScript : MonoBehaviour {
 		else			PauseEnable();
 	}
 
-	public void PauseEnable() {
+	public void PauseEnable() 
+	{
+		if (_loadingScreen.activeSelf)
+		{
+			return;
+		}
+
 		AudioListener.pause = true;
 		PauseSystems();
 		previousInvMode = _mouseLookScript.inventoryMode;

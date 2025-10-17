@@ -531,6 +531,22 @@ public class MainMenuHandler : MonoBehaviour {
 		_consts.difficultyMission = mission.difficultySetting;
 		_consts.difficultyPuzzle = puzzle.difficultySetting;
 		_consts.difficultyCyber = cyber.difficultySetting;
+		
+		OnGameStarted(isNew);
+
+		if (isNew)
+		{ 
+			_consts.NewGame();
+		}
+	}
+
+	public void OnNewGameStarted()
+	{
+		OnGameStarted(true);
+	}
+
+	private void OnGameStarted(bool isNew)
+	{
 		if (_consts.difficultyMission < 3) {
 			_missionTimer.text.text = System.String.Empty;
 			_missionTimer.timerTypeText.text = System.String.Empty;
@@ -542,16 +558,23 @@ public class MainMenuHandler : MonoBehaviour {
 		}
 		
 		if (isNew) {
-			string pname = newgamePage.GetComponentInChildren<InputField>(true).text;
-			if (string.IsNullOrWhiteSpace(pname)) pname = "Hacker";
-			_consts.playerName = pname;
-			_consts.NewGame();
-		}
+			string pname = newgameInputText.text;
 
+			if (string.IsNullOrWhiteSpace(pname) && string.IsNullOrWhiteSpace(_consts.playerName))
+			{
+				pname = "Hacker";
+			}
+
+			if (!string.IsNullOrWhiteSpace(pname))
+			{
+				_consts.playerName = pname;
+			}
+		}
+		
 		_mouseCursor.mainCamera.enabled = true;
 		this.gameObject.SetActive(false);
 	}
-
+	
 	void ResetPages() {
 		singleplayerPage.SetActive(false);
 		multiplayerPage.SetActive(false);
