@@ -1,3 +1,1 @@
-"Assets/Prefabs/Levels/**" filter=lfs diff=lfs merge=lfs -text
-Assets/Prefabs/Levels/** !text !filter !merge !diff
 Assets/Resources/** !text !filter !merge !diff
