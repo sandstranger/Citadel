@@ -1,3 +1,6 @@
 [submodule "Packages/com.yvesalbuquerque.autolod"]
 	path = Packages/com.yvesalbuquerque.autolod
 	url = https://github.com/sandstranger/AutoLOD.git
+[submodule "Assets/Scenes"]
+	path = Assets/Scenes
+	url = https://gitlab.com/sandstranger/citadelscenes.git
