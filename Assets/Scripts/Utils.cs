@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Citadel.Game;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using Zenject;
 using ZLinq;
 
 #if UNITY_EDITOR
@@ -27,14 +30,13 @@ using ZLinq;
 // Start with data; End with data.
 //
 // E.g. 0|1|1 and NOT these: |0|1|1| or 0|1|1|.
-public class Utils {
+public sealed class Utils {
 	public static string splitChar = "|"; // Common delimiter, not a comma as
 										  // text could contain commas.  Used
 										  // for all savefile text.
 	public static char splitCharChar = '|';
-	public static CultureInfo en_US_Culture = new CultureInfo("en-US");
+	public static readonly CultureInfo en_US_Culture = new("en-US");
 
-	private static bool _betterStreamingAssetsInitialized = false;
 	private static bool getValparsed;
 	private static int getValreadInt;
 	private static float getValreadFloat;
@@ -44,29 +46,13 @@ public class Utils {
 	private static bool testAlreadyRan = false;
 	private static bool testRanSuccessful = false;
 
-	public static object SafeIndex(ref object[] array, int index, int max,
-                                   object failValue) {
-		if (array.Length < 1) {
-            Debug.Log("SafeIndex: Unexpected situation, array " + nameof(array)
-                      + " was empty!  Using fallback value of "
-                      + failValue.ToString());
-
-            return failValue;
-        }
-
-		if (index < 0 || index > max || index > array.Length) {
-            Debug.Log("SafeIndex: Unexpected situation, index "
-                      + index.ToString() + " out of bounds [0,"
-                      + array.Length.ToString() + "] or context max of "
-                      + max.ToString() + ".  Set to fallback value of "
-                      + failValue.ToString());
-
-            return failValue;
-        }
-
-		return array[index]; // Safe to pass the index value into the array space.
-	}
-
+	[Inject] 
+	private readonly IResourcesLoader _resourcesLoader;
+	[Inject] 
+	private readonly Const _consts;
+	[Inject] 
+	private readonly PauseScript _pauseScript;
+	
 	public static float Sign(float value) {
 		if (value < Mathf.Epsilon && value > -Mathf.Epsilon) return 0f;
 		if (value > 0f) return 1f;
@@ -265,6 +251,9 @@ public class Utils {
     }
     
     private static bool IsStreamingAssetsWritable() {
+#if UNITY_ANDROID
+	    return true;
+#else	    
         if (testAlreadyRan) return testRanSuccessful;
 
 		if (Application.platform != RuntimePlatform.WindowsPlayer &&
@@ -318,6 +307,7 @@ public class Utils {
 			UnityEngine.Debug.Log("IsStreamingAssetsWritable result false 4");
 			return false; // Exception indicates non-writable directory
         }
+#endif
     }
     
     // Determines the appropriate path based on platform and writability
@@ -339,12 +329,12 @@ public class Utils {
         return Application.persistentDataPath;
     }
 
-    public static StreamReader ReadStreamingAsset(string fName)
+    public async UniTask<StreamReader> ReadStreamingAsset(string fName)
     {
 #if UNITY_ANDROID
 	    string basePath = Utils.GetAppropriateDataPath();
 	    var finalPathToFile = Path.Combine(basePath, fName);
-	    ConfirmExistsMakeIfNot(basePath, fName);
+	    await ConfirmExistsMakeIfNot(basePath, fName);
 	    if (!File.Exists(finalPathToFile))
 	    {
 		    return null;
@@ -389,7 +379,7 @@ public class Utils {
 		return SafePathCombine(folderInResources,fname);
 	}
 
-	public static void ConfirmExistsMakeIfNot(string basePath, string fileName) {
+	public async UniTask ConfirmExistsMakeIfNot(string basePath, string fileName) {
 		if (string.IsNullOrWhiteSpace(fileName)) {
 			UnityEngine.Debug.LogWarning("fileName was null or whitespace passed to ConfirmExistsMakeIfNot");
 			return;
@@ -425,17 +415,8 @@ public class Utils {
 			}
 		}
 
-		try {
-			InitializeBetterStreamingassets();
-			File.WriteAllBytes(strmAstPth, BetterStreamingAssets.ReadAllBytes(Path.Combine("StreamingAssetsRecovery", fileName)));
-			if (File.Exists(strmAstPth)) {
-				UnityEngine.Debug.Log("File " + strmAstPth + " recreated");
-			} else {
-				UnityEngine.Debug.LogWarning("File " + strmAstPth + " failed to be created by File.WriteAllText!");
-			}
-		} catch (Exception ex) {
-			UnityEngine.Debug.LogError("Failed to recreate " + strmAstPth + ": " + ex.Message);
-		}
+		var textAsset = await _resourcesLoader.LoadAssetAsync<TextAsset>(fileName);
+		await File.WriteAllTextAsync(strmAstPth, textAsset.text);
 	}
 
     static readonly char[] pathSplitCharacters = new char[] { '/', '\\' };
@@ -1458,38 +1439,38 @@ public class Utils {
 		PlayOneShotSavable(SFX,fxclip,0);
 	}
 
-	public static void PlayOneShotSavable(Const consts,AudioSource SFX, int fx) {
+	public void PlayOneShotSavable(AudioSource SFX, int fx) {
 		if (fx < 0) return;
-		if (fx >= consts.sounds.Length) return;
+		if (fx >= _consts.sounds.Length) return;
 
-		PlayOneShotSavable(SFX,consts.sounds[fx],0);
+		PlayOneShotSavable(SFX,_consts.sounds[fx],0);
 	}
 
-	public static void PlayOneShotSavable(Const consts,AudioSource SFX, int fx, float vol) {
+	public void PlayOneShotSavable(AudioSource SFX, int fx, float vol) {
 		if (fx < 0) return;
-		if (fx >= consts.sounds.Length) return;
+		if (fx >= _consts.sounds.Length) return;
 
-		PlayOneShotSavable(SFX,consts.sounds[fx],vol);
+		PlayOneShotSavable(SFX,_consts.sounds[fx],vol);
 	}
 	
-	public static void PlayUIOneShotSavable(Const consts,int fx, float vol) {
+	public void PlayUIOneShotSavable(int fx, float vol) {
 		if (fx < 0) return;
-		if (fx >= consts.sounds.Length) return;
+		if (fx >= _consts.sounds.Length) return;
 
 		AudioSource aud = null;
-		for (int i=0;i<consts.MfdManager.UIAudSource.Length;i++) { 
-			if (consts.MfdManager.UIAudSource[i].isPlaying) continue;
+		for (int i=0;i<_consts.MfdManager.UIAudSource.Length;i++) { 
+			if (_consts.MfdManager.UIAudSource[i].isPlaying) continue;
 			
-			aud = consts.MfdManager.UIAudSource[i]; // Free channel.
+			aud = _consts.MfdManager.UIAudSource[i]; // Free channel.
 		}
 		
 		if (aud == null) return; // Couldn't find a free channel.
 		
-		PlayOneShotSavable(aud,consts.sounds[fx],vol);
+		PlayOneShotSavable(aud,_consts.sounds[fx],vol);
 	}
 	
-	public static void PlayUIOneShotSavable(Const @consts,int fx) {
-		PlayUIOneShotSavable(consts,fx,1.0f);
+	public void PlayUIOneShotSavable(int fx) {
+		PlayUIOneShotSavable(fx,1.0f);
 	}
 	
 	public static void PlayUIOneShotSavable(MFDManager mfdManager,AudioClip fxclip) {
@@ -1509,8 +1490,8 @@ public class Utils {
 		PlayAudioSavable(SFX,fxclip,0,false);
 	}
 
-	public static void PlaySavable(Const @consts,AudioSource SFX, int fxclip) {
-		PlayAudioSavable(SFX,consts.sounds[fxclip],0,false);
+	public void PlaySavable(AudioSource SFX, int fxclip) {
+		PlayAudioSavable(SFX,_consts.sounds[fxclip],0,false);
 	}
 
 	private static StringBuilder auds1 = new StringBuilder();
@@ -1569,21 +1550,18 @@ public class Utils {
     // in case there is a whackado one-off instance of comparing (time - 
     // finished) somewhere instead of (finished < time) which is my usual Quake
     // derived timer pattern.
-    public static string SaveRelativeTimeDifferential(PauseScript pauseScript,float timerValue,
-													  string name) {
-
-        if (pauseScript == null) return name + ":0000.00000";
-        float val = timerValue - pauseScript.relativeTime; // Remove current
+    public string SaveRelativeTimeDifferential(float timerValue, string name)
+    {
+        float val = timerValue - _pauseScript.relativeTime; // Remove current
                                                              // instance's
                                                              // relative time.
         return FloatToString(val,name);
     }
 
-    public static float LoadRelativeTimeDifferential(PauseScript pauseScript,string savedTimer,
-													 string name) {
+    public float LoadRelativeTimeDifferential(string savedTimer, string name) {
 
         float val = GetFloatFromString(savedTimer,name);
-        return pauseScript.relativeTime + val; // Add current instance's
+        return _pauseScript.relativeTime + val; // Add current instance's
                                                  // relative time to get same
                                                  // timer in context of current
                                                  // time.  See above notes.
@@ -1672,7 +1650,7 @@ public class Utils {
 		rbody.AddForceAtPosition((attackNormal*impactVelocity*30f),spot);
 	}
 
-	public static void ApplyImpactForceSphere(Const @const,DamageData dd, Vector3 centerPoint, float radius, float impactScale) {
+	public void ApplyImpactForceSphere(DamageData dd, Vector3 centerPoint, float radius, float impactScale) {
 		HealthManager hm = null;
 		Collider[] colliders = Physics.OverlapSphere(centerPoint, radius);
 		int i = 0;
@@ -1693,7 +1671,7 @@ public class Utils {
 
 			if (!applyImpact) {
 				// Only raycast if not close
-				bool raycastHit = Physics.Raycast(centerPoint, dir, out hit, radius + 0.02f, @const.layerMaskExplosion);
+				bool raycastHit = Physics.Raycast(centerPoint, dir, out hit, radius + 0.02f, _consts.layerMaskExplosion);
 				applyImpact = raycastHit && (hit.collider == colliders[i] || (hit.rigidbody == rbody && rbody != null));
 			}
 
@@ -1733,8 +1711,8 @@ public class Utils {
 		}
 	}
 	
-	public static void PlayTempAudio(Const @consts,Vector3 spot,AudioClip clip,float volume) {
-		GameObject tempAud = consts.GetObjectFromPool(PoolType.TempAudioSources);
+	public void PlayTempAudio(Vector3 spot,AudioClip clip,float volume) {
+		GameObject tempAud = _consts.GetObjectFromPool(PoolType.TempAudioSources);
 		if (tempAud != null) {
 			tempAud.transform.position = spot; // set temporary audiosource to right here
 			PooledItemDestroy poolDet = tempAud.GetComponent<PooledItemDestroy>();
@@ -1745,8 +1723,8 @@ public class Utils {
 		}
 	}
 
-	public static void PlayTempAudio(Const @const,Vector3 spot,AudioClip clip) {
-		PlayTempAudio(@const,spot,clip,1f);
+	public void PlayTempAudio(Vector3 spot,AudioClip clip) {
+		PlayTempAudio(spot,clip,1f);
 	}
 
 	public static HealthManager GetMainHealthManager(GameObject go) {
@@ -1904,14 +1882,5 @@ public class Utils {
 	public static IReadOnlyList<GameObject> FindAllSaveObjectsGOs()
 	{
 		return GameObject.FindObjectsOfType<SaveObject>(true).Select(saveObject => saveObject.gameObject).ToList();
-	}
-	
-	private static void InitializeBetterStreamingassets()
-	{
-		if (!_betterStreamingAssetsInitialized)
-		{
-			BetterStreamingAssets.Initialize();
-			_betterStreamingAssetsInitialized = true;
-		}
 	}
 }

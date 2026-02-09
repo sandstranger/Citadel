@@ -995,12 +995,13 @@ public class DynamicCulling : MonoBehaviour {
     }
     
     private void SetupDebugImageWorkingVariables() {
+        return;/*
         debugTex = new Texture2D(WORLDX,WORLDX);
         pixels = new Color32[WORLDX * WORLDX];
         string basePath = Utils.GetAppropriateDataPath();
         string fileName = "worldcellvis_" + LevelManager.CurrentLevel.ToString() + ".png";
 		Utils.ConfirmExistsMakeIfNot(basePath,fileName);
-        visDebugImagePath = Utils.SafePathCombine(basePath,fileName);        
+        visDebugImagePath = Utils.SafePathCombine(basePath,fileName);        */
     }
 
     public void Cull_Init() {

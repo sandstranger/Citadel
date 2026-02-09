@@ -41,6 +41,7 @@ public class WeaponCurrent : MonoBehaviour {
 	[Inject] private Inventory _inventory;
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private WeaponFire _weaponFire;
+	[Inject] private readonly Utils _utils;
 
 	public int weaponCurrentPending; // save
 	public int weaponIndexPending; // save
@@ -152,7 +153,7 @@ public class WeaponCurrent : MonoBehaviour {
 			return;
 		}
 
-		Utils.PlayUIOneShotSavable(_consts,80); // changeweapon
+		_utils.PlayUIOneShotSavable(80); // changeweapon
 		if (buttonIndex == weaponCurrent) return; // Already there!
 
 		int wep16index =  // Get index into the list of 16 weapons
@@ -330,9 +331,9 @@ public class WeaponCurrent : MonoBehaviour {
 
 		if (!isSilent) {
 			if (wep16index == 0 || wep16index == 3) {
-				Utils.PlayUIOneShotSavable(_consts,248); // wlocknload
+				_utils.PlayUIOneShotSavable(248); // wlocknload
 			} else {
-				Utils.PlayUIOneShotSavable(_consts,260); // wreload
+				_utils.PlayUIOneShotSavable(260); // wreload
 			}
 		}
 
@@ -374,9 +375,9 @@ public class WeaponCurrent : MonoBehaviour {
 
 		if (!isSilent) {
 			if (wep16index == 0 || wep16index == 3) {
-				Utils.PlayUIOneShotSavable(_consts,248); // wlocknload
+				_utils.PlayUIOneShotSavable(248); // wlocknload
 			} else {
-				Utils.PlayUIOneShotSavable(_consts,260); // wreload
+				_utils.PlayUIOneShotSavable(260); // wreload
 			}
 		}
 
@@ -412,7 +413,7 @@ public class WeaponCurrent : MonoBehaviour {
 			// Update the counter on the HUD
 			_mfdManager.UpdateHUDAmmoCounts(currentMagazineAmount[weaponCurrent]);
 		}
-		if (!isSilent) Utils.PlayUIOneShotSavable(_consts,260); // wreload
+		if (!isSilent) _utils.PlayUIOneShotSavable(260); // wreload
 	}
 
 	public void ReloadSecret(bool isSilent) {

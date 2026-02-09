@@ -35,6 +35,34 @@ namespace Citadel.Android.Tools
                 Debug.Log(string.Join("," + Environment.NewLine, result));
             }
         }
+
+        [MenuItem("Tools/Debug/Print objects with Animator on selected Gameobject to console")]
+        private static void PrintObjectsWithAnimator()
+        {
+            var selectedGameObject = Selection.activeGameObject;
+
+            if (selectedGameObject != null)
+            {
+                var result = new HashSet<string>();
+                
+                foreach (Transform child in selectedGameObject.transform)
+                {
+                    var meshRenders = child.gameObject.GetComponentsInChildren<Animator>(true, true);
+
+                    var childName = child.gameObject.name;
+                    if (meshRenders.Length >0)
+                    {
+                        result.Add(childName);
+                    }
+                }
+
+                if (result.Count > 0)
+                {
+                    Debug.Log($"not static childs on selected \"{selectedGameObject.name}\" gameobject {string.Join(",", result)}");
+                }
+            }
+        }
+
         
         [MenuItem("Tools/Debug/Print all not static objects with meshes on selected Gameobject to console")]
         private static void PrintAllNotStaticObjects()

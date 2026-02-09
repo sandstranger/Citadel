@@ -252,6 +252,7 @@ public class MFDManager : MonoBehaviour  {
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private WeaponCurrent _weaponCurrent;
 	[Inject] private readonly ITexturesStorage _texturesStorage;
+	[Inject] private readonly Utils _utils;
 
 	private static readonly StringBuilder s1 = new(100 * 1024);
 

@@ -185,6 +185,7 @@ public class PlayerMovement : MonoBehaviour {
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private PlayerHealth _playerHealth;
+	[Inject] private readonly Utils _utils;
 
     void Start() {
 		currentCrouchRatio = def1;
@@ -1253,7 +1254,7 @@ public class PlayerMovement : MonoBehaviour {
 								out tempHit,feetRayLength,
 								_consts.layerMaskPlayerFeet);
 				
-				if (tempHit.collider == null) { Utils.PlayOneShotSavable(_consts,SFX,SFXJump,jumpSFXVolume); return; }
+				if (tempHit.collider == null) { _utils.PlayOneShotSavable(SFX,SFXJump,jumpSFXVolume); return; }
 				GameObject hitGO = tempHit.collider.transform.gameObject;
 				PrefabIdentifier prefID = hitGO.GetComponent<PrefabIdentifier>();
 				if (prefID == null) {
@@ -1261,11 +1262,11 @@ public class PlayerMovement : MonoBehaviour {
 						prefID = hitGO.transform.parent.gameObject.GetComponent<PrefabIdentifier>();
 					}
 				}
-				if (prefID == null) { Utils.PlayOneShotSavable(_consts,SFX,SFXJump,jumpSFXVolume); return; }
+				if (prefID == null) { _utils.PlayOneShotSavable(SFX,SFXJump,jumpSFXVolume); return; }
 				
 				FootStepType fstep = GetFootstepTypeForPrefab(prefID.constIndex);
 				AudioClip stcp = JumpSound(fstep);
-				Utils.PlayTempAudio(_consts,transform.position - feetOffset,stcp,jumpSFXVolume);
+				_utils.PlayTempAudio(transform.position - feetOffset,stcp,jumpSFXVolume);
 			}
 			justJumped = false;
 		}
@@ -1299,7 +1300,7 @@ public class PlayerMovement : MonoBehaviour {
 				&& rbody.linearVelocity.y > ladderSpeed * 0.5f) {
 
 				SFX.pitch = (UnityEngine.Random.Range(0.8f,1.2f));
-				Utils.PlayOneShotSavable(_consts,SFX,SFXLadder,0.2f);
+				_utils.PlayOneShotSavable(SFX,SFXLadder,0.2f);
 				ladderSFXFinished = _pauseScript.relativeTime
 									+ ladderSFXIntervalTime;
 			}
@@ -1427,7 +1428,7 @@ public class PlayerMovement : MonoBehaviour {
 			FootStepType fstep = GetFootstepTypeForPrefab(prefID.constIndex);
 			AudioClip stcp = JumpLandSound(fstep);
 			float vol = Mathf.Max(Mathf.Min(1f - ((fallDamageSpeed - velChange) / fallDamageSpeed),1f),0.5f);
-			Utils.PlayTempAudio(_consts,transform.position - feetOffset,stcp,vol);
+			_utils.PlayTempAudio(transform.position - feetOffset,stcp,vol);
 		}
 	}
 
@@ -1858,6 +1859,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	public static string Save(GameObject go) {
 		PlayerMovement pm = go.GetComponent<PlayerMovement>();
+		Utils utils = pm._utils;
 		var pauseScript = pm._pauseScript;
 		s1.Clear();
 		s1.Append(Utils.SaveTransform(go.transform));
@@ -1894,9 +1896,9 @@ public class PlayerMovement : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(pm.justJumped,"justJumped"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.fatigueFinished,"fatigueFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(pm.fatigueFinished,"fatigueFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.fatigueFinished2,"fatigueFinished2"));
+		s1.Append(utils.SaveRelativeTimeDifferential(pm.fatigueFinished2,"fatigueFinished2"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(pm.cyberSetup,"cyberSetup"));
 		s1.Append(Utils.splitChar);
@@ -1908,19 +1910,19 @@ public class PlayerMovement : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(pm.leanShift,"leanShift"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.jumpSFXFinished,"jumpSFXFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(pm.jumpSFXFinished,"jumpSFXFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.jumpLandSoundFinished,"jumpLandSoundFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(pm.jumpLandSoundFinished,"jumpLandSoundFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.jumpJetEnergySuckTickFinished,"jumpJetEnergySuckTickFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(pm.jumpJetEnergySuckTickFinished,"jumpJetEnergySuckTickFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(pm.fatigueWarned,"fatigueWarned"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.turboFinished,"turboFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(pm.turboFinished,"turboFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.ressurectingFinished,"ressurectingFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(pm.ressurectingFinished,"ressurectingFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pm.doubleJumpFinished,"doubleJumpFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(pm.doubleJumpFinished,"doubleJumpFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(pm.SFX.time,"SFX.time"));
 		s1.Append(Utils.splitChar);
@@ -1933,6 +1935,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	public static int Load(Const @consts,GameObject go, ref string[] entries, int index) {
 		PlayerMovement pm = go.GetComponent<PlayerMovement>();
+		Utils utils = pm._utils;
 		var pauseScript = pm._pauseScript;
 		float readFloatx, readFloaty, readFloatz;
 		string oldpos = go.transform.localPosition.ToString();
@@ -1957,8 +1960,8 @@ public class PlayerMovement : MonoBehaviour {
 		pm.oldVelocity = new Vector3(readFloatx,readFloaty,readFloatz);
 		pm.fatigue = Utils.GetFloatFromString(entries[index],"fatigue"); index++;
 		pm.justJumped = Utils.GetBoolFromString(entries[index],"justJumped"); index++;
-		pm.fatigueFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"fatigueFinished"); index++;
-		pm.fatigueFinished2 = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"fatigueFinished2"); index++;
+		pm.fatigueFinished = utils.LoadRelativeTimeDifferential(entries[index],"fatigueFinished"); index++;
+		pm.fatigueFinished2 = utils.LoadRelativeTimeDifferential(entries[index],"fatigueFinished2"); index++;
 		pm.cyberSetup = Utils.GetBoolFromString(entries[index],"cyberSetup"); index++;
 		pm.cyberDesetup = Utils.GetBoolFromString(entries[index],"cyberDesetup"); index++;
 		pm.oldBodyState = Utils.IntToBodyState(Utils.GetIntFromString(entries[index],"oldBodyState")); index++;
@@ -1966,13 +1969,13 @@ public class PlayerMovement : MonoBehaviour {
 		pm.leanShift = Utils.GetFloatFromString(entries[index],"leanShift"); index++;
 		pm.leanTransform.localRotation = Quaternion.Euler(0, 0, pm.leanTarget);
 		pm.leanTransform.localPosition = new Vector3(pm.leanShift,0,0);
-		pm.jumpSFXFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"jumpSFXFinished"); index++;
-		pm.jumpLandSoundFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"jumpLandSoundFinished"); index++;
-		pm.jumpJetEnergySuckTickFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"jumpJetEnergySuckTickFinished"); index++;
+		pm.jumpSFXFinished = utils.LoadRelativeTimeDifferential(entries[index],"jumpSFXFinished"); index++;
+		pm.jumpLandSoundFinished = utils.LoadRelativeTimeDifferential(entries[index],"jumpLandSoundFinished"); index++;
+		pm.jumpJetEnergySuckTickFinished = utils.LoadRelativeTimeDifferential(entries[index],"jumpJetEnergySuckTickFinished"); index++;
 		pm.fatigueWarned = Utils.GetBoolFromString(entries[index],"fatigueWarned"); index++;
-		pm.turboFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"turboFinished"); index++;
-		pm.ressurectingFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"ressurectingFinished"); index++;
-		pm.doubleJumpFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"doubleJumpFinished"); index++;
+		pm.turboFinished = utils.LoadRelativeTimeDifferential(entries[index],"turboFinished"); index++;
+		pm.ressurectingFinished = utils.LoadRelativeTimeDifferential(entries[index],"ressurectingFinished"); index++;
+		pm.doubleJumpFinished = utils.LoadRelativeTimeDifferential(entries[index],"doubleJumpFinished"); index++;
 		float sfxTime = Utils.GetFloatFromString(entries[index],"SFX.time"); index++;
 		pm.SFXIndex = Utils.GetIntFromString(entries[index],"SFXIndex"); index++;
 		pm.ladderSFXFinished = 0;

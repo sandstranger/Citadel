@@ -142,6 +142,7 @@ public class AIController : MonoBehaviour {
 	[Inject] private WeaponFire _weaponFire;
 	[Inject] private DynamicCulling _dynamicCulling;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
+	[Inject] private readonly Utils _utils;
 
 	public float Tranquilize(float amount, bool energy) {
 		float tranqSecs = amount;

@@ -10,7 +10,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Debug = System.Diagnostics.Debug;
 
-public class Music : MonoBehaviour {
+public class Music : MonoBehaviour
+{
+	private const int MaxMusicFilesCount = 200;
+	
 	public AudioSource SFXMain;
 	public AudioSource SFXMain2;
 	public bool twoPlaying;
@@ -51,7 +54,7 @@ public class Music : MonoBehaviour {
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	private bool _isReadyToPlay = true;
-	private readonly AudioClip[] _levelMusic = new AudioClip[200];
+	private readonly AudioClip[] _levelMusic = new AudioClip[MaxMusicFilesCount];
 
 	private void Awake() {
 		clipFinished = Time.time;
@@ -130,7 +133,7 @@ public class Music : MonoBehaviour {
 		curOverlayC = null;
 		Array.Clear(_levelMusic, 0, _levelMusic.Length);
 		
-		var tasksToWait = new List<UniTask>();
+		var tasksToWait = new List<UniTask>(MaxMusicFilesCount);
 		
 		// Load all the audio clips at the start of level to prevent stutter during dynamic transitions.
 		if (levnum == 1) {

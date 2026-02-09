@@ -117,6 +117,7 @@ public class MouseLookScript : MonoBehaviour {
 	[Inject] private DynamicCulling _dynamicCulling;
 	[Inject] private readonly ITexturesStorage _texturesStorage;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
+	[Inject] private readonly Utils _utils;
 	
 	private int _prefabIndexToInstantiate;
 	

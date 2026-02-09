@@ -107,6 +107,7 @@ public class WeaponFire : MonoBehaviour {
 	[Inject] private WeaponCurrent _weaponCurrent;
 	[Inject] private readonly Config _config;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
+	[Inject] private readonly Utils _utils;
 
 	// Not needed on Const as this only exists in one unique place on player.
 	private float[] driftForWeapon = new float[16]{5f,0f,15f,50f,0f,0f,0f,8f,
@@ -476,7 +477,7 @@ public class WeaponFire : MonoBehaviour {
 					if (_inventory.currentEnergyWeaponHeat[_weaponCurrent.weaponCurrent] > overheatedPercent
 						&& !_weaponCurrent.bottomless
 						&& !_weaponCurrent.redbull) {
-						Utils.PlayUIOneShotSavable(_consts,238); // noammo
+						_utils.PlayUIOneShotSavable(238); // noammo
 						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
 						_consts.sprint(11);
 					} else {
@@ -493,7 +494,7 @@ public class WeaponFire : MonoBehaviour {
 						|| _weaponCurrent.bottomless) {
 						yield return FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
 					} else {
-						Utils.PlayUIOneShotSavable(_consts,238); // noammo
+						_utils.PlayUIOneShotSavable(238); // noammo
 						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
 					}
 				} else {
@@ -501,7 +502,7 @@ public class WeaponFire : MonoBehaviour {
 						|| _weaponCurrent.bottomless) {
 						yield return FireWeapon(wepdex, false); // weapon index, isSilent == false so play normal SFX
 					} else {
-						Utils.PlayUIOneShotSavable(_consts,238); // noammo
+						_utils.PlayUIOneShotSavable(238); // noammo
 						waitTilNextFire = _pauseScript.relativeTime + 0.8f;
 					}
 				}
@@ -589,7 +590,7 @@ public class WeaponFire : MonoBehaviour {
 					// Fire pulser
 					_consts.shotsFired++;
 					if (_inventory.hasSoft[1]) await FireCyberBeachball(true,railgunShotForce,492);
-					Utils.PlayUIOneShotSavable(_consts,258); // wpulser
+					_utils.PlayUIOneShotSavable(258); // wpulser
 					cyberWeaponAttackFinished = _pauseScript.relativeTime + 0.08f;
 				}
 			} else {
@@ -597,7 +598,7 @@ public class WeaponFire : MonoBehaviour {
 					// Fire I.C.E. drill
 					_consts.shotsFired++;
 					if (_inventory.hasSoft[0]) await FireCyberBeachball(false,plasmaShotForce,495);
-					Utils.PlayUIOneShotSavable(_consts,241); // wdrill baby drill
+					_utils.PlayUIOneShotSavable(241); // wdrill baby drill
 					cyberWeaponAttackFinished = _pauseScript.relativeTime + 0.5f;
 				}
 			}
@@ -639,7 +640,7 @@ public class WeaponFire : MonoBehaviour {
         switch (_weaponCurrent.weaponIndex) {
             case 36:
                 //Mark3 Assault Rifle
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,251); // wmarksman
+                if (!isSilent) _utils.PlayUIOneShotSavable(251); // wmarksman
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashMK3.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeMK3,muzFlashMK3.transform.position,_consts.quaternionIdentity) as GameObject;
@@ -651,7 +652,7 @@ public class WeaponFire : MonoBehaviour {
                 //ER-90 Blaster
 				blasterSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Blaster fired with energy setting of " + blasterSetting.ToString());
-				if (!isSilent) Utils.PlayUIOneShotSavable(_consts,239); // wblaster
+				if (!isSilent) _utils.PlayUIOneShotSavable(239); // wblaster
 				if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashBlaster.SetActive(true);
                 if (overloadEnabled) {
@@ -663,13 +664,13 @@ public class WeaponFire : MonoBehaviour {
                 break;
             case 38:
                 //SV-23 Dartgun
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,240); // wdartgun
+                if (!isSilent) _utils.PlayUIOneShotSavable(240); // wdartgun
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashDartgun.SetActive(true);
                 break;
             case 39:
                 //AM-27 Flechette
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,243); // wflechette
+                if (!isSilent) _utils.PlayUIOneShotSavable(243); // wflechette
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashFlechette.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeFlechette,muzFlashFlechette.transform.position,_consts.quaternionIdentity) as GameObject;
@@ -681,7 +682,7 @@ public class WeaponFire : MonoBehaviour {
                 //RW-45 Ion Beam
 				ionSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Ion rifle fired with energy setting of " + ionSetting.ToString());
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,245); // wion
+                if (!isSilent) _utils.PlayUIOneShotSavable(245); // wion
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashIonBeam.SetActive(true);
                 if (overloadEnabled) {
@@ -701,7 +702,7 @@ public class WeaponFire : MonoBehaviour {
                 break;
             case 43:
                 //Magnum 2100
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,249); // wmagnum
+                if (!isSilent) _utils.PlayUIOneShotSavable(249); // wmagnum
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashMagnum.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeMagnum,muzFlashMagnum.transform.position,_consts.quaternionIdentity) as GameObject;
@@ -711,13 +712,13 @@ public class WeaponFire : MonoBehaviour {
                 break;
             case 44:
                 //SB-20 Magpulse
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,250); // wmagpulse
+                if (!isSilent) _utils.PlayUIOneShotSavable(250); // wmagpulse
                 await FireMagpulse(index);
 				muzFlashMagpulse.SetActive(true);
                 break;
             case 45:
                 //ML-41 Pistol
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,255); // wpistol
+                if (!isSilent) _utils.PlayUIOneShotSavable(255); // wpistol
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashPistol.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokePistol,muzFlashPistol.transform.position,_consts.quaternionIdentity) as GameObject;
@@ -729,7 +730,7 @@ public class WeaponFire : MonoBehaviour {
                 //LG-XX Plasma Rifle
 				plasmaSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
 				//Debug.Log("Plasma rifle fired with energy setting of " + plasmaSetting.ToString());
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,257); // wplasma
+                if (!isSilent) _utils.PlayUIOneShotSavable(257); // wplasma
                 await FirePlasma(index);
 				muzFlashPlasma.SetActive(true);
                 if (overloadEnabled) {
@@ -741,7 +742,7 @@ public class WeaponFire : MonoBehaviour {
                 break;
             case 47:
                 //MM-76 Railgun
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,259); // wrailgun
+                if (!isSilent) _utils.PlayUIOneShotSavable(259); // wrailgun
                 await FireRailgun(index);
 				muzFlashRailgun.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeRailgun,muzFlashRailgun.transform.position,_consts.quaternionIdentity) as GameObject;
@@ -751,7 +752,7 @@ public class WeaponFire : MonoBehaviour {
                 break;
             case 48:
                 //DC-05 Riotgun
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,262); // wriotgun
+                if (!isSilent) _utils.PlayUIOneShotSavable(262); // wriotgun
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashRiotgun.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeRiotgun,muzFlashRiotgun.transform.position,_consts.quaternionIdentity) as GameObject;
@@ -761,7 +762,7 @@ public class WeaponFire : MonoBehaviour {
                 break;
             case 49:
                 //RF-07 Skorpion
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,263); // wskorpion
+                if (!isSilent) _utils.PlayUIOneShotSavable(263); // wskorpion
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashSkorpion.SetActive(true);
 				smoke = RootInstaller.InstantiatePrefab(muzSmokeSkorpion,muzFlashSkorpion.transform.position,_consts.quaternionIdentity) as GameObject;
@@ -772,7 +773,7 @@ public class WeaponFire : MonoBehaviour {
             case 50:
                 //Sparq Beam
 				sparqSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,264); // wsparq
+                if (!isSilent) _utils.PlayUIOneShotSavable(264); // wsparq
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashSparq.SetActive(true);
                 if (overloadEnabled) {
@@ -785,7 +786,7 @@ public class WeaponFire : MonoBehaviour {
             case 51:
                 //DH-07 Stungun
 				stungunSetting = _weaponCurrent.weaponEnergySetting[_weaponCurrent.weaponCurrent];
-                if (!isSilent) Utils.PlayUIOneShotSavable(_consts,265); // wstungun
+                if (!isSilent) _utils.PlayUIOneShotSavable(265); // wstungun
                 await FireStungun(index);
 				muzFlashStungun.SetActive(true);
                 if (overloadEnabled) {
@@ -1252,10 +1253,10 @@ public class WeaponFire : MonoBehaviour {
 				if (prefID != null && !isRapier) {
 					FootStepType fstep = _playerMovement.GetFootstepTypeForPrefab(prefID.constIndex);
 					AudioClip stcp = _playerMovement.JumpLandSound(fstep);
-					Utils.PlayTempAudio(_consts,transform.position,stcp,1f);
-					Utils.PlayTempAudio(_consts,transform.position,hit,0.65f);	
+					_utils.PlayTempAudio(transform.position,stcp,1f);
+					_utils.PlayTempAudio(transform.position,hit,0.65f);	
 				} else {
-					Utils.PlayTempAudio(_consts,transform.position,hit,1f);	
+					_utils.PlayTempAudio(transform.position,hit,1f);	
 				}
 
 				_playerHealth.makingNoise = true;
@@ -1284,7 +1285,7 @@ public class WeaponFire : MonoBehaviour {
 				|| (tempHM.bloodType == BloodType.Green)) {
 				Utils.PlayUIOneShotSavable(_mfdManager,hitflesh);
 			} else if (isRapier && _playerEnergy.energy < 4f) {
-				Utils.PlayUIOneShotSavable(_consts,67);
+				_utils.PlayUIOneShotSavable(67);
 			} else {
 				Utils.PlayUIOneShotSavable(_mfdManager,hit);
 			}
@@ -1428,9 +1429,10 @@ public class WeaponFire : MonoBehaviour {
 
 	public static string Save(GameObject go) {
 		WeaponFire wf = go.GetComponent<WeaponFire>();
+		Utils utils = wf._utils;
 		var pauseScript = wf._pauseScript;
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.waitTilNextFire,"waitTilNextFire"));
+		s1.Append(utils.SaveRelativeTimeDifferential(wf.waitTilNextFire,"waitTilNextFire"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(wf.overloadEnabled,"overloadEnabled"));
 		s1.Append(Utils.splitChar);
@@ -1448,15 +1450,15 @@ public class WeaponFire : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(wf.reloadLerpValue,"reloadLerpValue"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.reloadFinished,"reloadFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(wf.reloadFinished,"reloadFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.lerpStartTime,"lerpStartTime"));
+		s1.Append(utils.SaveRelativeTimeDifferential(wf.lerpStartTime,"lerpStartTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.justFired,"justFired"));
+		s1.Append(utils.SaveRelativeTimeDifferential(wf.justFired,"justFired"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.energySliderClickedTime,"energySliderClickedTime"));
+		s1.Append(utils.SaveRelativeTimeDifferential(wf.energySliderClickedTime,"energySliderClickedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,wf.cyberWeaponAttackFinished,"cyberWeaponAttackFinished"));
+		s1.Append(utils.SaveRelativeTimeDifferential(wf.cyberWeaponAttackFinished,"cyberWeaponAttackFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.SaveTransform(wf.reloadContainer.transform));
 		s1.Append(Utils.splitChar);
@@ -1466,8 +1468,9 @@ public class WeaponFire : MonoBehaviour {
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		WeaponFire wf = go.GetComponent<WeaponFire>();
+		Utils utils = wf._utils;
 		var pauseScript = wf._pauseScript;
-		wf.waitTilNextFire = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"waitTilNextFire"); index++;
+		wf.waitTilNextFire = utils.LoadRelativeTimeDifferential(entries[index],"waitTilNextFire"); index++;
 		wf.overloadEnabled = Utils.GetBoolFromString(entries[index],"overloadEnabled"); index++;
 		wf.sparqSetting = Utils.GetFloatFromString(entries[index],"sparqSetting"); index++;
 		wf.ionSetting = Utils.GetFloatFromString(entries[index],"ionSetting"); index++;
@@ -1476,11 +1479,11 @@ public class WeaponFire : MonoBehaviour {
 		wf.stungunSetting = Utils.GetFloatFromString(entries[index],"stungunSetting"); index++;
 		wf.recoiling = Utils.GetBoolFromString(entries[index],"recoiling"); index++;
 		wf.reloadLerpValue = Utils.GetFloatFromString(entries[index],"reloadLerpValue"); index++;
-		wf.reloadFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"reloadFinished"); index++;
-		wf.lerpStartTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"lerpStartTime"); index++;
-		wf.justFired = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"justFired"); index++;
-		wf.energySliderClickedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"energySliderClickedTime"); index++;
-		wf.cyberWeaponAttackFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"cyberWeaponAttackFinished"); index++;
+		wf.reloadFinished = utils.LoadRelativeTimeDifferential(entries[index],"reloadFinished"); index++;
+		wf.lerpStartTime = utils.LoadRelativeTimeDifferential(entries[index],"lerpStartTime"); index++;
+		wf.justFired = utils.LoadRelativeTimeDifferential(entries[index],"justFired"); index++;
+		wf.energySliderClickedTime = utils.LoadRelativeTimeDifferential(entries[index],"energySliderClickedTime"); index++;
+		wf.cyberWeaponAttackFinished = utils.LoadRelativeTimeDifferential(entries[index],"cyberWeaponAttackFinished"); index++;
 		index = Utils.LoadTransform(wf.reloadContainer.transform,ref entries,index);
 		wf.targetY = Utils.GetFloatFromString(entries[index],"targetY"); index++;
 		return index;
