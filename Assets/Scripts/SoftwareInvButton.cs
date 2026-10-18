@@ -7,6 +7,7 @@ public class SoftwareInvButton : MonoBehaviour {
 	public int index = 0;
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private GUIState _guiState;
 	[Inject] private Inventory _inventory;
@@ -25,14 +26,14 @@ public class SoftwareInvButton : MonoBehaviour {
 					_inventory.pulserButtonText.Select(false);
 					_inventory.drillButtonText.Select(true);
 					_inventory.isPulserNotDrill = false;
-					Utils.PlayUIOneShotSavable(_consts,80); // changeweapon
+					_utils.PlayUIOneShotSavable(80); // changeweapon
 					break;
 			case 1:
 					// Pulser
 					_inventory.pulserButtonText.Select(true);
 					_inventory.drillButtonText.Select(false);
 					_inventory.isPulserNotDrill = true;
-					Utils.PlayUIOneShotSavable(_consts,80); // changeweapon
+					_utils.PlayUIOneShotSavable(80); // changeweapon
 					break;
 			case 2:
 					// CyberShield

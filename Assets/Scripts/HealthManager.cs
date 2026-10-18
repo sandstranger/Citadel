@@ -71,6 +71,7 @@ public class HealthManager : MonoBehaviour {
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private Music _music;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
@@ -397,13 +398,13 @@ public class HealthManager : MonoBehaviour {
 						if (absorb > 1f) absorb = 1f; // cap it at 100%....shouldn't really ever be here, nothing is 92% + 8%
 						take *= (1f-absorb); // shield doing it's thing
 						_playerHealth.shieldEffect.SetActive(true); // Activate shield screen effect to indicate damage was absorbed, effect intensity determined by absorb amount
-						Utils.PlayUIOneShotSavable(_consts,94); // Play shield absorb sound
+						_utils.PlayUIOneShotSavable(94); // Play shield absorb sound
 						int abs = (int)(absorb * 100f); //  for int display of absorbption percent
 						_consts.sprint(_consts.stringTable[208] + abs.ToString() + _consts.stringTable[209],dd.other);  // Shield absorbs x% damage
 					}
 				}
 				if (take > 0 && ((absorb <0.4f) || Random.Range(0,1f) < 0.5f)) {
-					Utils.PlayUIOneShotSavable(_consts,140); // Play player pain noise
+					_utils.PlayUIOneShotSavable(140); // Play player pain noise
 					int intensityOfPainFlash = 0; // 0 = light
 					if (take > 15f) {
 						intensityOfPainFlash = 2; // 2 = heavy
@@ -586,7 +587,7 @@ public class HealthManager : MonoBehaviour {
 
 		deathDone = true; // Mark it so we only die once.
 		CreateDeathEffects(deathFX);
-		if (aic.index == 0 && !actAsCorpseOnly) Utils.PlayTempAudio(_consts,transform.position,_consts.sounds[64]); // npc_autobomb: explosion1
+		if (aic.index == 0 && !actAsCorpseOnly) _utils.PlayTempAudio(transform.position,_consts.sounds[64]); // npc_autobomb: explosion1
 
 		if (aic == null) {
 			if (transform.parent != null) {
@@ -653,7 +654,7 @@ public class HealthManager : MonoBehaviour {
 			case 526: soundex = 68; break; // prop_console02: hit3
 		}
 		
-		Utils.PlayTempAudio(_consts,transform.position,_consts.sounds[soundex]);
+		_utils.PlayTempAudio(transform.position,_consts.sounds[soundex]);
 		if (deathFX != PoolType.None) HideSelf();
 	}
 
@@ -725,7 +726,7 @@ public class HealthManager : MonoBehaviour {
 		if (deathDone) return;
 
 		deathDone = true; // Screens maintain collisions, so not disabling here; also maintain visible mesh, don't turn it off
-		Utils.PlayTempAudio(_consts,transform.position,_consts.sounds[69]);
+		_utils.PlayTempAudio(transform.position,_consts.sounds[69]);
 		ImageSequenceTextureArray ista = GetComponent<ImageSequenceTextureArray>();
 		ista.Destroy(); // ista deada nowa
 		if (gibOnDeath) Gib();
@@ -895,12 +896,12 @@ public class HealthManager : MonoBehaviour {
 			s1.Append(Utils.splitChar);
 			s1.Append(Utils.SaveString(ista.resourceFolder,"resourceFolder"));
 			s1.Append(Utils.splitChar);
-			s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ista.tickFinished,"ista.tickFinished"));
+			s1.Append(hm._utils.SaveRelativeTimeDifferential(ista.tickFinished,"ista.tickFinished"));
 		} else if (prefID.constIndex == 574) { // prop_healingbed
 			GameObject child = go.transform.GetChild(0).gameObject;
 			ImageSequenceTextureArray ista = child.GetComponent<ImageSequenceTextureArray>();
 			s1.Append(Utils.splitChar);
-			s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ista.tickFinished,"ista.tickFinished"));
+			s1.Append(hm._utils.SaveRelativeTimeDifferential(ista.tickFinished,"ista.tickFinished"));
 		}
 
 		s1.Append(Utils.splitChar);
@@ -951,12 +952,12 @@ public class HealthManager : MonoBehaviour {
 					child.SetActive(Utils.GetBoolFromString(entries[index],"child.activeSelf")); index++;
 					ImageSequenceTextureArray ista = child.GetComponent<ImageSequenceTextureArray>();
 					ista.resourceFolder = Utils.LoadString(entries[index],"resourceFolder"); index++;
-					ista.tickFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"ista.tickFinished"); index++;
+					ista.tickFinished = hm._utils.LoadRelativeTimeDifferential(entries[index],"ista.tickFinished"); index++;
 				}
 			} else if (prefID.constIndex == 574) { // prop_healingbed
 				GameObject child = go.transform.GetChild(0).gameObject;
 				ImageSequenceTextureArray ista = child.GetComponent<ImageSequenceTextureArray>();
-				ista.tickFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"ista.tickFinished"); index++;
+				ista.tickFinished = hm._utils.LoadRelativeTimeDifferential(entries[index],"ista.tickFinished"); index++;
 			}
 		} else {
 			if (prefID == null) Debug.LogError("Missing PrefabIdentifier on " + go.name + ".");	

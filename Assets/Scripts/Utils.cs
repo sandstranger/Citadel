@@ -37,6 +37,9 @@ public sealed class Utils {
 	public static char splitCharChar = '|';
 	public static readonly CultureInfo en_US_Culture = new("en-US");
 
+	// Kept for synchronous legacy callers while the DI-based async loader is migrated.
+	private static bool _betterStreamingAssetsInitialized = false;
+
 	private static bool getValparsed;
 	private static int getValreadInt;
 	private static float getValreadFloat;
@@ -329,12 +332,53 @@ public sealed class Utils {
         return Application.persistentDataPath;
     }
 
-    public async UniTask<StreamReader> ReadStreamingAsset(string fName)
+    public static StreamReader ReadStreamingAsset(string fName)
+    {
+#if UNITY_ANDROID
+        string basePath = Utils.GetAppropriateDataPath();
+        var finalPathToFile = Path.Combine(basePath, fName);
+        ConfirmExistsMakeIfNot(basePath, fName);
+        if (!File.Exists(finalPathToFile))
+        {
+            return null;
+        }
+
+        var bytes = File.ReadAllBytes(finalPathToFile);
+        return bytes.Length > 0 ? new StreamReader(new MemoryStream(bytes), Encoding.ASCII) : null;
+#else
+        StreamReader dataReader = null;
+        string basePath = Application.streamingAssetsPath;
+        string fPath = SafePathCombine(basePath, fName);
+        if (File.Exists(fPath))
+        {
+            dataReader = new StreamReader(fPath, Encoding.ASCII);
+        }
+        else
+        {
+            UnityEngine.Debug.LogWarning($"File {fPath} not found, attempting recovery.");
+            string rsrc = ResourcesPathCombine("StreamingAssetsRecovery", fName);
+            TextAsset resourcesFile = (TextAsset)Resources.Load(rsrc);
+            if (resourcesFile != null)
+            {
+                MemoryStream memStr = new MemoryStream(Encoding.ASCII.GetBytes(resourcesFile.text));
+                dataReader = new StreamReader(memStr, Encoding.ASCII);
+            }
+            else
+            {
+                UnityEngine.Debug.LogError($"Recovery file {rsrc} not found in Resources/StreamingAssetsRecovery.");
+                return null;
+            }
+        }
+        return dataReader;
+#endif
+    }
+
+    public async UniTask<StreamReader> ReadStreamingAssetAsync(string fName)
     {
 #if UNITY_ANDROID
 	    string basePath = Utils.GetAppropriateDataPath();
 	    var finalPathToFile = Path.Combine(basePath, fName);
-	    await ConfirmExistsMakeIfNot(basePath, fName);
+	    await ConfirmExistsMakeIfNotAsync(basePath, fName);
 	    if (!File.Exists(finalPathToFile))
 	    {
 		    return null;
@@ -379,7 +423,7 @@ public sealed class Utils {
 		return SafePathCombine(folderInResources,fname);
 	}
 
-	public async UniTask ConfirmExistsMakeIfNot(string basePath, string fileName) {
+	public async UniTask ConfirmExistsMakeIfNotAsync(string basePath, string fileName) {
 		if (string.IsNullOrWhiteSpace(fileName)) {
 			UnityEngine.Debug.LogWarning("fileName was null or whitespace passed to ConfirmExistsMakeIfNot");
 			return;
@@ -419,7 +463,69 @@ public sealed class Utils {
 		await File.WriteAllTextAsync(strmAstPth, textAsset.text);
 	}
 
-    static readonly char[] pathSplitCharacters = new char[] { '/', '\\' };
+public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            UnityEngine.Debug.LogWarning("fileName was null or whitespace passed to ConfirmExistsMakeIfNot");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(basePath))
+        {
+            UnityEngine.Debug.LogWarning("basePath was null or whitespace passed to ConfirmExistsMakeIfNot");
+            return;
+        }
+
+        string targetPath = basePath;
+        if (basePath == Application.streamingAssetsPath &&
+            (Application.platform == RuntimePlatform.Android ||
+             Application.platform == RuntimePlatform.OSXEditor ||
+             Application.platform == RuntimePlatform.OSXPlayer ||
+             !IsStreamingAssetsWritable()))
+        {
+            UnityEngine.Debug.LogWarning("Target path redirected to persistent data path for ConfirmExistsMakeIfNot()");
+            targetPath = Application.persistentDataPath;
+        }
+
+        string strmAstPth = SafePathCombine(targetPath, fileName);
+        if (File.Exists(strmAstPth)) return;
+
+        string directoryPath = Path.GetDirectoryName(strmAstPth);
+        if (!Directory.Exists(directoryPath))
+        {
+            try { Directory.CreateDirectory(directoryPath); }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogError($"Failed to create directory {directoryPath}: {ex.Message}");
+                return;
+            }
+        }
+
+        try
+        {
+            InitializeBetterStreamingassets();
+            File.WriteAllBytes(strmAstPth,
+                BetterStreamingAssets.ReadAllBytes(Path.Combine("StreamingAssetsRecovery", fileName)));
+            if (File.Exists(strmAstPth))
+                UnityEngine.Debug.Log("File " + strmAstPth + " recreated");
+            else
+                UnityEngine.Debug.LogWarning("File " + strmAstPth + " failed to be created by File.WriteAllText!");
+        }
+        catch (Exception ex)
+        {
+            UnityEngine.Debug.LogError("Failed to recreate " + strmAstPth + ": " + ex.Message);
+        }
+    }
+
+    private static void InitializeBetterStreamingassets()
+    {
+        if (_betterStreamingAssetsInitialized) return;
+        BetterStreamingAssets.Initialize();
+        _betterStreamingAssetsInitialized = true;
+    }
+
+        static readonly char[] pathSplitCharacters = new char[] { '/', '\\' };
 
 	// Check if particular bit is 1 (ON/TRUE) in binary format of given integer
 	public static bool CheckFlags (int checkInt, int flag) {
@@ -1494,6 +1600,8 @@ public sealed class Utils {
 		PlayAudioSavable(SFX,_consts.sounds[fxclip],0,false);
 	}
 
+	
+
 	private static StringBuilder auds1 = new StringBuilder();
 	public static string SaveAudioSource(GameObject go) {
 		AudioSource aus = go.GetComponent<AudioSource>();
@@ -1550,6 +1658,12 @@ public sealed class Utils {
     // in case there is a whackado one-off instance of comparing (time - 
     // finished) somewhere instead of (finished < time) which is my usual Quake
     // derived timer pattern.
+    // Legacy overloads retain the caller-supplied clock explicitly. Prefer the
+    // instance overloads in code that has migrated to injected Utils.
+    
+
+    
+
     public string SaveRelativeTimeDifferential(float timerValue, string name)
     {
         float val = timerValue - _pauseScript.relativeTime; // Remove current
@@ -1650,7 +1764,8 @@ public sealed class Utils {
 		rbody.AddForceAtPosition((attackNormal*impactVelocity*30f),spot);
 	}
 
-	public void ApplyImpactForceSphere(DamageData dd, Vector3 centerPoint, float radius, float impactScale) {
+	public void ApplyImpactForceSphere(DamageData dd, Vector3 centerPoint, float radius, float impactScale)
+	{
 		HealthManager hm = null;
 		Collider[] colliders = Physics.OverlapSphere(centerPoint, radius);
 		int i = 0;
@@ -1709,9 +1824,12 @@ public sealed class Utils {
 			}
 			i++;
 		}
+	
+	
 	}
 	
-	public void PlayTempAudio(Vector3 spot,AudioClip clip,float volume) {
+	public void PlayTempAudio(Vector3 spot, AudioClip clip, float volume)
+	{
 		GameObject tempAud = _consts.GetObjectFromPool(PoolType.TempAudioSources);
 		if (tempAud != null) {
 			tempAud.transform.position = spot; // set temporary audiosource to right here
@@ -1721,11 +1839,16 @@ public sealed class Utils {
 			AudioSource aS = tempAud.GetComponent<AudioSource>();
 			PlayOneShotSavable(aS,clip);
 		}
+	
+	
 	}
 
-	public void PlayTempAudio(Vector3 spot,AudioClip clip) {
-		PlayTempAudio(spot,clip,1f);
+	public void PlayTempAudio(Vector3 spot, AudioClip clip)
+	{
+		PlayTempAudio(spot, clip, 1f);
 	}
+
+
 
 	public static HealthManager GetMainHealthManager(GameObject go) {
 		if (go == null) return null;

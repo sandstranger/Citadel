@@ -25,6 +25,7 @@ public class KeypadElevator : MonoBehaviour {
 	[Inject] 
 	private LevelManager _levelManager;
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	
 	private static readonly StringBuilder s1 = new(100 * 1024);
@@ -58,7 +59,7 @@ public class KeypadElevator : MonoBehaviour {
 		}
 
 		padInUse = true;
-		Utils.PlayUIOneShotSavable(_consts,91);
+		_utils.PlayUIOneShotSavable(91);
 		_mfdManager.SendElevatorKeypadToDataTab(this,buttonsEnabled,
 												 buttonsDarkened,buttonText,
 												 targetDestination,

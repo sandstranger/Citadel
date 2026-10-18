@@ -25,6 +25,7 @@ public class ChargeStation : MonoBehaviour {
 	[Inject] private Const _consts;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerHealth _playerHealth;
 
 	void Awake() {
@@ -75,7 +76,7 @@ public class ChargeStation : MonoBehaviour {
 	public static string Save(GameObject go) {
 		ChargeStation chg = go.GetComponent<ChargeStation>();
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(chg._pauseScript,chg.nextthink,"nextthink")); // float - time before recharged
+		s1.Append(chg._utils.SaveRelativeTimeDifferential(chg.nextthink,"nextthink")); // float - time before recharged
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(chg.amount,"amount"));
 		s1.Append(Utils.splitChar);
@@ -114,7 +115,7 @@ public class ChargeStation : MonoBehaviour {
 			return index + 12;
 		}
 
-		chg.nextthink = Utils.LoadRelativeTimeDifferential(chg._pauseScript,entries[index],"nextthink"); index++; // float - time before recharged
+		chg.nextthink = chg._utils.LoadRelativeTimeDifferential(entries[index],"nextthink"); index++; // float - time before recharged
 		chg.amount  = Utils.GetFloatFromString(entries[index],"amount"); index++;
 		chg.resetTime  = Utils.GetFloatFromString(entries[index],"resetTime"); index++;
 		chg.requireReset  = Utils.GetBoolFromString(entries[index],"requireReset"); index++;

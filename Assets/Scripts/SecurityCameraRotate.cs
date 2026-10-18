@@ -22,6 +22,7 @@ public class SecurityCameraRotate : MonoBehaviour {
 	private static StringBuilder s1 = new StringBuilder();
 
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 
 	void Start () {
 		waitingFinished = _pauseScript.relativeTime;
@@ -78,7 +79,7 @@ public class SecurityCameraRotate : MonoBehaviour {
 		SecurityCameraRotate scr = go.GetComponent<SecurityCameraRotate>();
 		var pauseScript = scr._pauseScript;
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,scr.waitingFinished,"waitingFinished"));
+		s1.Append(scr._utils.SaveRelativeTimeDifferential(scr.waitingFinished,"waitingFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(scr.enabled,"enabled"));
 		s1.Append(Utils.splitChar);
@@ -93,7 +94,7 @@ public class SecurityCameraRotate : MonoBehaviour {
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		SecurityCameraRotate scr = go.GetComponent<SecurityCameraRotate>();
 		var pauseScript = scr._pauseScript;
-		scr.waitingFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"waitingFinished"); index++;
+		scr.waitingFinished = scr._utils.LoadRelativeTimeDifferential(entries[index],"waitingFinished"); index++;
 		scr.enabled = Utils.GetBoolFromString(entries[index],"enabled"); index++;
 		scr.startYAngle = Utils.GetFloatFromString(entries[index],"startYAngle"); index++;
 		scr.endYAngle = Utils.GetFloatFromString(entries[index],"endYAngle"); index++;

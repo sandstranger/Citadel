@@ -9,6 +9,7 @@ public class Radiation : MonoBehaviour {
 	private static StringBuilder s1 = new StringBuilder();
 
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerHealth _playerHealth;
 
 	void Start() {
@@ -55,7 +56,7 @@ public class Radiation : MonoBehaviour {
 		s1.Append(Utils.splitChar);	
 		s1.Append(Utils.FloatToString(rad.intervalTime,"intervalTime"));
 		s1.Append(Utils.splitChar);	
-		s1.Append(Utils.SaveRelativeTimeDifferential(rad._pauseScript,rad.radFinished,"radFinished"));
+		s1.Append(rad._utils.SaveRelativeTimeDifferential(rad.radFinished,"radFinished"));
 		return s1.ToString();
 	}
 
@@ -63,7 +64,7 @@ public class Radiation : MonoBehaviour {
 		Radiation rad = go.GetComponent<Radiation>();
 		rad.radiationAmount = Utils.GetFloatFromString(entries[index],"radiationAmount"); index++;
 		rad.intervalTime = Utils.GetFloatFromString(entries[index],"intervalTime"); index++;
-		rad.radFinished = Utils.LoadRelativeTimeDifferential(rad._pauseScript,entries[index],"radFinished"); index++;
+		rad.radFinished = rad._utils.LoadRelativeTimeDifferential(entries[index],"radFinished"); index++;
 		return index;
 	}
 }

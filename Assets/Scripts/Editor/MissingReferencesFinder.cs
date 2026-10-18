@@ -96,7 +96,7 @@ public class MissingReferencesFinder : MonoBehaviour
                         }
 
 						if (sp.objectReferenceValue == null
-						    && (sp.objectReferenceInstanceIDValue != 0 || objectReferenceStringValue.StartsWith("Missing")))
+						    && (sp.objectReferenceEntityIdValue.IsValid() || objectReferenceStringValue.StartsWith("Missing")))
 						{
 							ShowError(context, go, component.GetType().Name, ObjectNames.NicifyVariableName(sp.name));
 						}

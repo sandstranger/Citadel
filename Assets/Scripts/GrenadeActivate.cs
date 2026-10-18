@@ -26,6 +26,7 @@ public class GrenadeActivate : MonoBehaviour {
 	[Inject] private Const _consts;
 	[Inject] private Inventory _inventory;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private WeaponFire _weaponFire;
 
@@ -109,7 +110,7 @@ public class GrenadeActivate : MonoBehaviour {
 			_playerHealth.noiseFinished = _pauseScript.relativeTime + 2f;
 		}
 		
-		Utils.ApplyImpactForceSphere(_consts,dd,transform.position,nearradius,1.0f);
+		_utils.ApplyImpactForceSphere(dd,transform.position,nearradius,1.0f);
 		GameObject explosionEffect = _consts.GetObjectFromPool(explosionType);
 		if (explosionEffect != null) {
 			explosionEffect.SetActive(true);
@@ -125,7 +126,7 @@ public class GrenadeActivate : MonoBehaviour {
 				case 13: soundIndex = 63; _weaponFire.fogFac += 10; break; // gas, explode_minor
 			}
 			
-			Utils.PlayTempAudio(_consts,transform.position,_consts.sounds[soundIndex]);
+			_utils.PlayTempAudio(transform.position,_consts.sounds[soundIndex]);
 		}
 
 		_consts.Shake(true,-1,-1);
@@ -142,7 +143,7 @@ public class GrenadeActivate : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(ga.useTimer,"useTimer"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(ga._pauseScript,ga.timeFinished,"timeFinished"));
+		s1.Append(ga._utils.SaveRelativeTimeDifferential(ga.timeFinished,"timeFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(ga.explodeOnContact,"explodeOnContact"));
 		s1.Append(Utils.splitChar);
@@ -162,7 +163,7 @@ public class GrenadeActivate : MonoBehaviour {
 		ga.constIndex = Utils.GetIntFromString(entries[index],"constIndex"); index++;
 		ga.active = Utils.GetBoolFromString(entries[index],"active"); index++;
 		ga.useTimer = Utils.GetBoolFromString(entries[index],"useTimer"); index++;
-		ga.timeFinished = Utils.LoadRelativeTimeDifferential(ga._pauseScript,entries[index],"timeFinished"); index++;
+		ga.timeFinished = ga._utils.LoadRelativeTimeDifferential(entries[index],"timeFinished"); index++;
 		ga.explodeOnContact = Utils.GetBoolFromString(entries[index],"explodeOnContact"); index++;
 		ga.useProx = Utils.GetBoolFromString(entries[index],"useProx"); index++;
 		bool isNPC = Utils.GetBoolFromString(entries[index],"IsNPCMine"); index++;

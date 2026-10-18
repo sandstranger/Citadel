@@ -19,6 +19,7 @@ public class Trigger : MonoBehaviour {
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerMovement _playerMovement;
 
     IEnumerator DelayedTarget(GameObject activator) {
@@ -96,9 +97,9 @@ public class Trigger : MonoBehaviour {
 		else s1.Append("hadRecentActivator:0");
 
 		s1.Append(Utils.splitChar);		
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,trig.delayFireFinished,"delayFireFinished"));
+		s1.Append(trig._utils.SaveRelativeTimeDifferential(trig.delayFireFinished,"delayFireFinished"));
 		s1.Append(Utils.splitChar);		
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,trig.delayResetFinished,"delayResetFinished"));
+		s1.Append(trig._utils.SaveRelativeTimeDifferential(trig.delayResetFinished,"delayResetFinished"));
 		s1.Append(Utils.splitChar);		
 		s1.Append(Utils.FloatToString(trig.delay,"delay"));
 		s1.Append(Utils.splitChar);		
@@ -119,8 +120,8 @@ public class Trigger : MonoBehaviour {
 		trig.numPlayers = Utils.GetIntFromString(entries[index],"numPlayers"); index++;
 		bool hadRecentActivator = Utils.GetBoolFromString(entries[index],"hadRecentActivator"); index++;
 		if (hadRecentActivator) trig.recentMostActivator = trig._playerMovement.gameObject;
-		trig.delayFireFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"delayFireFinished"); index++;
-		trig.delayResetFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"delayResetFinished"); index++;
+		trig.delayFireFinished = trig._utils.LoadRelativeTimeDifferential(entries[index],"delayFireFinished"); index++;
+		trig.delayResetFinished = trig._utils.LoadRelativeTimeDifferential(entries[index],"delayResetFinished"); index++;
 		trig.delay = Utils.GetFloatFromString(entries[index],"delay"); index++;
 		trig.onlyOnce = Utils.GetBoolFromString(entries[index],"onlyOnce"); index++;
 		trig.ignoreSecondaryTriggers = Utils.GetBoolFromString(entries[index],"ignoreSecondaryTriggers"); index++;

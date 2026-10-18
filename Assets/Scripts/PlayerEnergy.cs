@@ -24,6 +24,7 @@ public class PlayerEnergy : MonoBehaviour {
 	[Inject] private Const _consts;
 	[Inject] private Inventory _inventory;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private WeaponFire _weaponFire;
 	[Inject] private WeaponCurrent _weaponCurrent;
 
@@ -176,7 +177,7 @@ public class PlayerEnergy : MonoBehaviour {
 		energy -= take;
 		if (energy <= 0f) {
 			energy = 0f;
-			Utils.PlayUIOneShotSavable(_consts,84); // energy_gone
+			_utils.PlayUIOneShotSavable(84); // energy_gone
 			_consts.sprint(314); //Power supply exhausted.
 			DeactivateHardwareOnEnergyDepleted();
 		}
@@ -186,10 +187,10 @@ public class PlayerEnergy : MonoBehaviour {
 		energy += give;
 		if (energy > maxenergy) energy = maxenergy;
         if (type == EnergyType.Battery) {
-            Utils.PlayUIOneShotSavable(_consts,79); // batteryuse
+            _utils.PlayUIOneShotSavable(79); // batteryuse
         }
         if (type == EnergyType.ChargeStation) {
-            Utils.PlayUIOneShotSavable(_consts,100); // chargingstation
+            _utils.PlayUIOneShotSavable(100); // chargingstation
         }
     }
 
@@ -198,14 +199,14 @@ public class PlayerEnergy : MonoBehaviour {
 		s1.Clear();
 		s1.Append(Utils.FloatToString(pe.energy,"energy"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pe._pauseScript,pe.tickFinished,"tickFinished"));
+		s1.Append(pe._utils.SaveRelativeTimeDifferential(pe.tickFinished,"tickFinished"));
 		return s1.ToString();
 	}
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		PlayerEnergy pe = go.GetComponent<PlayerEnergy>();
 		pe.energy = Utils.GetFloatFromString(entries[index],"energy"); index++;
-		pe.tickFinished = Utils.LoadRelativeTimeDifferential(pe._pauseScript,entries[index],"tickFinished"); index++;
+		pe.tickFinished = pe._utils.LoadRelativeTimeDifferential(entries[index],"tickFinished"); index++;
 		return index;
 	}
 }

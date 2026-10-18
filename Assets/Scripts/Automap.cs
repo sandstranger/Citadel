@@ -106,6 +106,7 @@ public class Automap : MonoBehaviour {
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private Inventory _inventory;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerMovement _playerMovement;
 
 	void Start() {
@@ -597,7 +598,7 @@ public class Automap : MonoBehaviour {
 		for (j=0;j<4096;j++) { s1.Append(Utils.BoolToString(amp.automapExploredG4[j],"automapExploredG4[" + j.ToString() + "]")); s1.Append(Utils.splitChar); } // bool
 		s1.Append(Utils.UintToString(amp.currentAutomapZoomLevel,"currentAutomapZoomLevel"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,amp.automapUpdateFinished,"automapUpdateFinished"));
+		s1.Append(amp._utils.SaveRelativeTimeDifferential(amp.automapUpdateFinished,"automapUpdateFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(amp.inSideView,"inSideView"));
 		return s1.ToString();
@@ -625,7 +626,7 @@ public class Automap : MonoBehaviour {
 		if (amp.currentAutomapZoomLevel < 0) amp.currentAutomapZoomLevel = 0;
 		if (amp.currentAutomapZoomLevel > 2) amp.currentAutomapZoomLevel = 2;
 		amp.AutomapZoomAdjust();
-		amp.automapUpdateFinished = Utils.LoadRelativeTimeDifferential(amp._pauseScript,entries[index],"automapUpdateFinished"); index++;
+		amp.automapUpdateFinished = amp._utils.LoadRelativeTimeDifferential(entries[index],"automapUpdateFinished"); index++;
 		amp.inSideView =  Utils.GetBoolFromString(entries[index],"inSideView");
 		return index;
 	}

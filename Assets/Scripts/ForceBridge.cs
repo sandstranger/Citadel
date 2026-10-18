@@ -26,6 +26,7 @@ public class ForceBridge : MonoBehaviour {
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 
 	public void Start() {
 		#if UNITY_EDITOR
@@ -161,7 +162,7 @@ public class ForceBridge : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(fb.lerping,"lerping"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(fb._pauseScript,fb.tickFinished,"tickFinished"));
+		s1.Append(fb._utils.SaveRelativeTimeDifferential(fb.tickFinished,"tickFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(fb.x,"x"));
 		s1.Append(Utils.splitChar);
@@ -213,7 +214,7 @@ public class ForceBridge : MonoBehaviour {
 		
 		index++;
 		fb.lerping = Utils.GetBoolFromString(entries[index],"lerping"); index++;
-		fb.tickFinished = Utils.LoadRelativeTimeDifferential(fb._pauseScript,entries[index],"tickFinished"); index++;
+		fb.tickFinished = fb._utils.LoadRelativeTimeDifferential(entries[index],"tickFinished"); index++;
 		fb.x = Utils.GetBoolFromString(entries[index],"x"); index++;
 		fb.y = Utils.GetBoolFromString(entries[index],"y"); index++;
 		fb.z = Utils.GetBoolFromString(entries[index],"z"); index++;

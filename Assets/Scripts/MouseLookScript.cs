@@ -220,7 +220,7 @@ public class MouseLookScript : MonoBehaviour {
 				randomKlaxonFinished = _pauseScript.relativeTime
 				                       + UnityEngine.Random.Range(10f,20f);
 
-				Utils.PlayUIOneShotSavable(_consts,104); // klaxon
+				_utils.PlayUIOneShotSavable(104); // klaxon
 			}
 		}
 
@@ -405,7 +405,7 @@ public class MouseLookScript : MonoBehaviour {
 		playerCamera.useOcclusionCulling = false;
 		_mfdManager.DrawTicks(true);
 		SetCameraCullDistances();
-		Utils.PlayUIOneShotSavable(_consts,81); // cyber
+		_utils.PlayUIOneShotSavable(81); // cyber
 	}
 
 	public void ExitCyberspace() {
@@ -435,7 +435,7 @@ public class MouseLookScript : MonoBehaviour {
 		playerCamera.useOcclusionCulling = true;
 		_consts.decoyActive = false;
 		_mfdManager.DrawTicks(true);
-		Utils.PlayUIOneShotSavable(_consts,81); // cyber
+		_utils.PlayUIOneShotSavable(81); // cyber
 		SetCameraCullDistances();
 	}
 
@@ -817,7 +817,7 @@ public class MouseLookScript : MonoBehaviour {
 		UseHandler uh = go.GetComponent<UseHandler>();
 		bool playedSound = false;
 		if (uh != null) {
-			Utils.PlayUIOneShotSavable(_consts,91); // searchsound
+			_utils.PlayUIOneShotSavable(91); // searchsound
 			playedSound = true;
 			uh.Use(ud);
 			return true; // Item can get absorbed, not dropped.
@@ -826,7 +826,7 @@ public class MouseLookScript : MonoBehaviour {
 		UseHandlerRelay uhr = go.GetComponent<UseHandlerRelay>();
 		if (uhr != null) {
 			
-			if (!playedSound) Utils.PlayUIOneShotSavable(_consts,91); // searchsound
+			if (!playedSound) _utils.PlayUIOneShotSavable(91); // searchsound
 			uhr.referenceUseHandler.Use(ud);
 			return true; // Item can get absorbed, not dropped.
 		}
@@ -1155,7 +1155,7 @@ public class MouseLookScript : MonoBehaviour {
 			}
 		}
 
-		Utils.PlayUIOneShotSavable(_consts,87); // frob_item
+		_utils.PlayUIOneShotSavable(87); // frob_item
 		int numberFoundContents = 0;
 		if (currentSearchItem != null) {
 			SearchableItem curSearchScript = currentSearchItem.GetComponent<SearchableItem>();
@@ -1362,7 +1362,7 @@ public class MouseLookScript : MonoBehaviour {
 				}
 			}
 		} else {
-			Utils.PlayUIOneShotSavable(_consts,91); // searchsound
+			_utils.PlayUIOneShotSavable(91); // searchsound
 		}
 
 		curSearchScript.searchableInUse = true;
@@ -1484,13 +1484,13 @@ public class MouseLookScript : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.UintToString(ml.cyberspaceReturnLevel,"cyberspaceReturnLevel"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ml.returnFromCyberspaceFinished,"returnFromCyberspaceFinished"));
+		s1.Append(ml._utils.SaveRelativeTimeDifferential(ml.returnFromCyberspaceFinished,"returnFromCyberspaceFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ml.randomShakeFinished,"randomShakeFinished"));
+		s1.Append(ml._utils.SaveRelativeTimeDifferential(ml.randomShakeFinished,"randomShakeFinished"));
         s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ml.randomKlaxonFinished,"randomKlaxonFinished"));
+		s1.Append(ml._utils.SaveRelativeTimeDifferential(ml.randomKlaxonFinished,"randomKlaxonFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ml.shakeFinished,"shakeFinished"));
+		s1.Append(ml._utils.SaveRelativeTimeDifferential(ml.shakeFinished,"shakeFinished"));
 		return s1.ToString();
 	}
 
@@ -1536,10 +1536,10 @@ public class MouseLookScript : MonoBehaviour {
 		readFloatz = Utils.GetFloatFromString(entries[index],"cyberspaceRecallPoint.z"); index++;
 		ml.cyberspaceRecallPoint = new Vector3(readFloatx,readFloaty,readFloatz);
 		ml.cyberspaceReturnLevel = Utils.GetIntFromString(entries[index],"cyberspaceReturnLevel"); index++;
-		ml.returnFromCyberspaceFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"returnFromCyberspaceFinished"); index++;
-		ml.randomShakeFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"randomShakeFinished"); index++;
-		ml.randomKlaxonFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"randomKlaxonFinished"); index++;
-		ml.shakeFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"shakeFinished"); index++;
+		ml.returnFromCyberspaceFinished = ml._utils.LoadRelativeTimeDifferential(entries[index],"returnFromCyberspaceFinished"); index++;
+		ml.randomShakeFinished = ml._utils.LoadRelativeTimeDifferential(entries[index],"randomShakeFinished"); index++;
+		ml.randomKlaxonFinished = ml._utils.LoadRelativeTimeDifferential(entries[index],"randomKlaxonFinished"); index++;
+		ml.shakeFinished = ml._utils.LoadRelativeTimeDifferential(entries[index],"shakeFinished"); index++;
 
 		// Prevent picking up first item immediately. Not currently possible to
 		// save references (without a lot of work, aherm).

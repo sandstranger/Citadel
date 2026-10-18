@@ -30,6 +30,7 @@ public class FuncWall : MonoBehaviour {
 
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
 	private void Awake()
@@ -182,7 +183,7 @@ public class FuncWall : MonoBehaviour {
 		s1.Append(Utils.splitChar );
 		s1.Append(Utils.FloatToString(fw.percentMoved,"percentMoved"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(fw._pauseScript,fw.startTime,"startTime"));
+		s1.Append(fw._utils.SaveRelativeTimeDifferential(fw.startTime,"startTime"));
 
 		// The mover_target transform and position was saved by SaveObject.Save
 		// prior to that function calling this function, so only save the
@@ -230,7 +231,7 @@ public class FuncWall : MonoBehaviour {
 		fw.speed = Utils.GetFloatFromString(entries[index],"speed"); index++;
 		fw.percentAjar = Utils.GetFloatFromString(entries[index],"percentAjar"); index++;
 		fw.percentMoved = Utils.GetFloatFromString(entries[index],"percentMoved"); index++;
-		fw.startTime = Utils.LoadRelativeTimeDifferential(fw._pauseScript,entries[index],"startTime"); index++;
+		fw.startTime = fw._utils.LoadRelativeTimeDifferential(entries[index],"startTime"); index++;
 		Transform parentTR = go.transform.parent.transform;
 		index = Utils.LoadTransform(parentTR,ref entries,index);
 		Transform info_target = go.transform.parent.transform.GetChild(1);

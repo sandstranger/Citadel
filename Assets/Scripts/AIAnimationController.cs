@@ -37,6 +37,7 @@ public class AIAnimationController : MonoBehaviour {
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 
 	public void Start () {
 	    if (initialized) return;
@@ -260,7 +261,7 @@ public class AIAnimationController : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aiac.dying,"dying"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(aiac._pauseScript,aiac.animSwapFinished,"animSwapFinished"));
+		s1.Append(aiac._utils.SaveRelativeTimeDifferential(aiac.animSwapFinished,"animSwapFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(aiac.useDeadAnimForDeath,"useDeadAnimForDeath"));
 		s1.Append(Utils.splitChar);
@@ -304,7 +305,7 @@ public class AIAnimationController : MonoBehaviour {
         aiac.clipName = Utils.LoadString(entries[index],"clipName"); index++;
 		aiac.currentClipPercentage = Utils.GetFloatFromString(entries[index],"currentClipPercentage"); index++;
 		aiac.dying = Utils.GetBoolFromString(entries[index],"dying"); index++;
-		aiac.animSwapFinished = Utils.LoadRelativeTimeDifferential(aiac._pauseScript,entries[index],"animSwapFinished"); index++;
+		aiac.animSwapFinished = aiac._utils.LoadRelativeTimeDifferential(entries[index],"animSwapFinished"); index++;
 		aiac.useDeadAnimForDeath = Utils.GetBoolFromString(entries[index],"useDeadAnimForDeath"); index++;
 		aiac.playDeathAnim = Utils.GetBoolFromString(entries[index],"playDeathAnim"); index++;
 		aiac.playDyingAnim = Utils.GetBoolFromString(entries[index],"playDyingAnim"); index++;

@@ -19,6 +19,7 @@ public class TabButtons : MonoBehaviour {
 	public int lastTab = 0;
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;	
 	void Start() {
 		TurnAllTabsOff();
@@ -77,7 +78,7 @@ public class TabButtons : MonoBehaviour {
 	}
 
 	public void TabButtonAction(int tabNum) { // For keyboard events.
-		Utils.PlayUIOneShotSavable(_consts,97);
+		_utils.PlayUIOneShotSavable(97);
 		TabButtonClickSilent(tabNum,false);
 		SetMFDLasts(tabNum);
 	}

@@ -13,6 +13,7 @@ public class GrenadeButton : MonoBehaviour {
 	private bool pointerEntered;
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private GUIState _guiState;
 	[Inject] private Inventory _inventory;
@@ -77,7 +78,7 @@ public class GrenadeButton : MonoBehaviour {
 	public void GrenadeInvSelect() {
 		_mfdManager.SendInfoToItemTab(useableItemIndex);
 		_inventory.grenadeCurrent = GrenButtonIndex; // Set current
-		Utils.PlayUIOneShotSavable(_consts,80); //changeweapon
+		_utils.PlayUIOneShotSavable(80); //changeweapon
 	}
 
 	void Start() {

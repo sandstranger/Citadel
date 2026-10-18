@@ -23,6 +23,7 @@ public class KeypadKeycode : MonoBehaviour {
 	[Inject] 
 	private LevelManager _levelManager;
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private MouseLookScript _mouseLookScript;
 
@@ -90,7 +91,7 @@ public class KeypadKeycode : MonoBehaviour {
 		}
 
 		padInUse = true;
-		Utils.PlayUIOneShotSavable(_consts,91);
+		_utils.PlayUIOneShotSavable(91);
 		_mouseLookScript.ForceInventoryMode();
 		_mfdManager.SendKeypadKeycodeToDataTab(keycode,transform.position,
 		                                        this,solved);
