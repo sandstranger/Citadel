@@ -16,6 +16,7 @@ public class GravityLift : MonoBehaviour {
 	private static StringBuilder s1 = new StringBuilder(200 * 10);
 
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerMovement _playerMovement;
 
 	void Awake() {
@@ -111,7 +112,7 @@ public class GravityLift : MonoBehaviour {
 		s1.Clear();
 		s1.Append(Utils.BoolToString(gl.active,"active")); // bool - is this gravlift on?
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(gl._pauseScript,gl.initialBurstFinished,"initialBurstFinished"));
+		s1.Append(gl._utils.SaveRelativeTimeDifferential(gl.initialBurstFinished,"initialBurstFinished"));
 		return s1.ToString();
 	}
 
@@ -133,7 +134,7 @@ public class GravityLift : MonoBehaviour {
 		}
 
 		gl.active = Utils.GetBoolFromString(entries[index],"active"); index++; // bool - is this gravlift on?
-		gl.initialBurstFinished = Utils.LoadRelativeTimeDifferential(gl._pauseScript,entries[index],"initialBurstFinished"); index++;
+		gl.initialBurstFinished = gl._utils.LoadRelativeTimeDifferential(entries[index],"initialBurstFinished"); index++;
 		return index;
 	}
 }

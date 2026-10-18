@@ -7,6 +7,7 @@ public class CyberMine : MonoBehaviour {
 	private float dmg = 22f;
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerHealth _playerHealth;
 
     void Start() {
@@ -40,7 +41,7 @@ public class CyberMine : MonoBehaviour {
 				damageData.damage = dmg;
 				// No impact force in cyberspace.
 				_playerHealth.hm.TakeDamage(damageData);
-				Utils.PlayUIOneShotSavable(_consts,67);
+				_utils.PlayUIOneShotSavable(67);
 				gameObject.SetActive(false);
 			}
 		}

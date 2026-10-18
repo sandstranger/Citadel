@@ -15,6 +15,7 @@ public class DelayedSpawn : MonoBehaviour {
 	private static StringBuilder s1 = new StringBuilder();
 
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 
 	void OnEnable() {
 		if (_pauseScript != null) timerFinished = _pauseScript.relativeTime + delay;
@@ -54,7 +55,7 @@ public class DelayedSpawn : MonoBehaviour {
 		s1.Clear();
 		s1.Append(Utils.FloatToString(ds.delay,"delay"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(ds._pauseScript,ds.timerFinished,"timerFinished"));
+		s1.Append(ds._utils.SaveRelativeTimeDifferential(ds.timerFinished,"timerFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(ds.active,"active"));
 		s1.Append(Utils.splitChar);
@@ -89,7 +90,7 @@ public class DelayedSpawn : MonoBehaviour {
 		}
 
 		ds.delay = Utils.GetFloatFromString(entries[index],"delay"); index++;
-		ds.timerFinished = Utils.LoadRelativeTimeDifferential(ds._pauseScript,entries[index],"timerFinished"); index++;
+		ds.timerFinished = ds._utils.LoadRelativeTimeDifferential(entries[index],"timerFinished"); index++;
 		ds.active = Utils.GetBoolFromString(entries[index],"active"); index++;
 		ds.despawnInstead = Utils.GetBoolFromString(entries[index],"despawnInstead"); index++;
 		ds.doSelfAfterList = Utils.GetBoolFromString(entries[index],"doSelfAfterList"); index++;

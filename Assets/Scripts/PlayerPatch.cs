@@ -48,6 +48,7 @@ public class PlayerPatch : MonoBehaviour,IInitializer {
 	[Inject] private Inventory _inventory;
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private PlayerMovement _playerMovement;
 
@@ -167,7 +168,7 @@ public class PlayerPatch : MonoBehaviour,IInitializer {
 						 + _consts.stringTable[589]),_mouseLookScript.player);
 		}
 
-		Utils.PlayUIOneShotSavable(_consts,89);
+		_utils.PlayUIOneShotSavable(89);
 		_guiState.ClearOverButton();
 	}
 
@@ -334,23 +335,23 @@ public class PlayerPatch : MonoBehaviour,IInitializer {
 		PlayerPatch pp = go.GetComponent<PlayerPatch>();
 		var pauseScript = pp._pauseScript;
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pp.berserkFinishedTime,"berserkFinishedTime"));
+		s1.Append(pp._utils.SaveRelativeTimeDifferential(pp.berserkFinishedTime,"berserkFinishedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pp.berserkIncrementFinishedTime,"berserkIncrementFinishedTime"));
+		s1.Append(pp._utils.SaveRelativeTimeDifferential(pp.berserkIncrementFinishedTime,"berserkIncrementFinishedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pp.detoxFinishedTime,"detoxFinishedTime"));
+		s1.Append(pp._utils.SaveRelativeTimeDifferential(pp.detoxFinishedTime,"detoxFinishedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pp.geniusFinishedTime,"geniusFinishedTime"));
+		s1.Append(pp._utils.SaveRelativeTimeDifferential(pp.geniusFinishedTime,"geniusFinishedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pp.mediFinishedTime,"mediFinishedTime"));
+		s1.Append(pp._utils.SaveRelativeTimeDifferential(pp.mediFinishedTime,"mediFinishedTime"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(pp.reflexFinishedTime - Time.realtimeSinceStartup,"reflexFinishedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pp.sightFinishedTime,"sightFinishedTime"));
+		s1.Append(pp._utils.SaveRelativeTimeDifferential(pp.sightFinishedTime,"sightFinishedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pp.sightSideEffectFinishedTime,"sightSideEffectFinishedTime"));
+		s1.Append(pp._utils.SaveRelativeTimeDifferential(pp.sightSideEffectFinishedTime,"sightSideEffectFinishedTime"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,pp.staminupFinishedTime,"staminupFinishedTime"));
+		s1.Append(pp._utils.SaveRelativeTimeDifferential(pp.staminupFinishedTime,"staminupFinishedTime"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(pp.berserkIncrement,"berserkIncrement"));
 		s1.Append(Utils.splitChar);
@@ -379,16 +380,16 @@ public class PlayerPatch : MonoBehaviour,IInitializer {
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		PlayerPatch pp = go.GetComponent<PlayerPatch>();
 		var pauseScript = pp._pauseScript;
-		pp.berserkFinishedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"berserkFinishedTime"); index++;
-		pp.berserkIncrementFinishedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"berserkIncrementFinishedTime"); index++;
-		pp.detoxFinishedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"detoxFinishedTime"); index++;
-		pp.geniusFinishedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"geniusFinishedTime"); index++;
-		pp.mediFinishedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"mediFinishedTime"); index++;
+		pp.berserkFinishedTime = pp._utils.LoadRelativeTimeDifferential(entries[index],"berserkFinishedTime"); index++;
+		pp.berserkIncrementFinishedTime = pp._utils.LoadRelativeTimeDifferential(entries[index],"berserkIncrementFinishedTime"); index++;
+		pp.detoxFinishedTime = pp._utils.LoadRelativeTimeDifferential(entries[index],"detoxFinishedTime"); index++;
+		pp.geniusFinishedTime = pp._utils.LoadRelativeTimeDifferential(entries[index],"geniusFinishedTime"); index++;
+		pp.mediFinishedTime = pp._utils.LoadRelativeTimeDifferential(entries[index],"mediFinishedTime"); index++;
 		pp.reflexFinishedTime = Utils.GetFloatFromString(entries[index],"reflexFinishedTime");
 		pp.reflexFinishedTime += Time.realtimeSinceStartup; index++;
-		pp.sightFinishedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"sightFinishedTime"); index++;
-		pp.sightSideEffectFinishedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"sightSideEffectFinishedTime"); index++;
-		pp.staminupFinishedTime = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"staminupFinishedTime"); index++;
+		pp.sightFinishedTime = pp._utils.LoadRelativeTimeDifferential(entries[index],"sightFinishedTime"); index++;
+		pp.sightSideEffectFinishedTime = pp._utils.LoadRelativeTimeDifferential(entries[index],"sightSideEffectFinishedTime"); index++;
+		pp.staminupFinishedTime = pp._utils.LoadRelativeTimeDifferential(entries[index],"staminupFinishedTime"); index++;
 		pp.berserkIncrement = Utils.GetIntFromString(entries[index],"berserkIncrement"); index++;
 		pp.patchActive = Utils.GetIntFromString(entries[index],"patchActive"); index++;
 		index = BerserkEffect.Load(pp.berserk.gameObject,ref entries,index);

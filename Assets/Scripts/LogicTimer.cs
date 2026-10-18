@@ -15,6 +15,7 @@ public class LogicTimer : MonoBehaviour {
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 
 	void Start() {
 		intervalFinished = _pauseScript.relativeTime + (useRandomTimes ? Random.Range(randomMin,randomMax) : timeInterval);
@@ -48,7 +49,7 @@ public class LogicTimer : MonoBehaviour {
 	public static string Save(GameObject go) {
 		LogicTimer lt = go.GetComponent<LogicTimer>();
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(lt._pauseScript,lt.intervalFinished,"intervalFinished"));
+		s1.Append(lt._utils.SaveRelativeTimeDifferential(lt.intervalFinished,"intervalFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(lt.timeInterval,"timeInterval"));
 		s1.Append(Utils.splitChar);
@@ -68,7 +69,7 @@ public class LogicTimer : MonoBehaviour {
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		LogicTimer lt = go.GetComponent<LogicTimer>();
-		lt.intervalFinished = Utils.LoadRelativeTimeDifferential(lt._pauseScript,entries[index],"intervalFinished"); index++;
+		lt.intervalFinished = lt._utils.LoadRelativeTimeDifferential(entries[index],"intervalFinished"); index++;
 		lt.timeInterval = Utils.GetFloatFromString(entries[index],"timeInterval"); index++;
 		lt.randomMin = Utils.GetFloatFromString(entries[index],"randomMin"); index++;
 		lt.randomMax = Utils.GetFloatFromString(entries[index],"randomMax"); index++;

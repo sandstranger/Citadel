@@ -145,6 +145,7 @@ public class Inventory : MonoBehaviour {
 	private static StringBuilder s1 = new StringBuilder(100 *500);
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private GetInput _getInput;
 	[Inject] private MainMenuHandler _mainMenuHandler;
@@ -1408,7 +1409,7 @@ public class Inventory : MonoBehaviour {
 				else _consts.sprint(_consts.stringTable[46],_consts.Player);
 				drillVersionText.text = softVersions[0].ToString();
 				hasSoft[0] = true;
-				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_utils.PlayUIOneShotSavable(86); // frob_hardware
 				_consts.sprint(_consts.stringTable[444] + softVersions[0].ToString() + _consts.stringTable[458],_consts.Player);
 				return true;
 			case SoftwareType.Pulser:	
@@ -1422,7 +1423,7 @@ public class Inventory : MonoBehaviour {
 				else _consts.sprint(_consts.stringTable[46],_consts.Player);
 				pulserVersionText.text = softVersions[1].ToString();
 				hasSoft[1] = true;
-				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_utils.PlayUIOneShotSavable(86); // frob_hardware
 				_consts.sprint(_consts.stringTable[445] + softVersions[1].ToString() + _consts.stringTable[458],_consts.Player);
 				return true;
 			case SoftwareType.CShield:	
@@ -1431,7 +1432,7 @@ public class Inventory : MonoBehaviour {
 				else _consts.sprint(_consts.stringTable[46],_consts.Player);
 				cshieldVersionText.text = softVersions[2].ToString();
 				hasSoft[2] = true;
-				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_utils.PlayUIOneShotSavable(86); // frob_hardware
 				_consts.sprint(_consts.stringTable[446] + softVersions[2].ToString() + _consts.stringTable[458],_consts.Player);
 				return true;
 			case SoftwareType.Turbo:
@@ -1440,7 +1441,7 @@ public class Inventory : MonoBehaviour {
 				softVersions[3]++;
 				turboCountText.text = softVersions[3].ToString();
 				hasSoft[3] = true;
-				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_utils.PlayUIOneShotSavable(86); // frob_hardware
 				_consts.sprint(_consts.stringTable[447],_consts.Player);
 				return true;
 			case SoftwareType.Decoy:	
@@ -1449,7 +1450,7 @@ public class Inventory : MonoBehaviour {
 				softVersions[4]++;
 				decoyCountText.text = softVersions[4].ToString();
 				hasSoft[4] = true;
-				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_utils.PlayUIOneShotSavable(86); // frob_hardware
 				_consts.sprint(_consts.stringTable[448],_consts.Player);
 				return true;
 			case SoftwareType.Recall:	
@@ -1458,7 +1459,7 @@ public class Inventory : MonoBehaviour {
 				softVersions[5]++;
 				recallCountText.text = softVersions[5].ToString();
 				hasSoft[5] = true;
-				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_utils.PlayUIOneShotSavable(86); // frob_hardware
 				_consts.sprint(_consts.stringTable[449],_consts.Player);
 				return true;
 			case SoftwareType.Game:		
@@ -1489,19 +1490,19 @@ public class Inventory : MonoBehaviour {
 							_consts.sprint(_consts.stringTable[456],_consts.Player);
 							break;
 				}
-				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_utils.PlayUIOneShotSavable(86); // frob_hardware
 				
 				return true;
 			case SoftwareType.Data:
 				hasNewData = true;
-				Utils.PlayUIOneShotSavable(_consts,87); // frob_item
+				_utils.PlayUIOneShotSavable(87); // frob_item
 				_consts.sprint(_consts.stringTable[457],_consts.Player);
 				hasLog[vers] = true;
 				return true;
 			case SoftwareType.Integrity:
 				//Debug.Log("Cyber integrity touched");
 				if (hm.cyberHealth >=255) return false;
-				Utils.PlayUIOneShotSavable(_consts,86); // frob_hardware
+				_utils.PlayUIOneShotSavable(86); // frob_hardware
 				hm.cyberHealth += 77f;
 				if (hm.cyberHealth > 255f) hm.cyberHealth = 255f;
 				_mfdManager.DrawTicks(true);

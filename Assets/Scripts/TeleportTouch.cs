@@ -15,6 +15,7 @@ public class TeleportTouch : MonoBehaviour {
 	[Inject] private Const _consts;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 
 	public void Awake() {
 		if (teleportID > allTeleportTouches.Length || teleportID < 0) { Destroy(this.gameObject); return; }
@@ -38,7 +39,7 @@ public class TeleportTouch : MonoBehaviour {
 						tt.justUsed = _pauseScript.relativeTime + 1.0f;
 					}
 					
-					Utils.PlayUIOneShotSavable(_consts,106);
+					_utils.PlayUIOneShotSavable(106);
 				}
 			}
 		}
@@ -48,7 +49,7 @@ public class TeleportTouch : MonoBehaviour {
 		TeleportTouch tt = go.GetComponent<TeleportTouch>();
 		var pauseScript = tt._pauseScript;
 		s1.Clear();
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,tt.justUsed,"justUsed"));
+		s1.Append(tt._utils.SaveRelativeTimeDifferential(tt.justUsed,"justUsed"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(tt.touchEnabled,"touchEnabled"));
 		s1.Append(Utils.splitChar);
@@ -60,7 +61,7 @@ public class TeleportTouch : MonoBehaviour {
 
 	public static int Load(GameObject go, ref string[] entries, int index) {
 		TeleportTouch tt = go.GetComponent<TeleportTouch>();
-		tt.justUsed = Utils.LoadRelativeTimeDifferential(tt._pauseScript,entries[index],"justUsed"); index++;
+		tt.justUsed = tt._utils.LoadRelativeTimeDifferential(entries[index],"justUsed"); index++;
 		tt.touchEnabled = Utils.GetBoolFromString(entries[index],"touchEnabled"); index++;
 		tt.teleportID = Utils.GetIntFromString(entries[index],"teleportID"); index++;
 		tt.targetDestinationID = Utils.GetIntFromString(entries[index],"targetDestinationID"); index++;

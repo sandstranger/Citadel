@@ -9,6 +9,7 @@ public class PatchButton: MonoBehaviour {
 	public int useableItemIndex;
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private PlayerPatch _playerPatch;
 	[Inject] private Inventory _inventory;
@@ -34,7 +35,7 @@ public class PatchButton: MonoBehaviour {
 			_inventory.patchCountTextObjects [i].color = _consts.ssGreenText;
 		}
 		_inventory.patchCountTextObjects[PatchButtonIndex].color = _consts.ssYellowText;
-		if (useSound) Utils.PlayUIOneShotSavable(_consts,80); //changeweapon
+		if (useSound) _utils.PlayUIOneShotSavable(80); //changeweapon
 	}
 
     void Start() {

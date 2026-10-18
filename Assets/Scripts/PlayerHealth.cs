@@ -49,6 +49,7 @@ public class PlayerHealth : MonoBehaviour {
 	[Inject] private MainMenuHandler _mainMenuHandler;
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private PlayerMovement _playerMovement;
 
 	void Start () {
@@ -129,14 +130,14 @@ public class PlayerHealth : MonoBehaviour {
 				}
 				if (radSoundFinished < _pauseScript.relativeTime) {
 					radSoundFinished = _pauseScript.relativeTime + Random.Range(1f,3f);
-					Utils.PlayUIOneShotSavable(_consts,90);
+					_utils.PlayUIOneShotSavable(90);
 				}
 			}
 		}
 		if (lastHealth > hm.health) { // Did we lose health?
 			if (painSoundFinished < _pauseScript.relativeTime && !(radSoundFinished < _pauseScript.relativeTime)) {
 				painSoundFinished = _pauseScript.relativeTime + Random.Range(0.25f,3f); // Don't spam pain sounds
-				Utils.PlayUIOneShotSavable(_consts,140);
+				_utils.PlayUIOneShotSavable(140);
 				makingNoise = true;
 			}
 		}
@@ -269,7 +270,7 @@ public class PlayerHealth : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(ph.radiationArea,"radiationArea"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ph.mediPatchPulseFinished,"mediPatchPulseFinished"));
+		s1.Append(ph._utils.SaveRelativeTimeDifferential(ph.mediPatchPulseFinished,"mediPatchPulseFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(ph.mediPatchPulseCount,"mediPatchPulseCount"));
 		s1.Append(Utils.splitChar);
@@ -277,13 +278,13 @@ public class PlayerHealth : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(ph.lastHealth,"lastHealth"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ph.painSoundFinished,"painSoundFinished"));
+		s1.Append(ph._utils.SaveRelativeTimeDifferential(ph.painSoundFinished,"painSoundFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ph.radSoundFinished,"radSoundFinished"));
+		s1.Append(ph._utils.SaveRelativeTimeDifferential(ph.radSoundFinished,"radSoundFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ph.radiationBleedOffFinished,"radiationBleedOffFinished"));
+		s1.Append(ph._utils.SaveRelativeTimeDifferential(ph.radiationBleedOffFinished,"radiationBleedOffFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,ph.radFXFinished,"radFXFinished"));
+		s1.Append(ph._utils.SaveRelativeTimeDifferential(ph.radFXFinished,"radFXFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(ph.deaths,"deaths"));
 		s1.Append(Utils.splitChar);
@@ -298,14 +299,14 @@ public class PlayerHealth : MonoBehaviour {
 		ph.timer = Utils.GetFloatFromString(entries[index],"timer"); index++; // Not relative time
 		ph.playerDead = Utils.GetBoolFromString(entries[index],"playerDead"); index++;
 		ph.radiationArea = Utils.GetBoolFromString(entries[index],"radiationArea"); index++;
-		ph.mediPatchPulseFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"mediPatchPulseFinished"); index++;
+		ph.mediPatchPulseFinished = ph._utils.LoadRelativeTimeDifferential(entries[index],"mediPatchPulseFinished"); index++;
 		ph.mediPatchPulseCount = Utils.GetIntFromString(entries[index],"mediPatchPulseCount"); index++;
 		ph.makingNoise = Utils.GetBoolFromString(entries[index],"makingNoise"); index++;
 		ph.lastHealth = Utils.GetFloatFromString(entries[index],"lastHealth"); index++;
-		ph.painSoundFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"painSoundFinished"); index++;
-		ph.radSoundFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"radSoundFinished"); index++;
-		ph.radiationBleedOffFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"radiationBleedOffFinished"); index++;
-		ph.radFXFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"radFXFinished"); index++;
+		ph.painSoundFinished = ph._utils.LoadRelativeTimeDifferential(entries[index],"painSoundFinished"); index++;
+		ph.radSoundFinished = ph._utils.LoadRelativeTimeDifferential(entries[index],"radSoundFinished"); index++;
+		ph.radiationBleedOffFinished = ph._utils.LoadRelativeTimeDifferential(entries[index],"radiationBleedOffFinished"); index++;
+		ph.radFXFinished = ph._utils.LoadRelativeTimeDifferential(entries[index],"radFXFinished"); index++;
 		ph.deaths = Utils.GetIntFromString(entries[index],"deaths"); index++;
 		ph.ressurections = Utils.GetIntFromString(entries[index],"ressurections"); index++;
 		return index;

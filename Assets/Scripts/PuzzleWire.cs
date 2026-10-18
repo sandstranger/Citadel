@@ -84,6 +84,7 @@ public class PuzzleWire : MonoBehaviour {
 	public HUDColor[] rememberColors;
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PauseScript _pauseScript;
@@ -666,7 +667,7 @@ public class PuzzleWire : MonoBehaviour {
 		actualValue = 1f;
 		slider.value = actualValue;
 		Solved = true;
-		Utils.PlayUIOneShotSavable(_consts,46);
+		_utils.PlayUIOneShotSavable(46);
 		puzzleWP.puzzleSolved = true;
 		puzzleWP.UseTargets(udSender.owner);
 		if (usedLogicProbe) {

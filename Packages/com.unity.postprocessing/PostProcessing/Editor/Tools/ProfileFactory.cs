@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEditor.ProjectWindowCallback;
 using System.IO;
@@ -12,6 +13,7 @@ namespace UnityEditor.Rendering.PostProcessing
     public sealed class ProfileFactory
     {
         [MenuItem("Assets/Create/Post-processing Profile", priority = 201)]
+        [Obsolete("Obsolete")]
         static void CreatePostProcessProfile()
         {
             //var icon = EditorGUIUtility.FindTexture("ScriptableObject Icon");
@@ -71,6 +73,7 @@ namespace UnityEditor.Rendering.PostProcessing
         }
     }
 
+    [Obsolete("Obsolete")]
     class DoCreatePostProcessProfile : EndNameEditAction
     {
         public override void Action(int instanceId, string pathName, string resourceFile)

@@ -17,6 +17,7 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 	private AudioSource SFXSource;
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private GetInput _getInput;
 	[Inject] private PauseScript _pauseScript;
@@ -42,7 +43,7 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 		if (keypad == null) return;
 		if (keypad.solved) return;
 		
-		Utils.PlayOneShotSavable(_consts,SFXSource,39);
+		_utils.PlayOneShotSavable(SFXSource,39);
 		// Digit key pressed 0 thru 9
 		if ((button >= 0) && (button <= 9))
 			SetDigit(button);
@@ -77,13 +78,13 @@ public class KeypadKeycodeButtons : MonoBehaviour {
 		
 		if (currentEntry == keycode) {
 			if ((entryHuns != -1)) {
-				Utils.PlayOneShotSavable(_consts,SFXSource,46);
+				_utils.PlayOneShotSavable(SFXSource,46);
 			}
 			keypad.UseTargets();
 			keypad.solved = true;
 		} else {
 			if ((entryHuns != -1)) {
-				Utils.PlayOneShotSavable(_consts,SFXSource,43);
+				_utils.PlayOneShotSavable(SFXSource,43);
 			}
 		}
 	}

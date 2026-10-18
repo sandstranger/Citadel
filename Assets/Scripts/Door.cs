@@ -58,6 +58,7 @@ public class Door : MonoBehaviour {
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private Inventory _inventory;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	[Inject] private QuestLogNotesManager _questLogNotesManager;
 
 	void Start () {
@@ -403,15 +404,15 @@ public class Door : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(dr.blocked,"blocked"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,dr.useFinished,"useFinished"));
+		s1.Append(dr._utils.SaveRelativeTimeDifferential(dr.useFinished,"useFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,dr.waitBeforeClose,"waitBeforeClose"));
+		s1.Append(dr._utils.SaveRelativeTimeDifferential(dr.waitBeforeClose,"waitBeforeClose"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(Utils.AccessCardTypeToInt(dr.requiredAccessCard),"requiredAccessCard"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(dr.timeBeforeLasersOn,"timeBeforeLasersOn"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,dr.lasersFinished,"lasersFinished"));
+		s1.Append(dr._utils.SaveRelativeTimeDifferential(dr.lasersFinished,"lasersFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(dr.accessCardUsedByPlayer,"accessCardUsedByPlayer"));
 		s1.Append(Utils.splitChar);
@@ -460,11 +461,11 @@ public class Door : MonoBehaviour {
 		dr.useTimeDelay = Utils.GetFloatFromString(entries[index],"useTimeDelay"); index++;
 		dr.lockedMessageLingdex = Utils.GetIntFromString(entries[index],"lockedMessageLingdex"); index++;
 		dr.blocked = Utils.GetBoolFromString(entries[index],"blocked"); index++;
-		dr.useFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"useFinished"); index++;
-		dr.waitBeforeClose = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"waitBeforeClose"); index++;
+		dr.useFinished = dr._utils.LoadRelativeTimeDifferential(entries[index],"useFinished"); index++;
+		dr.waitBeforeClose = dr._utils.LoadRelativeTimeDifferential(entries[index],"waitBeforeClose"); index++;
 		dr.requiredAccessCard = Utils.IntToAccessCardType(Utils.GetIntFromString(entries[index],"requiredAccessCard")); index++;
 		dr.timeBeforeLasersOn = Utils.GetFloatFromString(entries[index],"timeBeforeLasersOn"); index++;
-		dr.lasersFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"lasersFinished"); index++;
+		dr.lasersFinished = dr._utils.LoadRelativeTimeDifferential(entries[index],"lasersFinished"); index++;
 		dr.accessCardUsedByPlayer = Utils.GetBoolFromString(entries[index],"accessCardUsedByPlayer"); index++;
 		dr.toggleLasers = Utils.GetBoolFromString(entries[index],"toggleLasers"); index++;
 		dr.targettingOnlyUnlocks = Utils.GetBoolFromString(entries[index],"targettingOnlyUnlocks"); index++;

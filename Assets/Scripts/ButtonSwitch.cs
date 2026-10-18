@@ -50,6 +50,7 @@ public class ButtonSwitch : MonoBehaviour {
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly MFDManager _mfdManager;
 	[Inject] private readonly PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	private Color _normalColor;
 	private readonly List<MaterialPropertyHelper> _materialPropertyHelpers = new();
 	private readonly List<MeshRenderer> _renderers = new();
@@ -241,9 +242,9 @@ public class ButtonSwitch : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(bs.alternateOn,"alternateOn"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(bs._pauseScript,bs.delayFinished,"delayFinished"));
+		s1.Append(bs._utils.SaveRelativeTimeDifferential(bs.delayFinished,"delayFinished"));
 	    s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(bs._pauseScript,bs.tickFinished,"tickFinished"));
+		s1.Append(bs._utils.SaveRelativeTimeDifferential(bs.tickFinished,"tickFinished"));
 		s1.Append(Utils.splitChar);
 		if (bs.animateModel) {
 			if (bs.anim == null) bs.anim = bs.gameObject.GetComponent<Animator>();
@@ -278,13 +279,13 @@ public class ButtonSwitch : MonoBehaviour {
 		bs.lockedMessageLingdex = Utils.GetIntFromString(entries[index],"lockedMessageLingdex"); index++;
 		bs.active = Utils.GetBoolFromString(entries[index],"active"); index++;
 		bs.alternateOn = Utils.GetBoolFromString(entries[index],"alternateOn"); index++;
-		bs.delayFinished = Utils.LoadRelativeTimeDifferential(bs._pauseScript,entries[index],"delayFinished"); index++;
+		bs.delayFinished = bs._utils.LoadRelativeTimeDifferential(entries[index],"delayFinished"); index++;
 		bs.delayFinished = 0;
 // 		if (bs.delayFinished >= 0.1f) {
 // 			bs.delayFinished = Mathf.Max(Mathf.Max(bs.delayFinished,_pauseScript.relativeTime + bs.delay),Time.time + bs.delay);
 // 		}
 		
-		bs.tickFinished = Utils.LoadRelativeTimeDifferential(bs._pauseScript,entries[index],"tickFinished"); index++;
+		bs.tickFinished = bs._utils.LoadRelativeTimeDifferential(entries[index],"tickFinished"); index++;
 		if ((bs.tickFinished - bs._pauseScript.relativeTime) > tickTime) {
 			bs.tickFinished = bs._pauseScript.relativeTime + tickTime;
 		}

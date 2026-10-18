@@ -13,6 +13,7 @@ public class ProjectileEffectImpact : MonoBehaviour {
     [HideInInspector] public int numHits;
 	private static StringBuilder s1 = new StringBuilder(100);
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private Music _music;
 	[Inject] private WeaponFire _weaponFire;
 
@@ -42,7 +43,7 @@ public class ProjectileEffectImpact : MonoBehaviour {
 		// Most already was when launched by AIController or WeaponFire.
 		dd.damage = DamageData.GetDamageTakeAmount(dd);
 		if (impactType == PoolType.RailgunImpacts) {
-			Utils.ApplyImpactForceSphere(_consts,dd,transform.position,3.2f,1f);
+			_utils.ApplyImpactForceSphere(dd,transform.position,3.2f,1f);
 			_weaponFire.fogFac += 4;
 		}
 

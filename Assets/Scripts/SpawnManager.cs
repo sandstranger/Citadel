@@ -25,6 +25,7 @@ public class SpawnManager : MonoBehaviour {
 	[Inject] private LevelManager _levelManager;
 	[Inject] private ConsoleEmulator _consoleEmulator;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 
 	private static readonly StringBuilder s1 = new(100 * 500);
 
@@ -157,7 +158,7 @@ public class SpawnManager : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(sm.numberActive,"numberActive"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(sm._pauseScript,sm.delayFinished,"delayFinished"));
+		s1.Append(sm._utils.SaveRelativeTimeDifferential(sm.delayFinished,"delayFinished"));
 		return s1.ToString();
 	}
 
@@ -171,7 +172,7 @@ public class SpawnManager : MonoBehaviour {
 		// goodness gracious!)
 		sm.active = Utils.GetBoolFromString(entries[index],"SpawnManager.active"); index++;
 		sm.numberActive = Utils.GetIntFromString(entries[index],"numberActive"); index++;
-		sm.delayFinished = Utils.LoadRelativeTimeDifferential(sm._pauseScript,entries[index],"delayFinished"); index++;
+		sm.delayFinished = sm._utils.LoadRelativeTimeDifferential(entries[index],"delayFinished"); index++;
 		return index;
 	}
 }

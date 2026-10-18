@@ -55,6 +55,7 @@ public class PuzzleGrid : MonoBehaviour {
 	private bool[] checkedCells;
 
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PauseScript _pauseScript;
@@ -431,7 +432,7 @@ public class PuzzleGrid : MonoBehaviour {
 
 		puzzleSolved = true;
 		outputNode.overrideSprite = nodeOn;
-		Utils.PlayUIOneShotSavable(_consts,46);
+		_utils.PlayUIOneShotSavable(46);
 		puzzleGP.puzzleSolved = true;
 		puzzleGP.UseTargets(udSender.owner);
 		progressBar.value = 100f;

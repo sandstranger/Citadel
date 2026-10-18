@@ -81,6 +81,7 @@ namespace Citadel.Game
             Container.Bind<AudioSource>().WithId(MainAudioSourceName).FromInstance(_mainmenuMusic).AsSingle();
             Container.Bind<ITexturesStorage>().FromInstance(texturesStorage).AsSingle();
             Container.Bind<IResourcesLoader>().FromInstance(AddressablesResourcesLoader.Default).AsSingle();
+            Container.Bind<Utils>().AsSingle();
             Container.Bind<AndroidConfig>().FromInstance(AndroidConfig.Default).AsSingle();
             Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>()
                 .FromInstance(_postProcessLayerStorages).AsSingle();

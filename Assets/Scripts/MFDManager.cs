@@ -309,7 +309,7 @@ public class MFDManager : MonoBehaviour  {
 		if (_mouseLookScript.inCyberSpace) {
 			// There's only two cyberspace weapons, up is down.
 			_inventory.isPulserNotDrill = !_inventory.isPulserNotDrill;
-			Utils.PlayUIOneShotSavable(_consts,80); // changeweapon
+			_utils.PlayUIOneShotSavable(80); // changeweapon
 			if (_inventory.isPulserNotDrill) {
 				_inventory.pulserButtonText.Select(true);
 				_inventory.drillButtonText.Select(false);
@@ -335,7 +335,7 @@ public class MFDManager : MonoBehaviour  {
 		if (_mouseLookScript.inCyberSpace) {
 			// There's only two cyberspace weapons, up is down.
 			_inventory.isPulserNotDrill = !_inventory.isPulserNotDrill;
-			Utils.PlayUIOneShotSavable(_consts,80); // changeweapon
+			_utils.PlayUIOneShotSavable(80); // changeweapon
 			if (_inventory.isPulserNotDrill) {
 				_inventory.pulserButtonText.Select(true);
 				_inventory.drillButtonText.Select(false);
@@ -415,11 +415,11 @@ public class MFDManager : MonoBehaviour  {
 		if (Input.GetKeyDown(KeyCode.PageUp)) {
 			if (DataReaderContentTab.activeInHierarchy) {
 				ResetMultiMediaTabs();
-				Utils.PlayUIOneShotSavable(_consts,97);
+				_utils.PlayUIOneShotSavable(97);
 				CenterTabButtonClickSilent(0,true);
 				if (_inventory.hardwareIsActive[3]) {
 					hwb.SensaroundOff();
-					Utils.PlayUIOneShotSavable(_consts,82); // deactivate
+					_utils.PlayUIOneShotSavable(82); // deactivate
 				}
 			} else {
 				switch(curCenterTab) {
@@ -434,11 +434,11 @@ public class MFDManager : MonoBehaviour  {
 		if (Input.GetKeyDown(KeyCode.PageDown)) {
 			if (DataReaderContentTab.activeInHierarchy) {
 				ResetMultiMediaTabs();
-				Utils.PlayUIOneShotSavable(_consts,97);
+				_utils.PlayUIOneShotSavable(97);
 				CenterTabButtonClickSilent(0,true);
 				if (_inventory.hardwareIsActive[3]) {
 					hwb.SensaroundOff();
-					Utils.PlayUIOneShotSavable(_consts,82); // deactivate
+					_utils.PlayUIOneShotSavable(82); // deactivate
 				}
 			} else {
 				switch(curCenterTab) {
@@ -1304,7 +1304,7 @@ public class MFDManager : MonoBehaviour  {
 		}
 
 		_consts.sprint(25);
-		Utils.PlayUIOneShotSavable(_consts,468,0.85f);
+		_utils.PlayUIOneShotSavable(468,0.85f);
 		objectInUsePos = tetherPoint;
 		usingObject = true;
 	}
@@ -1729,11 +1729,11 @@ public class MFDManager : MonoBehaviour  {
 	public void CenterTabButtonAction(int tabNum) {
 		if (_pauseScript.mainMenu.activeInHierarchy) return;
 
-		Utils.PlayUIOneShotSavable(_consts,97);
+		_utils.PlayUIOneShotSavable(97);
 		CenterTabButtonClickSilent(tabNum,false);
 		if (_inventory.hardwareIsActive[3]) {
 			hwb.SensaroundOff();
-			Utils.PlayUIOneShotSavable(_consts,82); // deactivate
+			_utils.PlayUIOneShotSavable(82); // deactivate
 		}
 	}
 
@@ -2084,13 +2084,13 @@ public class MFDManager : MonoBehaviour  {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(mfd.logLevelsFolder.activeSelf,"logLevelsFolder.activeSelf"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,mfd.logFinished,"logFinished"));
+		s1.Append(mfd._utils.SaveRelativeTimeDifferential(mfd.logFinished,"logFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(mfd.logActive,"logActive"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.IntToString(Utils.GetIntFromAudioLogType(mfd.logType),"logType"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,mfd.cyberTimer.GetComponent<CyberTimer>().timerFinished,"mfd.cyberTimer.timerFinished"));
+		s1.Append(mfd._utils.SaveRelativeTimeDifferential(mfd.cyberTimer.GetComponent<CyberTimer>().timerFinished,"mfd.cyberTimer.timerFinished"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.UintToString(mfd.leftTC.curTab,"leftTC.curTab"));
 		s1.Append(Utils.splitChar);
@@ -2122,9 +2122,9 @@ public class MFDManager : MonoBehaviour  {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(mfd._missionTimer.lastTimer,"MissionTimer.a.lastTimer"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,mfd._missionTimer.timerFinished,"MissionTimer.a.timerFinished"));
+		s1.Append(mfd._utils.SaveRelativeTimeDifferential(mfd._missionTimer.timerFinished,"MissionTimer.a.timerFinished"));
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(pauseScript,mfd._missionTimer.t,"MissionTimer.a.t"));
+		s1.Append(mfd._utils.SaveRelativeTimeDifferential(mfd._missionTimer.t,"MissionTimer.a.t"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.SaveString(mfd._missionTimer.currentMission,"MissionTimer.a.currentMission"));
 		s1.Append(Utils.splitChar);
@@ -2163,10 +2163,10 @@ public class MFDManager : MonoBehaviour  {
 		mfd.DataReaderContentTab.SetActive(Utils.GetBoolFromString(entries[index],"DataReaderContentTab.activeSelf")); index++;
 		mfd.logTable.SetActive(Utils.GetBoolFromString(entries[index],"logTable.activeSelf")); index++;
 		mfd.logLevelsFolder.SetActive(Utils.GetBoolFromString(entries[index],"logLevelsFolder.activeSelf")); index++;
-		mfd.logFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"logFinished"); index++;
+		mfd.logFinished = mfd._utils.LoadRelativeTimeDifferential(entries[index],"logFinished"); index++;
 		mfd.logActive = Utils.GetBoolFromString(entries[index],"logActive"); index++;
 		mfd.logType = Utils.GetAudioLogTypeFromInt(Utils.GetIntFromString(entries[index],"logType")); index++;
-		mfd.cyberTimer.GetComponent<CyberTimer>().timerFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"mfd.cyberTimer.timerFinished"); index++;
+		mfd.cyberTimer.GetComponent<CyberTimer>().timerFinished = mfd._utils.LoadRelativeTimeDifferential(entries[index],"mfd.cyberTimer.timerFinished"); index++;
 		mfd.leftTC.curTab = Utils.GetIntFromString(entries[index],"leftTC.curTab"); index++;
 		mfd.leftTC.SetCurrentAsLast();
 		mfd.leftTC.ReturnToLastTab();
@@ -2188,8 +2188,8 @@ public class MFDManager : MonoBehaviour  {
 		mfd.SetWepInfo(mfd._weaponCurrent.weaponIndex);
 		mfd._missionTimer.currentMissionIndex = Utils.GetIntFromString(entries[index],"MissionTimer.a.currentMissionIndex"); index++;
 		mfd._missionTimer.lastTimer = Utils.GetBoolFromString(entries[index],"MissionTimer.a.lastTimer"); index++;
-		mfd._missionTimer.timerFinished = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"MissionTimer.a.timerFinished"); index++;
-		mfd._missionTimer.t = Utils.LoadRelativeTimeDifferential(pauseScript,entries[index],"MissionTimer.a.t"); index++;
+		mfd._missionTimer.timerFinished = mfd._utils.LoadRelativeTimeDifferential(entries[index],"MissionTimer.a.timerFinished"); index++;
+		mfd._missionTimer.t = mfd._utils.LoadRelativeTimeDifferential(entries[index],"MissionTimer.a.t"); index++;
 		mfd._missionTimer.currentMission = Utils.LoadString(entries[index],"MissionTimer.a.currentMission"); index++;
 		mfd._missionTimer.text.text = Utils.LoadString(entries[index],"MissionTimer.a.text.text"); index++;
 		mfd._missionTimer.timerTypeText.text = Utils.LoadString(entries[index],"MissionTimer.a.timerTypeText.text"); index++;

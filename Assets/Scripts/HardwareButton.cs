@@ -49,6 +49,7 @@ public class HardwareButton : MonoBehaviour {
 	private BiomonitorGraphSystem _biomonitorGraphSystem;
 	[Inject] private PlayerEnergy _playerEnergy;
 	[Inject] private Const _consts;
+	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private GetInput _getInput;
 	[Inject] private Inventory _inventory;
@@ -112,7 +113,7 @@ public class HardwareButton : MonoBehaviour {
 			return;
 		}
 
-		Utils.PlayUIOneShotSavable(_consts,78);
+		_utils.PlayUIOneShotSavable(78);
 		if (_inventory.BioMonitorActive()) {
 			BioOff();
 		} else {
@@ -195,10 +196,10 @@ public class HardwareButton : MonoBehaviour {
 		if (_playerEnergy.energy <=0) { _consts.sprint(_consts.stringTable[314],_weaponCurrent.owner); return; }
 
 		if (_inventory.hardwareIsActive[3]) {
-			Utils.PlayUIOneShotSavable(_consts,82);
+			_utils.PlayUIOneShotSavable(82);
 			SensaroundOff();
 		} else {
-			Utils.PlayUIOneShotSavable(_consts,93);
+			_utils.PlayUIOneShotSavable(93);
 			SensaroundOn();
 		}
 	}
@@ -228,10 +229,10 @@ public class HardwareButton : MonoBehaviour {
 	public void ShieldAction() {
 		if (_playerEnergy.energy <=0) { _consts.sprint(_consts.stringTable[314],_weaponCurrent.owner); return; }
 		if (_inventory.hardwareIsActive[5]) {
-			Utils.PlayUIOneShotSavable(_consts,95);
+			_utils.PlayUIOneShotSavable(95);
 			ShieldOffWithEffects();
 		} else {
-			Utils.PlayUIOneShotSavable(_consts,96);
+			_utils.PlayUIOneShotSavable(96);
 			ShieldDeactivateFX.SetActive(false);
 			ShieldActivateFX.SetActive(true);
 			ShieldOn();
@@ -253,7 +254,7 @@ public class HardwareButton : MonoBehaviour {
 
 	public void LanternAction() {
 		if (_playerEnergy.energy <=0) { _consts.sprint(_consts.stringTable[314],_weaponCurrent.owner); return; }
-		Utils.PlayUIOneShotSavable(_consts,78);
+		_utils.PlayUIOneShotSavable(78);
 		if (_inventory.hardwareIsActive[7]) {
 			LanternOff();
 		} else {
@@ -293,9 +294,9 @@ public class HardwareButton : MonoBehaviour {
 	public void InfraredAction() {
 		if (_playerEnergy.energy <=0) { _consts.sprint(_consts.stringTable[314],_weaponCurrent.owner); return; }
 		if (_inventory.hardwareIsActive[11]) {
-			Utils.PlayUIOneShotSavable(_consts,82);
+			_utils.PlayUIOneShotSavable(82);
 		} else {
-			Utils.PlayUIOneShotSavable(_consts,98);
+			_utils.PlayUIOneShotSavable(98);
 		}
 		_inventory.hardwareIsActive[11] = !_inventory.hardwareIsActive[11];
 		SetVersionIconForButton(_inventory.hardwareIsActive[11], _inventory.hardwareVersionSetting[11],4);
@@ -336,7 +337,7 @@ public class HardwareButton : MonoBehaviour {
 	}
 
 	public void EReaderAction() {
-		Utils.PlayUIOneShotSavable(_consts,97);
+		_utils.PlayUIOneShotSavable(97);
 		EReaderOn();
 	}
 
@@ -352,7 +353,7 @@ public class HardwareButton : MonoBehaviour {
 			return;
 		}
 
-		Utils.PlayUIOneShotSavable(_consts,78);
+		_utils.PlayUIOneShotSavable(78);
 		if (_inventory.hardwareIsActive[9]) {
 			BoosterOff();
 		} else {
@@ -382,7 +383,7 @@ public class HardwareButton : MonoBehaviour {
 			return;
 		}
 
-		Utils.PlayUIOneShotSavable(_consts,78);
+		_utils.PlayUIOneShotSavable(78);
 		_inventory.JumpJetsToggle();
 		if (_inventory.JumpJetsActive()) {
 			JumpJetsOn();

@@ -33,6 +33,7 @@ public class LightAnimation : MonoBehaviour {
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
+	[Inject] private readonly Utils _utils;
 	
 	public void Start () {
 		if (initialized) return;
@@ -171,11 +172,11 @@ public class LightAnimation : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(la.lerpValue,"lerpValue")); // %
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(la._pauseScript,la.lerpTime,"lerpTime"));
+		s1.Append(la._utils.SaveRelativeTimeDifferential(la.lerpTime,"lerpTime"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.FloatToString(la.stepTime,"stepTime")); // Not a timer, current time amount
 		s1.Append(Utils.splitChar);
-		s1.Append(Utils.SaveRelativeTimeDifferential(la._pauseScript,la.lerpStartTime,"lerpStartTime"));
+		s1.Append(la._utils.SaveRelativeTimeDifferential(la.lerpStartTime,"lerpStartTime"));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(la.animLight.enabled,"light.enabled"));
 		return s1.ToString();
@@ -200,9 +201,9 @@ public class LightAnimation : MonoBehaviour {
 		la.lerpOn = Utils.GetBoolFromString(entries[index],"lerpOn"); index++;
 		la.currentStep = Utils.GetIntFromString(entries[index],"currentStep"); index++;
 		la.lerpValue = Utils.GetFloatFromString(entries[index],"lerpValue"); index++; // %
-		la.lerpTime = Utils.LoadRelativeTimeDifferential(la._pauseScript,entries[index],"lerpTime"); index++;
+		la.lerpTime = la._utils.LoadRelativeTimeDifferential(entries[index],"lerpTime"); index++;
 		la.stepTime = Utils.GetFloatFromString(entries[index],"stepTime"); index++; // Not a timer, current time amount
-		la.lerpStartTime = Utils.LoadRelativeTimeDifferential(la._pauseScript,entries[index],"lerpStartTime"); index++;
+		la.lerpStartTime = la._utils.LoadRelativeTimeDifferential(entries[index],"lerpStartTime"); index++;
 		la.animLight.enabled = Utils.GetBoolFromString(entries[index],"light.enabled"); index++;
 		return index;
 	}
