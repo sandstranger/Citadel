@@ -141,6 +141,8 @@ namespace DigitalRuby.LightningBolt
 
         private void GenerateLightningBolt(Vector3 start, Vector3 end, int generation, int totalGenerations, float offsetAmount)
         {
+            const int maxSegments = 1000;
+
             if (generation < 0 || generation > 8)
             {
                 return;
@@ -162,11 +164,11 @@ namespace DigitalRuby.LightningBolt
                 offsetAmount = (end - start).magnitude * ChaosFactor;
             }
 
-            while (generation-- > 0)
+            while (generation-- > 0 && segments.Count < maxSegments)
             {
                 int previousStartIndex = startIndex;
                 startIndex = segments.Count;
-                for (int i = previousStartIndex; i < startIndex; i++)
+                for (int i = previousStartIndex; i < startIndex && segments.Count < maxSegments; i++)
                 {
                     start = segments[i].Key;
                     end = segments[i].Value;

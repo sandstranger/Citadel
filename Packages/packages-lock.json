@@ -1,5 +1,16 @@
 {
   "dependencies": {
+    "com.annulusgames.lit-motion": {
+      "version": "https://github.com/annulusgames/LitMotion.git?path=src/LitMotion/Assets/LitMotion",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.burst": "1.6.0",
+        "com.unity.collections": "1.5.1",
+        "com.unity.mathematics": "1.0.1"
+      },
+      "hash": "422eb124051c81a9bc3f422ebf190703c5053514"
+    },
     "com.cysharp.unitask": {
       "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
       "depth": 0,
@@ -26,7 +37,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "a7c6b49a0141a5bff9b1983e38137522ef61977d"
+      "hash": "acc1c7bc9ea34c33b830e40316fca52553878d29"
     },
     "com.gwiazdorrr.betterstreamingassets": {
       "version": "https://github.com/gwiazdorrr/BetterStreamingAssets.git",
@@ -83,7 +94,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ai.navigation": {
-      "version": "2.0.15",
+      "version": "2.0.16",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -136,7 +147,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.27",
+      "version": "2.0.28",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -152,7 +163,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.20.0",
+      "version": "1.20.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -187,7 +198,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.performance.profile-analyzer": {
-      "version": "1.4.0",
+      "version": "1.4.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
@@ -294,7 +305,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "d741912bfeaad8da4fe0f258f4f3eefe1fe7b3f3"
+      "hash": "53fdb3122645bcd3ad2c258235200dff3dfbaa9b"
     },
     "com.yasirkula.assetusagedetector": {
       "version": "https://github.com/yasirkula/UnityAssetUsageDetector.git",
@@ -315,7 +326,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "bce53b258059a5e6563e0be233f804a4f189649e"
+      "hash": "b9a2798fa5dbe92815dd6c9cb69e5c1ed69fff66"
     },
     "com.yvesalbuquerque.autolod": {
       "version": "file:com.yvesalbuquerque.autolod",

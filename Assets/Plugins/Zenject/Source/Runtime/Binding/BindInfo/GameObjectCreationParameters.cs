@@ -9,7 +9,7 @@ namespace Zenject
     public class GameObjectCreationParameters
     {
         public string AddressablesAssetName { get; set; }
-
+        
         public string Name
         {
             get;

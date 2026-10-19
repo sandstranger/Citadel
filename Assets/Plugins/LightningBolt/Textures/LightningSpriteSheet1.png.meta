@@ -94,6 +94,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 59471
   packageName: Lightning Bolt Effect for Unity
-  packageVersion: 1.0.1
-  assetPath: Assets/LightningBolt/Textures/LightningSpriteSheet1.png
-  uploadId: 500399
+  packageVersion: 1.1.0
+  assetPath: Assets/Plugins/LightningBolt/Textures/LightningSpriteSheet1.png
+  uploadId: 898548

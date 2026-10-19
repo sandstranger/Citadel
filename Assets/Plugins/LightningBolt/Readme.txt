@@ -4,7 +4,7 @@ Created by Jeff Johnson
 
 http://www.digitalruby.com
 
-Version 1.0
+Version 1.1.0
 
 Simple Lightning Bolt is a highly performant and easy way to add lightning and electricity effects to your Unity app or game.
 
