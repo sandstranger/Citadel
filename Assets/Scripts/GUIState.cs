@@ -14,7 +14,7 @@ public class GUIState : MonoBehaviour {
 	public ButtonType overButtonType = ButtonType.None;
 	public bool overButton;
 	[HideInInspector] public GameObject currentButton;
-	private static readonly StringBuilder s1 = new(100 * 1024);
+
 
 	private void Awake()
 	{
@@ -39,6 +39,8 @@ public class GUIState : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		GUIState guis = go.GetComponent<GUIState>();
 		if (guis == null) {
 			Debug.Log("GUIState missing!  GameObject.name: " + go.name);

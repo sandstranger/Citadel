@@ -1165,7 +1165,8 @@ namespace Tests {
         private string ParentChain(GameObject go) {
             if (go.transform.parent == null) return "none";
 
-            StringBuilder s1 = new StringBuilder();
+            using var __stringBuilderLease1 = StringBuilderPool.Rent();
+            var s1 = __stringBuilderLease1.Builder;
             s1.Clear();
             Transform tr = go.transform;
             while(tr.parent != null) {

@@ -112,7 +112,8 @@ public static class SaveLoad {
                 if (pidmain == null) { // Ok we are a saveable container object most likely
                     if (sobmain != null) {
                         if (sobmain.saveType == SaveableType.Transform) { // Ok final check, most definitely a toggleable container that has nothing of its own.
-                            StringBuilder nest = new StringBuilder();
+                            using var __stringBuilderLease1 = StringBuilderPool.Rent();
+                            var nest = __stringBuilderLease1.Builder;
                             nest.Clear();
                             nest.Append("container " + go.name);
                             nest.Append(splitChar);
@@ -132,7 +133,8 @@ public static class SaveLoad {
             if (go.transform.childCount >= 1) {
                 if (sobmain != null) {
                     if (sobmain.saveType == SaveableType.Transform) { // Ok final check, most definitely a toggleable container that has nothing of its own.
-                        StringBuilder nest = new StringBuilder();
+                        using var __stringBuilderLease2 = StringBuilderPool.Rent();
+                        var nest = __stringBuilderLease2.Builder;
                         nest.Clear();
                         nest.Append("container " + go.name);
                         nest.Append(splitChar);
@@ -179,7 +181,8 @@ public static class SaveLoad {
             return await LoadStaticImmutable(@const,consoleEmulator,entries,lineNum,curlevel);
         } else {
             // Something went wrong, rebuild the line and print it.
-            StringBuilder s1 = new StringBuilder(100 * 500);
+            using var __stringBuilderLease3 = StringBuilderPool.Rent(100 * 500);
+            var s1 = __stringBuilderLease3.Builder;
             s1.Clear();
             for (int i=0;i<entries.Length;i++) {
                 s1.Append(entries[i]);
@@ -198,7 +201,8 @@ public static class SaveLoad {
         if (!ConsoleEmulator.ConstIndexIsStaticObjectImmutable(pid.constIndex)) {
             Debug.LogError(go.name + " is not a static object immutable, has constIndex of " + pid.constIndex.ToString());
         }
-        StringBuilder s1 = new StringBuilder(100 * 500);
+        using var __stringBuilderLease4 = StringBuilderPool.Rent(100 * 500);
+        var s1 = __stringBuilderLease4.Builder;
         s1.Clear();
         s1.Append(Utils.IntToString(pid.constIndex,"constIndex"));
         s1.Append(splitChar);
@@ -627,7 +631,8 @@ public static class SaveLoad {
             } 
         #endif
         
-        StringBuilder s1 = new StringBuilder();
+        using var __stringBuilderLease5 = StringBuilderPool.Rent();
+        var s1 = __stringBuilderLease5.Builder;
         s1.Clear();
         s1.Append(Utils.UintToString(pid.constIndex,"constIndex"));
         s1.Append(Utils.splitChar);
@@ -965,7 +970,8 @@ public static class SaveLoad {
         Light lit = go.GetComponent<Light>();
         if (lit == null) { Debug.LogError("Missing Light component when trying to SaveLight on " + go.name); return ""; }
 
-        StringBuilder s1 = new StringBuilder();
+        using var __stringBuilderLease6 = StringBuilderPool.Rent();
+        var s1 = __stringBuilderLease6.Builder;
         s1.Clear();
         Transform tr = go.transform;
         s1.Append(Utils.SaveTransform(go.transform));

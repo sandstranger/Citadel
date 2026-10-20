@@ -121,7 +121,7 @@ public class MouseLookScript : MonoBehaviour {
 	
 	private int _prefabIndexToInstantiate;
 	
-	private static readonly StringBuilder s1 = new StringBuilder(500 * 1024);
+
     
     void Start (){
 		ResetHeldItem();
@@ -1421,6 +1421,8 @@ public class MouseLookScript : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(500 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		MouseLookScript ml = go.GetComponent<MouseLookScript>();
 		var pauseScript = ml._pauseScript;
         s1.Clear();

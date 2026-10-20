@@ -23,7 +23,7 @@ public class PuzzleWirePuzzle : MonoBehaviour {
 	public int messageOnLockedLingdex = 302;
 	public int messageOnBrokenLingdex = 189;
 	public bool puzzleSolved; // save
-	private static StringBuilder s1 = new(100 * 500);
+
 	private Animator anim;
 	
 	public bool animate = true;
@@ -110,6 +110,8 @@ public class PuzzleWirePuzzle : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		PuzzleWirePuzzle pwp = go.GetComponent<PuzzleWirePuzzle>();
 		s1.Clear();
 		s1.Append(Utils.BoolToString(pwp.puzzleSolved,"puzzleSolved"));

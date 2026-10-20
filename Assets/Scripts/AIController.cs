@@ -127,7 +127,7 @@ public class AIController : MonoBehaviour {
 	public float posCheckFinished;
 	private const float positionCheckDelay = 2f;
 	private const float searchTime = 5f;
-	private static StringBuilder s1 = new StringBuilder();
+
 	private static Vector3 targetOffset = new Vector3(0f,0.24f,0f);
 
 	[Inject] 
@@ -1878,6 +1878,8 @@ public class AIController : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease1.Builder;
 		AIController aic = go.GetComponent<AIController>();
 		var pauseScript = aic._pauseScript;
 		s1.Clear();

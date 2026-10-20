@@ -395,8 +395,8 @@ public class Const : SingletonHelper<Const>
 	
 	// Private CONSTANTS
 	[HideInInspector] public int TARGET_FPS = 240;
-	private StringBuilder s1;
-	private StringBuilder s2;
+
+
 
 	public ConsoleEmulator ConsoleEmulator => _consoleEmulator;
 	public DynamicCulling DynamicCulling => _dynamicCulling;
@@ -472,8 +472,6 @@ public class Const : SingletonHelper<Const>
 		allParents.Clear();
 		allParents = null;
 
-		s1 = new StringBuilder(StringBuilderSize);
-		s2 = new StringBuilder(StringBuilderSize);
 		if (mainMenuInit != null) {
 			if (!mainMenuInit.activeSelf) mainMenuInit.SetActive(true);
 		}
@@ -622,7 +620,8 @@ public class Const : SingletonHelper<Const>
 	public void LoadAudioLogMetaData() {
 		// The following to be assigned to the arrays in the Unity Const data structure
 		int readIndexOfLog, readLogImageLHIndex, readLogImageRHIndex; // look-up index for assigning the following data on the line in the file to the arrays
-		StringBuilder readLogText = new StringBuilder(); // loaded into string audioLogSpeech2Text[]
+		using var __stringBuilderLease2 = StringBuilderPool.Rent();
+		var readLogText = __stringBuilderLease2.Builder; // loaded into string audioLogSpeech2Text[]
 		string readline; // variable to hold each string read in from the file
 		char logSplitChar = ',';
 		string tF = null;
@@ -740,7 +739,8 @@ public class Const : SingletonHelper<Const>
 		string readline; // variable to hold each string read in from the file
 		int pagenum = 0;
 		creditsLength = 1;
-		StringBuilder page = new StringBuilder(StringBuilderSize);
+		using var __stringBuilderLease3 = StringBuilderPool.Rent(StringBuilderSize);
+		var page = __stringBuilderLease3.Builder;
 		StreamReader dataReader = Utils.ReadStreamingAsset("credits.txt");
 		using (dataReader) {
 			do {
@@ -1215,44 +1215,49 @@ public class Const : SingletonHelper<Const>
 
 		saveData.Add(savename);
 		
-		// Credit Stats and Times
-		s1.Clear();
-		s1.Append(Utils.FloatToString(_pauseScript.relativeTime,"GameTime"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.FloatToString(_pauseScript.absoluteTime,"TotalPlayTime"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.IntToString(kills,"kills"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.IntToString(kills,"cyberkills"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.IntToString(shotsFired,"shotsFired"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.IntToString(grenadesThrown,"grenadesThrown"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.FloatToString(damageDealt,"damageDealt"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.FloatToString(damageReceived,"damageReceived"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.IntToString(savesScummed,"savesScummed"));
-		saveData.Add(s1.ToString());
+		using (var __stringBuilderLease1 = StringBuilderPool.Rent(StringBuilderSize))
+		{
+			var s1 = __stringBuilderLease1.Builder;
+			// Credit Stats and Times
+			s1.Clear();
+			s1.Append(Utils.FloatToString(_pauseScript.relativeTime,"GameTime"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.FloatToString(_pauseScript.absoluteTime,"TotalPlayTime"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.IntToString(kills,"kills"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.IntToString(kills,"cyberkills"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.IntToString(shotsFired,"shotsFired"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.IntToString(grenadesThrown,"grenadesThrown"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.FloatToString(damageDealt,"damageDealt"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.FloatToString(damageReceived,"damageReceived"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.IntToString(savesScummed,"savesScummed"));
+			saveData.Add(s1.ToString());
 
-		s1.Clear();
-		s1.Append(_levelManager.Save());
-		s1.Append(Utils.splitChar);
-		s1.Append(questData.Save());
-		s1.Append(Utils.splitChar);
-		s1.Append(_questLogNotesManager.Save());
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.UintToString(difficultyCombat,"difficultyCombat"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.UintToString(difficultyMission,"difficultyMission"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.UintToString(difficultyPuzzle,"difficultyPuzzle"));
-		s1.Append(Utils.splitChar);
-		s1.Append(Utils.UintToString(difficultyCyber,"difficultyCyber"));
-		saveData.Add(s1.ToString());
-		
-		s1.Clear();
+			s1.Clear();
+			s1.Append(_levelManager.Save());
+			s1.Append(Utils.splitChar);
+			s1.Append(questData.Save());
+			s1.Append(Utils.splitChar);
+			s1.Append(_questLogNotesManager.Save());
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.UintToString(difficultyCombat,"difficultyCombat"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.UintToString(difficultyMission,"difficultyMission"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.UintToString(difficultyPuzzle,"difficultyPuzzle"));
+			s1.Append(Utils.splitChar);
+			s1.Append(Utils.UintToString(difficultyCyber,"difficultyCyber"));
+			saveData.Add(s1.ToString());
+			
+			s1.Clear();
+
+		}
 
 		// Save all the objects data
 		for (i=0;i<saveableGameObjects.Count;i++) {
@@ -2106,7 +2111,8 @@ public class Const : SingletonHelper<Const>
 	}
 
 	public string CreditsStats() {
-	    StringBuilder s1 = new StringBuilder();
+	    using var __stringBuilderLease4 = StringBuilderPool.Rent();
+	    var s1 = __stringBuilderLease4.Builder;
 	    s1.Clear();
 	    s1.Append("======================================================================");
         s1.Append("\n");
@@ -2225,7 +2231,5 @@ public class Const : SingletonHelper<Const>
 		player1PlayerMovementScript = null;
 		player1PlayerHealthScript = null;
 		player1CapsuleMainCameragGO = null;
-		s1 = null;
-		s2 = null;
 	}
 }

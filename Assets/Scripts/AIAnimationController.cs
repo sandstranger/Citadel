@@ -33,7 +33,7 @@ public class AIAnimationController : MonoBehaviour {
 	private float loadedSetSpeed;
 	private bool initialized = false;
 	private bool doneDidDead = false;
-	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
+
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
@@ -249,6 +249,8 @@ public class AIAnimationController : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		AIAnimationController aiac = go.GetComponentInChildren<AIAnimationController>(true);
 		s1.Clear();
 		if (aiac == null) { // Keep!  Cyber enemies don't have an AIAC!

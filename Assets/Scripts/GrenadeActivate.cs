@@ -22,7 +22,7 @@ public class GrenadeActivate : MonoBehaviour {
 	[HideInInspector] public bool useTimer = false; // save
 	private GameObject explosionEffect;
 	private Rigidbody rbody;
-	private static StringBuilder s1 = new StringBuilder(100 * 500);
+
 	[Inject] private Const _consts;
 	[Inject] private Inventory _inventory;
 	[Inject] private PauseScript _pauseScript;
@@ -135,6 +135,8 @@ public class GrenadeActivate : MonoBehaviour {
 
 	// Live grenades - These should only be up in the air or active running timer, but still...or it's a landmine
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		s1.Clear();
 		GrenadeActivate ga = go.GetComponent<GrenadeActivate>();
 		s1.Append(Utils.UintToString(ga.constIndex,"constIndex"));

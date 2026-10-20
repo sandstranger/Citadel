@@ -19,7 +19,7 @@ public class SecurityCameraRotate : MonoBehaviour {
 	private float degreesYPerSecond = 4f;
 	private float waitingFinished = 0f;
 	private float tickTime = 0.1f;
-	private static StringBuilder s1 = new StringBuilder();
+
 
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private readonly Utils _utils;
@@ -76,6 +76,8 @@ public class SecurityCameraRotate : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease1.Builder;
 		SecurityCameraRotate scr = go.GetComponent<SecurityCameraRotate>();
 		var pauseScript = scr._pauseScript;
 		s1.Clear();

@@ -142,7 +142,7 @@ public class Inventory : MonoBehaviour {
 	public Text[] weaponShotsInventory;
 	public Text[] weaponButtonText;
 
-	private static StringBuilder s1 = new StringBuilder(100 *500);
+
 
 	[Inject] private Const _consts;
 	[Inject] private readonly Utils _utils;
@@ -1768,6 +1768,8 @@ public class Inventory : MonoBehaviour {
 
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 *500);
+		var s1 = __stringBuilderLease1.Builder;
 		int j;
 		Inventory inv = go.GetComponent<Inventory>();
 		s1.Clear();

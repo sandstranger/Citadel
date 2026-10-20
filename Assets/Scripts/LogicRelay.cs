@@ -12,7 +12,7 @@ public class LogicRelay : MonoBehaviour {
 	public bool onceEver = false; // save
 	[HideInInspector] public bool alreadyDone = false; // save
 	private UseData tempUd;
-	private static StringBuilder s1 = new StringBuilder(100 * 200);
+
 
 	[Inject] private Const _consts;
 	
@@ -59,6 +59,8 @@ public class LogicRelay : MonoBehaviour {
 	// Also I think I used this in a few places.  This is the relayEnabled by
 	// the way.
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 200);
+		var s1 = __stringBuilderLease1.Builder;
 		LogicRelay lr = go.GetComponent<LogicRelay>();
 		if (lr == null) {
 			Debug.Log("LogicRelay missing on savetype of LogicRelay!  GameObject.name: " + go.name);

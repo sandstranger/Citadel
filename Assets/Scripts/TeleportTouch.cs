@@ -10,7 +10,7 @@ public class TeleportTouch : MonoBehaviour {
 	public bool touchEnabled = true;
 	
     private static readonly TeleportTouch[] allTeleportTouches = new TeleportTouch[8];
-	private static readonly StringBuilder s1 = new StringBuilder(100);
+
 
 	[Inject] private Const _consts;
 	[Inject] private MFDManager _mfdManager;
@@ -46,6 +46,8 @@ public class TeleportTouch : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+		var s1 = __stringBuilderLease1.Builder;
 		TeleportTouch tt = go.GetComponent<TeleportTouch>();
 		var pauseScript = tt._pauseScript;
 		s1.Clear();

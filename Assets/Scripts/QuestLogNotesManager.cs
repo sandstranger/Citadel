@@ -276,7 +276,8 @@ public class QuestLogNotesManager : MonoBehaviour
 	}
 	
 	public string Save() {
-		StringBuilder s1 = new StringBuilder(200);
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200);
+		var s1 = __stringBuilderLease1.Builder;
 		for (int i=0;i<18;i++) {
 			s1.Append(Utils.BoolToString(notes[i].activeSelf,"notes[" + i.ToString() + "].activeSelf"));
 			s1.Append(Utils.splitChar);

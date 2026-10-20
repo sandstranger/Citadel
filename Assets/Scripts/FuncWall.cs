@@ -26,7 +26,7 @@ public class FuncWall : MonoBehaviour {
 	private Vector3 tempVec;
 	private float dist;         // Only ever used right away, not saved.
 	private float distanceLeft; // Only ever used right away, not saved.
-	private static StringBuilder s1 = new StringBuilder(100 * 500);
+
 
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly PauseScript _pauseScript;
@@ -163,6 +163,8 @@ public class FuncWall : MonoBehaviour {
 	// Only need to save state here.  Transform position is saved higher up in
 	// the saving hierarchy and that is the only other thing needed for these.
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		FuncWall fw = go.GetComponent<FuncWall>();
 		s1.Clear();
 		s1.Append(Utils.IntToString(Utils.FuncStatesToInt(fw.currentState),"FuncWall.currentState"));

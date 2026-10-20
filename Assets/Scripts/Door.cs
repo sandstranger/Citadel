@@ -51,7 +51,7 @@ public class Door : MonoBehaviour {
 	private bool initialized = false;
 	private AnimatorStateInfo asi;
 	private bool delayFrame = false;
-	private static readonly StringBuilder s1 = new(100 * 1024);
+
 
 	[Inject] private LevelManager _levelManager;
 	[Inject] private Const _consts;
@@ -373,6 +373,8 @@ public class Door : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		Door dr = go.GetComponent<Door>();
 		var pauseScript = dr._pauseScript;
 		s1.Clear();

@@ -6,7 +6,7 @@ public class Radiation : MonoBehaviour {
 	public float radiationAmount = 11f;
 	public float intervalTime = 1f;
 	public float radFinished = 0f;
-	private static StringBuilder s1 = new StringBuilder();
+
 
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private readonly Utils _utils;
@@ -50,6 +50,8 @@ public class Radiation : MonoBehaviour {
 	}
 	
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease1.Builder;
 		Radiation rad = go.GetComponent<Radiation>();
 		s1.Clear();
 		s1.Append(Utils.FloatToString(rad.radiationAmount,"radiationAmount"));

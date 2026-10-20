@@ -85,7 +85,7 @@ public class WeaponFire : MonoBehaviour {
     private float heatTickTime = 0.50f;
 	private Rigidbody playercapRbody;
 	private float wepYRot;
-	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
+
 
 	[Inject] private LevelManager _levelManager;
 	[Inject] private ConsoleEmulator _consoleEmulator;
@@ -1428,6 +1428,8 @@ public class WeaponFire : MonoBehaviour {
     }
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		WeaponFire wf = go.GetComponent<WeaponFire>();
 		Utils utils = wf._utils;
 		var pauseScript = wf._pauseScript;

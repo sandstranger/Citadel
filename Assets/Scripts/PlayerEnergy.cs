@@ -18,7 +18,7 @@ public class PlayerEnergy : MonoBehaviour {
 	[HideInInspector] public int drainJPM = 0;
 	private string jpm = " J/min";
 	
-	private static StringBuilder s1 = new StringBuilder(100 * 1024);
+
 
 	[Inject] private LevelManager _levelManager;
 	[Inject] private Const _consts;
@@ -195,6 +195,8 @@ public class PlayerEnergy : MonoBehaviour {
     }
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		PlayerEnergy pe = go.GetComponent<PlayerEnergy>();
 		s1.Clear();
 		s1.Append(Utils.FloatToString(pe.energy,"energy"));

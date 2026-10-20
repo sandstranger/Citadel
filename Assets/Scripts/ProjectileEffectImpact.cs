@@ -11,7 +11,7 @@ public class ProjectileEffectImpact : MonoBehaviour {
     [SerializeField] public int hitCountBeforeRemoval = 1;
     private Vector3 tempVec;
     [HideInInspector] public int numHits;
-	private static StringBuilder s1 = new StringBuilder(100);
+
 	[Inject] private Const _consts;
 	[Inject] private readonly Utils _utils;
 	[Inject] private Music _music;
@@ -110,6 +110,8 @@ public class ProjectileEffectImpact : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+		var s1 = __stringBuilderLease1.Builder;
 		ProjectileEffectImpact pei = go.GetComponent<ProjectileEffectImpact>();
 		s1.Clear();
 		s1.Append(Utils.UintToString(pei.hitCountBeforeRemoval,"hitCountBeforeRemoval"));

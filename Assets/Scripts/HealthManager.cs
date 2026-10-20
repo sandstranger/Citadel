@@ -75,7 +75,7 @@ public class HealthManager : MonoBehaviour {
 	[Inject] private PlayerHealth _playerHealth;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 
-	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
+
 	
 	public void Awake () {
 		if (awakeInitialized) return;
@@ -858,6 +858,8 @@ public class HealthManager : MonoBehaviour {
 
 	// Generic health info string
 	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		HealthManager hm;
 		if (go.name.Contains("se_corpse_eaten")) hm = go.transform.GetChild(0).GetComponent<HealthManager>(); // se_corpse_eaten
 		else hm = go.GetComponent<HealthManager>();

@@ -13,7 +13,7 @@ public class GravityLift : MonoBehaviour {
 	public Vector3 topPoint;
 	public float initialBurstFinished;
 	private BoxCollider boxcol;
-	private static StringBuilder s1 = new StringBuilder(200 * 10);
+
 
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private readonly Utils _utils;
@@ -103,6 +103,8 @@ public class GravityLift : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 10);
+		var s1 = __stringBuilderLease1.Builder;
 		GravityLift gl = go.GetComponent<GravityLift>(); // Not quite Open, but hey
 		if (gl == null) {
 			Debug.Log("GravityLift missing on savetype of GravityLift!  GameObject.name: " + go.name);

@@ -13,7 +13,7 @@ public class CyberSwitch : MonoBehaviour {
 	public GameObject deactiveCenter;
 	public GameObject iceNode;
 	[HideInInspector] public bool iceActive;
-	private static readonly StringBuilder s1 = new StringBuilder(100 *500);
+
 
 	[Inject] private Const _consts;
 	[Inject] private MFDManager _mfdManager;
@@ -56,6 +56,8 @@ public class CyberSwitch : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 *500);
+		var s1 = __stringBuilderLease1.Builder;
 		CyberSwitch cs = go.GetComponent<CyberSwitch>();
 		s1.Clear();
 		s1.Append(Utils.BoolToString(cs.active,"CyberSwitch.active"));

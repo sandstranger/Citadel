@@ -22,7 +22,7 @@ public class InteractablePanel : MonoBehaviour {
 	
 	private AudioSource SFX;
 	private Animator anim;
-	private static readonly StringBuilder s1 = new(100 * 200);
+
 
 	[Inject] private Const _consts;
 	[Inject] private MouseLookScript _mouseLookScript;
@@ -84,6 +84,8 @@ public class InteractablePanel : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 200);
+		var s1 = __stringBuilderLease1.Builder;
 		InteractablePanel ip = go.GetComponent<InteractablePanel>();
 		s1.Clear();
 		s1.Append(Utils.BoolToString(ip.open,"open"));
