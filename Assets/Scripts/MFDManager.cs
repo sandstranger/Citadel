@@ -254,7 +254,7 @@ public class MFDManager : MonoBehaviour  {
 	[Inject] private readonly ITexturesStorage _texturesStorage;
 	[Inject] private readonly Utils _utils;
 
-	private static readonly StringBuilder s1 = new(100 * 1024);
+
 
 	private readonly List<Image> _searchItemImagesLHComponents = new();
 	private readonly List<Image> _searchItemImagesRHComponents = new();
@@ -2038,6 +2038,8 @@ public class MFDManager : MonoBehaviour  {
 	}
 	
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		MFDManager mfd = go.GetComponent<MFDManager>();
 		var pauseScript = mfd._pauseScript;
 		s1.Clear();

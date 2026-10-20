@@ -9,7 +9,7 @@ public class UseableObjectUse : MonoBehaviour {
 	public int ammo = 0;
 	public int ammo2 = 0;
 	public bool heldObjectLoadedAlternate = false;
-	private static StringBuilder s1 = new StringBuilder(100);
+
 
 	[Inject] private Const _consts;
 	[Inject] private MouseLookScript _mouseLookScript;
@@ -72,6 +72,8 @@ public class UseableObjectUse : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+		var s1 = __stringBuilderLease1.Builder;
 		UseableObjectUse uou = go.GetComponent<UseableObjectUse>();
 		if (uou == null) {
 			Debug.Log("UseableObjectUse missing on saveable");

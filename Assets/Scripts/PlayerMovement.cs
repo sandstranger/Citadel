@@ -171,7 +171,7 @@ public class PlayerMovement : MonoBehaviour {
 	private float bodyLerpGravityOffDelayFinished;
 	private ContactPoint[] contactsCache;
 	private static Vector3 feetOffset = new Vector3(0f,-0.48f,0f);
-	private static readonly StringBuilder s1 = new(200 * 1024);
+
 
 	[Inject] private LevelManager _levelManager;
 	[Inject] private BiomonitorGraphSystem _biomonitorGraphSystem;
@@ -1858,6 +1858,8 @@ public class PlayerMovement : MonoBehaviour {
     }
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		PlayerMovement pm = go.GetComponent<PlayerMovement>();
 		Utils utils = pm._utils;
 		var pauseScript = pm._pauseScript;

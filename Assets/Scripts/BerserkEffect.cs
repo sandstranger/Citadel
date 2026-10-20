@@ -27,7 +27,7 @@ public class BerserkEffect : UnityStandardAssets.ImageEffects.ImageEffectBase {
 
 	[HideInInspector] public float effectStrength = 3f; // save
 	[HideInInspector] public float hithreshold = 0.25f; // save
-	private static StringBuilder s1 = new StringBuilder();
+
 
 	void Awake() {
 		effectStrength = 3.0f;
@@ -59,6 +59,8 @@ public class BerserkEffect : UnityStandardAssets.ImageEffects.ImageEffectBase {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease1.Builder;
 		BerserkEffect bzk = go.GetComponent<BerserkEffect>();
 		s1.Clear();
 		s1.Append(Utils.BoolToString(bzk.enabled,"BerserkEffect.enabled"));

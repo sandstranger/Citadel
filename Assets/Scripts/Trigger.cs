@@ -15,7 +15,7 @@ public class Trigger : MonoBehaviour {
 	[HideInInspector] public float delayFireFinished;
 	[HideInInspector] public float delayResetFinished;
 	[HideInInspector] public bool allDone = false;
-	private static StringBuilder s1 = new StringBuilder(100);
+
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
@@ -86,6 +86,8 @@ public class Trigger : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+		var s1 = __stringBuilderLease1.Builder;
 		Trigger trig = go.GetComponent<Trigger>();
 		var pauseScript = trig._pauseScript;
 		s1.Clear();

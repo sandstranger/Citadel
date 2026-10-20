@@ -1224,7 +1224,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
     }
 
     public static string SaveTransform(Transform tr) {
-        StringBuilder s1 = new StringBuilder();
+        using var __stringBuilderLease3 = StringBuilderPool.Rent();
+        var s1 = __stringBuilderLease3.Builder;
         s1.Clear();
 		
 		if (tr is RectTransform rectTr) {
@@ -1378,7 +1379,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 	
 	public static string SaveBoxCollider(GameObject go) {
 		BoxCollider bcol = go.GetComponent<BoxCollider>();
-		StringBuilder s1 = new StringBuilder();
+		using var __stringBuilderLease4 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease4.Builder;
 		s1.Clear();
 		s1.Append(FloatToString(bcol.center.x,"center.x"));
 		s1.Append(splitChar);
@@ -1413,7 +1415,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 		Rigidbody rbody = go.GetComponent<Rigidbody>();
 		if (rbody == null) return ("velocity.x:0000.00000" + splitChar + "velocity.y:0000.00000" + splitChar + "velocity.z:0000.00000" + splitChar + "isKinematic:0");
 
-		StringBuilder s1 = new StringBuilder();
+		using var __stringBuilderLease5 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease5.Builder;
         s1.Clear();
         s1.Append(FloatToString(rbody.linearVelocity.x,"velocity.x"));
         s1.Append(splitChar);
@@ -1460,7 +1463,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 				   + SaveRigidbody(null) + "subGO.activeSelf:0";
 		}
 
-		StringBuilder s1 = new StringBuilder();
+		using var __stringBuilderLease6 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease6.Builder;
         s1.Clear();
         s1.Append(SaveTransform(subGO.transform));
 		s1.Append(splitChar);
@@ -1485,8 +1489,10 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 			return SaveSubActivatedGOState(childTR.gameObject);
 	}
 
-	private static StringBuilder cams1 = new StringBuilder();
+
 	public static string SaveCamera(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+		var cams1 = __stringBuilderLease1.Builder;
 		Camera cm = go.GetComponent<Camera>();
         Grayscale gsc = go.GetComponent<Grayscale>();
 		if (cm == null) {
@@ -1602,8 +1608,10 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 
 	
 
-	private static StringBuilder auds1 = new StringBuilder();
+
 	public static string SaveAudioSource(GameObject go) {
+		using var __stringBuilderLease2 = StringBuilderPool.Rent();
+		var auds1 = __stringBuilderLease2.Builder;
 		AudioSource aus = go.GetComponent<AudioSource>();
 		auds1.Clear();
         auds1.Append(BoolToString(aus.enabled,"AudioSource.enabled"));

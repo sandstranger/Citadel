@@ -9,9 +9,11 @@ public class UseName : MonoBehaviour {
 
 	[Inject] private MouseLookScript _mouseLookScript;
 
-	private static readonly StringBuilder s1 = new StringBuilder(200);
+
 
 	public static void UseNameSprint(Const consts,GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200);
+		var s1 = __stringBuilderLease1.Builder;
 		UseName un = go.GetComponent<UseName>();
 		PrefabIdentifier pid = go.GetComponent<PrefabIdentifier>();
 		if (pid == null) { // Ok, maybe the parent has it.

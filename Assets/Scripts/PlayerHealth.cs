@@ -37,7 +37,7 @@ public class PlayerHealth : MonoBehaviour {
 	[HideInInspector] public float noiseFinished;
 	[HideInInspector] public int deaths = 0;
 	[HideInInspector] public int ressurections = 0;
-	private static readonly StringBuilder s1 = new(100 * 1024);
+
 
 	[Inject] private BiomonitorGraphSystem _biomonitorGraphSystem;
 	[Inject] private LevelManager _levelManager;
@@ -259,6 +259,8 @@ public class PlayerHealth : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		PlayerHealth ph = go.GetComponent<PlayerHealth>();
 		var pauseScript = ph._pauseScript;
 		s1.Clear();

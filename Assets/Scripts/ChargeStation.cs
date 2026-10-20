@@ -17,7 +17,7 @@ public class ChargeStation : MonoBehaviour {
 
 	// Internal references
 	[HideInInspector] public float nextthink; // save, stores the time after which this will be usable again.  Soem charge stations must recharge.
-	private static readonly StringBuilder s1 = new StringBuilder(100 * 1024);
+
 
 	[Inject] 
 	private LevelManager _levelManager;
@@ -74,6 +74,8 @@ public class ChargeStation : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		ChargeStation chg = go.GetComponent<ChargeStation>();
 		s1.Clear();
 		s1.Append(chg._utils.SaveRelativeTimeDifferential(chg.nextthink,"nextthink")); // float - time before recharged

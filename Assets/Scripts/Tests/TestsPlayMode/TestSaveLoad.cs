@@ -58,7 +58,8 @@ namespace Tests {
             List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
             int childCount = 0;
             GameObject childGO = null;
-            StringBuilder s1 = new StringBuilder();
+            using var __stringBuilderLease1 = StringBuilderPool.Rent();
+            var s1 = __stringBuilderLease1.Builder;
             s1.Append(Environment.NewLine);
             s1.Append("GameObject Hierarchy Counts::");
             for (int i=0;i<allParents.Count;i++) {

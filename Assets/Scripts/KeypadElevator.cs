@@ -28,7 +28,7 @@ public class KeypadElevator : MonoBehaviour {
 	[Inject] private readonly Utils _utils;
 	[Inject] private MFDManager _mfdManager;
 	
-	private static readonly StringBuilder s1 = new(100 * 1024);
+
 
 	void Start () {
 		padInUse = false;
@@ -72,6 +72,8 @@ public class KeypadElevator : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		KeypadElevator ke = go.GetComponent<KeypadElevator>();
 		if (ke == null) {
 			Debug.Log("KeypadElevator missing on savetype of KeypadElevator! "

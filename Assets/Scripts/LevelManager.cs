@@ -55,7 +55,7 @@ public class LevelManager : MonoBehaviour
 	private bool _levelDataLoaded = false;
 	private int getValreadInt;
 	private float getValreadFloat;
-	private static readonly StringBuilder s1 = new(200*1024);
+
 	private GameObject _dummyGameObject;
 
 	[SerializeField]
@@ -783,6 +783,8 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public string Save() {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200*1024);
+		var s1 = __stringBuilderLease1.Builder;
 		int i=0;
 		s1.Clear();
 		s1.Append(Utils.UintToString(LevelManager.CurrentLevel,"currentLevel"));

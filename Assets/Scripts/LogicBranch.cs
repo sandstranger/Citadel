@@ -19,7 +19,7 @@ public class LogicBranch : MonoBehaviour {
 	[HideInInspector] public bool onSecond = false; // save
 	public bool autoFlipOnTarget = true;
 	
-	private static StringBuilder s1 = new StringBuilder(100);
+
 
 	[Inject] private Const _consts;
 	
@@ -81,6 +81,8 @@ public class LogicBranch : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+		var s1 = __stringBuilderLease1.Builder;
 		LogicBranch lb = go.GetComponent<LogicBranch>();
 		s1.Clear();
 		s1.Append(Utils.BoolToString(lb.relayEnabled,"relayEnabled"));

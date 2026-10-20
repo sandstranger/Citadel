@@ -27,7 +27,7 @@ public class SpawnManager : MonoBehaviour {
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private readonly Utils _utils;
 
-	private static readonly StringBuilder s1 = new(100 * 500);
+
 
 	void Start() {
 		delayFinished = _pauseScript.relativeTime;
@@ -152,6 +152,8 @@ public class SpawnManager : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		SpawnManager sm = go.GetComponent<SpawnManager>();
 		s1.Clear();
 		s1.Append(Utils.BoolToString(sm.active,"SpawnManager.active"));

@@ -55,7 +55,7 @@ public class ButtonSwitch : MonoBehaviour {
 	private readonly List<MaterialPropertyHelper> _materialPropertyHelpers = new();
 	private readonly List<MeshRenderer> _renderers = new();
 	
-	private static readonly StringBuilder s1 = new StringBuilder(100 * 1024);
+
 
 	public void Awake() {
 		if (awakeInitialized) return;
@@ -216,6 +216,8 @@ public class ButtonSwitch : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		ButtonSwitch bs = go.GetComponent<ButtonSwitch>();
 		s1.Clear();
 		s1.Append(Utils.UintToString(bs.securityThreshhold,"securityThreshhold"));

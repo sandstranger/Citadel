@@ -34,7 +34,7 @@ public class PuzzleGridPuzzle : MonoBehaviour {
 	[Inject] private LevelManager _levelManager;
 	[Inject] private Const _consts;
 	[Inject] private MFDManager _mfdManager;
-	private static readonly StringBuilder s1 = new(200 * 500);
+
 
 	void Awake() {
 		puzzleSolved = false;
@@ -112,6 +112,8 @@ public class PuzzleGridPuzzle : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		PuzzleGridPuzzle pgp = go.GetComponent<PuzzleGridPuzzle>();
 		s1.Clear();
 		s1.Append(Utils.BoolToString(pgp.puzzleSolved,"puzzleSolved"));

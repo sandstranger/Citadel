@@ -27,7 +27,7 @@ public class KeypadKeycode : MonoBehaviour {
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private MouseLookScript _mouseLookScript;
 
-	private static readonly StringBuilder s1 = new(100 * 1024);
+
 
 	void Start () {
 		padInUse = false;
@@ -106,6 +106,8 @@ public class KeypadKeycode : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		KeypadKeycode kk = go.GetComponent<KeypadKeycode>();
 		s1.Clear();
 		s1.Append(Utils.IntToString(kk.securityThreshhold,"securityThreshhold"));

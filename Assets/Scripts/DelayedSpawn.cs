@@ -12,7 +12,7 @@ public class DelayedSpawn : MonoBehaviour {
 	public bool destroyAfterListInsteadOfDeactivate = false; // save
 	[HideInInspector] public float timerFinished; // save
 	[HideInInspector] public bool active; // save
-	private static StringBuilder s1 = new StringBuilder();
+
 
 	[Inject] private PauseScript _pauseScript;
 	[Inject] private readonly Utils _utils;
@@ -51,6 +51,8 @@ public class DelayedSpawn : MonoBehaviour {
     }
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease1.Builder;
 		DelayedSpawn ds = go.GetComponent<DelayedSpawn>();
 		s1.Clear();
 		s1.Append(Utils.FloatToString(ds.delay,"delay"));

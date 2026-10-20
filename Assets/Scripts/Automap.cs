@@ -98,7 +98,7 @@ public class Automap : MonoBehaviour {
 	private RectTransform[] automapFoWTilesRects;
 	private Vector2[] automapFoWTilesRectsPos;
 	private bool initialized = false;
-	private static StringBuilder s1 = new StringBuilder(100);
+
 
 	[Inject] 
 	private LevelManager _levelManager;
@@ -579,6 +579,8 @@ public class Automap : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+		var s1 = __stringBuilderLease1.Builder;
 		Automap amp = go.GetComponent<Automap>();
 		var pauseScript = amp._pauseScript;
 		int j = 0;

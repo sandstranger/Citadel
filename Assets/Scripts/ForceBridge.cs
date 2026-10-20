@@ -22,7 +22,7 @@ public class ForceBridge : MonoBehaviour {
 	private AudioSource SFX;
 	private const float tickTime = 0.05f;
 	private bool initialized = false;
-	private static readonly StringBuilder s1 = new StringBuilder(100 * 500);
+
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
@@ -149,6 +149,8 @@ public class ForceBridge : MonoBehaviour {
 	}
 	
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+		var s1 = __stringBuilderLease1.Builder;
 		ForceBridge fb = go.GetComponent<ForceBridge>();
 		if (fb == null) {
 			Debug.Log("ForceBridge missing on savetype of ForceBridge!"

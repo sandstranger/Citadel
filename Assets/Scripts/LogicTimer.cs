@@ -11,7 +11,7 @@ public class LogicTimer : MonoBehaviour {
 	[HideInInspector] public float intervalFinished; //save
 	public string target; //save
 	public string argvalue; //save
-	private static StringBuilder s1 = new StringBuilder(100 *200);
+
 
 	[Inject] private Const _consts;
 	[Inject] private PauseScript _pauseScript;
@@ -47,6 +47,8 @@ public class LogicTimer : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 *200);
+		var s1 = __stringBuilderLease1.Builder;
 		LogicTimer lt = go.GetComponent<LogicTimer>();
 		s1.Clear();
 		s1.Append(lt._utils.SaveRelativeTimeDifferential(lt.intervalFinished,"intervalFinished"));

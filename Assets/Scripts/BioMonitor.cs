@@ -18,7 +18,7 @@ public class BioMonitor : MonoBehaviour {
 
 	// Internal references
 	private const float beatTick = 0.5f;
-	private StringBuilder tempStr;
+
 	private float beatFinished; // Visual only, Time.time controlled
 
 	[Inject] private Const _consts;
@@ -29,8 +29,7 @@ public class BioMonitor : MonoBehaviour {
 
 	void Start() {
 		beatFinished = Time.time + beatTick;
-		tempStr = new StringBuilder();
-		tempStr.Clear();
+		
 	}
 
     void Update() {
@@ -43,6 +42,8 @@ public class BioMonitor : MonoBehaviour {
 		heartRateText.text = _consts.stringTable[527];
 		bpmText.text = _consts.stringTable[529];
 		fatigueDetailText.text = _consts.stringTable[531];
+        using var __stringBuilderLease1 = StringBuilderPool.Rent();
+        var tempStr = __stringBuilderLease1.Builder;
 		tempStr.Clear();
 		if (_playerMovement.fatigue >= 80f) {
 			tempStr.Append(_consts.stringTable[532]); // High!

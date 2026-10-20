@@ -35,7 +35,7 @@ public class WeaponCurrent : MonoBehaviour {
 													  // energy weapons no
 													  // energy, save
 	[HideInInspector] public bool redbull = false; // No energy usage, save
-	private static StringBuilder s1 = new StringBuilder(100);
+
 	[Inject] private Const _consts;
 	[Inject] private MFDManager _mfdManager;
 	[Inject] private Inventory _inventory;
@@ -474,6 +474,8 @@ public class WeaponCurrent : MonoBehaviour {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+		var s1 = __stringBuilderLease1.Builder;
 		WeaponCurrent wc = go.GetComponent<WeaponCurrent>();
 		if (wc == null) {
 			Debug.Log("WeaponCurrent missing on Player!  GameObject.name: " + go.name);

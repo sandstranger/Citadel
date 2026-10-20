@@ -14,7 +14,7 @@ public class SaveObject : MonoBehaviour {
 	public bool instantiated = false; // Should oject be instantiated on load?
 	public static string currentObjectInfo;
 	
-	private static readonly StringBuilder s1 = new(200 * 1024);
+
 	[HideInInspector] public string saveableType;
 	[HideInInspector] public bool initialized = false;
 
@@ -74,6 +74,8 @@ public class SaveObject : MonoBehaviour {
 
 	// Generates a string of object data with the specific object type's info.
 	public static string Save(LevelManager levelManager, GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 1024);
+		var s1 = __stringBuilderLease1.Builder;
 		SaveObject so = SaveLoad.GetPrefabSaveObject(go);
 		if (so == null) return "";
 
@@ -297,7 +299,8 @@ public class SaveObject : MonoBehaviour {
 	public static string ParentChain(GameObject go) {
 		if (go.transform.parent == null) return "none";
 
-		StringBuilder s1 = new StringBuilder();
+		using var __stringBuilderLease2 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease2.Builder;
 		s1.Clear();
 		Transform tr = go.transform;
 		while(tr.parent != null) {

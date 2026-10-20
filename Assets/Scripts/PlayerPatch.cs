@@ -41,7 +41,7 @@ public class PlayerPatch : MonoBehaviour,IInitializer {
 	[HideInInspector] public const int PATCH_SIGHT = 32;
 	[HideInInspector] public const int PATCH_STAMINUP = 64;
 	[HideInInspector] public int patchActive;  // bitflag carrier for active patches // save
-	private static StringBuilder s1 = new StringBuilder(100);
+
 
 	[Inject] private Const _consts;
 	[Inject] private GUIState _guiState;
@@ -332,6 +332,8 @@ public class PlayerPatch : MonoBehaviour,IInitializer {
 	}
 
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+		var s1 = __stringBuilderLease1.Builder;
 		PlayerPatch pp = go.GetComponent<PlayerPatch>();
 		var pauseScript = pp._pauseScript;
 		s1.Clear();

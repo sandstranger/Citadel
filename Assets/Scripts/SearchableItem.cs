@@ -14,7 +14,7 @@ public class SearchableItem : MonoBehaviour {
 
 	[HideInInspector] public bool searchableInUse;
 	[HideInInspector] public bool generationDone = false;
-	private static StringBuilder s1 = new StringBuilder();
+
 	public int maxRandomItems = 2;
 
 	void Start () {
@@ -51,6 +51,8 @@ public class SearchableItem : MonoBehaviour {
 
 	// Save searchable data
 	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+		var s1 = __stringBuilderLease1.Builder;
 		SearchableItem se;
 		if (go.name.Contains("se_corpse_eaten")) se = go.transform.GetChild(0).GetComponent<SearchableItem>(); // se_corpse_eaten
 		else se = go.GetComponent<SearchableItem>();

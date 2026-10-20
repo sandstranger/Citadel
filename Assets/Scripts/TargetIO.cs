@@ -72,7 +72,7 @@ public class TargetIO : MonoBehaviour {
 	[Inject] private Const _consts;
 	[Inject] private Inventory _inventory;
 
-	private static readonly StringBuilder s1 = new StringBuilder(100 *500);
+
 
 	private void Start() {
 		RemoteStart(this.gameObject,"self Start()");
@@ -411,6 +411,8 @@ public class TargetIO : MonoBehaviour {
 
 	// Save searchable data
 	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 *500);
+		var s1 = __stringBuilderLease1.Builder;
 		TargetIO tio;
 		if (go.name.Contains("se_corpse_eaten")) tio = go.transform.GetChild(0).GetComponent<TargetIO>(); // se_corpse_eaten
 		else tio = go.GetComponent<TargetIO>(); 
