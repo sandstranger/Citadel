@@ -62,6 +62,13 @@
       },
       "hash": "473683f9c4e2aff5f99ad8618376c605eac3ff92"
     },
+    "com.svermeulen.extenject": {
+      "version": "https://github.com/sandstranger/Extenject.git?path=UnityProject/Assets/Plugins/Zenject/Source",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "2ef64037bd95d9f899789fdcc2be0f2f2368897c"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
