@@ -1420,8 +1420,8 @@ public class MouseLookScript : MonoBehaviour {
 		else shakeForce = 0.48f;
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(500 * 1024);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(500 * 1024);
 		var s1 = __stringBuilderLease1.Builder;
 		MouseLookScript ml = go.GetComponent<MouseLookScript>();
 		var pauseScript = ml._pauseScript;
