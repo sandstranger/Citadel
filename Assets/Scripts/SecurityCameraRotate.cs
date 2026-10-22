@@ -75,8 +75,8 @@ public class SecurityCameraRotate : MonoBehaviour {
 						 Space.World);
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		SecurityCameraRotate scr = go.GetComponent<SecurityCameraRotate>();
 		var pauseScript = scr._pauseScript;
