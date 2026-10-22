@@ -6,45 +6,53 @@ using UnityEngine;
 #if UNITY_ANDROID
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
 #endif
 
 namespace Citadel.Game
 {
     internal sealed class Startup : MonoBehaviour
     {
+#if UNITY_ANDROID
         private async void Start()
         {
-#if UNITY_ANDROID
             try
             {
-                if (!await CopyAddressableTextAssetsAsync())
+                if (await CopyAddressableTextAssetsAsync())
                 {
-                    return;
+                    ScenesLoader.LoadLevelAsync(ScenesLoader.MainGameSceneIndex);
                 }
             }
             catch (Exception exception)
             {
                 Debug.LogException(exception);
-                return;
             }
-#endif
-            ScenesLoader.LoadLevelAsync(ScenesLoader.MainGameSceneIndex);
         }
 
-#if UNITY_ANDROID
         private static async System.Threading.Tasks.Task<bool> CopyAddressableTextAssetsAsync()
         {
             var initializationHandle = Addressables.InitializeAsync();
-            await initializationHandle.Task;
+            bool initialized;
+            try
+            {
+                await initializationHandle.Task;
+                initialized = initializationHandle.Status == AsyncOperationStatus.Succeeded;
+            }
+            finally
+            {
+                if (initializationHandle.IsValid())
+                {
+                    Addressables.Release(initializationHandle);
+                }
+            }
 
-            if (initializationHandle.Status != AsyncOperationStatus.Succeeded)
+            if (!initialized)
             {
                 Debug.LogError("Failed to initialize Addressables. The game scene will not be loaded.");
                 return false;
             }
 
-            var textLocations = new Dictionary<string, UnityEngine.ResourceManagement.ResourceLocations.IResourceLocation>(
-                StringComparer.OrdinalIgnoreCase);
+            var textLocations = new Dictionary<string, IResourceLocation>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var locator in Addressables.ResourceLocators)
             {
@@ -63,6 +71,11 @@ namespace Citadel.Game
                         }
 
                         var fileName = Path.GetFileName(location.PrimaryKey);
+                        if (string.IsNullOrWhiteSpace(fileName))
+                        {
+                            continue;
+                        }
+
                         var extension = Path.GetExtension(fileName);
                         if (!extension.Equals(".txt", StringComparison.OrdinalIgnoreCase) &&
                             !extension.Equals(".csv", StringComparison.OrdinalIgnoreCase))
@@ -121,6 +134,8 @@ namespace Citadel.Game
             Debug.Log($"Addressable text assets ready. Found {textLocations.Count}, copied {copiedFiles}, path: {dataPath}");
             return true;
         }
+#else
+        private void Start() => ScenesLoader.LoadLevelAsync(ScenesLoader.MainGameSceneIndex);
 #endif
     }
 }
