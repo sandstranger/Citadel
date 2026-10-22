@@ -106,6 +106,7 @@ public class LevelManager : MonoBehaviour
 	[Inject] private readonly QuestLogNotesManager _questLogNotesManager;
 	[Inject] private readonly LightDistanceCuller _lightDistanceCuller;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
+	[Inject] private readonly ScenesLoader _scenesLoader;
 
 	public static bool LoadLevelAfterSceneChanges { get; private set; }
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
@@ -308,7 +309,7 @@ public class LevelManager : MonoBehaviour
 		TargetPosition = targetPosition ?? Vector3.zero;
 		CurrentLevel = levnum;
 		ObjectContainmentSystem.ClearLists();
-		ScenesLoader.LoadLevelAsync(levnum);
+		_scenesLoader.LoadLevelAsync(levnum);
 	}
 	
 	public void LoadLevel(int levnum, Vector3 targetPosition, bool loadLevelForced = false)
