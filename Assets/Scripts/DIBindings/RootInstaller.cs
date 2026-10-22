@@ -50,7 +50,7 @@ namespace Citadel.Game
             DontDestroyOnLoad(gameObject);
 
             _const.InitializeInstance();
-            _playerReference.InitializeInstance();
+            DontDestroyOnLoad(_playerReference.gameObject);
             _playerPatch.Initialize();
 
             foreach (var postProcessLayer in _postProcessLayers)
@@ -67,6 +67,10 @@ namespace Citadel.Game
             Container.Bind<Utils>().AsSingle();
             Container.Bind<AndroidConfig>().AsSingle();
             Container.Bind<ScenesLoader>().AsSingle();
+            Container.Bind<StringBuilderPool>().AsSingle();
+            Container.Bind<SaveLoad>().AsSingle();
+            Container.Bind<ObjectContainmentSystem>().AsSingle();
+            Container.Bind<AutoSplitterData>().AsSingle();
             Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>()
                 .FromInstance(_postProcessLayerStorages).AsSingle();
             Container.Bind<Config>().AsSingle();
