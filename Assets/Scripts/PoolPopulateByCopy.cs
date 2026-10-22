@@ -12,18 +12,21 @@ public class PoolPopulateByCopy : MonoBehaviour {
 
 	private readonly List<GameObject> _childs = new();
 
-	[Inject] private Const _consts;
-	[Inject] private DiContainer _container;
-	[Inject] private ScenesLoader _scenesLoader;
+	private Const _consts;
+	private DiContainer _container;
+	private ScenesLoader _scenesLoader;
 	
-	private void Awake()
+	[Inject]
+	private void Construct(Const consts, DiContainer container, ScenesLoader scenesLoader)
 	{
+		_consts = consts;
+		_container = container;
+		_scenesLoader = scenesLoader;
 		_scenesLoader.OnStartLoadScene += DisableAllChilds;
-		int i = 0;
-		while (i < numberOfCopies)
+
+		for (var i = 0; i < numberOfCopies; i++)
 		{
 			CreateCopy();
-			i++;
 		}
 	}
 
