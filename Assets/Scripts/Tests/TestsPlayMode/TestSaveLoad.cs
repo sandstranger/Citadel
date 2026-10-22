@@ -18,6 +18,7 @@ using UnityEditor.SceneManagement;
 
 namespace Tests {
     public class TestSaveLoad {
+        private readonly StringBuilderPool _stringBuilderPool = new();
         private bool sceneLoaded = false;
 
         //private IEnumerator LoadSceneAsync(string sceneName) {
@@ -58,7 +59,7 @@ namespace Tests {
             List<GameObject> allParents = SceneManager.GetActiveScene().GetRootGameObjects().ToList();
             int childCount = 0;
             GameObject childGO = null;
-            using var __stringBuilderLease1 = StringBuilderPool.Rent();
+            using var __stringBuilderLease1 = _stringBuilderPool.Rent();
             var s1 = __stringBuilderLease1.Builder;
             s1.Append(Environment.NewLine);
             s1.Append("GameObject Hierarchy Counts::");
