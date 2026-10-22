@@ -159,8 +159,8 @@ public class LightAnimation : MonoBehaviour {
 		}
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100);
 		var s1 = __stringBuilderLease1.Builder;
 		LightAnimation la = go.GetComponent<LightAnimation>();
 		if (la.animLight == null) la.animLight = la.GetComponent<Light>();
