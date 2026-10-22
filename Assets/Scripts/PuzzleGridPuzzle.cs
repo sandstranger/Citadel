@@ -111,8 +111,8 @@ public class PuzzleGridPuzzle : MonoBehaviour {
 		_consts.sprint(successMessageLingdex);
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 500);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(200 * 500);
 		var s1 = __stringBuilderLease1.Builder;
 		PuzzleGridPuzzle pgp = go.GetComponent<PuzzleGridPuzzle>();
 		s1.Clear();
