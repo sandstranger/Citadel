@@ -45,8 +45,8 @@ public class TeleportTouch : MonoBehaviour {
 		}
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100);
 		var s1 = __stringBuilderLease1.Builder;
 		TeleportTouch tt = go.GetComponent<TeleportTouch>();
 		var pauseScript = tt._pauseScript;
