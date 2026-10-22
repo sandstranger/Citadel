@@ -1877,8 +1877,8 @@ public class AIController : MonoBehaviour {
 		Alert(ud);
 	}
 
-	public static string Save(GameObject go, PrefabIdentifier prefID) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		AIController aic = go.GetComponent<AIController>();
 		var pauseScript = aic._pauseScript;
