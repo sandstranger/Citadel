@@ -410,8 +410,8 @@ public class TargetIO : MonoBehaviour {
 	}
 
 	// Save searchable data
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 *500);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 *500);
 		var s1 = __stringBuilderLease1.Builder;
 		TargetIO tio;
 		if (go.name.Contains("se_corpse_eaten")) tio = go.transform.GetChild(0).GetComponent<TargetIO>(); // se_corpse_eaten
