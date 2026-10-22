@@ -162,8 +162,8 @@ public class FuncWall : MonoBehaviour {
 
 	// Only need to save state here.  Transform position is saved higher up in
 	// the saving hierarchy and that is the only other thing needed for these.
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 500);
 		var s1 = __stringBuilderLease1.Builder;
 		FuncWall fw = go.GetComponent<FuncWall>();
 		s1.Clear();
