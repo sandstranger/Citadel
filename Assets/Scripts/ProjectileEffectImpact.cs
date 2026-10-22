@@ -109,8 +109,8 @@ public class ProjectileEffectImpact : MonoBehaviour {
 		}
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100);
 		var s1 = __stringBuilderLease1.Builder;
 		ProjectileEffectImpact pei = go.GetComponent<ProjectileEffectImpact>();
 		s1.Clear();
