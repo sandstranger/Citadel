@@ -105,8 +105,8 @@ public class KeypadKeycode : MonoBehaviour {
 		_consts.sprint(successMessageLingdex);
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 1024);
 		var s1 = __stringBuilderLease1.Builder;
 		KeypadKeycode kk = go.GetComponent<KeypadKeycode>();
 		s1.Clear();
