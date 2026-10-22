@@ -28,6 +28,14 @@ namespace Citadel.Game
             _renderer.SetPropertyBlock(_materialPropertyBlock);
         }
 
+        public Texture GetMainTexture() => GetTexture("_MainTex");
+
+        public void SetMainTexture(Texture texture) => SetTexture("_MainTex", texture);
+
+        public void SetEmissionTexture(Texture texture) => SetTexture("_EmissionMap", texture);
+
+        public void SetEmissionColor(Color value) => SetColor("_EmissionColor", value);
+
         public void SetTexture(string propertyName, Texture value)
         {
             if (value != null)
@@ -38,17 +46,5 @@ namespace Citadel.Game
             
             _textures[propertyName] = value;
         }
-    }
-
-    internal static class MaterialPropertyHelperExtensions
-    {
-        public static Texture GetMainTexture (this MaterialPropertyHelper helper) => helper.GetTexture("_MainTex");
-
-        public static void SetMainTexture(this MaterialPropertyHelper helper, Texture texture) => helper.SetTexture("_MainTex", texture);
-        
-        public static void SetEmissionTexture (this MaterialPropertyHelper helper, Texture texture) => 
-            helper.SetTexture("_EmissionMap", texture);
-        
-        public static void SetEmissionColor (this MaterialPropertyHelper helper, Color value) => helper.SetColor("_EmissionColor", value);
     }
 }
