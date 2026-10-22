@@ -190,7 +190,7 @@ public class SaveObject : MonoBehaviour {
 			if (prefID == null) { Debug.Log("BUG: Missing PrefabIdentifier on load object " + go.name); return; }
 		}
 
-		SaveObject so = SaveLoad.GetPrefabSaveObject(go);
+		SaveObject so = saveLoad.GetPrefabSaveObject(go);
 		if (!so.initialized) so.Start();
 		currentObjectInfo = go.name + " " + ParentChain(stringBuilderPool, go) + " ("
 							+ so.saveType.ToString() + ") Line:"
@@ -299,7 +299,7 @@ public class SaveObject : MonoBehaviour {
 	public static string ParentChain(StringBuilderPool stringBuilderPool, GameObject go) {
 		if (go.transform.parent == null) return "none";
 
-		using var __stringBuilderLease2 = StringBuilderPool.Rent();
+		using var __stringBuilderLease2 = stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease2.Builder;
 		s1.Clear();
 		Transform tr = go.transform;
