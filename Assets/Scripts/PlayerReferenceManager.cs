@@ -6,7 +6,7 @@ using Citadel.SceneManagement;
 using Zenject;
 using UnityEngine;
 
-public class PlayerReferenceManager : SingletonHelper<PlayerReferenceManager> {
+public class PlayerReferenceManager : MonoBehaviour {
 	// External references, required
 	public GameObject playerCapsule;
 	public GameObject playerCapsuleHardwareLantern;
