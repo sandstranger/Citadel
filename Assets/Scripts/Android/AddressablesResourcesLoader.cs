@@ -14,10 +14,8 @@ namespace Citadel.Game
     {
         private const int DefaultAssetsCapacity = 1024;
 
-        public static readonly IResourcesLoader Default = new AddressablesResourcesLoader();
-        
         [Inject]
-        private readonly DiContainer _container;
+        private DiContainer _container;
         private readonly Dictionary<string, AssetInfo> _loadedAssets = new(DefaultAssetsCapacity);
         
         public async UniTask<T> LoadAssetAsync<T>(string assetName, CancellationToken cancellationToken) 
