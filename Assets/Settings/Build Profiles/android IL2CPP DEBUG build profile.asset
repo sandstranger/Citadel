@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 15003, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: android IL2CPP DEBUG build profile 1
+  m_Name: android IL2CPP DEBUG build profile
   m_EditorClassIdentifier: 
   m_AssetVersion: 1
   m_BuildTarget: 13
@@ -944,7 +944,7 @@ MonoBehaviour:
     - line: '|   il2cppCodeGeneration: {}'
     - line: '|   il2cppStacktraceInformation: {}'
     - line: '|   managedStrippingLevel:'
-    - line: '|     Android: 1'
+    - line: '|     Android: 4'
     - line: '|     EmbeddedLinux: 1'
     - line: '|     GameCoreScarlett: 1'
     - line: '|     GameCoreXboxOne: 1'
