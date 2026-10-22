@@ -784,7 +784,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public string Save() {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(200*1024);
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(200*1024);
 		var s1 = __stringBuilderLease1.Builder;
 		int i=0;
 		s1.Clear();
