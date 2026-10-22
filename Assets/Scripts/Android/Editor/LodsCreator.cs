@@ -7,7 +7,7 @@ using static Citadel.Editor.Utils;
 
 namespace Citadel.Android.Tools
 {
-    internal static class LodsCreator
+    internal sealed class LodsCreator
     {
         private const float OldObjectSize = 10.0f;
         private const float NewObjectSize = 25.0f;
@@ -60,7 +60,7 @@ namespace Citadel.Android.Tools
         {
             foreach (var projectPrefab in FindAllComponentsInProject<GameObject>("Prefab"))
             {
-                if (!projectPrefab.NeedToCreateLods())
+                if (!NeedToCreateLods(projectPrefab))
                 {
                     continue;
                 }
@@ -120,7 +120,7 @@ namespace Citadel.Android.Tools
             AssetDatabase.Refresh();
         }
 
-        private static bool NeedToCreateLods(this GameObject gameObject)
+        private static bool NeedToCreateLods(GameObject gameObject)
         {
             var goName = gameObject.name;
             
@@ -141,10 +141,10 @@ namespace Citadel.Android.Tools
                     meshRender.GetComponent<MeshFilter>()).Where(meshFilter => meshFilter!=null && meshFilter.sharedMesh!=null).ToArray();
 
             return (meshFilters.Length > 0 && 
-                    !meshFilters.Any(mesh => mesh.sharedMesh.name.Contains("med1_1_")) && meshFilters.Any(meshFilter => meshFilter.sharedMesh.GetTrianglesCount() >= MinMeshTrianglesCountToGenerateLods));
+                    !meshFilters.Any(mesh => mesh.sharedMesh.name.Contains("med1_1_")) && meshFilters.Any(meshFilter => GetTrianglesCount(meshFilter.sharedMesh) >= MinMeshTrianglesCountToGenerateLods));
         }
         
-        private static float GetTrianglesCount(this Mesh mesh)
+        private static float GetTrianglesCount(Mesh mesh)
         {
             return mesh.triangles.Length / 3.0f;
         }
