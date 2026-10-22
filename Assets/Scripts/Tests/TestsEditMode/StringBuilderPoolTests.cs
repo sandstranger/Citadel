@@ -4,10 +4,11 @@ namespace Tests
 {
     public class StringBuilderPoolTests
     {
+        private readonly StringBuilderPool _pool = new();
         [Test]
         public void RentReturnsCleanBuilder()
         {
-            using (var firstLease = StringBuilderPool.Rent())
+            using (var firstLease = _pool.Rent())
             {
                 firstLease.Builder.Append("first");
                 Assert.That(firstLease.Builder.ToString(), Is.EqualTo("first"));
