@@ -33,9 +33,9 @@ public class PlayerReferenceManager : MonoBehaviour {
 	public PlayerHealth PlayerHealth => _playerHealth;
 	public HealthManager HealthManager => _healthManager;
 	
-	public static string SavePlayerData(GameObject plyr, PrefabIdentifier prefID) {
+	public static string SavePlayerData(StringBuilderPool stringBuilderPool, GameObject plyr, PrefabIdentifier prefID) {
 		PlayerReferenceManager PRman = plyr.GetComponent<PlayerReferenceManager>();
-        using var __stringBuilderLease1 = StringBuilderPool.Rent(200);
+        using var __stringBuilderLease1 = stringBuilderPool.Rent(200);
         var s1 = __stringBuilderLease1.Builder;
         s1.Clear();
 		s1.Append("Hacker");//s1.Append(_consts.playerName);
