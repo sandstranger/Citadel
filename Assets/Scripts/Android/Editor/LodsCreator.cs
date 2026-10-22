@@ -69,7 +69,7 @@ namespace Citadel.Android.Tools
                 {
                     AutoLOD.RemoveLODs(prefabInstance);
 
-                    var meshFilters = Citadel.Game.Extensions.GetComponentsInChildren<MeshRenderer>(prefabInstance, true, true)
+                    var meshFilters = prefabInstance.GetComponentsInChildren<MeshRenderer>(true)
                         .Select(render => render.GetComponent<MeshFilter>()).Where(mesh => mesh!=null && mesh.sharedMesh!=null).ToArray();
                     
                     AutoLOD.GenerateLODs(prefabInstance);
@@ -136,7 +136,7 @@ namespace Citadel.Android.Tools
                 return false;
             }
 
-            var meshFilters = Game.Extensions.GetComponentsInChildren<MeshRenderer>(gameObject, true, true)
+            var meshFilters = gameObject.GetComponentsInChildren<MeshRenderer>(true)
                 .Select(meshRender => 
                     meshRender.GetComponent<MeshFilter>()).Where(meshFilter => meshFilter!=null && meshFilter.sharedMesh!=null).ToArray();
 
