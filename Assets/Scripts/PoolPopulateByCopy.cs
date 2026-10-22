@@ -13,10 +13,12 @@ public class PoolPopulateByCopy : MonoBehaviour {
 	private readonly List<GameObject> _childs = new();
 
 	[Inject] private Const _consts;
+	[Inject] private DiContainer _container;
+	[Inject] private ScenesLoader _scenesLoader;
 	
 	private void Awake()
 	{
-		ScenesLoader.OnStartLoadScene += DisableAllChilds;
+		_scenesLoader.OnStartLoadScene += DisableAllChilds;
 		int i = 0;
 		while (i < numberOfCopies)
 		{
@@ -27,7 +29,7 @@ public class PoolPopulateByCopy : MonoBehaviour {
 
 	private void OnDestroy()
 	{
-		ScenesLoader.OnStartLoadScene -= DisableAllChilds;
+		if (_scenesLoader != null) _scenesLoader.OnStartLoadScene -= DisableAllChilds;
 	}
 
 	private void DisableAllChilds(string sceneName)
@@ -39,7 +41,7 @@ public class PoolPopulateByCopy : MonoBehaviour {
 	}
 	
 	private void CreateCopy() {
-		GameObject copy = RootInstaller.InstantiatePrefab(transform.GetChild(0).gameObject,transform.position,_consts.quaternionIdentity) as GameObject; // create a copy of a pool object
+		GameObject copy = _container.InstantiatePrefab(transform.GetChild(0).gameObject,transform.position,_consts.quaternionIdentity) as GameObject; // create a copy of a pool object
 		if (copy != null) {
 			copy.SetActive(false); // Ensure it is in fact, "empty" and available to return.
 			var rectTransform = copy.GetComponent<RectTransform>();
