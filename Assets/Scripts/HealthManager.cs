@@ -857,8 +857,8 @@ public class HealthManager : MonoBehaviour {
 	}
 
 	// Generic health info string
-	public static string Save(GameObject go, PrefabIdentifier prefID) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 500);
 		var s1 = __stringBuilderLease1.Builder;
 		HealthManager hm;
 		if (go.name.Contains("se_corpse_eaten")) hm = go.transform.GetChild(0).GetComponent<HealthManager>(); // se_corpse_eaten
