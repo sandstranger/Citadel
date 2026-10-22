@@ -434,9 +434,9 @@ public class PauseScript : MonoBehaviour {
 
 // Fore use with LiveSplit or other future speedrunner utilities for doing speedruns
 [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-public static class AutoSplitterData {
-	public static long magicNumber = 0x1337133713371337;
-	public static double thisRunTime = 0;
-	public static bool isLoading = false;
-	public static int missionSplitID = 0;
+public sealed class AutoSplitterData {
+	public long magicNumber = 0x1337133713371337;
+	public double thisRunTime = 0;
+	public bool isLoading = false;
+	public int missionSplitID = 0;
 }
