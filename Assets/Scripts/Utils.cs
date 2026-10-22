@@ -35,6 +35,7 @@ public sealed class Utils {
 										  // text could contain commas.  Used
 										  // for all savefile text.
 	public static char splitCharChar = '|';
+	public const char keyValueSplitChar = ':';
 	public static readonly CultureInfo en_US_Culture = new("en-US");
 
 	// Kept for synchronous legacy callers while the DI-based async loader is migrated.
@@ -601,7 +602,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 			case TrackType.Distortion:      return IntToString(12,name);;
 		}
 		
-		return name + SaveLoad.keyValueSplitChar;
+		return name + Utils.keyValueSplitChar;
 	}
 
 	public static TrackType IntToTrackType(string typ, string name) {
@@ -644,7 +645,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 			case MusicType.Override: return IntToString(4,name);
 		}
 		
-		return name + SaveLoad.keyValueSplitChar;
+		return name + Utils.keyValueSplitChar;
 	}
 
 	public static MusicType IntToMusicType(string typ, string name) {
@@ -1224,8 +1225,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
     }
 
     public static string SaveTransform(Transform tr) {
-        using var __stringBuilderLease3 = StringBuilderPool.Rent();
-        var s1 = __stringBuilderLease3.Builder;
+        var s1 = new StringBuilder();
         s1.Clear();
 		
 		if (tr is RectTransform rectTr) {
@@ -1379,8 +1379,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 	
 	public static string SaveBoxCollider(GameObject go) {
 		BoxCollider bcol = go.GetComponent<BoxCollider>();
-		using var __stringBuilderLease4 = StringBuilderPool.Rent();
-		var s1 = __stringBuilderLease4.Builder;
+		var s1 = new StringBuilder();
 		s1.Clear();
 		s1.Append(FloatToString(bcol.center.x,"center.x"));
 		s1.Append(splitChar);
@@ -1415,8 +1414,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 		Rigidbody rbody = go.GetComponent<Rigidbody>();
 		if (rbody == null) return ("velocity.x:0000.00000" + splitChar + "velocity.y:0000.00000" + splitChar + "velocity.z:0000.00000" + splitChar + "isKinematic:0");
 
-		using var __stringBuilderLease5 = StringBuilderPool.Rent();
-		var s1 = __stringBuilderLease5.Builder;
+		var s1 = new StringBuilder();
         s1.Clear();
         s1.Append(FloatToString(rbody.linearVelocity.x,"velocity.x"));
         s1.Append(splitChar);
@@ -1463,8 +1461,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 				   + SaveRigidbody(null) + "subGO.activeSelf:0";
 		}
 
-		using var __stringBuilderLease6 = StringBuilderPool.Rent();
-		var s1 = __stringBuilderLease6.Builder;
+		var s1 = new StringBuilder();
         s1.Clear();
         s1.Append(SaveTransform(subGO.transform));
 		s1.Append(splitChar);
@@ -1491,8 +1488,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 
 
 	public static string SaveCamera(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent();
-		var cams1 = __stringBuilderLease1.Builder;
+		var cams1 = new StringBuilder();
 		Camera cm = go.GetComponent<Camera>();
         Grayscale gsc = go.GetComponent<Grayscale>();
 		if (cm == null) {
@@ -1610,8 +1606,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 
 
 	public static string SaveAudioSource(GameObject go) {
-		using var __stringBuilderLease2 = StringBuilderPool.Rent();
-		var auds1 = __stringBuilderLease2.Builder;
+		var auds1 = new StringBuilder();
 		AudioSource aus = go.GetComponent<AudioSource>();
 		auds1.Clear();
         auds1.Append(BoolToString(aus.enabled,"AudioSource.enabled"));
