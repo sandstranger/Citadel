@@ -38,7 +38,7 @@ namespace Citadel.Game
 
                 if (cancellationToken.CanBeCanceled)
                 {
-                    using (cancellationToken.Register(() => ReleaseAsset(assetName)));
+                    await using (cancellationToken.Register(() => ReleaseAsset(assetName)));
                 }
                 
                 if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
@@ -116,10 +116,9 @@ namespace Citadel.Game
                 throw new ArgumentNullException(nameof(assetName));
             }
             
-            if (_loadedAssets.TryGetValue(assetName, out var assetInfo))
+            if (_loadedAssets.Remove(assetName, out var assetInfo))
             {
                 Addressables.Release(assetInfo.Handle);
-                _loadedAssets.Remove(assetName);
             }
         }
 
@@ -141,23 +140,23 @@ namespace Citadel.Game
 
         private readonly struct AssetInfo : IEquatable<AssetInfo>
         {
-            public readonly string AssetKey;
+            private readonly string _assetKey;
 
             public AsyncOperationHandle Handle { get; }
 
             public AssetInfo(string assetKey, AsyncOperationHandle handle)
             {
-                AssetKey = assetKey;
+                _assetKey = assetKey;
                 Handle = handle;
             }
 
             public T GetResult<T>() where T : Object => Handle.IsDone ? Handle.Convert<T>().Result : null;
             
-            public bool Equals(AssetInfo other) => AssetKey == other.AssetKey;
+            public bool Equals(AssetInfo other) => _assetKey == other._assetKey;
             
             public override bool Equals(object obj) => obj is AssetInfo other && Equals(other);
 
-            public override int GetHashCode() => AssetKey.GetHashCode();
+            public override int GetHashCode() => _assetKey.GetHashCode();
         }
     }
 }
