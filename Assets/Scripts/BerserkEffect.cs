@@ -58,8 +58,8 @@ public class BerserkEffect : UnityStandardAssets.ImageEffects.ImageEffectBase {
 		Graphics.Blit (source, destination, material);
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		BerserkEffect bzk = go.GetComponent<BerserkEffect>();
 		s1.Clear();
