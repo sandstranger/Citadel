@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Video;
 
 public class Inventory : MonoBehaviour {
+	[Inject] private DiContainer _container;
 	// Access Cards
 	public AccessCardType[] accessCardsOwned; // save
 	private AccessCardType doorAccessTypeAcquired;
@@ -1376,7 +1377,7 @@ public class Inventory : MonoBehaviour {
 			hasSoft[4] = false;
 			softs[4].SetActive(false); // turn the button off now that we are out
 		}
-		GameObject decoyObj = RootInstaller.InstantiatePrefab(decoyPrefab,_playerMovement.transform.position,
+		GameObject decoyObj = _container.InstantiatePrefab(decoyPrefab,_playerMovement.transform.position,
 			_mouseLookScript.transform.rotation);
 		if (decoyObj != null) {
 			decoyObj.transform.SetParent(CyberSpaceStaticContainer.transform,true);
