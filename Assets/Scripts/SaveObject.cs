@@ -117,7 +117,7 @@ public class SaveObject : MonoBehaviour {
 
 		switch (so.saveType) {
 			case SaveableType.Player:         s1.Append(PlayerReferenceManager.SavePlayerData(stringBuilderPool, go,prefID)); break;
-			case SaveableType.Useable:              s1.Append(UseableObjectUse.Save(go)); break;
+			case SaveableType.Useable:              s1.Append(UseableObjectUse.Save(stringBuilderPool, go)); break;
 			case SaveableType.Grenade:               s1.Append(GrenadeActivate.Save(stringBuilderPool, go)); break;
 			case SaveableType.NPC:                     s1.Append(HealthManager.Save(stringBuilderPool, go,prefID)); s1.Append(Utils.splitChar); // Saves TargetIO
 													    s1.Append(AIController.Save(stringBuilderPool, go,prefID)); s1.Append(Utils.splitChar); // Handles SearchableDestructable for corpse child
@@ -126,18 +126,18 @@ public class SaveObject : MonoBehaviour {
 			case SaveableType.SearchableStatic:       s1.Append(SearchableItem.Save(stringBuilderPool, go,prefID)); break;
 			case SaveableType.SearchableDestructable: s1.Append(SearchableItem.Save(stringBuilderPool, go,prefID)); s1.Append(Utils.splitChar);
                                                        s1.Append(HealthManager.Save(stringBuilderPool, go,prefID)); break; // Saves TargetIO
-			case SaveableType.Door:                             s1.Append(Door.Save(go,prefID)); s1.Append(Utils.splitChar);
+			case SaveableType.Door:                             s1.Append(Door.Save(stringBuilderPool, go,prefID)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
 			case SaveableType.ForceBridge:               s1.Append(ForceBridge.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
-			case SaveableType.Switch:                   s1.Append(ButtonSwitch.Save(go)); s1.Append(Utils.splitChar);
+			case SaveableType.Switch:                   s1.Append(ButtonSwitch.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
 			case SaveableType.FuncWall:                     s1.Append(FuncWall.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
-			case SaveableType.TeleDest:                s1.Append(TeleportTouch.Save(go)); break;
-			case SaveableType.LBranch:                   s1.Append(LogicBranch.Save(go)); s1.Append(Utils.splitChar);
+			case SaveableType.TeleDest:                s1.Append(TeleportTouch.Save(stringBuilderPool, go)); break;
+			case SaveableType.LBranch:                   s1.Append(LogicBranch.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
-			case SaveableType.LRelay:                     s1.Append(LogicRelay.Save(go)); s1.Append(Utils.splitChar);
+			case SaveableType.LRelay:                     s1.Append(LogicRelay.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
 			case SaveableType.LSpawner:                 s1.Append(SpawnManager.Save(stringBuilderPool, go)); break;
 			case SaveableType.InteractablePanel:   s1.Append(InteractablePanel.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
@@ -156,25 +156,25 @@ public class SaveObject : MonoBehaviour {
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
 			case SaveableType.GravPad:                s1.Append(TextureChanger.Save(go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
-			case SaveableType.ChargeStation:           s1.Append(ChargeStation.Save(go)); break;
+			case SaveableType.ChargeStation:           s1.Append(ChargeStation.Save(stringBuilderPool, go)); break;
 			case SaveableType.Light:                  s1.Append(LightAnimation.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
 			case SaveableType.LTimer:                     s1.Append(LogicTimer.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
-			case SaveableType.Camera:                  s1.Append(BerserkEffect.Save(go)); s1.Append(Utils.splitChar);
+			case SaveableType.Camera:                  s1.Append(BerserkEffect.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													           s1.Append(Utils.SaveCamera(go)); break;
-			case SaveableType.DelayedSpawn:             s1.Append(DelayedSpawn.Save(go)); break;
+			case SaveableType.DelayedSpawn:             s1.Append(DelayedSpawn.Save(stringBuilderPool, go)); break;
 			case SaveableType.SecurityCamera:   s1.Append(SecurityCameraRotate.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													   s1.Append(HealthManager.Save(stringBuilderPool, go.transform.GetChild(0).gameObject,prefID)); s1.Append(Utils.splitChar); // Saves TargetIO
 													           s1.Append(Utils.SaveTransform(go.transform.GetChild(0))); break;
-			case SaveableType.Trigger:                       s1.Append(Trigger.Save(go)); s1.Append(Utils.splitChar);
+			case SaveableType.Trigger:                       s1.Append(Trigger.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
-			case SaveableType.Projectile:               s1.Append(DelayedSpawn.Save(go)); s1.Append(Utils.splitChar);
+			case SaveableType.Projectile:               s1.Append(DelayedSpawn.Save(stringBuilderPool, go)); s1.Append(Utils.splitChar);
 										      s1.Append(ProjectileEffectImpact.Save(stringBuilderPool, go)); break;
 			case SaveableType.NormalScreen:            s1.Append(HealthManager.Save(stringBuilderPool, go,prefID)); break; // Saves TargetIO
 			case SaveableType.TriggerRadiation:    		   s1.Append(Radiation.Save(stringBuilderPool, go));
 															s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
-			case SaveableType.CyberSwitch:               s1.Append(CyberSwitch.Save(go,prefID)); s1.Append(Utils.splitChar);
+			case SaveableType.CyberSwitch:               s1.Append(CyberSwitch.Save(stringBuilderPool, go,prefID)); s1.Append(Utils.splitChar);
 													        s1.Append(TargetIO.Save(stringBuilderPool, go)); break;
 			case SaveableType.CyberItem:               s1.Append(HealthManager.Save(stringBuilderPool, go.transform.GetChild(0).GetChild(0).gameObject,prefID)); break; // Saves TargetIO
 		}
