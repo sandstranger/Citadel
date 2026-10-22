@@ -12,7 +12,7 @@ public class UseName : MonoBehaviour {
 
 
 	public static void UseNameSprint(Const consts,GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(200);
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(200);
 		var s1 = __stringBuilderLease1.Builder;
 		UseName un = go.GetComponent<UseName>();
 		PrefabIdentifier pid = go.GetComponent<PrefabIdentifier>();
