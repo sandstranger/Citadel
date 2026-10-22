@@ -9,11 +9,6 @@ using UnityEngine.ResourceManagement.ResourceLocations;
 
 namespace Citadel.Game
 {
-    internal interface IAddressableTextAssetsPreparer
-    {
-        UniTask<bool> PrepareAsync();
-    }
-
     internal sealed class AddressableTextAssetsPreparer : IAddressableTextAssetsPreparer
     {
         public async UniTask<bool> PrepareAsync()

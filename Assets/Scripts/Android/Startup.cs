@@ -12,7 +12,7 @@ namespace Citadel.Game
     {
 #if UNITY_ANDROID
         [Inject]
-        private IAddressableTextAssetsPreparer _addressableTextAssetsPreparer;
+        private readonly IAddressableTextAssetsPreparer _addressableTextAssetsPreparer;
 
         private void Start() => InitializeAsync().Forget();
 
