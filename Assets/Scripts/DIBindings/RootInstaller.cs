@@ -3,6 +3,7 @@ using Citadel.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.Serialization;
+using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace Citadel.Game
@@ -11,7 +12,7 @@ namespace Citadel.Game
     {
         public const string MainAudioSourceName = "main_menu_music";
         
-        private static RootInstaller _instance;
+        private ScenesLoader _scenesLoader;
 
         [SerializeField] 
         private TexturesStorage texturesStorage;
@@ -42,29 +43,11 @@ namespace Citadel.Game
         [SerializeField] private PostProcessProfile _postProcessProfile;
         [SerializeField] private PostProcessLayer[] _postProcessLayers;
 
-        private readonly List<object> _itemsToInject = new();
         private readonly List<Config.PostProcessLayerStorage> _postProcessLayerStorages = new();
 
         private void Awake()
         {
-            if (_instance == null)
-            {
-                _instance = this;
-                DontDestroyOnLoad(this.gameObject);
-            }
-            else if (Const.StartingNewGame)
-            {
-                DestroyImmediate(_instance.gameObject);
-                _instance = this;
-                DontDestroyOnLoad(this.gameObject);
-            }
-            else
-            {
-                DestroyImmediate(this.gameObject);
-                return;
-            }
-
-            ScenesLoader.OnActiveSceneChanged += OnSceneChanged;
+            DontDestroyOnLoad(gameObject);
 
             _const.InitializeInstance();
             _playerReference.InitializeInstance();
@@ -80,9 +63,10 @@ namespace Citadel.Game
         {
             Container.Bind<AudioSource>().WithId(MainAudioSourceName).FromInstance(_mainmenuMusic).AsSingle();
             Container.Bind<ITexturesStorage>().FromInstance(texturesStorage).AsSingle();
-            Container.Bind<IResourcesLoader>().FromInstance(AddressablesResourcesLoader.Default).AsSingle();
+            Container.Bind<IResourcesLoader>().To<AddressablesResourcesLoader>().AsSingle();
             Container.Bind<Utils>().AsSingle();
-            Container.Bind<AndroidConfig>().FromInstance(AndroidConfig.Default).AsSingle();
+            Container.Bind<AndroidConfig>().AsSingle();
+            Container.Bind<ScenesLoader>().AsSingle();
             Container.Bind<IReadOnlyCollection<Config.PostProcessLayerStorage>>()
                 .FromInstance(_postProcessLayerStorages).AsSingle();
             Container.Bind<Config>().AsSingle();
@@ -92,10 +76,11 @@ namespace Citadel.Game
             Container.BindInstance(_playerReference).AsSingle();
             Container.BindInstance(_biomonitorGraphSystem).AsSingle();
             Container.BindInstance(_playerEnergy).AsSingle();
-            Container.Bind<DynamicCulling>().FromInstance(FindFirstObjectByType<DynamicCulling>()).AsTransient();
-            Container.Bind<LevelManager>().FromInstance(FindFirstObjectByType<LevelManager>()).AsTransient();
-            Container.Bind<LevelEditor>().FromInstance(FindFirstObjectByType<LevelEditor>()).AsTransient();
-            Container.Bind<LightDistanceCuller>().FromInstance(FindFirstObjectByType<LightDistanceCuller>())
+            var activeScene = SceneManager.GetActiveScene();
+            Container.Bind<DynamicCulling>().FromInstance(FindComponentInScene<DynamicCulling>(activeScene)).AsTransient();
+            Container.Bind<LevelManager>().FromInstance(FindComponentInScene<LevelManager>(activeScene)).AsTransient();
+            Container.Bind<LevelEditor>().FromInstance(FindComponentInScene<LevelEditor>(activeScene)).AsTransient();
+            Container.Bind<LightDistanceCuller>().FromInstance(FindComponentInScene<LightDistanceCuller>(activeScene))
                 .AsTransient();
             Container.BindInstance(_const).AsSingle();
             Container.BindInstance(_mfdManager).AsSingle();
@@ -117,64 +102,69 @@ namespace Citadel.Game
             Container.BindInstance(_weaponCurrent).AsSingle();
             Container.BindInstance(_questLogNotesManager).AsSingle();
 
-            Container.Inject(AddressablesResourcesLoader.Default);
             
-            _itemsToInject.Add(_playerReference);
-            _itemsToInject.Add(_biomonitorGraphSystem);
-            _itemsToInject.Add(_playerEnergy);
-            _itemsToInject.Add(_const);
-            _itemsToInject.Add(_mfdManager);
-            _itemsToInject.Add(_automap);
-            _itemsToInject.Add(_guiState);
-            _itemsToInject.Add(_playerPatch);
-            _itemsToInject.Add(_getInput);
-            _itemsToInject.Add(_inventory);
-            _itemsToInject.Add(_mainMenuHandler);
-            _itemsToInject.Add(_missionTimer);
-            _itemsToInject.Add(_mouseCursor);
-            _itemsToInject.Add(_minigameCursor);
-            _itemsToInject.Add(_mouseLookScript);
-            _itemsToInject.Add(_music);
-            _itemsToInject.Add(_pauseScript);
-            _itemsToInject.Add(_playerHealth);
-            _itemsToInject.Add(_playerMovement);
-            _itemsToInject.Add(_weaponFire);
-            _itemsToInject.Add(_weaponCurrent);
-            _itemsToInject.Add(_questLogNotesManager);
+            _scenesLoader = Container.Resolve<ScenesLoader>();
+            _scenesLoader.OnActiveSceneChanged += OnSceneChanged;
+        }
+
+        private void Start()
+        {
+            OnSceneChanged(SceneManager.GetActiveScene().name);
         }
 
         private void OnDestroy()
         {
-            ScenesLoader.OnActiveSceneChanged -= OnSceneChanged;
+            if (_scenesLoader != null)
+            {
+                _scenesLoader.OnActiveSceneChanged -= OnSceneChanged;
+            }
         }
 
         private void OnSceneChanged(string sceneName)
         {
-            var dynamicCulling = FindFirstObjectByType<DynamicCulling>();
-            var levelManager = FindFirstObjectByType<LevelManager>();
-            var levelEditor = FindFirstObjectByType<LevelEditor>();
-            var lightsCuller = FindFirstObjectByType<LightDistanceCuller>();
-
-            Container.Rebind<LightDistanceCuller>().FromInstance(lightsCuller).AsTransient();
-            Container.Rebind<DynamicCulling>().FromInstance(dynamicCulling).AsTransient();
-            Container.Rebind<LevelManager>().FromInstance(levelManager).AsTransient();
-            Container.Rebind<LevelEditor>().FromInstance(levelEditor).AsTransient();
-
-            Container.Inject(lightsCuller);
-            Container.Inject(levelEditor);
-            Container.Inject(levelManager);
-            Container.Inject(dynamicCulling);
-
-            foreach (var itemToInject in _itemsToInject)
+            var scene = SceneManager.GetSceneByName(sceneName);
+            if (!scene.IsValid() || !scene.isLoaded)
             {
-                Container.Inject(itemToInject);
+                scene = SceneManager.GetActiveScene();
+            }
+
+            var dynamicCulling = FindComponentInScene<DynamicCulling>(scene);
+            var levelManager = FindComponentInScene<LevelManager>(scene);
+            var levelEditor = FindComponentInScene<LevelEditor>(scene);
+            var lightsCuller = FindComponentInScene<LightDistanceCuller>(scene);
+
+            if (lightsCuller != null)
+                Container.Rebind<LightDistanceCuller>().FromInstance(lightsCuller).AsTransient();
+            if (dynamicCulling != null)
+                Container.Rebind<DynamicCulling>().FromInstance(dynamicCulling).AsTransient();
+            if (levelManager != null)
+                Container.Rebind<LevelManager>().FromInstance(levelManager).AsTransient();
+            if (levelEditor != null)
+                Container.Rebind<LevelEditor>().FromInstance(levelEditor).AsTransient();
+
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                Container.InjectGameObject(root);
             }
         }
 
-        public static GameObject InstantiatePrefab(GameObject original, Vector3 position, Quaternion rotation,
-            Transform parentTransform = null)
+        private static T FindComponentInScene<T>(Scene scene) where T : Component
         {
-            return _instance.Container.InstantiatePrefab(original, position, rotation, parentTransform);
+            if (!scene.IsValid() || !scene.isLoaded)
+            {
+                return null;
+            }
+
+            foreach (var root in scene.GetRootGameObjects())
+            {
+                var components = root.GetComponentsInChildren<T>(true);
+                if (components.Length > 0)
+                {
+                    return components[0];
+                }
+            }
+
+            return null;
         }
     }
 }
