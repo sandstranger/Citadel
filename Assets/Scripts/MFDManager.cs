@@ -2037,8 +2037,8 @@ public class MFDManager : MonoBehaviour  {
 		searchButton.customIndex[index] = customIndex[index];
 	}
 	
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 1024);
 		var s1 = __stringBuilderLease1.Builder;
 		MFDManager mfd = go.GetComponent<MFDManager>();
 		var pauseScript = mfd._pauseScript;
