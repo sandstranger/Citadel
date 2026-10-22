@@ -41,8 +41,13 @@ using Debug = UnityEngine.Debug;
 // UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion 1200
 // TextLocalization 1300
 
-public class Const : SingletonHelper<Const>
+public class Const : MonoBehaviour
 {
+    [Inject] private ScenesLoader _scenesLoader;
+    [Inject] private StringBuilderPool _stringBuilderPool;
+    [Inject] private SaveLoad _saveLoad;
+    [Inject] private ObjectContainmentSystem _objectContainmentSystem;
+    [Inject] private DiContainer _container;
 	private const int StringBuilderSize = 500 * 1024;
 	public float shadowThreshold = 0.03f;
 	//Item constants
@@ -426,8 +431,8 @@ public class Const : SingletonHelper<Const>
 
 	private void Awake()
 	{
-		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
-		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
+		_scenesLoader.OnSceneLoaded += OnSceneLoaded;
+		_scenesLoader.OnStartLoadScene += OnStartLoadScene;
 		
 #if UNITY_EDITOR || !UNITY_ANDROID
 		TARGET_FPS = 144;
@@ -608,8 +613,8 @@ public class Const : SingletonHelper<Const>
 		PauseAnimation[] panims = FindObjectsByType<PauseAnimation>(FindObjectsSortMode.None);
 		for (int i=0;i<panims.Length;i++) panimsList.Add(panims[i]);
 
-		ObjectContainmentSystem.FindAllFloorGOs();
-		ObjectContainmentSystem.UpdateActiveFlooring();	
+		_objectContainmentSystem.FindAllFloorGOs();
+		_objectContainmentSystem.UpdateActiveFlooring();	
 	}
 
 	IEnumerator InitializeEventSystem () {
@@ -620,7 +625,7 @@ public class Const : SingletonHelper<Const>
 	public void LoadAudioLogMetaData() {
 		// The following to be assigned to the arrays in the Unity Const data structure
 		int readIndexOfLog, readLogImageLHIndex, readLogImageRHIndex; // look-up index for assigning the following data on the line in the file to the arrays
-		using var __stringBuilderLease2 = StringBuilderPool.Rent();
+		using var __stringBuilderLease2 = _stringBuilderPool.Rent();
 		var readLogText = __stringBuilderLease2.Builder; // loaded into string audioLogSpeech2Text[]
 		string readline; // variable to hold each string read in from the file
 		char logSplitChar = ',';
@@ -739,7 +744,7 @@ public class Const : SingletonHelper<Const>
 		string readline; // variable to hold each string read in from the file
 		int pagenum = 0;
 		creditsLength = 1;
-		using var __stringBuilderLease3 = StringBuilderPool.Rent(StringBuilderSize);
+		using var __stringBuilderLease3 = _stringBuilderPool.Rent(StringBuilderSize);
 		var page = __stringBuilderLease3.Builder;
 		StreamReader dataReader = Utils.ReadStreamingAsset("credits.txt");
 		using (dataReader) {
@@ -1131,7 +1136,7 @@ public class Const : SingletonHelper<Const>
 
 		GameObject InstantiatePrefab(GameObject prefab)
 		{
-			return RootInstaller.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity);
+			return _container.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity);
 		}
 	}
 
@@ -1215,7 +1220,7 @@ public class Const : SingletonHelper<Const>
 
 		saveData.Add(savename);
 		
-		using (var __stringBuilderLease1 = StringBuilderPool.Rent(StringBuilderSize))
+		using (var __stringBuilderLease1 = _stringBuilderPool.Rent(StringBuilderSize))
 		{
 			var s1 = __stringBuilderLease1.Builder;
 			// Credit Stats and Times
@@ -1262,7 +1267,7 @@ public class Const : SingletonHelper<Const>
 		// Save all the objects data
 		for (i=0;i<saveableGameObjects.Count;i++) {
 			// Take this object's data and add it to the array.
-			saveData.Add(SaveObject.Save(_levelManager,saveableGameObjects[i])); // <<< THIS IS IT <<<
+			saveData.Add(SaveObject.Save(_saveLoad, _stringBuilderPool, _levelManager,saveableGameObjects[i])); // <<< THIS IS IT <<<
 		}
 		
 		foreach (var dynamicObjectsSaveList in LevelManager.DynamicObjectsSavestrings)
@@ -1577,7 +1582,7 @@ public class Const : SingletonHelper<Const>
 					} // skip checking this and doing GetComponent
 
 					currentGameObjectInScene = saveableGameObjectsInScene[j];
-					currentSaveObjectInScene = SaveLoad.GetPrefabSaveObject(currentGameObjectInScene);
+					currentSaveObjectInScene = _saveLoad.GetPrefabSaveObject(currentGameObjectInScene);
 
 					if (!currentSaveObjectInScene.instantiated) alreadyCheckedThisInstantiableGameObjectInScene[j] = true; // Huge time saver right here!
 
@@ -1598,7 +1603,7 @@ public class Const : SingletonHelper<Const>
 						
 						
 						entries = readFileList[i].Split(Utils.splitCharChar);
-						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
+						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
 						yield return SaveObject.Load(this,_levelManager,currentGameObjectInScene, entries,i,prefID);
 						wasLoaded = true;
 						alreadyCheckedThisSaveableGameObjectInScene[j] = true; // Huge time saver right here!
@@ -1639,7 +1644,7 @@ public class Const : SingletonHelper<Const>
 					continue;
 				}
 
-				sob = SaveLoad.GetPrefabSaveObject(saveableGameObjectsInScene[i]);
+				sob = _saveLoad.GetPrefabSaveObject(saveableGameObjectsInScene[i]);
 				if (sob != null) {
 					if (!sob.instantiated) {
 						UnityEngine.Debug.Log(saveableGameObjectsInScene[i].name
@@ -1697,7 +1702,7 @@ public class Const : SingletonHelper<Const>
 						taskToWait = _consoleEmulator.SpawnDynamicObject(constdex, levID, false, contnr, savID).AsTask();
 						yield return taskToWait;
 						instGO = taskToWait.Result;
-						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
+						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
 						yield return SaveObject.Load(this,_levelManager,instGO, entries,i,prefID); // Load NPC.
 					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex) && !isNpc) {
 						// For DynamicObjects, if current level, go ahead and Instantiate new Prefabs, else add string to LevelManager's list for other levels.
@@ -1706,7 +1711,7 @@ public class Const : SingletonHelper<Const>
 							taskToWait = _consoleEmulator.SpawnDynamicObject(constdex, levID, false, contnr, savID).AsTask();
 							yield return taskToWait;
 							instGO = taskToWait.Result;
-							PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
+							PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
 							yield return SaveObject.Load(this,_levelManager,instGO, entries,i,prefID); // Load NPC.
 						} else {
 							if (levID < LevelManager.DynamicObjectsSavestrings.Count && levID >= 0) { // levID < 14
@@ -2111,7 +2116,7 @@ public class Const : SingletonHelper<Const>
 	}
 
 	public string CreditsStats() {
-	    using var __stringBuilderLease4 = StringBuilderPool.Rent();
+	    using var __stringBuilderLease4 = _stringBuilderPool.Rent();
 	    var s1 = __stringBuilderLease4.Builder;
 	    s1.Clear();
 	    s1.Append("======================================================================");
@@ -2185,8 +2190,8 @@ public class Const : SingletonHelper<Const>
 	}
 	
 	void OnDestroy() {
-		ScenesLoader.OnSceneLoaded -= OnSceneLoaded;
-		ScenesLoader.OnStartLoadScene -= OnStartLoadScene;
+		if (_scenesLoader != null) _scenesLoader.OnSceneLoaded -= OnSceneLoaded;
+		if (_scenesLoader != null) _scenesLoader.OnStartLoadScene -= OnStartLoadScene;
 		questData = null;
 		audiologNames = null;
 		audiologSenders = null;
