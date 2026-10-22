@@ -120,8 +120,8 @@ public class SaveObject : MonoBehaviour {
 			case SaveableType.Useable:              s1.Append(UseableObjectUse.Save(go)); break;
 			case SaveableType.Grenade:               s1.Append(GrenadeActivate.Save(stringBuilderPool, go)); break;
 			case SaveableType.NPC:                     s1.Append(HealthManager.Save(stringBuilderPool, go,prefID)); s1.Append(Utils.splitChar); // Saves TargetIO
-													    s1.Append(AIController.Save(go,prefID)); s1.Append(Utils.splitChar); // Handles SearchableDestructable for corpse child
-										       s1.Append(AIAnimationController.Save(go)); break;
+													    s1.Append(AIController.Save(stringBuilderPool, go,prefID)); s1.Append(Utils.splitChar); // Handles SearchableDestructable for corpse child
+										       s1.Append(AIAnimationController.Save(stringBuilderPool, go)); break;
 			case SaveableType.Destructable:            s1.Append(HealthManager.Save(stringBuilderPool, go,prefID)); break; // Saves TargetIO
 			case SaveableType.SearchableStatic:       s1.Append(SearchableItem.Save(stringBuilderPool, go,prefID)); break;
 			case SaveableType.SearchableDestructable: s1.Append(SearchableItem.Save(stringBuilderPool, go,prefID)); s1.Append(Utils.splitChar);
