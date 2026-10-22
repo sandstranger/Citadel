@@ -80,8 +80,8 @@ public class LogicBranch : MonoBehaviour {
 		if (autoFlipOnTarget) FlipTrackSwitch();
 	}
 
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100);
 		var s1 = __stringBuilderLease1.Builder;
 		LogicBranch lb = go.GetComponent<LogicBranch>();
 		s1.Clear();
