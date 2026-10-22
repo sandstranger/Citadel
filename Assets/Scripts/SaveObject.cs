@@ -73,17 +73,17 @@ public class SaveObject : MonoBehaviour {
 	}
 
 	// Generates a string of object data with the specific object type's info.
-	public static string Save(LevelManager levelManager, GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 1024);
+	public static string Save(SaveLoad saveLoad, StringBuilderPool stringBuilderPool, LevelManager levelManager, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(200 * 1024);
 		var s1 = __stringBuilderLease1.Builder;
-		SaveObject so = SaveLoad.GetPrefabSaveObject(go);
+		SaveObject so = saveLoad.GetPrefabSaveObject(go);
 		if (so == null) return "";
 
 		if (!so.initialized) so.Start();
 		s1.Clear();
 		// Start Saving
 		// --------------------------------------------------------------------
-		PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(go,true);
+		PrefabIdentifier prefID = saveLoad.GetPrefabIdentifier(go,true);
 		if (prefID != null) {
 			s1.Append(Utils.UintToString(prefID.constIndex,"constIndex")); // 0
 			s1.Append(Utils.splitChar);
@@ -182,7 +182,7 @@ public class SaveObject : MonoBehaviour {
 	}
 
 	// Called after prefab has been instantiated.
-	public static async UniTask Load(Const consts,LevelManager levelManager,GameObject go, string[] entries, int lineNum,
+	public static async UniTask Load(SaveLoad saveLoad, StringBuilderPool stringBuilderPool, Const consts,LevelManager levelManager,GameObject go, string[] entries, int lineNum,
 							PrefabIdentifier prefID) {
 
 		if (prefID == null) { 
@@ -192,7 +192,7 @@ public class SaveObject : MonoBehaviour {
 
 		SaveObject so = SaveLoad.GetPrefabSaveObject(go);
 		if (!so.initialized) so.Start();
-		currentObjectInfo = go.name + " " + ParentChain(go) + " ("
+		currentObjectInfo = go.name + " " + ParentChain(stringBuilderPool, go) + " ("
 							+ so.saveType.ToString() + ") Line:"
 						    + lineNum.ToString();
 		// Start Loading
@@ -296,7 +296,7 @@ public class SaveObject : MonoBehaviour {
 		}
 	}
 
-	public static string ParentChain(GameObject go) {
+	public static string ParentChain(StringBuilderPool stringBuilderPool, GameObject go) {
 		if (go.transform.parent == null) return "none";
 
 		using var __stringBuilderLease2 = StringBuilderPool.Rent();
