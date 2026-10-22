@@ -1604,7 +1604,7 @@ public class Const : MonoBehaviour
 						
 						entries = readFileList[i].Split(Utils.splitCharChar);
 						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
-						yield return SaveObject.Load(this,_levelManager,currentGameObjectInScene, entries,i,prefID);
+						yield return SaveObject.Load(_saveLoad, _stringBuilderPool, this, _levelManager,currentGameObjectInScene, entries,i,prefID);
 						wasLoaded = true;
 						alreadyCheckedThisSaveableGameObjectInScene[j] = true; // Huge time saver right here!
 						break;
@@ -1703,7 +1703,7 @@ public class Const : MonoBehaviour
 						yield return taskToWait;
 						instGO = taskToWait.Result;
 						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
-						yield return SaveObject.Load(this,_levelManager,instGO, entries,i,prefID); // Load NPC.
+						yield return SaveObject.Load(_saveLoad, _stringBuilderPool, this, _levelManager,instGO, entries,i,prefID); // Load NPC.
 					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex) && !isNpc) {
 						// For DynamicObjects, if current level, go ahead and Instantiate new Prefabs, else add string to LevelManager's list for other levels.
 						if (levID == LevelManager.CurrentLevel) {
@@ -1712,7 +1712,7 @@ public class Const : MonoBehaviour
 							yield return taskToWait;
 							instGO = taskToWait.Result;
 							PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
-							yield return SaveObject.Load(this,_levelManager,instGO, entries,i,prefID); // Load NPC.
+							yield return SaveObject.Load(_saveLoad, _stringBuilderPool, this, _levelManager,instGO, entries,i,prefID); // Load NPC.
 						} else {
 							if (levID < LevelManager.DynamicObjectsSavestrings.Count && levID >= 0) { // levID < 14
 								if (i < (readFileList.Count - 1) && readFileList.Count > 0 && i >= 0) {
