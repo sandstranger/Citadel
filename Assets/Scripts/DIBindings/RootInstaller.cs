@@ -49,7 +49,7 @@ namespace Citadel.Game
         {
             DontDestroyOnLoad(gameObject);
 
-            _const.InitializeInstance();
+            DontDestroyOnLoad(_const.gameObject);
             DontDestroyOnLoad(_playerReference.gameObject);
             _playerPatch.Initialize();
 
