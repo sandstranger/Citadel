@@ -39,6 +39,7 @@ public sealed class ConsoleEmulator {
 	[Inject] private readonly PlayerMovement _playerMovement;
 	[Inject] private readonly WeaponCurrent _weaponCurrent;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
+	[Inject] private SaveLoad _saveLoad;
 
 	public void ConsoleUpdate() {
         if (_getInput.Console()) _playerMovement.ToggleConsole();
@@ -1480,7 +1481,7 @@ Generic Materials (_consts.genericMaterials[])
 		if (go != null) {
 			lastSpawnedGO = go;
 			if (Application.isPlaying) { // Not called from Test.cs in editor.
-				SaveObject so = SaveLoad.GetPrefabSaveObject(go);
+				SaveObject so = _saveLoad.GetPrefabSaveObject(go);
 				if (so != null) {
 					if (saveID <= -1) {
 						so.SaveID = _consts.nextFreeSaveID;
