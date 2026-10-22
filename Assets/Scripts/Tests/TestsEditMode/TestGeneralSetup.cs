@@ -18,6 +18,8 @@ using UnityEditor.SceneManagement;
 
 namespace Tests {
     public class TestGeneralSetup {
+        private readonly StringBuilderPool _stringBuilderPool = new();
+        private readonly SaveLoad _saveLoad = new(new StringBuilderPool());
         public CitadelTests tester;
         public List<GameObject> allGOs;
         private List<GameObject> allParents;
@@ -1109,7 +1111,7 @@ namespace Tests {
                                                         true);
 
                 for (int k=0;k<compArray.Length;k++) {
-                    so = SaveLoad.GetPrefabSaveObject(compArray[k].gameObject);
+                    so = _saveLoad.GetPrefabSaveObject(compArray[k].gameObject);
                     saveIDsFound.Add(so.SaveID);
                 }
             }
@@ -1165,7 +1167,7 @@ namespace Tests {
         private string ParentChain(GameObject go) {
             if (go.transform.parent == null) return "none";
 
-            using var __stringBuilderLease1 = StringBuilderPool.Rent();
+            using var __stringBuilderLease1 = _stringBuilderPool.Rent();
             var s1 = __stringBuilderLease1.Builder;
             s1.Clear();
             Transform tr = go.transform;
