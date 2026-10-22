@@ -109,9 +109,9 @@ public sealed class SaveLoad {
         
         if (isGeom) {           return SaveGeometry(go,pid);
         } else if (isDyn) {     return SaveObject.Save(this, _stringBuilderPool, levelManager,go);
-        } else if (isDor) {     return SaveObject.Save(levelManager,go);
-        } else if (isStatSav) { return SaveObject.Save(levelManager,go);
-        } else if (isNPC) {     return SaveObject.Save(levelManager,go);
+        } else if (isDor) {     return SaveObject.Save(this, _stringBuilderPool, levelManager,go);
+        } else if (isStatSav) { return SaveObject.Save(this, _stringBuilderPool, levelManager,go);
+        } else if (isNPC) {     return SaveObject.Save(this, _stringBuilderPool, levelManager,go);
         } else if (isStatImm) { 
             if (go.transform.childCount > 1) {
                 PrefabIdentifier pidmain = go.GetComponent<PrefabIdentifier>();
@@ -139,7 +139,7 @@ public sealed class SaveLoad {
             if (go.transform.childCount >= 1) {
                 if (sobmain != null) {
                     if (sobmain.saveType == SaveableType.Transform) { // Ok final check, most definitely a toggleable container that has nothing of its own.
-                        using var __stringBuilderLease2 = StringBuilderPool.Rent();
+                        using var __stringBuilderLease2 = _stringBuilderPool.Rent();
                         var nest = __stringBuilderLease2.Builder;
                         nest.Clear();
                         nest.Append("container " + go.name);
@@ -187,7 +187,7 @@ public sealed class SaveLoad {
             return await LoadStaticImmutable(@const,consoleEmulator,entries,lineNum,curlevel);
         } else {
             // Something went wrong, rebuild the line and print it.
-            using var __stringBuilderLease3 = StringBuilderPool.Rent(100 * 500);
+            using var __stringBuilderLease3 = _stringBuilderPool.Rent(100 * 500);
             var s1 = __stringBuilderLease3.Builder;
             s1.Clear();
             for (int i=0;i<entries.Length;i++) {
@@ -207,7 +207,7 @@ public sealed class SaveLoad {
         if (!ConsoleEmulator.ConstIndexIsStaticObjectImmutable(pid.constIndex)) {
             Debug.LogError(go.name + " is not a static object immutable, has constIndex of " + pid.constIndex.ToString());
         }
-        using var __stringBuilderLease4 = StringBuilderPool.Rent(100 * 500);
+        using var __stringBuilderLease4 = _stringBuilderPool.Rent(100 * 500);
         var s1 = __stringBuilderLease4.Builder;
         s1.Clear();
         s1.Append(Utils.IntToString(pid.constIndex,"constIndex"));
@@ -637,7 +637,7 @@ public sealed class SaveLoad {
             } 
         #endif
         
-        using var __stringBuilderLease5 = StringBuilderPool.Rent();
+        using var __stringBuilderLease5 = _stringBuilderPool.Rent();
         var s1 = __stringBuilderLease5.Builder;
         s1.Clear();
         s1.Append(Utils.UintToString(pid.constIndex,"constIndex"));
@@ -976,7 +976,7 @@ public sealed class SaveLoad {
         Light lit = go.GetComponent<Light>();
         if (lit == null) { Debug.LogError("Missing Light component when trying to SaveLight on " + go.name); return ""; }
 
-        using var __stringBuilderLease6 = StringBuilderPool.Rent();
+        using var __stringBuilderLease6 = _stringBuilderPool.Rent();
         var s1 = __stringBuilderLease6.Builder;
         s1.Clear();
         Transform tr = go.transform;
