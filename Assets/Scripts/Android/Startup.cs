@@ -1,9 +1,9 @@
 using System;
 using Citadel.SceneManagement;
 using UnityEngine;
+using Zenject;
 #if UNITY_ANDROID
 using Cysharp.Threading.Tasks;
-using Zenject;
 #endif
 
 namespace Citadel.Game
@@ -11,8 +11,9 @@ namespace Citadel.Game
     internal sealed class Startup : MonoBehaviour
     {
 #if UNITY_ANDROID
-        [Inject]
-        private readonly IAddressableTextAssetsPreparer _addressableTextAssetsPreparer;
+        [Inject] private IAddressableTextAssetsPreparer _addressableTextAssetsPreparer;
+
+        [Inject] private ScenesLoader _scenesLoader;
 
         private void Start() => InitializeAsync().Forget();
 
@@ -22,7 +23,7 @@ namespace Citadel.Game
             {
                 if (await _addressableTextAssetsPreparer.PrepareAsync())
                 {
-                    await ScenesLoader.LoadLevelAsync(ScenesLoader.MainGameSceneIndex);
+                    await _scenesLoader.LoadLevelAsync(_scenesLoader.MainGameSceneIndex);
                 }
             }
             catch (Exception exception)
@@ -31,7 +32,7 @@ namespace Citadel.Game
             }
         }
 #else
-        private void Start() => ScenesLoader.LoadLevelAsync(ScenesLoader.MainGameSceneIndex);
+        private void Start() => _scenesLoader.LoadLevelAsync(_scenesLoader.MainGameSceneIndex);
 #endif
     }
 }
