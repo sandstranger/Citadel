@@ -10,10 +10,10 @@ namespace Citadel.Game
 {
     internal sealed class Startup : MonoBehaviour
     {
+        [Inject] private ScenesLoader _scenesLoader;
+
 #if UNITY_ANDROID
         [Inject] private IAddressableTextAssetsPreparer _addressableTextAssetsPreparer;
-
-        [Inject] private ScenesLoader _scenesLoader;
 
         private void Start() => InitializeAsync().Forget();
 
