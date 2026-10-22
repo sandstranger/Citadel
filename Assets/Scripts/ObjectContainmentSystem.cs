@@ -4,12 +4,12 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public static class ObjectContainmentSystem
+internal sealed class ObjectContainmentSystem
 {
-    private static readonly List<GameObject> FloorChunks = new();
-    private static readonly List<GameObject> ActiveFloorChunks = new();
+    private readonly List<GameObject> _floorChunks = new();
+    private readonly List<GameObject> _active_floorChunks = new();
 
-    public static void FindAllFloorGOs()
+    public void FindAllFloorGOs()
     {
         FloorChunks.Clear();
 
@@ -24,7 +24,7 @@ public static class ObjectContainmentSystem
         }
     }
 
-    public static void UpdateActiveFlooring()
+    public void UpdateActiveFlooring()
     {
         if (FloorChunks.Count == 0)
         {
@@ -40,7 +40,7 @@ public static class ObjectContainmentSystem
         }
     }
 
-    public static Vector3 FindNearestFloor(float x, float y, float heightFallback)
+    public Vector3 FindNearestFloor(float x, float y, float heightFallback)
     {
         Vector3 checkpos;
         float distMin = 1000000f;
@@ -67,7 +67,7 @@ public static class ObjectContainmentSystem
         return new Vector3(x, heightFallback, y);
     }
 
-    public static void ClearLists()
+    public void ClearLists()
     {
         FloorChunks.Clear();
         ActiveFloorChunks.Clear();
