@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace Citadel.Android.Tools
 {
-    internal static class AndroidTools
+    internal sealed class AndroidTools
     {
         
         [MenuItem("Tools/Debug/Print elev destinations world positions to console")]
