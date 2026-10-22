@@ -13,7 +13,7 @@ namespace Citadel.Game
     {
         public async UniTask<bool> PrepareAsync()
         {
-            var initializationHandle = Addressables.InitializeAsync();
+            var initializationHandle = Addressables.InitializeAsync(autoReleaseHandle: false);
             bool initialized;
 
             try
