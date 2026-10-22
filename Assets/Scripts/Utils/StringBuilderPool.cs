@@ -3,49 +3,50 @@ using System.Text;
 using UnityEngine.Pool;
 
 /// <summary>
-/// Rents reusable StringBuilder instances from Unity's built-in object pool.
-/// The pool is intended for Unity's main-thread game and save/load code.
+/// Rents reusable StringBuilder instances from a DI-owned object pool.
 /// </summary>
-public static class StringBuilderPool
+public sealed class StringBuilderPool
 {
     private const int InitialPoolCapacity = 8;
     private const int MaxPoolSize = 8;
     private const int MaxRetainedCapacity = 512 * 1024;
 
-    private static readonly ObjectPool<StringBuilder> Pool = new ObjectPool<StringBuilder>(
-        createFunc: () => new StringBuilder(),
-        actionOnGet: builder => builder.Clear(),
-        actionOnRelease: ReleaseBuilder,
-        actionOnDestroy: null,
-        collectionCheck: true,
-        defaultCapacity: InitialPoolCapacity,
-        maxSize: MaxPoolSize);
+    private readonly ObjectPool<StringBuilder> _pool;
+
+    public StringBuilderPool()
+    {
+        _pool = new ObjectPool<StringBuilder>(
+            createFunc: () => new StringBuilder(),
+            actionOnGet: builder => builder.Clear(),
+            actionOnRelease: ReleaseBuilder,
+            actionOnDestroy: null,
+            collectionCheck: true,
+            defaultCapacity: InitialPoolCapacity,
+            maxSize: MaxPoolSize);
+    }
 
     /// <summary>
-    /// Rents a builder. Use the returned lease in a using declaration and do not
-    /// keep Builder references after the lease has been disposed.
+    /// Rents a builder. Dispose the lease when finished; do not keep the builder afterwards.
     /// </summary>
-    public static StringBuilderLease Rent(int initialCapacity = 0)
+    public StringBuilderLease Rent(int initialCapacity = 0)
     {
-        var builder = Pool.Get();
+        var builder = _pool.Get();
         if (initialCapacity > builder.Capacity)
         {
             builder.EnsureCapacity(initialCapacity);
         }
 
-        return new StringBuilderLease(builder);
+        return new StringBuilderLease(this, builder);
     }
 
-    internal static void Return(StringBuilder builder)
+    internal void Return(StringBuilder builder)
     {
-        Pool.Release(builder);
+        _pool.Release(builder);
     }
 
     private static void ReleaseBuilder(StringBuilder builder)
     {
         builder.Clear();
-
-        // Do not let unusually large buffers remain in the pool indefinitely.
         if (builder.Capacity > MaxRetainedCapacity)
         {
             builder.Capacity = MaxRetainedCapacity;
@@ -54,14 +55,16 @@ public static class StringBuilderPool
 }
 
 /// <summary>
-/// Disposable lease for a StringBuilder borrowed from <see cref="StringBuilderPool"/>.
+/// Idempotent disposable lease for a StringBuilder borrowed from StringBuilderPool.
 /// </summary>
-public readonly struct StringBuilderLease : IDisposable
+public sealed class StringBuilderLease : IDisposable
 {
+    private StringBuilderPool _pool;
     private readonly StringBuilder _builder;
 
-    internal StringBuilderLease(StringBuilder builder)
+    internal StringBuilderLease(StringBuilderPool pool, StringBuilder builder)
     {
+        _pool = pool;
         _builder = builder;
     }
 
@@ -69,9 +72,13 @@ public readonly struct StringBuilderLease : IDisposable
 
     public void Dispose()
     {
-        if (_builder != null)
+        var pool = _pool;
+        if (pool == null)
         {
-            StringBuilderPool.Return(_builder);
+            return;
         }
+
+        _pool = null;
+        pool.Return(_builder);
     }
 }
