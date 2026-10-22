@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Citadel.Android.Tools
 {
-    internal static class MeshTools
+    internal sealed class MeshTools
     {
         [MenuItem("Tools/Disable read-write property on created lods")]
         private static void DisableReadWritePropertyOnCreatedLods()
