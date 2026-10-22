@@ -97,7 +97,7 @@ public class ItemTabManager : MonoBehaviour {
 			accessCardList.SetActive(true);
 			AccessCardType acc = AccessCardType.Standard;
 			Array cardTypes = Enum.GetValues(typeof(AccessCardType));
-			using var __stringBuilderLease1 = StringBuilderPool.Rent();
+			using var __stringBuilderLease1 = stringBuilderPool.Rent();
 			var s1 = __stringBuilderLease1.Builder;
 			s1.Clear();
 			for (int i=0;i<cardTypes.Length;i++) {
