@@ -37,7 +37,7 @@ namespace Citadel.SceneManagement
             SceneManager.activeSceneChanged += (_,scene ) => OnActiveSceneChanged?.Invoke(scene.name);
         }
 
-        public static async UniTaskVoid LoadLevelAsync(int level)
+        public static async UniTask LoadLevelAsync(int level)
         {
             if (level < _levelScenesNames.Length)
             {

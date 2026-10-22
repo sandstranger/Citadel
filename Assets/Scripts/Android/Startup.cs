@@ -4,6 +4,7 @@ using System.IO;
 using Citadel.SceneManagement;
 using UnityEngine;
 #if UNITY_ANDROID
+using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
@@ -20,7 +21,7 @@ namespace Citadel.Game
             {
                 if (await CopyAddressableTextAssetsAsync())
                 {
-                    ScenesLoader.LoadLevelAsync(ScenesLoader.MainGameSceneIndex);
+                    await ScenesLoader.LoadLevelAsync(ScenesLoader.MainGameSceneIndex);
                 }
             }
             catch (Exception exception)
@@ -29,13 +30,13 @@ namespace Citadel.Game
             }
         }
 
-        private static async System.Threading.Tasks.Task<bool> CopyAddressableTextAssetsAsync()
+        private static async UniTask<bool> CopyAddressableTextAssetsAsync()
         {
             var initializationHandle = Addressables.InitializeAsync();
             bool initialized;
             try
             {
-                await initializationHandle.Task;
+                await initializationHandle.Task.AsUniTask();
                 initialized = initializationHandle.Status == AsyncOperationStatus.Succeeded;
             }
             finally
