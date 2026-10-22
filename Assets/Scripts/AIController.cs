@@ -2051,7 +2051,7 @@ public class AIController : MonoBehaviour {
 			s1.Append(Utils.splitChar);
 			s1.Append(Utils.BoolToString(aic.searchColliderGO.activeSelf,"searchColliderGO.activeSelf"));
 			s1.Append(Utils.splitChar);
-			s1.Append(SearchableItem.Save(aic.searchColliderGO,prefID));
+			s1.Append(SearchableItem.Save(stringBuilderPool, aic.searchColliderGO,prefID));
 
 			// Weird exclusion for hopper to not check 
 			// && !healthManager.vaporizeCorpse
@@ -2059,7 +2059,7 @@ public class AIController : MonoBehaviour {
 				|| prefID.constIndex == 421 /* avian mutant */) {
 
 				s1.Append(Utils.splitChar);
-				s1.Append(HealthManager.Save(aic.searchColliderGO,prefID));
+				s1.Append(HealthManager.Save(stringBuilderPool, aic.searchColliderGO,prefID));
 			}
 		}
 		return s1.ToString();
