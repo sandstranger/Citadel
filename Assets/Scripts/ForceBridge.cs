@@ -148,8 +148,8 @@ public class ForceBridge : MonoBehaviour {
 		}
 	}
 	
-	public static string Save(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
+	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 500);
 		var s1 = __stringBuilderLease1.Builder;
 		ForceBridge fb = go.GetComponent<ForceBridge>();
 		if (fb == null) {
