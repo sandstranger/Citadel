@@ -108,7 +108,6 @@ public class WeaponFire : MonoBehaviour {
 	[Inject] private readonly Config _config;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 	[Inject] private readonly Utils _utils;
-	[Inject] private StringBuilderPool _stringBuilderPool;
 	[Inject] private DiContainer _container;
 	[Inject] private ScenesLoader _scenesLoader;
 
