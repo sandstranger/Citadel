@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Citadel.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
-using UnityEngine.Serialization;
 using UnityEngine.SceneManagement;
 using Zenject;
 
@@ -250,5 +249,6 @@ namespace Citadel.Game
             lightsCuller = FindFirstObjectByType<LightDistanceCuller>(findObjectsRule);
         }
 
+        public static T ResolveInstance<T>() where T : class => _instance?.Container.Resolve<T>();
     }
 }
