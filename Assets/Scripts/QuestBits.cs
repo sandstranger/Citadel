@@ -37,6 +37,7 @@ public class QuestBits {
 
 	private readonly LevelManager _levelManager;
 	private readonly Const _consts;
+	private readonly StringBuilderPool _stringBuilderPool;
 
 	public QuestBits(LevelManager levelManager,Const @const)
 	{
@@ -88,7 +89,7 @@ public class QuestBits {
 	}
 
 	public string Save() {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent();
+		using var __stringBuilderLease1 = _stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		s1.Clear();
 		s1.Append(Utils.IntToString(lev1SecCode,"lev1SecCode"));
