@@ -65,7 +65,7 @@ public class ButtonSwitch : MonoBehaviour {
 		    Debug.Log("BUG: ButtonSwitch missing component for SFXSource");
 		} else SFXSource.playOnAwake = false;
 
-		_renderers.AddRange(this.GetComponentsInChildren<MeshRenderer>(includeSelf: true));
+		_renderers.AddRange(this.GetComponentsInChildren<MeshRenderer>(true));
 		_normalColor = _renderers[0].sharedMaterial.color;
 		
 		foreach (var renderer in _renderers)
