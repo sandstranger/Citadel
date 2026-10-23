@@ -224,7 +224,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.SaveString(cybacc.argvalue,"argvalue"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(go));
+            s1.Append(TargetIO.Save(_stringBuilderPool, go));
         } else if (pid.constIndex == 574) { // prop_healingbed
             HealingBed heb = go.GetComponent<HealingBed>();
             s1.Append(splitChar);
@@ -298,7 +298,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.BoolToString(em.autoPlayEmail,"autoPlayEmail"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(go));
+            s1.Append(TargetIO.Save(_stringBuilderPool, go));
         } else if (pid.constIndex == 709) { // info_message
             TriggeredSprintMessage msg = go.GetComponent<TriggeredSprintMessage>();
             s1.Append(splitChar);
@@ -306,7 +306,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.SaveString(msg.messageToDisplay,"messageToDisplay"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(go));
+            s1.Append(TargetIO.Save(_stringBuilderPool, go));
         } else if (pid.constIndex == 710) { // info_mission
             QuestBitRelay qbr = go.GetComponent<QuestBitRelay>();
             s1.Append(splitChar);
@@ -370,7 +370,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.SaveString(qbr.argvalueIfFalse,"argvalueIfFalse"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(go));
+            s1.Append(TargetIO.Save(_stringBuilderPool, go));
         } else if (pid.constIndex == 711) { // info_note
             Note nt = go.GetComponent<Note>();
             s1.Append(splitChar);
@@ -394,7 +394,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.IntToString(snd.burstemittcnt2,"burstemittcnt2"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(go));
+            s1.Append(TargetIO.Save(_stringBuilderPool, go));
             s1.Append(splitChar);
             s1.Append(Utils.SaveAudioSource(go));
         } else if (pid.constIndex == 714) { // info_screenshake
@@ -404,7 +404,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.FloatToString(eft.force,"force"));
         } else if (pid.constIndex == 715) { // info_spawnpoint
-            s1.Append(TargetIO.Save(go));
+            s1.Append(TargetIO.Save(_stringBuilderPool, go));
         } else if (pid.constIndex == 716) { // fx_reverbzone
             AudioReverbZone arz = go.GetComponent<AudioReverbZone>();
             s1.Append(splitChar);
@@ -1013,9 +1013,9 @@ public sealed class SaveLoad {
         if (sob != null) {
             if (sob.saveType == SaveableType.Light) {
                 s1.Append(Utils.splitChar);
-                s1.Append(LightAnimation.Save(go));
+                s1.Append(LightAnimation.Save(_stringBuilderPool, go));
                 s1.Append(Utils.splitChar);
-                s1.Append(TargetIO.Save(go));
+                s1.Append(TargetIO.Save(_stringBuilderPool, go));
             }
         }
         s1.Append(Utils.splitChar);
