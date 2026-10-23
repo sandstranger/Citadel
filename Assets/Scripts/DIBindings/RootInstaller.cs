@@ -13,6 +13,7 @@ namespace Citadel.Game
         public const string MainAudioSourceName = "main_menu_music";
 
         private static RootInstaller _instance;
+        private readonly List<object> _itemsToInject = new();
         
         [SerializeField] 
         private TexturesStorage texturesStorage;
@@ -56,6 +57,17 @@ namespace Citadel.Game
             }
             else if (Const.StartingNewGame)
             {
+                // The previous scene's Const and PlayerReferenceManager were kept
+                // alive separately from the root installer. Replace those copies
+                // with the instances serialized in the newly loaded gameplay scene.
+                var previousConst = _instance._const;
+                var previousPlayerReference = _instance._playerReference;
+
+                if (previousConst != null && previousConst != _const)
+                    DestroyImmediate(previousConst.gameObject);
+                if (previousPlayerReference != null && previousPlayerReference != _playerReference)
+                    DestroyImmediate(previousPlayerReference.gameObject);
+
                 DestroyImmediate(_instance.gameObject);
                 _instance = this;
                 DontDestroyOnLoad(gameObject);
@@ -136,6 +148,33 @@ namespace Citadel.Game
             Container.BindInstance(_weaponCurrent).AsSingle();
             Container.BindInstance(_questLogNotesManager).AsSingle();
 
+            // These service objects can live in the persistent scene. Reinject them
+            // after scene-specific bindings (LevelManager, cullers, etc.) are rebound.
+            _itemsToInject.AddRange(new object[]
+            {
+                _playerReference,
+                _biomonitorGraphSystem,
+                _playerEnergy,
+                _const,
+                _mfdManager,
+                _automap,
+                _guiState,
+                _playerPatch,
+                _getInput,
+                _inventory,
+                _mainMenuHandler,
+                _missionTimer,
+                _mouseCursor,
+                _minigameCursor,
+                _mouseLookScript,
+                _music,
+                _pauseScript,
+                _playerHealth,
+                _playerMovement,
+                _weaponFire,
+                _weaponCurrent,
+                _questLogNotesManager
+            });
         }
 
         private void OnActiveSceneChanged(Scene previousScene, Scene activeScene) =>
@@ -164,6 +203,14 @@ namespace Citadel.Game
             foreach (var root in scene.GetRootGameObjects())
             {
                 Container.InjectGameObject(root);
+            }
+
+            foreach (var item in _itemsToInject)
+            {
+                if (item != null)
+                {
+                    Container.Inject(item);
+                }
             }
         }
 
