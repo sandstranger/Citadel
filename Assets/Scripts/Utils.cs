@@ -343,15 +343,14 @@ public sealed class Utils {
             return null;
         }
 
-        string address = SafePathCombine("TextsAssets", fName);
-        var handle = Addressables.LoadAssetAsync<TextAsset>(address);
+        var handle = Addressables.LoadAssetAsync<TextAsset>(fName);
 
         try
         {
             TextAsset textAsset = handle.WaitForCompletion();
             if (handle.Status != AsyncOperationStatus.Succeeded || textAsset == null)
             {
-                Debug.LogError($"Failed to load addressable text asset '{address}'.");
+                Debug.LogError($"Failed to load addressable text asset '{fName}'.");
                 return null;
             }
 
@@ -360,7 +359,7 @@ public sealed class Utils {
         }
         catch (Exception exception)
         {
-            Debug.LogError($"Failed to load addressable text asset '{address}': {exception.Message}");
+            Debug.LogError($"Failed to load addressable text asset '{fName}': {exception.Message}");
             return null;
         }
         finally
