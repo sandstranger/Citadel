@@ -139,14 +139,14 @@ namespace Citadel.Android.Tools
 
             string readline;
             int lineNum = 0;
-            char splitter = Convert.ToChar(SaveLoad.splitChar);
+            char splitter = Convert.ToChar(saveLoad.splitChar);
             using (sf) {
                 do {
                     readline = sf.ReadLine();
                     if (readline == null) break;
 				
                     string[] entries = readline.Split(splitter);
-                    var light = await SaveLoad.LoadPrefab(@const,consoleEmulator, 
+                    var light = await saveLoad.LoadPrefab(@const,consoleEmulator, 
                         levelManager, entries,lineNum,curlevel, null, lightParent);
                     var lightComponent = light.GetComponent<Light>();
                     lightComponent.enabled = true;
