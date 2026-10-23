@@ -12,7 +12,6 @@ namespace Citadel.Game
     {
         public const string MainAudioSourceName = "main_menu_music";
         
-
         [SerializeField] 
         private TexturesStorage texturesStorage;
         [SerializeReference] private AudioSource _mainmenuMusic;
@@ -58,7 +57,11 @@ namespace Citadel.Game
                 _postProcessLayerStorages.Add(new Config.PostProcessLayerStorage(postProcessLayer));
             }
         }
+        
+        private new void Start() => OnSceneChanged(SceneManager.GetActiveScene().name);
 
+        private void OnDestroy() => SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+        
         public override void InstallBindings()
         {
             Container.Bind<AudioSource>().WithId(MainAudioSourceName).FromInstance(_mainmenuMusic).AsSingle();
@@ -80,8 +83,7 @@ namespace Citadel.Game
             Container.BindInstance(_playerReference).AsSingle();
             Container.BindInstance(_biomonitorGraphSystem).AsSingle();
             Container.BindInstance(_playerEnergy).AsSingle();
-            var activeScene = SceneManager.GetActiveScene();
-            FindSceneComponents(activeScene, out var dynamicCulling, out var levelManager,
+            FindSceneComponents(out var dynamicCulling, out var levelManager,
                 out var levelEditor, out var lightsCuller);
             Container.Bind<DynamicCulling>().FromInstance(dynamicCulling).AsTransient();
             Container.Bind<LevelManager>().FromInstance(levelManager).AsTransient();
@@ -109,16 +111,6 @@ namespace Citadel.Game
 
         }
 
-        private void Start()
-        {
-            OnSceneChanged(SceneManager.GetActiveScene().name);
-        }
-
-        private void OnDestroy()
-        {
-            SceneManager.activeSceneChanged -= OnActiveSceneChanged;
-        }
-
         private void OnActiveSceneChanged(Scene previousScene, Scene activeScene) =>
             OnSceneChanged(activeScene.name);
 
@@ -130,7 +122,7 @@ namespace Citadel.Game
                 scene = SceneManager.GetActiveScene();
             }
 
-            FindSceneComponents(scene, out var dynamicCulling, out var levelManager,
+            FindSceneComponents( out var dynamicCulling, out var levelManager,
                 out var levelEditor, out var lightsCuller);
 
             if (lightsCuller != null)
@@ -149,46 +141,16 @@ namespace Citadel.Game
         }
 
         private static void FindSceneComponents(
-            Scene scene,
             out DynamicCulling dynamicCulling,
             out LevelManager levelManager,
             out LevelEditor levelEditor,
             out LightDistanceCuller lightsCuller)
         {
-            dynamicCulling = null;
-            levelManager = null;
-            levelEditor = null;
-            lightsCuller = null;
-
-            if (!scene.IsValid() || !scene.isLoaded)
-            {
-                return;
-            }
-
-            // Traverse each scene hierarchy once instead of scanning it separately
-            // for every service that needs rebinding.
-            foreach (var root in scene.GetRootGameObjects())
-            {
-                foreach (var behaviour in root.GetComponentsInChildren<MonoBehaviour>(true))
-                {
-                    if (dynamicCulling == null && behaviour is DynamicCulling foundDynamicCulling)
-                    {
-                        dynamicCulling = foundDynamicCulling;
-                    }
-                    else if (levelManager == null && behaviour is LevelManager foundLevelManager)
-                    {
-                        levelManager = foundLevelManager;
-                    }
-                    else if (levelEditor == null && behaviour is LevelEditor foundLevelEditor)
-                    {
-                        levelEditor = foundLevelEditor;
-                    }
-                    else if (lightsCuller == null && behaviour is LightDistanceCuller foundLightsCuller)
-                    {
-                        lightsCuller = foundLightsCuller;
-                    }
-                }
-            }
+            var findObjectsRule = FindObjectsInactive.Include;
+            dynamicCulling = FindFirstObjectByType<DynamicCulling>(findObjectsRule);
+            levelManager = FindFirstObjectByType<LevelManager>(findObjectsRule);
+            levelEditor = FindFirstObjectByType<LevelEditor>(findObjectsRule);
+            lightsCuller = FindFirstObjectByType<LightDistanceCuller>(findObjectsRule);
         }
 
     }
