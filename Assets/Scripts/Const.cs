@@ -43,6 +43,7 @@ using Debug = UnityEngine.Debug;
 
 public class Const : MonoBehaviour
 {
+    public StringBuilderPool StringBuilderPool => _stringBuilderPool;
     [Inject] private ScenesLoader _scenesLoader;
     [Inject] private StringBuilderPool _stringBuilderPool;
     [Inject] private SaveLoad _saveLoad;
