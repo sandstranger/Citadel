@@ -433,7 +433,10 @@ public class Const : MonoBehaviour
 
 	private void Awake()
 	{
-		_scenesLoader.OnSceneLoaded += OnSceneLoaded;
+		// The injected loader belongs to a scene DI container and can be disposed
+		// during a Single-mode transition. Observe completion through Unity's
+		// global event so game initialization still runs after the old scene unloads.
+		SceneManager.sceneLoaded += HandleSceneLoaded;
 		_scenesLoader.OnStartLoadScene += OnStartLoadScene;
 		
 #if UNITY_EDITOR || !UNITY_ANDROID
@@ -685,6 +688,9 @@ public class Const : MonoBehaviour
 		lastTargetRegistrySize = 0;
 	}
 	
+	private void HandleSceneLoaded(Scene scene, LoadSceneMode mode) =>
+		OnSceneLoaded(scene.name);
+
 	private void OnSceneLoaded(string sceneName)
 	{
 		QuitAfterSavingDone = false;
@@ -2192,7 +2198,7 @@ public class Const : MonoBehaviour
 	}
 	
 	void OnDestroy() {
-		if (_scenesLoader != null) _scenesLoader.OnSceneLoaded -= OnSceneLoaded;
+		SceneManager.sceneLoaded -= HandleSceneLoaded;
 		if (_scenesLoader != null) _scenesLoader.OnStartLoadScene -= OnStartLoadScene;
 		questData = null;
 		audiologNames = null;
