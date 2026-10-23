@@ -590,7 +590,7 @@ public class Const : MonoBehaviour
 
 		LoadCreditsData();
 		StartCoroutine(InitializeEventSystem());
-		questData = new QuestBits (_levelManager,this);
+		questData = new QuestBits (_levelManager, this, _stringBuilderPool);
 // 		if (mainFont1 != null) { // Ensure text is crisp and readable.
 			mainFont1.material.mainTexture.filterMode = FilterMode.Point;
 // 		}
