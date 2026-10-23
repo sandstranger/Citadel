@@ -74,7 +74,22 @@ namespace Citadel.Game
             }
             else
             {
+                // Other gameplay scenes may contain serialized copies of these
+                // persistent managers. Destroy the copies together with their
+                // duplicate installer, keeping the active persistent instances.
+                var duplicateConst = _const;
+                var duplicatePlayerReference = _playerReference;
+                var existingConst = _instance._const;
+                var existingPlayerReference = _instance._playerReference;
+
                 DestroyImmediate(gameObject);
+
+                if (duplicateConst != null && duplicateConst != existingConst)
+                    DestroyImmediate(duplicateConst.gameObject);
+                if (duplicatePlayerReference != null &&
+                    duplicatePlayerReference != existingPlayerReference)
+                    DestroyImmediate(duplicatePlayerReference.gameObject);
+
                 return;
             }
 
