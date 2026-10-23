@@ -11,6 +11,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour {
+	[Inject] private DiContainer _container;
 	// External references, required
 	public GameObject cameraObject;
 	public Transform cheatG1Spawn;
@@ -1807,8 +1808,8 @@ public class PlayerMovement : MonoBehaviour {
 			case 12: arsenal = cheatL6arsenal; break;
 			default: arsenal = cheatL1arsenal; break;
 		}
-		GameObject cheatArsenal = RootInstaller.InstantiatePrefab(arsenal,transform.position,
-								    _consts.quaternionIdentity) as GameObject;
+		GameObject cheatArsenal = _container.InstantiatePrefab(arsenal, transform.position,
+								    _consts.quaternionIdentity, null) as GameObject;
 									
 		if (cheatArsenal == null) return; // Failed!
 

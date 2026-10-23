@@ -15,6 +15,12 @@ using UnityEditor.SceneManagement;
 #endif
 
 public class CitadelTests : MonoBehaviour {
+	private SaveLoad _saveLoad;
+
+	private void Awake()
+	{
+		_saveLoad = new SaveLoad();
+	}
 	public Camera probeCam;
 	public Light cookieLight;
 	public GameObject[] geometryContainters;
@@ -187,7 +193,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<allStaticObjects.Count;i++) {				
-			//	sw.Write(SaveLoad.SavePrefab(allStaticObjects[i]));
+			//	sw.Write(_saveLoad.SavePrefab(allStaticObjects[i]));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();
@@ -230,7 +236,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<allStaticObjects.Count;i++) {				
-				sw.Write(SaveLoad.SavePrefab(allStaticObjects[i]));
+				sw.Write(_saveLoad.SavePrefab(allStaticObjects[i]));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();
@@ -672,7 +678,7 @@ public class CitadelTests : MonoBehaviour {
 // 
 // 		using (sw) {
 // 			for (int i=0;i<lightsSaveableContainers[levelToOutputFrom].transform.childCount;i++) {
-// 				sw.Write(SaveLoad.SavePrefab(lightsSaveableContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
+// 				sw.Write(_saveLoad.SavePrefab(lightsSaveableContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
 // 				sw.Write(Environment.NewLine);
 // 			}
 // 			sw.Close();
@@ -698,7 +704,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<doorContainers[levelToOutputFrom].transform.childCount;i++) {
-				sw.Write(SaveLoad.SavePrefab(doorContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
+				sw.Write(_saveLoad.SavePrefab(doorContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();
@@ -724,7 +730,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<npcContainers[levelToOutputFrom].transform.childCount;i++) {
-				sw.Write(SaveLoad.SavePrefab(npcContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
+				sw.Write(_saveLoad.SavePrefab(npcContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();

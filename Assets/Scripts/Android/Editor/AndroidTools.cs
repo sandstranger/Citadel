@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace Citadel.Android.Tools
 {
-    internal static class AndroidTools
+    internal sealed class AndroidTools
     {
         
         [MenuItem("Tools/Debug/Print elev destinations world positions to console")]
@@ -47,7 +47,7 @@ namespace Citadel.Android.Tools
                 
                 foreach (Transform child in selectedGameObject.transform)
                 {
-                    var meshRenders = child.gameObject.GetComponentsInChildren<Animator>(true, true);
+                    var meshRenders = child.gameObject.GetComponentsInChildren<Animator>(true);
 
                     var childName = child.gameObject.name;
                     if (meshRenders.Length >0)
@@ -75,7 +75,7 @@ namespace Citadel.Android.Tools
                 
                 foreach (Transform child in selectedGameObject.transform)
                 {
-                    var meshRenders = child.gameObject.GetComponentsInChildren<MeshRenderer>(true, true);
+                    var meshRenders = child.gameObject.GetComponentsInChildren<MeshRenderer>(true);
 
                     var childName = child.gameObject.name;
                     if (meshRenders.Any(render => !render.gameObject.isStatic) && !result.Any(childName.StartsWith))

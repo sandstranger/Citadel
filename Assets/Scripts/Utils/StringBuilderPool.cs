@@ -3,8 +3,7 @@ using System.Text;
 using UnityEngine.Pool;
 
 /// <summary>
-/// Rents reusable StringBuilder instances from Unity's built-in object pool.
-/// The pool is intended for Unity's main-thread game and save/load code.
+/// Rents reusable StringBuilder instances from one process-wide pool.
 /// </summary>
 public static class StringBuilderPool
 {
@@ -22,8 +21,7 @@ public static class StringBuilderPool
         maxSize: MaxPoolSize);
 
     /// <summary>
-    /// Rents a builder. Use the returned lease in a using declaration and do not
-    /// keep Builder references after the lease has been disposed.
+    /// Rents a builder. Dispose the lease when finished; do not keep the builder afterwards.
     /// </summary>
     public static StringBuilderLease Rent(int initialCapacity = 0)
     {
@@ -44,8 +42,6 @@ public static class StringBuilderPool
     private static void ReleaseBuilder(StringBuilder builder)
     {
         builder.Clear();
-
-        // Do not let unusually large buffers remain in the pool indefinitely.
         if (builder.Capacity > MaxRetainedCapacity)
         {
             builder.Capacity = MaxRetainedCapacity;
@@ -54,10 +50,11 @@ public static class StringBuilderPool
 }
 
 /// <summary>
-/// Disposable lease for a StringBuilder borrowed from <see cref="StringBuilderPool"/>.
+/// Idempotent disposable lease for a StringBuilder borrowed from StringBuilderPool.
 /// </summary>
-public readonly struct StringBuilderLease : IDisposable
+public sealed class StringBuilderLease : IDisposable
 {
+    private bool _disposed;
     private readonly StringBuilder _builder;
 
     internal StringBuilderLease(StringBuilder builder)
@@ -69,9 +66,12 @@ public readonly struct StringBuilderLease : IDisposable
 
     public void Dispose()
     {
-        if (_builder != null)
+        if (_disposed)
         {
-            StringBuilderPool.Return(_builder);
+            return;
         }
+
+        _disposed = true;
+        StringBuilderPool.Return(_builder);
     }
 }

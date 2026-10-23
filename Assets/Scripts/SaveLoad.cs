@@ -10,12 +10,13 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 #endif
 
-public static class SaveLoad {
-    public static string commentIndicator = "//"; // Ignore anything after on a line.
-    public static string sectionIndicator = "#"; // Separates types of items in files.
-    public static string splitChar = "|"; // Common delimiter, not a comma as in csv.
-    public static char keyValueSplitChar = ':';
-    public static int litCullingMask = LayerMask.GetMask("Default",
+public sealed class SaveLoad {
+
+    public string commentIndicator = "//"; // Ignore anything after on a line.
+    public string sectionIndicator = "#"; // Separates types of items in files.
+    public string splitChar = "|"; // Common delimiter, not a comma as in csv.
+    public char keyValueSplitChar = ':';
+    public int litCullingMask = LayerMask.GetMask("Default",
                                             "TransparentFX",
                                             "Water","GunViewModel",
                                             "Geometry","NPC","Bullets",
@@ -26,7 +27,7 @@ public static class SaveLoad {
                                             "NPCBulllet",
                                             "CorpseSearchable");
 
-    public static float[] shadCullArray = new float[] {
+    public float[] shadCullArray = new float[] {
         15f, // Default
         0.0f, // TransparentFX
         0.0f, // Ignore Raycast
@@ -61,7 +62,7 @@ public static class SaveLoad {
         0.0f  //
     };
 
-    public static string SavePrefab(GameObject go) {
+    public string SavePrefab(GameObject go) {
         if (go == null) { Debug.LogError("Tried to save null GameObject in SavePrefab()"); return ""; }
 
         PrefabIdentifier pid = GetPrefabIdentifier(go,false);
@@ -102,10 +103,10 @@ public static class SaveLoad {
         Const consts = sobmain?.Consts;
         
         if (isGeom) {           return SaveGeometry(go,pid);
-        } else if (isDyn) {     return SaveObject.Save(levelManager,go);
-        } else if (isDor) {     return SaveObject.Save(levelManager,go);
-        } else if (isStatSav) { return SaveObject.Save(levelManager,go);
-        } else if (isNPC) {     return SaveObject.Save(levelManager,go);
+        } else if (isDyn) {     return SaveObject.Save(this, levelManager,go);
+        } else if (isDor) {     return SaveObject.Save(this, levelManager,go);
+        } else if (isStatSav) { return SaveObject.Save(this, levelManager,go);
+        } else if (isNPC) {     return SaveObject.Save(this, levelManager,go);
         } else if (isStatImm) { 
             if (go.transform.childCount > 1) {
                 PrefabIdentifier pidmain = go.GetComponent<PrefabIdentifier>();
@@ -157,7 +158,7 @@ public static class SaveLoad {
         }
     }
     
-    public static async UniTask<GameObject> LoadPrefab(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager,
+    public async UniTask<GameObject> LoadPrefab(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager,
         string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null, GameObject lightsParent = null) {
         if (!(entries[0].Contains("constIndex"))) { // [sic], need to fix light file to start with constIndex:7777
             return LoadLight(@const,levelManager,entries,lineNum,curlevel, lightsParent);
@@ -174,8 +175,8 @@ public static class SaveLoad {
             int saveID = Utils.GetIntFromString(entries[2],"SaveID");
             GameObject container = levelManager.GetRequestedLevelDynamicContainer(LevelManager.CurrentLevel);
 			GameObject newGO = await consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,container,saveID);
-			PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(newGO,true);
-			if (newGO != null) await SaveObject.Load(@const,levelManager,newGO,entries,lineNum,prefID);
+			PrefabIdentifier prefID = GetPrefabIdentifier(newGO,true);
+			if (newGO != null) await SaveObject.Load(this, @const,levelManager,newGO,entries,lineNum,prefID);
 			return newGO;
         } else if (ConsoleEmulator.ConstIndexIsStaticObjectImmutable(constIndex)) {
             return await LoadStaticImmutable(@const,consoleEmulator,entries,lineNum,curlevel);
@@ -197,7 +198,7 @@ public static class SaveLoad {
     
     // GameObect already null checked by originator.
     // PrefabIdentifier already null checked by originator.  
-    private static string SaveStaticImmutable(Const consts,GameObject go, PrefabIdentifier pid) {
+    private string SaveStaticImmutable(Const consts,GameObject go, PrefabIdentifier pid) {
         if (!ConsoleEmulator.ConstIndexIsStaticObjectImmutable(pid.constIndex)) {
             Debug.LogError(go.name + " is not a static object immutable, has constIndex of " + pid.constIndex.ToString());
         }
@@ -416,7 +417,7 @@ public static class SaveLoad {
         return s1.ToString();
     }
 
-    private static async UniTask<GameObject> LoadStaticImmutable(Const @const,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel) {
+    private async UniTask<GameObject> LoadStaticImmutable(Const @const,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel) {
         if (entries.Length <= 1) { 
             Debug.Log("Can't load static immutable from line "
                       + lineNum.ToString() + ", line had only one or no "
@@ -568,7 +569,7 @@ public static class SaveLoad {
 
     // GameObect already null checked by originator.
     // PrefabIdentifier already null checked by originator.
-    private static string SaveGeometry(GameObject go, PrefabIdentifier pid) {
+    private string SaveGeometry(GameObject go, PrefabIdentifier pid) {
         bool hasBoxColliderOverride = false;
         bool hasTextOverride = false;
         string materialOverride = "";
@@ -688,7 +689,7 @@ public static class SaveLoad {
         return s1.ToString();
     }
 
-    private static async UniTask<GameObject> LoadGeometry(Const consts,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null) {
+    private async UniTask<GameObject> LoadGeometry(Const consts,ConsoleEmulator consoleEmulator,string[] entries, int lineNum, int curlevel,GameObject levelGeometryParent = null) {
         if (entries.Length <= 1) { 
             Debug.Log("Can't load geometry from line " + lineNum.ToString()
                       + ", line had only one or no entries[]");
@@ -966,7 +967,7 @@ public static class SaveLoad {
         return chunk;
     }
 
-    private static string SaveLight(GameObject go) {
+    private string SaveLight(GameObject go) {
         Light lit = go.GetComponent<Light>();
         if (lit == null) { Debug.LogError("Missing Light component when trying to SaveLight on " + go.name); return ""; }
 
@@ -1016,8 +1017,8 @@ public static class SaveLoad {
         return s1.ToString();
     }
 
-    public static int numLightsWithShadows = 0;
-    private static GameObject LoadLight(Const @consts,LevelManager levelManager,string[] entries, int lineNum, int curlevel, GameObject lightsParent = null) {
+    public int numLightsWithShadows = 0;
+    private GameObject LoadLight(Const @consts,LevelManager levelManager,string[] entries, int lineNum, int curlevel, GameObject lightsParent = null) {
         if (entries.Length <= 1) { Debug.Log("Couldn't load light on line number: " + lineNum.ToString()); return null; }
 
         int index = 0;
@@ -1060,7 +1061,7 @@ public static class SaveLoad {
         return go;
     }
 
-    public static LightType GetLightTypeFromString(string val, string name) {
+    public LightType GetLightTypeFromString(string val, string name) {
         string[] splits = val.Split(':');
         if (splits.Length < 2) {
             Debug.Log("Invalid light type value, missing variable name: "
@@ -1084,7 +1085,7 @@ public static class SaveLoad {
 		return LightType.Point;	
 	}
 
-	public static LightShadows GetLightShadowsFromString(string val,
+	public LightShadows GetLightShadowsFromString(string val,
                                                          string name) {
         string[] splits = val.Split(':');
         if (splits.Length < 2) {
@@ -1107,7 +1108,7 @@ public static class SaveLoad {
 		return LightShadows.Soft;	
 	}
 
-	public static LightShadowResolution GetShadowResFromString(string val,
+	public LightShadowResolution GetShadowResFromString(string val,
                                                                string name) {
         string[] splits = val.Split(':');
         if (splits.Length < 2) {
@@ -1132,7 +1133,7 @@ public static class SaveLoad {
 		return LightShadowResolution.FromQualitySettings;	
 	}
 
-    private static int GetMaterialByName(string name) {
+    private int GetMaterialByName(string name) {
 		switch (name) {
 			case "cyberpanel_black":              return 49;
  			case "cyberpanel_blue":               return 50;
@@ -1192,7 +1193,7 @@ public static class SaveLoad {
 		return 0;
 	}
 
-    public static SaveObject GetPrefabSaveObject(GameObject go) {
+    public SaveObject GetPrefabSaveObject(GameObject go) {
         SaveObject so = go.GetComponent<SaveObject>();
 		if (so == null) {
 			if (go.transform.childCount > 0) { // Exception for some prefabs.
@@ -1203,7 +1204,7 @@ public static class SaveLoad {
 		return so;
     }
     
-    public static PrefabIdentifier GetPrefabIdentifier(GameObject go, bool sob) {
+    public PrefabIdentifier GetPrefabIdentifier(GameObject go, bool sob) {
 		PrefabIdentifier prefID;
 		if (go.name == "Player") { // Need to get it on child PlayerCapsule.
             prefID = go.transform.GetChild(0).GetComponent<PrefabIdentifier>();
@@ -1234,7 +1235,7 @@ public static class SaveLoad {
     }
     
         
-    private static AudioReverbPreset GetAudioReverbPresetFromInt(int val) {
+    private AudioReverbPreset GetAudioReverbPresetFromInt(int val) {
         if (Enum.IsDefined(typeof(AudioReverbPreset), val)) {
             return (AudioReverbPreset)val; // Cast the int to AudioReverbPreset
         } else {
@@ -1244,7 +1245,7 @@ public static class SaveLoad {
     }
 
     // Get the integer value from an AudioReverbPreset
-    private static int GetIntFromAudioReverbPreset(AudioReverbPreset preset) {
+    private int GetIntFromAudioReverbPreset(AudioReverbPreset preset) {
         return (int)preset;
     }
 }

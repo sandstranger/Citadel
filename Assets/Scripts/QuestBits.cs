@@ -38,7 +38,7 @@ public class QuestBits {
 	private readonly LevelManager _levelManager;
 	private readonly Const _consts;
 
-	public QuestBits(LevelManager levelManager,Const @const)
+	public QuestBits(LevelManager levelManager, Const @const)
 	{
 		_levelManager = levelManager;
 		_consts = @const;

@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace Citadel.Android.Tools
 {
-    internal static class LevelsGenerator
+    internal sealed class LevelsGenerator
     {
         private const int MaxLevels = 12;
         private static readonly string LevelsPrefabsLocations = Path.Combine("Assets","Resources", "Prefabs", "Levels");
@@ -25,13 +25,15 @@ namespace Citadel.Android.Tools
                 return;
             }
             
+            var saveLoad = new SaveLoad();
+
             for (var i = 0; i <= MaxLevels; ++i)
             {
                 var currentLevelPrefabsLocation = Path.Combine(LevelsPrefabsLocations, $"Level_{i}");
                 var levelGeometryParent = new GameObject("LevelGeometry");
                 var levelLightsParent = new GameObject("LevelLights");
-                LoadLevelGeometry(consts,consoleEmulator, levelManager,i, levelGeometryParent, levelLightsParent);
-             //   LoadLevelLights(consts,consoleEmulator, levelManager,i, levelLightsParent);
+                LoadLevelGeometry(saveLoad, consts,consoleEmulator, levelManager,i, levelGeometryParent, levelLightsParent);
+             //   LoadLevelLights(saveLoad, consts,consoleEmulator, levelManager,i, levelLightsParent);
 
              if (File.Exists(currentLevelPrefabsLocation))
              {
@@ -59,7 +61,7 @@ namespace Citadel.Android.Tools
             }
         }
         
-        private static async UniTask LoadLevelGeometry(Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager, 
+        private static async UniTask LoadLevelGeometry(SaveLoad saveLoad, Const @const,ConsoleEmulator consoleEmulator, LevelManager levelManager, 
             int curlevel, GameObject levelGeometryParent, GameObject lightsParent ) {
             if (curlevel < 0) return;
 		
@@ -72,7 +74,7 @@ namespace Citadel.Android.Tools
 
             string readline;
             int lineNum = 0;
-            char splitter = Convert.ToChar(SaveLoad.splitChar);
+            char splitter = Convert.ToChar(saveLoad.splitChar);
             Transform parent,child;
             int count = 0;
             Light lit;
@@ -85,7 +87,7 @@ namespace Citadel.Android.Tools
 
                     string[] entries = readline.Split(splitter);
 				
-                    go = await SaveLoad.LoadPrefab(@const,consoleEmulator,levelManager, entries,lineNum,curlevel, levelGeometryParent, lightsParent);
+                    go = await saveLoad.LoadPrefab(@const,consoleEmulator,levelManager, entries,lineNum,curlevel, levelGeometryParent, lightsParent);
                     if (go != null)
                     {
                         go.transform.SetParent(levelGeometryParent.transform,false);
@@ -123,7 +125,7 @@ namespace Citadel.Android.Tools
             }
         }
         
-        private static async UniTask LoadLevelLights(Const @const,ConsoleEmulator consoleEmulator, 
+        private static async UniTask LoadLevelLights(SaveLoad saveLoad, Const @const,ConsoleEmulator consoleEmulator, 
             LevelManager levelManager,int curlevel,GameObject lightParent) {
             if (curlevel > MaxLevels) return;
             if (curlevel < 0) return;
@@ -137,14 +139,14 @@ namespace Citadel.Android.Tools
 
             string readline;
             int lineNum = 0;
-            char splitter = Convert.ToChar(SaveLoad.splitChar);
+            char splitter = Convert.ToChar(saveLoad.splitChar);
             using (sf) {
                 do {
                     readline = sf.ReadLine();
                     if (readline == null) break;
 				
                     string[] entries = readline.Split(splitter);
-                    var light = await SaveLoad.LoadPrefab(@const,consoleEmulator, 
+                    var light = await saveLoad.LoadPrefab(@const,consoleEmulator, 
                         levelManager, entries,lineNum,curlevel, null, lightParent);
                     var lightComponent = light.GetComponent<Light>();
                     lightComponent.enabled = true;

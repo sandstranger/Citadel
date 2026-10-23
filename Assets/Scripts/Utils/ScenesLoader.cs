@@ -5,16 +5,23 @@ using UnityEngine.SceneManagement;
 
 namespace Citadel.SceneManagement
 {
-    internal static class ScenesLoader
+    /// <summary>
+    /// Instance-scoped scene loading service. Subscribe to lifecycle events on the injected instance.
+    /// </summary>
+    internal sealed class ScenesLoader : IDisposable
     {
-        public const int MainGameSceneIndex = 1;
-        public static event Action<string> OnStartLoadScene;
-        public static event Action<string> OnSceneLoaded;
-        public static event Action<string> OnActiveSceneChanged; 
+        public int MainGameSceneIndex => 1;
 
-        public static string LoadedSceneName => SceneManager.GetActiveScene().name;
+        public event Action<string> OnStartLoadScene;
+        public event Action<string> OnSceneLoaded;
+        public event Action<string> OnActiveSceneChanged;
+
+        public string LoadedSceneName => SceneManager.GetActiveScene().name;
+
+        public static ScenesLoader Default { get; } = new();
         
-        private static readonly string[] _levelScenesNames = {
+        private readonly string[] _levelScenesNames =
+        {
             "0-ReactorLevelScene",
             "1-MedicalLevelScene",
             "2-ScienceLevelScene",
@@ -31,20 +38,34 @@ namespace Citadel.SceneManagement
             "13-CyberspaceLevelScene"
         };
 
-        static ScenesLoader()
+        private ScenesLoader()
         {
-            SceneManager.sceneLoaded += (scene, _) => OnSceneLoaded?.Invoke(scene.name);
-            SceneManager.activeSceneChanged += (_,scene ) => OnActiveSceneChanged?.Invoke(scene.name);
+            SceneManager.sceneLoaded += HandleSceneLoaded;
+            SceneManager.activeSceneChanged += HandleActiveSceneChanged;
         }
 
-        public static async UniTask LoadLevelAsync(int level)
+        public async UniTask LoadLevelAsync(int level)
         {
-            if (level < _levelScenesNames.Length)
+            if (level < 0 || level >= _levelScenesNames.Length)
             {
-                var sceneName = _levelScenesNames[level];
-                OnStartLoadScene?.Invoke(sceneName);
-                await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+                throw new ArgumentOutOfRangeException(nameof(level), level, "Unknown Citadel level index.");
             }
+
+            var sceneName = _levelScenesNames[level];
+            OnStartLoadScene?.Invoke(sceneName);
+            await Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Single);
         }
+
+        public void Dispose()
+        {
+            SceneManager.sceneLoaded -= HandleSceneLoaded;
+            SceneManager.activeSceneChanged -= HandleActiveSceneChanged;
+        }
+
+        private void HandleSceneLoaded(Scene scene, LoadSceneMode _) =>
+            OnSceneLoaded?.Invoke(scene.name);
+
+        private void HandleActiveSceneChanged(Scene _, Scene scene) =>
+            OnActiveSceneChanged?.Invoke(scene.name);
     }
 }

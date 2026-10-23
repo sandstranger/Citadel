@@ -7,7 +7,7 @@ using Object = UnityEngine.Object;
 
 namespace Citadel.Editor
 {
-    internal static class Utils
+    internal sealed class Utils
     {
         public static void RemoveStaticBatchingFlag(GameObject targetObject)
         {

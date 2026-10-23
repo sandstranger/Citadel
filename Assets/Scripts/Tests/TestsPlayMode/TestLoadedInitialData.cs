@@ -18,6 +18,7 @@ using UnityEditor.SceneManagement;
 
 namespace Tests {
     public class TestLoadedInitialData {
+        private readonly SaveLoad _saveLoad = new();
         private bool sceneLoaded = false;
 
         public void RunBeforeAnyTests() {
@@ -96,7 +97,7 @@ namespace Tests {
             
             HashSet<string> targets = new HashSet<string>();
 
-            char splitter = Convert.ToChar(SaveLoad.splitChar);
+            char splitter = Convert.ToChar(_saveLoad.splitChar);
             string[] entries;
             string dynaname;
             for (int lev=0;lev<14;lev++) {

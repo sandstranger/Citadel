@@ -22,7 +22,6 @@ public class CameraView : MonoBehaviour {
 	private MeshRenderer mR3;
 
 	[Inject] private PauseScript _pauseScript;
-	[Inject] private DynamicCulling _dynamicCulling;
 
 	void Start () {
 		cam = GetComponent<Camera>();
@@ -54,22 +53,12 @@ public class CameraView : MonoBehaviour {
 		if (mR3 == null) mR3 = mR;
 	}
 
-	void OnEnable() {
-		_dynamicCulling.AddCameraPosition(this);
+	void OnEnable() { 
+//		_dynamicCulling.AddCameraPosition(this);
 		if (cam != null) cam.Render();
 	}
 	
-	void OnDisable() {
-		_dynamicCulling.RemoveCameraPosition(this);
-	}
-	
 	public bool IsVisible() {
-		Vector2Int cellPos = _dynamicCulling.PosToCellCoords(transform.position);
-		if (_dynamicCulling.XYPairInBounds(cellPos.x,cellPos.y)) {
-			if (_dynamicCulling.cullEnabled) {
-				if (!_dynamicCulling.GetPlayerCell().visible) return false;
-			}
-		}
 		if (mR == null) return false;
 		return mR.isVisible || mR2.isVisible || mR3.isVisible;
 	}

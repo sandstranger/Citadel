@@ -6,6 +6,7 @@ using Zenject;
 
 // Add this script to anything that should be able to be targetted
 public class TargetIO : MonoBehaviour {
+	[Inject] private SaveLoad _saveLoad;
 	public string targetname;
 
 	// Action bits.  What do we want our target to do, e.g. turn on a light or close a door or activate force bridge
@@ -90,7 +91,7 @@ public class TargetIO : MonoBehaviour {
 
 		if (!string.IsNullOrWhiteSpace(targetname)) {
 			if (disableThisGOOnAwake && !alreadyDisabledThisGOOnceEver) {
-				SaveObject so = SaveLoad.GetPrefabSaveObject(gameObject);
+				SaveObject so = _saveLoad.GetPrefabSaveObject(gameObject);
 				if (so != null) {
 					if (!so.initialized) so.Start();
 				} else {

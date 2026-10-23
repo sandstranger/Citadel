@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 // Used in conjunction with the ObjectContainmentSystem, recovers fallen
 // objects and returns them to nearest floor's center point which is the
 // same as the center of that valid open grid cell.  Nearness is x,y in
 // the flat plane of the world grid, ignoring height z (Unity's y).
 public class CatchTray : MonoBehaviour {
+	[Inject] private ObjectContainmentSystem _objectContainmentSystem;
 	void  OnCollisionEnter (Collision col){
 		Debug.Log("WARNING: Item of name "
 				  + col.gameObject.name
@@ -16,6 +18,6 @@ public class CatchTray : MonoBehaviour {
 		rbody.linearVelocity = Vector3.zero;
 		float xpos = col.gameObject.transform.position.x;
 		float ypos = col.gameObject.transform.position.z;
-		col.gameObject.transform.position = ObjectContainmentSystem.FindNearestFloor(xpos,ypos,col.gameObject.transform.position.y);
+		col.gameObject.transform.position = _objectContainmentSystem.FindNearestFloor(xpos,ypos,col.gameObject.transform.position.y);
 	}
 }

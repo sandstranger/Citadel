@@ -108,18 +108,20 @@ public class WeaponFire : MonoBehaviour {
 	[Inject] private readonly Config _config;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 	[Inject] private readonly Utils _utils;
+	[Inject] private DiContainer _container;
+	[Inject] private ScenesLoader _scenesLoader;
 
 	// Not needed on Const as this only exists in one unique place on player.
 	private float[] driftForWeapon = new float[16]{5f,0f,15f,50f,0f,0f,0f,8f,
 												   3f,3f,3f,12f,10f,30f,0f,3f};
 	private void Awake()
 	{
-		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
+		_scenesLoader.OnSceneLoaded += OnSceneLoaded;
 	}
 
 	private void OnDestroy()
 	{
-		ScenesLoader.OnSceneLoaded -= OnSceneLoaded;
+		if (_scenesLoader != null) _scenesLoader.OnSceneLoaded -= OnSceneLoaded;
 	}
 
 	void Start() {
@@ -643,7 +645,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) _utils.PlayUIOneShotSavable(251); // wmarksman
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashMK3.SetActive(true);
-				smoke = RootInstaller.InstantiatePrefab(muzSmokeMK3,muzFlashMK3.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = _container.InstantiatePrefab(muzSmokeMK3,muzFlashMK3.transform.position,_consts.quaternionIdentity, null) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;
@@ -673,7 +675,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) _utils.PlayUIOneShotSavable(243); // wflechette
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashFlechette.SetActive(true);
-				smoke = RootInstaller.InstantiatePrefab(muzSmokeFlechette,muzFlashFlechette.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = _container.InstantiatePrefab(muzSmokeFlechette,muzFlashFlechette.transform.position,_consts.quaternionIdentity, null) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 1;
@@ -705,7 +707,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) _utils.PlayUIOneShotSavable(249); // wmagnum
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashMagnum.SetActive(true);
-				smoke = RootInstaller.InstantiatePrefab(muzSmokeMagnum,muzFlashMagnum.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = _container.InstantiatePrefab(muzSmokeMagnum,muzFlashMagnum.transform.position,_consts.quaternionIdentity, null) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 3;
@@ -721,7 +723,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) _utils.PlayUIOneShotSavable(255); // wpistol
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashPistol.SetActive(true);
-				smoke = RootInstaller.InstantiatePrefab(muzSmokePistol,muzFlashPistol.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = _container.InstantiatePrefab(muzSmokePistol,muzFlashPistol.transform.position,_consts.quaternionIdentity, null) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 1;
@@ -745,7 +747,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) _utils.PlayUIOneShotSavable(259); // wrailgun
                 await FireRailgun(index);
 				muzFlashRailgun.SetActive(true);
-				smoke = RootInstaller.InstantiatePrefab(muzSmokeRailgun,muzFlashRailgun.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = _container.InstantiatePrefab(muzSmokeRailgun,muzFlashRailgun.transform.position,_consts.quaternionIdentity, null) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;
@@ -755,7 +757,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) _utils.PlayUIOneShotSavable(262); // wriotgun
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashRiotgun.SetActive(true);
-				smoke = RootInstaller.InstantiatePrefab(muzSmokeRiotgun,muzFlashRiotgun.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = _container.InstantiatePrefab(muzSmokeRiotgun,muzFlashRiotgun.transform.position,_consts.quaternionIdentity, null) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 4;
@@ -765,7 +767,7 @@ public class WeaponFire : MonoBehaviour {
                 if (!isSilent) _utils.PlayUIOneShotSavable(263); // wskorpion
                 if (DidRayHit(index)) await HitScanFire(index);
 				muzFlashSkorpion.SetActive(true);
-				smoke = RootInstaller.InstantiatePrefab(muzSmokeSkorpion,muzFlashSkorpion.transform.position,_consts.quaternionIdentity) as GameObject;
+				smoke = _container.InstantiatePrefab(muzSmokeSkorpion,muzFlashSkorpion.transform.position,_consts.quaternionIdentity, null) as GameObject;
 				smoke.transform.parent = reloadContainer;
 				smoke.SetActive(true);
 				fogFac += 2;

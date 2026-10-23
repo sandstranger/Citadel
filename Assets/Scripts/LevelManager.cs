@@ -106,6 +106,10 @@ public class LevelManager : MonoBehaviour
 	[Inject] private readonly QuestLogNotesManager _questLogNotesManager;
 	[Inject] private readonly LightDistanceCuller _lightDistanceCuller;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
+	[Inject] private readonly ScenesLoader _scenesLoader;
+	[Inject] private SaveLoad _saveLoad;
+	[Inject] private ObjectContainmentSystem _objectContainmentSystem;
+	[Inject] private AutoSplitterData _autoSplitterData;
 
 	public static bool LoadLevelAfterSceneChanges { get; private set; }
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
@@ -263,7 +267,7 @@ public class LevelManager : MonoBehaviour
 		UnloadLevelGeometry(levnum);
  		UnloadLevelDynamicObjects(levnum,true);
 		_levelDataLoaded = false;
-		SaveLoad.numLightsWithShadows = 0;
+		_saveLoad.numLightsWithShadows = 0;
 	}
 
 	// Make sure relevant data and objects are loaded in and present for the level.
@@ -281,7 +285,7 @@ public class LevelManager : MonoBehaviour
 		await _music.LoadLevelMusic(levnum);
 		await _resourcesLoader.ReleaseAllAssetsAsync();
 		_levelDataLoaded = true;
-		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + SaveLoad.numLightsWithShadows.ToString());
+		UnityEngine.Debug.Log("Number of lights for level " + levnum.ToString() + " with shadows: " + _saveLoad.numLightsWithShadows.ToString());
 	}
 
 	public void ChangeGameScene(int levnum, Vector3? targetPosition = null, bool changeSceneForced = false)
@@ -307,8 +311,8 @@ public class LevelManager : MonoBehaviour
 
 		TargetPosition = targetPosition ?? Vector3.zero;
 		CurrentLevel = levnum;
-		ObjectContainmentSystem.ClearLists();
-		ScenesLoader.LoadLevelAsync(levnum);
+		_objectContainmentSystem.ClearLists();
+		_scenesLoader.LoadLevelAsync(levnum);
 	}
 	
 	public void LoadLevel(int levnum, Vector3 targetPosition, bool loadLevelForced = false)
@@ -356,9 +360,9 @@ public class LevelManager : MonoBehaviour
 		DynamicCulling.camPositions = new Dictionary<GameObject, Vector3>();
 		System.GC.Collect();
 		System.GC.WaitForPendingFinalizers();
-		if (CurrentLevel == 2 && AutoSplitterData.missionSplitID == 0) {
-			AutoSplitterData.missionSplitID++; // 1 - Medical split - we are now on level 2
-			Debug.Log("AutoSplitterData missionSplitID incremented: " + AutoSplitterData.missionSplitID.ToString());
+		if (CurrentLevel == 2 && _autoSplitterData.missionSplitID == 0) {
+			_autoSplitterData.missionSplitID++; // 1 - Medical split - we are now on level 2
+			Debug.Log("AutoSplitterData missionSplitID incremented: " + _autoSplitterData.missionSplitID.ToString());
 		}
 		
 		PostLoadLevelSetupSystems();
@@ -601,7 +605,7 @@ public class LevelManager : MonoBehaviour
 		string readline;
 		List<string> readFileList = new List<string>();
 		int lineNum = 0;
-		char splitter = Convert.ToChar(SaveLoad.splitChar);
+		char splitter = Convert.ToChar(_saveLoad.splitChar);
 		Transform parent,child;
 		int count = 0;
 		Light lit;
@@ -614,7 +618,7 @@ public class LevelManager : MonoBehaviour
 
 				string[] entries = readline.Split(splitter);
 				
-				go = SaveLoad.LoadPrefab(_consts,_consoleEmulator,this,ref entries,lineNum,curlevel);
+				go = _saveLoad.LoadPrefab(_consts,_consoleEmulator,this,ref entries,lineNum,curlevel);
 				if (go != null) parent = go.transform;
 				else parent = null;
 				
@@ -688,7 +692,7 @@ public class LevelManager : MonoBehaviour
 
 			DynamicObjectsSavestrings[curlevel].Clear(); // Empty list.
 			for (int i=0;i<allDynamicObjects.Count;i++) {
-				DynamicObjectsSavestrings[curlevel].Add(SaveObject.Save(this,allDynamicObjects[i]));
+				DynamicObjectsSavestrings[curlevel].Add(SaveObject.Save(_saveLoad, this,allDynamicObjects[i]));
 			}
 		}
 		
@@ -732,12 +736,12 @@ public class LevelManager : MonoBehaviour
 		string[] entries;
 // 		MeshRenderer mr;
 		GameObject dynGO;
-		char splitter = Convert.ToChar(SaveLoad.splitChar);
+		char splitter = Convert.ToChar(_saveLoad.splitChar);
 		for (int i=0;i<DynamicObjectsSavestrings[curlevel].Count;i++) {
 			entries = DynamicObjectsSavestrings[curlevel][i].Split(splitter);
 			if (entries.Length <= 1) continue;
 			
-			dynGO = await SaveLoad.LoadPrefab(_consts,_consoleEmulator,this, entries,0,curlevel);
+			dynGO = await _saveLoad.LoadPrefab(_consts,_consoleEmulator,this, entries,0,curlevel);
 			if (dynGO == null) continue;
 
 			int constIndex = Utils.GetIntFromString(entries[0],"constIndex");
@@ -821,7 +825,7 @@ public class LevelManager : MonoBehaviour
 
 		UnloadLevelNPCs(CurrentLevel);
 		
-		var splitter = Convert.ToChar(SaveLoad.splitChar);
+		var splitter = Convert.ToChar(_saveLoad.splitChar);
 		GameObject contnr = GetRequestedLevelNPCContainer(levNum);
 		var saveableObjects = Utils.FindAllSaveObjectsGOs();
 		bool[] alreadyCheckedThisInstantiableGameObjectInScene = new bool[saveableObjects.Count];
@@ -836,8 +840,8 @@ public class LevelManager : MonoBehaviour
 			if (isNpc)
 			{
 				var instGO = await _consoleEmulator.SpawnDynamicObject(constIndex,levNum,false,contnr,savID);
-				PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-				await SaveObject.Load(_consts,this,instGO, entries,0,prefID); // Load NPC.
+				PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
+				await SaveObject.Load(_saveLoad, _consts, this, instGO, entries, 0, prefID); // Load NPC.
 			}
 			else
 			{
@@ -850,7 +854,7 @@ public class LevelManager : MonoBehaviour
 						continue;
 					}
 	
-					var currentSaveObjectInScene = SaveLoad.GetPrefabSaveObject(currentGameObjectInScene);
+					var currentSaveObjectInScene = _saveLoad.GetPrefabSaveObject(currentGameObjectInScene);
 					if (!currentSaveObjectInScene.instantiated)
 					{
 						alreadyCheckedThisInstantiableGameObjectInScene[i] = true; // Huge time saver right here!
@@ -858,8 +862,8 @@ public class LevelManager : MonoBehaviour
 
 					if (currentSaveObjectInScene.SaveID == savID && currentSaveObjectInScene.SaveID != 0)
 					{
-						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene, true);
-						await SaveObject.Load(_consts,this,currentGameObjectInScene, entries, i, prefID);
+						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(currentGameObjectInScene, true);
+						await SaveObject.Load(_saveLoad, _consts, this, currentGameObjectInScene, entries, i, prefID);
 						alreadyCheckedThisInstantiableGameObjectInScene[i] = true; // Huge time saver right here!
 						break;
 					}
@@ -916,7 +920,7 @@ public class LevelManager : MonoBehaviour
 		{
 			foreach (var saveObject in parent.GetComponentsInChildren<SaveObject>(true))
 			{
-				saveStringsStorage.Add(SaveObject.Save(this,saveObject.gameObject));
+				saveStringsStorage.Add(SaveObject.Save(_saveLoad, this,saveObject.gameObject));
 			}
 		}
 	}

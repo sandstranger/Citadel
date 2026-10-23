@@ -41,8 +41,13 @@ using Debug = UnityEngine.Debug;
 // UnityStandardAssets.ImageEffects.ScreenSpaceAmbientOcclusion 1200
 // TextLocalization 1300
 
-public class Const : SingletonHelper<Const>
+public class Const : MonoBehaviour
 {
+    [Inject] private ScenesLoader _scenesLoader;
+    [Inject] private SaveLoad _saveLoad;
+    [Inject] private ObjectContainmentSystem _objectContainmentSystem;
+    [Inject] private AutoSplitterData _autoSplitterData;
+    [Inject] private DiContainer _container;
 	private const int StringBuilderSize = 500 * 1024;
 	public float shadowThreshold = 0.03f;
 	//Item constants
@@ -426,8 +431,11 @@ public class Const : SingletonHelper<Const>
 
 	private void Awake()
 	{
-		ScenesLoader.OnSceneLoaded += OnSceneLoaded;
-		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
+		// The injected loader belongs to a scene DI container and can be disposed
+		// during a Single-mode transition. Observe completion through Unity's
+		// global event so game initialization still runs after the old scene unloads.
+		SceneManager.sceneLoaded += HandleSceneLoaded;
+		_scenesLoader.OnStartLoadScene += OnStartLoadScene;
 		
 #if UNITY_EDITOR || !UNITY_ANDROID
 		TARGET_FPS = 144;
@@ -584,7 +592,7 @@ public class Const : SingletonHelper<Const>
 
 		LoadCreditsData();
 		StartCoroutine(InitializeEventSystem());
-		questData = new QuestBits (_levelManager,this);
+		questData = new QuestBits (_levelManager, this);
 // 		if (mainFont1 != null) { // Ensure text is crisp and readable.
 			mainFont1.material.mainTexture.filterMode = FilterMode.Point;
 // 		}
@@ -608,8 +616,8 @@ public class Const : SingletonHelper<Const>
 		PauseAnimation[] panims = FindObjectsByType<PauseAnimation>(FindObjectsSortMode.None);
 		for (int i=0;i<panims.Length;i++) panimsList.Add(panims[i]);
 
-		ObjectContainmentSystem.FindAllFloorGOs();
-		ObjectContainmentSystem.UpdateActiveFlooring();	
+		_objectContainmentSystem.FindAllFloorGOs();
+		_objectContainmentSystem.UpdateActiveFlooring();	
 	}
 
 	IEnumerator InitializeEventSystem () {
@@ -678,6 +686,9 @@ public class Const : SingletonHelper<Const>
 		lastTargetRegistrySize = 0;
 	}
 	
+	private void HandleSceneLoaded(Scene scene, LoadSceneMode mode) =>
+		OnSceneLoaded(scene.name);
+
 	private void OnSceneLoaded(string sceneName)
 	{
 		QuitAfterSavingDone = false;
@@ -1131,7 +1142,7 @@ public class Const : SingletonHelper<Const>
 
 		GameObject InstantiatePrefab(GameObject prefab)
 		{
-			return RootInstaller.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity);
+			return _container.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity, null);
 		}
 	}
 
@@ -1262,7 +1273,7 @@ public class Const : SingletonHelper<Const>
 		// Save all the objects data
 		for (i=0;i<saveableGameObjects.Count;i++) {
 			// Take this object's data and add it to the array.
-			saveData.Add(SaveObject.Save(_levelManager,saveableGameObjects[i])); // <<< THIS IS IT <<<
+			saveData.Add(SaveObject.Save(_saveLoad, _levelManager,saveableGameObjects[i])); // <<< THIS IS IT <<<
 		}
 		
 		foreach (var dynamicObjectsSaveList in LevelManager.DynamicObjectsSavestrings)
@@ -1387,7 +1398,7 @@ public class Const : SingletonHelper<Const>
 		_mfdManager.TabReset(false);
 		_mfdManager.DisableAllCenterTabs();
 		loadingScreen.SetActive(true);
-		AutoSplitterData.isLoading = true;
+		_autoSplitterData.isLoading = true;
 	}
 
 	// Load the Game
@@ -1577,7 +1588,7 @@ public class Const : SingletonHelper<Const>
 					} // skip checking this and doing GetComponent
 
 					currentGameObjectInScene = saveableGameObjectsInScene[j];
-					currentSaveObjectInScene = SaveLoad.GetPrefabSaveObject(currentGameObjectInScene);
+					currentSaveObjectInScene = _saveLoad.GetPrefabSaveObject(currentGameObjectInScene);
 
 					if (!currentSaveObjectInScene.instantiated) alreadyCheckedThisInstantiableGameObjectInScene[j] = true; // Huge time saver right here!
 
@@ -1598,8 +1609,8 @@ public class Const : SingletonHelper<Const>
 						
 						
 						entries = readFileList[i].Split(Utils.splitCharChar);
-						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
-						yield return SaveObject.Load(this,_levelManager,currentGameObjectInScene, entries,i,prefID);
+						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
+						yield return SaveObject.Load(_saveLoad, this, _levelManager,currentGameObjectInScene, entries,i,prefID);
 						wasLoaded = true;
 						alreadyCheckedThisSaveableGameObjectInScene[j] = true; // Huge time saver right here!
 						break;
@@ -1639,7 +1650,7 @@ public class Const : SingletonHelper<Const>
 					continue;
 				}
 
-				sob = SaveLoad.GetPrefabSaveObject(saveableGameObjectsInScene[i]);
+				sob = _saveLoad.GetPrefabSaveObject(saveableGameObjectsInScene[i]);
 				if (sob != null) {
 					if (!sob.instantiated) {
 						UnityEngine.Debug.Log(saveableGameObjectsInScene[i].name
@@ -1697,8 +1708,8 @@ public class Const : SingletonHelper<Const>
 						taskToWait = _consoleEmulator.SpawnDynamicObject(constdex, levID, false, contnr, savID).AsTask();
 						yield return taskToWait;
 						instGO = taskToWait.Result;
-						PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-						yield return SaveObject.Load(this,_levelManager,instGO, entries,i,prefID); // Load NPC.
+						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
+						yield return SaveObject.Load(_saveLoad, this, _levelManager,instGO, entries,i,prefID); // Load NPC.
 					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex) && !isNpc) {
 						// For DynamicObjects, if current level, go ahead and Instantiate new Prefabs, else add string to LevelManager's list for other levels.
 						if (levID == LevelManager.CurrentLevel) {
@@ -1706,8 +1717,8 @@ public class Const : SingletonHelper<Const>
 							taskToWait = _consoleEmulator.SpawnDynamicObject(constdex, levID, false, contnr, savID).AsTask();
 							yield return taskToWait;
 							instGO = taskToWait.Result;
-							PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(instGO,true);
-							yield return SaveObject.Load(this,_levelManager,instGO, entries,i,prefID); // Load NPC.
+							PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
+							yield return SaveObject.Load(_saveLoad, this, _levelManager,instGO, entries,i,prefID); // Load NPC.
 						} else {
 							if (levID < LevelManager.DynamicObjectsSavestrings.Count && levID >= 0) { // levID < 14
 								if (i < (readFileList.Count - 1) && readFileList.Count > 0 && i >= 0) {
@@ -1795,7 +1806,7 @@ public class Const : SingletonHelper<Const>
 
  		System.GC.Collect(); // Collect it all!
 		System.GC.WaitForPendingFinalizers();
-		AutoSplitterData.isLoading = false;
+		_autoSplitterData.isLoading = false;
 		loadTimer.Stop();
 		loading = false;
 		loadPercentText.text = "";
@@ -2185,8 +2196,8 @@ public class Const : SingletonHelper<Const>
 	}
 	
 	void OnDestroy() {
-		ScenesLoader.OnSceneLoaded -= OnSceneLoaded;
-		ScenesLoader.OnStartLoadScene -= OnStartLoadScene;
+		SceneManager.sceneLoaded -= HandleSceneLoaded;
+		if (_scenesLoader != null) _scenesLoader.OnStartLoadScene -= OnStartLoadScene;
 		questData = null;
 		audiologNames = null;
 		audiologSenders = null;

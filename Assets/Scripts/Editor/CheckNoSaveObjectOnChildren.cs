@@ -22,7 +22,7 @@ namespace Trioptimum {
 				for (int k=0;k<compArray.Length;k++) {
 					numFound++;
 					GameObject foundGo = compArray[k].gameObject;
-					SaveObject so = SaveLoad.GetPrefabSaveObject(foundGo);
+					SaveObject so = new SaveLoad().GetPrefabSaveObject(foundGo);
 					if (so.instantiated) numInstantiated++;
 					if (foundGo.isStatic) { // EDITOR ONLY!!!!!!!!!!!!!!!!!!!!
 						numStatic++;

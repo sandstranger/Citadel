@@ -73,17 +73,17 @@ public class SaveObject : MonoBehaviour {
 	}
 
 	// Generates a string of object data with the specific object type's info.
-	public static string Save(LevelManager levelManager, GameObject go) {
+	public static string Save(SaveLoad saveLoad, LevelManager levelManager, GameObject go) {
 		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 1024);
 		var s1 = __stringBuilderLease1.Builder;
-		SaveObject so = SaveLoad.GetPrefabSaveObject(go);
+		SaveObject so = saveLoad.GetPrefabSaveObject(go);
 		if (so == null) return "";
 
 		if (!so.initialized) so.Start();
 		s1.Clear();
 		// Start Saving
 		// --------------------------------------------------------------------
-		PrefabIdentifier prefID = SaveLoad.GetPrefabIdentifier(go,true);
+		PrefabIdentifier prefID = saveLoad.GetPrefabIdentifier(go,true);
 		if (prefID != null) {
 			s1.Append(Utils.UintToString(prefID.constIndex,"constIndex")); // 0
 			s1.Append(Utils.splitChar);
@@ -182,7 +182,7 @@ public class SaveObject : MonoBehaviour {
 	}
 
 	// Called after prefab has been instantiated.
-	public static async UniTask Load(Const consts,LevelManager levelManager,GameObject go, string[] entries, int lineNum,
+	public static async UniTask Load(SaveLoad saveLoad, Const consts,LevelManager levelManager,GameObject go, string[] entries, int lineNum,
 							PrefabIdentifier prefID) {
 
 		if (prefID == null) { 
@@ -190,7 +190,7 @@ public class SaveObject : MonoBehaviour {
 			if (prefID == null) { Debug.Log("BUG: Missing PrefabIdentifier on load object " + go.name); return; }
 		}
 
-		SaveObject so = SaveLoad.GetPrefabSaveObject(go);
+		SaveObject so = saveLoad.GetPrefabSaveObject(go);
 		if (!so.initialized) so.Start();
 		currentObjectInfo = go.name + " " + ParentChain(go) + " ("
 							+ so.saveType.ToString() + ") Line:"

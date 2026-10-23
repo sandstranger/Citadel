@@ -72,7 +72,7 @@ public class CyberSwitch : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(cs.iceNode.activeSelf,"iceNode.activeSelf"));
 		s1.Append(Utils.splitChar);
-		s1.Append(HealthManager.Save(cs.iceNode,prefID));
+		s1.Append(HealthManager.Save(cs.iceNode, prefID));
 		return s1.ToString();
 	}
 

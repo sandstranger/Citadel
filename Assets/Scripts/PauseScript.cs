@@ -35,6 +35,7 @@ public class PauseScript : MonoBehaviour {
 	[Inject] private MainMenuHandler _mainMenuHandler;
 	[Inject] private MouseLookScript _mouseLookScript;
 	[Inject] private PlayerMovement _playerMovement;
+	private ScenesLoader _scenesLoader;
 
 	private bool menuActive = true; // Store the state of the main menu
 	                                // gameobject active state so that we don't
@@ -44,14 +45,17 @@ public class PauseScript : MonoBehaviour {
 
 	public bool OnSaveDialog => hardSaveDialog.activeSelf || saveDialog.activeSelf;
 									
-	private void Awake()
+	[Inject]
+	private void Construct(ScenesLoader scenesLoader)
 	{
-		ScenesLoader.OnStartLoadScene += OnStartLoadScene;
+		_scenesLoader = scenesLoader;
+		_scenesLoader.OnStartLoadScene += OnStartLoadScene;
 	}
 
 	private void OnDestroy()
 	{
-		ScenesLoader.OnStartLoadScene -= OnStartLoadScene;
+		if (_scenesLoader != null)
+			_scenesLoader.OnStartLoadScene -= OnStartLoadScene;
 	}
 
 	private void OnStartLoadScene(string sceneName)
@@ -430,9 +434,9 @@ public class PauseScript : MonoBehaviour {
 
 // Fore use with LiveSplit or other future speedrunner utilities for doing speedruns
 [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
-public static class AutoSplitterData {
-	public static long magicNumber = 0x1337133713371337;
-	public static double thisRunTime = 0;
-	public static bool isLoading = false;
-	public static int missionSplitID = 0;
+public sealed class AutoSplitterData {
+	public long magicNumber = 0x1337133713371337;
+	public double thisRunTime = 0;
+	public bool isLoading = false;
+	public int missionSplitID = 0;
 }

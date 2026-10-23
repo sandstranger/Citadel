@@ -114,7 +114,6 @@ public class MouseLookScript : MonoBehaviour {
 	[Inject] private PlayerMovement _playerMovement;
 	[Inject] private WeaponFire _weaponFire;
 	[Inject] private WeaponCurrent _weaponCurrent;
-	[Inject] private DynamicCulling _dynamicCulling;
 	[Inject] private readonly ITexturesStorage _texturesStorage;
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 	[Inject] private readonly Utils _utils;
@@ -159,10 +158,6 @@ public class MouseLookScript : MonoBehaviour {
 		bobTarget = 0.3f;
     }
     
-    void OnPreCull() {
-		_dynamicCulling.Cull(false); // Update dynamic culling system.
-	}
-
 	async void Update() {
 		// Allow quick load straight from the menu or pause.
 		if (Input.GetKeyUp(f9)) {

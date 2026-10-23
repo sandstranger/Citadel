@@ -6,7 +6,7 @@ using Citadel.SceneManagement;
 using Zenject;
 using UnityEngine;
 
-public class PlayerReferenceManager : SingletonHelper<PlayerReferenceManager> {
+public class PlayerReferenceManager : MonoBehaviour {
 	// External references, required
 	public GameObject playerCapsule;
 	public GameObject playerCapsuleHardwareLantern;
@@ -44,7 +44,7 @@ public class PlayerReferenceManager : SingletonHelper<PlayerReferenceManager> {
         s1.Append(Utils.splitChar); s1.Append(PlayerMovement.Save(PRman.playerCapsule));
         s1.Append(Utils.splitChar); s1.Append(PlayerPatch.Save(PRman.playerCapsule));
         s1.Append(Utils.splitChar); s1.Append(MouseLookScript.Save(PRman.playerCapsuleMainCamera));
-        s1.Append(Utils.splitChar); s1.Append(HealthManager.Save(PRman.playerCapsule,prefID));
+        s1.Append(Utils.splitChar); s1.Append(HealthManager.Save(PRman.playerCapsule, prefID));
         s1.Append(Utils.splitChar); s1.Append(GUIState.Save(PRman.playerCanvas));
         s1.Append(Utils.splitChar); s1.Append(Inventory.Save(PRman.playerInventory));
         s1.Append(Utils.splitChar); s1.Append(WeaponCurrent.Save(PRman.playerInventory));

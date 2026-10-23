@@ -7,10 +7,8 @@ namespace Citadel.Game
 {
     internal sealed class AndroidConfig
     {
-        private static readonly string PathToPreferVulkanApiFile = Path.Combine(Application.persistentDataPath, "PreferVulkanApi.txt");
-        
-        public static AndroidConfig Default { get; } = new();
-		
+        private readonly string PathToPreferVulkanApiFile = Path.Combine(Application.persistentDataPath, "PreferVulkanApi.txt");
+        		
         private readonly PlayerPrefsBoolValue _enableLightsCulling = new("enable_lights_culling", true);
         private readonly PlayerPrefsFloatValue _lightsCullingMaxDistance = new("lights_culling_max_distance", LightDistanceCuller.DefaultMaxDistance);
         private readonly PlayerPrefsBoolValue _enableVulkanApi = new("enable_vulkan_api");

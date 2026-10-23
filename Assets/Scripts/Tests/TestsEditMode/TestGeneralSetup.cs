@@ -18,6 +18,7 @@ using UnityEditor.SceneManagement;
 
 namespace Tests {
     public class TestGeneralSetup {
+        private readonly SaveLoad _saveLoad = new();
         public CitadelTests tester;
         public List<GameObject> allGOs;
         private List<GameObject> allParents;
@@ -1109,7 +1110,7 @@ namespace Tests {
                                                         true);
 
                 for (int k=0;k<compArray.Length;k++) {
-                    so = SaveLoad.GetPrefabSaveObject(compArray[k].gameObject);
+                    so = _saveLoad.GetPrefabSaveObject(compArray[k].gameObject);
                     saveIDsFound.Add(so.SaveID);
                 }
             }

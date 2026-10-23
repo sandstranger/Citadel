@@ -8,6 +8,8 @@ using System.Text;
 using Citadel.Game;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -35,6 +37,7 @@ public sealed class Utils {
 										  // text could contain commas.  Used
 										  // for all savefile text.
 	public static char splitCharChar = '|';
+	public const char keyValueSplitChar = ':';
 	public static readonly CultureInfo en_US_Culture = new("en-US");
 
 	// Kept for synchronous legacy callers while the DI-based async loader is migrated.
@@ -334,81 +337,68 @@ public sealed class Utils {
 
     public static StreamReader ReadStreamingAsset(string fName)
     {
-#if UNITY_ANDROID
-        string basePath = Utils.GetAppropriateDataPath();
-        var finalPathToFile = Path.Combine(basePath, fName);
-        ConfirmExistsMakeIfNot(basePath, fName);
-        if (!File.Exists(finalPathToFile))
+        if (string.IsNullOrWhiteSpace(fName))
         {
+            Debug.LogError("A file name is required to load a text asset.");
             return null;
         }
 
-        var bytes = File.ReadAllBytes(finalPathToFile);
-        return bytes.Length > 0 ? new StreamReader(new MemoryStream(bytes), Encoding.ASCII) : null;
-#else
-        StreamReader dataReader = null;
-        string basePath = Application.streamingAssetsPath;
-        string fPath = SafePathCombine(basePath, fName);
-        if (File.Exists(fPath))
+        string address = SafePathCombine("TextsAssets", fName);
+        var handle = Addressables.LoadAssetAsync<TextAsset>(address);
+
+        try
         {
-            dataReader = new StreamReader(fPath, Encoding.ASCII);
-        }
-        else
-        {
-            UnityEngine.Debug.LogWarning($"File {fPath} not found, attempting recovery.");
-            string rsrc = ResourcesPathCombine("StreamingAssetsRecovery", fName);
-            TextAsset resourcesFile = (TextAsset)Resources.Load(rsrc);
-            if (resourcesFile != null)
+            TextAsset textAsset = handle.WaitForCompletion();
+            if (handle.Status != AsyncOperationStatus.Succeeded || textAsset == null)
             {
-                MemoryStream memStr = new MemoryStream(Encoding.ASCII.GetBytes(resourcesFile.text));
-                dataReader = new StreamReader(memStr, Encoding.ASCII);
-            }
-            else
-            {
-                UnityEngine.Debug.LogError($"Recovery file {rsrc} not found in Resources/StreamingAssetsRecovery.");
+                Debug.LogError($"Failed to load addressable text asset '{address}'.");
                 return null;
             }
+
+            byte[] bytes = Encoding.UTF8.GetBytes(textAsset.text);
+            return new StreamReader(new MemoryStream(bytes), Encoding.UTF8);
         }
-        return dataReader;
-#endif
+        catch (Exception exception)
+        {
+            Debug.LogError($"Failed to load addressable text asset '{address}': {exception.Message}");
+            return null;
+        }
+        finally
+        {
+            if (handle.IsValid())
+            {
+                Addressables.Release(handle);
+            }
+        }
     }
 
     public async UniTask<StreamReader> ReadStreamingAssetAsync(string fName)
     {
-#if UNITY_ANDROID
-	    string basePath = Utils.GetAppropriateDataPath();
-	    var finalPathToFile = Path.Combine(basePath, fName);
-	    await ConfirmExistsMakeIfNotAsync(basePath, fName);
-	    if (!File.Exists(finalPathToFile))
-	    {
-		    return null;
-	    }
+        if (string.IsNullOrWhiteSpace(fName))
+        {
+            Debug.LogError("A file name is required to load a text asset.");
+            return null;
+        }
 
-	    var bytes = File.ReadAllBytes(finalPathToFile);
-	    return bytes.Length > 0 ? new StreamReader(new MemoryStream(bytes), Encoding.ASCII) : null;
-#else
-	        StreamReader dataReader = null;
-	        string basePath = Application.streamingAssetsPath;
-	        string fPath = SafePathCombine(basePath, fName);
-	        // Windows/Linux/MacOS: Try streamingAssetsPath first
-            if (File.Exists(fPath)) {
-                dataReader = new StreamReader(fPath, Encoding.ASCII);
-            } else {
-                // File missing, attempt recovery from Resources/StreamingAssetsRecovery
-                UnityEngine.Debug.LogWarning($"File {fPath} not found, attempting recovery.");
-                string rsrc = ResourcesPathCombine("StreamingAssetsRecovery",fName);
-                TextAsset resourcesFile = (TextAsset)Resources.Load(rsrc);
-                if (resourcesFile != null) {
-                    // Create StreamReader from TextAsset's text
-                    MemoryStream memStr = new MemoryStream(Encoding.ASCII.GetBytes(resourcesFile.text));
-                    dataReader = new StreamReader(memStr, Encoding.ASCII);
-                } else {
-                    UnityEngine.Debug.LogError($"Recovery file {rsrc} not found in Resources/StreamingAssetsRecovery.");
-                    return null;
-                }
+        string address = SafePathCombine("TextsAssets", fName);
+
+        try
+        {
+            TextAsset textAsset = await _resourcesLoader.LoadAssetAsync<TextAsset>(address);
+            if (textAsset == null)
+            {
+                Debug.LogError($"Failed to load addressable text asset '{address}'.");
+                return null;
             }
-        return dataReader;
-#endif
+
+            byte[] bytes = Encoding.UTF8.GetBytes(textAsset.text);
+            return new StreamReader(new MemoryStream(bytes), Encoding.UTF8);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError($"Failed to load addressable text asset '{address}': {exception.Message}");
+            return null;
+        }
     }
 
 	// From the Unity Documentation on Resources.Load:
@@ -459,7 +449,8 @@ public sealed class Utils {
 			}
 		}
 
-		var textAsset = await _resourcesLoader.LoadAssetAsync<TextAsset>(fileName);
+		string assetAddress = SafePathCombine("TextsAssets", fileName);
+		var textAsset = await _resourcesLoader.LoadAssetAsync<TextAsset>(assetAddress);
 		await File.WriteAllTextAsync(strmAstPth, textAsset.text);
 	}
 
@@ -601,7 +592,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 			case TrackType.Distortion:      return IntToString(12,name);;
 		}
 		
-		return name + SaveLoad.keyValueSplitChar;
+		return name + Utils.keyValueSplitChar;
 	}
 
 	public static TrackType IntToTrackType(string typ, string name) {
@@ -644,7 +635,7 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 			case MusicType.Override: return IntToString(4,name);
 		}
 		
-		return name + SaveLoad.keyValueSplitChar;
+		return name + Utils.keyValueSplitChar;
 	}
 
 	public static MusicType IntToMusicType(string typ, string name) {
@@ -1224,8 +1215,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
     }
 
     public static string SaveTransform(Transform tr) {
-        using var __stringBuilderLease3 = StringBuilderPool.Rent();
-        var s1 = __stringBuilderLease3.Builder;
+        using var s1Lease = StringBuilderPool.Rent();
+        var s1 = s1Lease.Builder;
         s1.Clear();
 		
 		if (tr is RectTransform rectTr) {
@@ -1379,8 +1370,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 	
 	public static string SaveBoxCollider(GameObject go) {
 		BoxCollider bcol = go.GetComponent<BoxCollider>();
-		using var __stringBuilderLease4 = StringBuilderPool.Rent();
-		var s1 = __stringBuilderLease4.Builder;
+		using var s1Lease = StringBuilderPool.Rent();
+		var s1 = s1Lease.Builder;
 		s1.Clear();
 		s1.Append(FloatToString(bcol.center.x,"center.x"));
 		s1.Append(splitChar);
@@ -1415,8 +1406,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 		Rigidbody rbody = go.GetComponent<Rigidbody>();
 		if (rbody == null) return ("velocity.x:0000.00000" + splitChar + "velocity.y:0000.00000" + splitChar + "velocity.z:0000.00000" + splitChar + "isKinematic:0");
 
-		using var __stringBuilderLease5 = StringBuilderPool.Rent();
-		var s1 = __stringBuilderLease5.Builder;
+		using var s1Lease = StringBuilderPool.Rent();
+		var s1 = s1Lease.Builder;
         s1.Clear();
         s1.Append(FloatToString(rbody.linearVelocity.x,"velocity.x"));
         s1.Append(splitChar);
@@ -1463,8 +1454,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 				   + SaveRigidbody(null) + "subGO.activeSelf:0";
 		}
 
-		using var __stringBuilderLease6 = StringBuilderPool.Rent();
-		var s1 = __stringBuilderLease6.Builder;
+		using var s1Lease = StringBuilderPool.Rent();
+		var s1 = s1Lease.Builder;
         s1.Clear();
         s1.Append(SaveTransform(subGO.transform));
 		s1.Append(splitChar);
@@ -1491,8 +1482,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 
 
 	public static string SaveCamera(GameObject go) {
-		using var __stringBuilderLease1 = StringBuilderPool.Rent();
-		var cams1 = __stringBuilderLease1.Builder;
+		using var cams1Lease = StringBuilderPool.Rent();
+		var cams1 = cams1Lease.Builder;
 		Camera cm = go.GetComponent<Camera>();
         Grayscale gsc = go.GetComponent<Grayscale>();
 		if (cm == null) {
@@ -1610,8 +1601,8 @@ public static void ConfirmExistsMakeIfNot(string basePath, string fileName)
 
 
 	public static string SaveAudioSource(GameObject go) {
-		using var __stringBuilderLease2 = StringBuilderPool.Rent();
-		var auds1 = __stringBuilderLease2.Builder;
+		using var auds1Lease = StringBuilderPool.Rent();
+		var auds1 = auds1Lease.Builder;
 		AudioSource aus = go.GetComponent<AudioSource>();
 		auds1.Clear();
         auds1.Append(BoolToString(aus.enabled,"AudioSource.enabled"));
