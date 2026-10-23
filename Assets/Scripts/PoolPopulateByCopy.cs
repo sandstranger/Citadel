@@ -44,7 +44,7 @@ public class PoolPopulateByCopy : MonoBehaviour {
 	}
 	
 	private void CreateCopy() {
-		GameObject copy = _container.InstantiatePrefab(transform.GetChild(0).gameObject,transform.position,_consts.quaternionIdentity) as GameObject; // create a copy of a pool object
+		GameObject copy = _container.InstantiatePrefab(transform.GetChild(0).gameObject, transform.position, _consts.quaternionIdentity, null) as GameObject; // create a copy of a pool object
 		if (copy != null) {
 			copy.SetActive(false); // Ensure it is in fact, "empty" and available to return.
 			var rectTransform = copy.GetComponent<RectTransform>();
