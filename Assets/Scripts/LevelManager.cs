@@ -110,6 +110,7 @@ public class LevelManager : MonoBehaviour
 	[Inject] private SaveLoad _saveLoad;
 	[Inject] private StringBuilderPool _stringBuilderPool;
 	[Inject] private ObjectContainmentSystem _objectContainmentSystem;
+	[Inject] private AutoSplitterData _autoSplitterData;
 
 	public static bool LoadLevelAfterSceneChanges { get; private set; }
 	public static Vector3 TargetPosition { get; private set; } = Vector3.zero;
@@ -360,9 +361,9 @@ public class LevelManager : MonoBehaviour
 		DynamicCulling.camPositions = new Dictionary<GameObject, Vector3>();
 		System.GC.Collect();
 		System.GC.WaitForPendingFinalizers();
-		if (CurrentLevel == 2 && AutoSplitterData.missionSplitID == 0) {
-			AutoSplitterData.missionSplitID++; // 1 - Medical split - we are now on level 2
-			Debug.Log("AutoSplitterData missionSplitID incremented: " + AutoSplitterData.missionSplitID.ToString());
+		if (CurrentLevel == 2 && _autoSplitterData.missionSplitID == 0) {
+			_autoSplitterData.missionSplitID++; // 1 - Medical split - we are now on level 2
+			Debug.Log("AutoSplitterData missionSplitID incremented: " + _autoSplitterData.missionSplitID.ToString());
 		}
 		
 		PostLoadLevelSetupSystems();
@@ -787,7 +788,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public string Save() {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(200*1024);
+		using var __stringBuilderLease1 = _stringBuilderPool.Rent(200*1024);
 		var s1 = __stringBuilderLease1.Builder;
 		int i=0;
 		s1.Clear();
@@ -841,7 +842,7 @@ public class LevelManager : MonoBehaviour
 			{
 				var instGO = await _consoleEmulator.SpawnDynamicObject(constIndex,levNum,false,contnr,savID);
 				PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
-				await SaveObject.Load(_consts,this,instGO, entries,0,prefID); // Load NPC.
+				await SaveObject.Load(_saveLoad, _stringBuilderPool, _consts, this, instGO, entries, 0, prefID); // Load NPC.
 			}
 			else
 			{
@@ -863,7 +864,7 @@ public class LevelManager : MonoBehaviour
 					if (currentSaveObjectInScene.SaveID == savID && currentSaveObjectInScene.SaveID != 0)
 					{
 						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(currentGameObjectInScene, true);
-						await SaveObject.Load(_consts,this,currentGameObjectInScene, entries, i, prefID);
+						await SaveObject.Load(_saveLoad, _stringBuilderPool, _consts, this, currentGameObjectInScene, entries, i, prefID);
 						alreadyCheckedThisInstantiableGameObjectInScene[i] = true; // Huge time saver right here!
 						break;
 					}
