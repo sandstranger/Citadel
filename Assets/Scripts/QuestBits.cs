@@ -89,8 +89,8 @@ public class QuestBits {
 		RunTargets(ud,tio,targ,arg);
 	}
 
-	public string Save() {
-		using var __stringBuilderLease1 = _stringBuilderPool.Rent();
+	public string Save(StringBuilderPool stringBuilderPool) {
+		using var __stringBuilderLease1 = stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		s1.Clear();
 		s1.Append(Utils.IntToString(lev1SecCode,"lev1SecCode"));
