@@ -39,6 +39,7 @@ public class QuestBitRelay : MonoBehaviour {
 	[Inject] private Const _consts;
 	[Inject] private LevelManager _levelManager;
 	[Inject] private QuestLogNotesManager _questLogNotesManager;
+	[Inject] private AutoSplitterData _autoSplitterData;
 	
     public void EnableBits() {
 		if (RobotSpawnDeactivated) {
@@ -82,7 +83,7 @@ public class QuestBitRelay : MonoBehaviour {
 			Debug.Log("Bit set LaserDestroyed: "
 					  + _consts.questData.LaserDestroyed.ToString());
 
-			if (AutoSplitterData.missionSplitID == 1) {
+			if (_autoSplitterData.missionSplitID == 1) {
 				AutoSplitterData.missionSplitID++;
 			}
 
