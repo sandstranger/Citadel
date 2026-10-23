@@ -8,6 +8,8 @@ using System.Text;
 using Citadel.Game;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -335,81 +337,68 @@ public sealed class Utils {
 
     public static StreamReader ReadStreamingAsset(string fName)
     {
-#if UNITY_ANDROID
-        string basePath = Utils.GetAppropriateDataPath();
-        var finalPathToFile = Path.Combine(basePath, fName);
-        ConfirmExistsMakeIfNot(basePath, fName);
-        if (!File.Exists(finalPathToFile))
+        if (string.IsNullOrWhiteSpace(fName))
         {
+            Debug.LogError("A file name is required to load a text asset.");
             return null;
         }
 
-        var bytes = File.ReadAllBytes(finalPathToFile);
-        return bytes.Length > 0 ? new StreamReader(new MemoryStream(bytes), Encoding.ASCII) : null;
-#else
-        StreamReader dataReader = null;
-        string basePath = Application.streamingAssetsPath;
-        string fPath = SafePathCombine(basePath, fName);
-        if (File.Exists(fPath))
+        string address = SafePathCombine("TextsAssets", fName);
+        var handle = Addressables.LoadAssetAsync<TextAsset>(address);
+
+        try
         {
-            dataReader = new StreamReader(fPath, Encoding.ASCII);
-        }
-        else
-        {
-            UnityEngine.Debug.LogWarning($"File {fPath} not found, attempting recovery.");
-            string rsrc = ResourcesPathCombine("StreamingAssetsRecovery", fName);
-            TextAsset resourcesFile = (TextAsset)Resources.Load(rsrc);
-            if (resourcesFile != null)
+            TextAsset textAsset = handle.WaitForCompletion();
+            if (handle.Status != AsyncOperationStatus.Succeeded || textAsset == null)
             {
-                MemoryStream memStr = new MemoryStream(Encoding.ASCII.GetBytes(resourcesFile.text));
-                dataReader = new StreamReader(memStr, Encoding.ASCII);
-            }
-            else
-            {
-                UnityEngine.Debug.LogError($"Recovery file {rsrc} not found in Resources/StreamingAssetsRecovery.");
+                Debug.LogError($"Failed to load addressable text asset '{address}'.");
                 return null;
             }
+
+            byte[] bytes = Encoding.ASCII.GetBytes(textAsset.text);
+            return new StreamReader(new MemoryStream(bytes), Encoding.ASCII);
         }
-        return dataReader;
-#endif
+        catch (Exception exception)
+        {
+            Debug.LogError($"Failed to load addressable text asset '{address}': {exception.Message}");
+            return null;
+        }
+        finally
+        {
+            if (handle.IsValid())
+            {
+                Addressables.Release(handle);
+            }
+        }
     }
 
     public async UniTask<StreamReader> ReadStreamingAssetAsync(string fName)
     {
-#if UNITY_ANDROID
-	    string basePath = Utils.GetAppropriateDataPath();
-	    var finalPathToFile = Path.Combine(basePath, fName);
-	    await ConfirmExistsMakeIfNotAsync(basePath, fName);
-	    if (!File.Exists(finalPathToFile))
-	    {
-		    return null;
-	    }
+        if (string.IsNullOrWhiteSpace(fName))
+        {
+            Debug.LogError("A file name is required to load a text asset.");
+            return null;
+        }
 
-	    var bytes = File.ReadAllBytes(finalPathToFile);
-	    return bytes.Length > 0 ? new StreamReader(new MemoryStream(bytes), Encoding.ASCII) : null;
-#else
-	        StreamReader dataReader = null;
-	        string basePath = Application.streamingAssetsPath;
-	        string fPath = SafePathCombine(basePath, fName);
-	        // Windows/Linux/MacOS: Try streamingAssetsPath first
-            if (File.Exists(fPath)) {
-                dataReader = new StreamReader(fPath, Encoding.ASCII);
-            } else {
-                // File missing, attempt recovery from Resources/StreamingAssetsRecovery
-                UnityEngine.Debug.LogWarning($"File {fPath} not found, attempting recovery.");
-                string rsrc = ResourcesPathCombine("StreamingAssetsRecovery",fName);
-                TextAsset resourcesFile = (TextAsset)Resources.Load(rsrc);
-                if (resourcesFile != null) {
-                    // Create StreamReader from TextAsset's text
-                    MemoryStream memStr = new MemoryStream(Encoding.ASCII.GetBytes(resourcesFile.text));
-                    dataReader = new StreamReader(memStr, Encoding.ASCII);
-                } else {
-                    UnityEngine.Debug.LogError($"Recovery file {rsrc} not found in Resources/StreamingAssetsRecovery.");
-                    return null;
-                }
+        string address = SafePathCombine("TextsAssets", fName);
+
+        try
+        {
+            TextAsset textAsset = await _resourcesLoader.LoadAssetAsync<TextAsset>(address);
+            if (textAsset == null)
+            {
+                Debug.LogError($"Failed to load addressable text asset '{address}'.");
+                return null;
             }
-        return dataReader;
-#endif
+
+            byte[] bytes = Encoding.ASCII.GetBytes(textAsset.text);
+            return new StreamReader(new MemoryStream(bytes), Encoding.ASCII);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogError($"Failed to load addressable text asset '{address}': {exception.Message}");
+            return null;
+        }
     }
 
 	// From the Unity Documentation on Resources.Load:
@@ -460,7 +449,8 @@ public sealed class Utils {
 			}
 		}
 
-		var textAsset = await _resourcesLoader.LoadAssetAsync<TextAsset>(fileName);
+		string assetAddress = SafePathCombine("TextsAssets", fileName);
+		var textAsset = await _resourcesLoader.LoadAssetAsync<TextAsset>(assetAddress);
 		await File.WriteAllTextAsync(strmAstPth, textAsset.text);
 	}
 
