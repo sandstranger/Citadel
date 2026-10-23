@@ -18,8 +18,6 @@ namespace Citadel.SceneManagement
 
         public string LoadedSceneName => SceneManager.GetActiveScene().name;
 
-        public static ScenesLoader Default { get; } = new();
-        
         private readonly string[] _levelScenesNames =
         {
             "0-ReactorLevelScene",
@@ -38,7 +36,7 @@ namespace Citadel.SceneManagement
             "13-CyberspaceLevelScene"
         };
 
-        private ScenesLoader()
+        public ScenesLoader()
         {
             SceneManager.sceneLoaded += HandleSceneLoaded;
             SceneManager.activeSceneChanged += HandleActiveSceneChanged;
