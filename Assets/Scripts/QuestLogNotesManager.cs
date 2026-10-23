@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class QuestLogNotesManager : MonoBehaviour
 {
-	[Inject] private StringBuilderPool _stringBuilderPool;
 	private const string NeuroSurgeryDoorName = "doorA_neurosurgery451";
 	private const string DoorTo7Name = "door_elevator1_toLevel7";
 	
