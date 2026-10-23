@@ -84,7 +84,7 @@ public class QuestBitRelay : MonoBehaviour {
 					  + _consts.questData.LaserDestroyed.ToString());
 
 			if (_autoSplitterData.missionSplitID == 1) {
-				AutoSplitterData.missionSplitID++;
+				_autoSplitterData.missionSplitID++;
 			}
 
 			_questLogNotesManager.notes[9].SetActive(true);
@@ -131,8 +131,8 @@ public class QuestBitRelay : MonoBehaviour {
 			Debug.Log("Bit set MasterJettisonBroken: "
 					  + _consts.questData.MasterJettisonBroken.ToString());
 
-			if (AutoSplitterData.missionSplitID == 2) {
-				AutoSplitterData.missionSplitID++;
+			if (_autoSplitterData.missionSplitID == 2) {
+				_autoSplitterData.missionSplitID++;
 			}
 
 			_questLogNotesManager.notes[12].SetActive(true);
@@ -160,8 +160,8 @@ public class QuestBitRelay : MonoBehaviour {
 			Debug.Log("Bit set MasterJettisonEnabled: "
 					  + _consts.questData.MasterJettisonEnabled.ToString());
 
-			if (AutoSplitterData.missionSplitID == 3) {
-				AutoSplitterData.missionSplitID++;
+			if (_autoSplitterData.missionSplitID == 3) {
+				_autoSplitterData.missionSplitID++;
 			}
 
 			_questLogNotesManager.notes[10].SetActive(true);
@@ -175,8 +175,8 @@ public class QuestBitRelay : MonoBehaviour {
 			Debug.Log("Bit set BetaGroveJettisoned: "
 					  + _consts.questData.BetaGroveJettisoned.ToString());
 
-			if (AutoSplitterData.missionSplitID == 4) { 
-				AutoSplitterData.missionSplitID++;
+			if (_autoSplitterData.missionSplitID == 4) { 
+				_autoSplitterData.missionSplitID++;
 			}
 
 			_questLogNotesManager.notes[12].SetActive(true);
@@ -367,7 +367,7 @@ public class QuestBitRelay : MonoBehaviour {
 		}
 		if (LaserDestroyed) {
 			_consts.questData.LaserDestroyed = !_consts.questData.LaserDestroyed;
-			if (AutoSplitterData.missionSplitID == 1) { AutoSplitterData.missionSplitID++; }
+			if (_autoSplitterData.missionSplitID == 1) { _autoSplitterData.missionSplitID++; }
 			_questLogNotesManager.checkBoxes[9].isOn = _consts.questData.LaserDestroyed;
 			if (_consts.questData.LaserDestroyed) {
 				_questLogNotesManager.notes[9].SetActive(true);
