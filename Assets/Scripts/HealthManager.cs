@@ -881,7 +881,7 @@ public class HealthManager : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.SaveString(hm.targetOnDeath,"targetOnDeath"));
 		s1.Append(Utils.splitChar);
-		s1.Append(TargetIO.Save(go));
+		s1.Append(TargetIO.Save(stringBuilderPool, go));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.UintToString(hm.gibObjects.Length,"gibObjects.Length"));
 		for (int i=0;i<hm.gibObjects.Length; i++) {
