@@ -88,11 +88,12 @@ namespace Citadel.Game
                 var existingPlayerReference = _instance._playerReference;
 
                 if (duplicateConst != null &&
-                    duplicateConst.gameObject != existingConst.gameObject &&
+                    (existingConst == null || duplicateConst.gameObject != existingConst.gameObject) &&
                     duplicateConst.gameObject != gameObject)
                     DestroyImmediate(duplicateConst.gameObject);
                 if (duplicatePlayerReference != null &&
-                    duplicatePlayerReference.gameObject != existingPlayerReference.gameObject &&
+                    (existingPlayerReference == null ||
+                     duplicatePlayerReference.gameObject != existingPlayerReference.gameObject) &&
                     duplicatePlayerReference.gameObject != gameObject)
                     DestroyImmediate(duplicatePlayerReference.gameObject);
 
