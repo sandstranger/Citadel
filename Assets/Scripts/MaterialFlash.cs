@@ -26,7 +26,7 @@ public class MaterialFlash : MonoBehaviour {
 	private readonly List<MaterialPropertyHelper> _materialPropertyHelpers = new();
 	
 	void Start () {
-		foreach (var renderer in this.GetComponentsInChildren<MeshRenderer>(includeSelf: true))
+		foreach (var renderer in this.GetComponentsInChildren<MeshRenderer>(true))
 		{
 			_materialPropertyHelpers.Add(new MaterialPropertyHelper(renderer));
 		}
