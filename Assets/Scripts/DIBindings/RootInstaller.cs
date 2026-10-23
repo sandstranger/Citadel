@@ -11,6 +11,8 @@ namespace Citadel.Game
     internal sealed class RootInstaller : MonoInstaller
     {
         public const string MainAudioSourceName = "main_menu_music";
+
+        private static RootInstaller _instance;
         
         [SerializeField] 
         private TexturesStorage texturesStorage;
@@ -45,7 +47,25 @@ namespace Citadel.Game
 
         private void Awake()
         {
-            DontDestroyOnLoad(gameObject);
+            // Keep exactly one persistent root installer. A newly loaded gameplay
+            // scene must replace the menu installer when a new game starts.
+            if (_instance == null)
+            {
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else if (Const.StartingNewGame)
+            {
+                DestroyImmediate(_instance.gameObject);
+                _instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                DestroyImmediate(gameObject);
+                return;
+            }
+
             SceneManager.activeSceneChanged += OnActiveSceneChanged;
 
             DontDestroyOnLoad(_const.gameObject);
@@ -60,7 +80,14 @@ namespace Citadel.Game
         
         private new void Start() => OnSceneChanged(SceneManager.GetActiveScene().name);
 
-        private void OnDestroy() => SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+        private void OnDestroy()
+        {
+            SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+            if (_instance == this)
+            {
+                _instance = null;
+            }
+        }
         
         public override void InstallBindings()
         {
