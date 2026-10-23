@@ -1,3 +1,4 @@
+using Citadel.SceneManagement;
 using Zenject;
 
 namespace Citadel.Game
@@ -6,9 +7,8 @@ namespace Citadel.Game
     {
         public override void InstallBindings()
         {
-            Container.Bind<Citadel.SceneManagement.ScenesLoader>().AsSingle();
-            Container.Bind<IAddressableTextAssetsPreparer>()
-                .To<AddressableTextAssetsPreparer>().AsSingle();
+            Container.Bind<ScenesLoader>().
+                FromInstance(ScenesLoader.Default).AsSingle();
         }
     }
 }

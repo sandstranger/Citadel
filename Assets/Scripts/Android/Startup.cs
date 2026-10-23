@@ -10,29 +10,9 @@ namespace Citadel.Game
 {
     internal sealed class Startup : MonoBehaviour
     {
-        [Inject] private ScenesLoader _scenesLoader;
-
-#if UNITY_ANDROID
-        [Inject] private IAddressableTextAssetsPreparer _addressableTextAssetsPreparer;
-
-        private void Start() => InitializeAsync().Forget();
-
-        private async UniTaskVoid InitializeAsync()
-        {
-            try
-            {
-                if (await _addressableTextAssetsPreparer.PrepareAsync())
-                {
-                    await _scenesLoader.LoadLevelAsync(_scenesLoader.MainGameSceneIndex);
-                }
-            }
-            catch (Exception exception)
-            {
-                Debug.LogException(exception);
-            }
-        }
-#else
+        [Inject] 
+        private readonly ScenesLoader _scenesLoader;
+        
         private void Start() => _scenesLoader.LoadLevelAsync(_scenesLoader.MainGameSceneIndex);
-#endif
     }
 }

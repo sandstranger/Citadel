@@ -130,7 +130,7 @@ namespace Citadel.Game
             Container.Bind<IResourcesLoader>().To<AddressablesResourcesLoader>().AsSingle();
             Container.Bind<Utils>().AsSingle();
             Container.Bind<AndroidConfig>().AsSingle();
-            Container.Bind<ScenesLoader>().AsSingle();
+            Container.Bind<ScenesLoader>().FromInstance(ScenesLoader.Default).AsSingle();
             Container.Bind<SaveLoad>().AsSingle();
             Container.Bind<ObjectContainmentSystem>().AsSingle();
             Container.Bind<AutoSplitterData>().AsSingle();
