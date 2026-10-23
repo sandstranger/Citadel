@@ -1808,8 +1808,8 @@ public class PlayerMovement : MonoBehaviour {
 			case 12: arsenal = cheatL6arsenal; break;
 			default: arsenal = cheatL1arsenal; break;
 		}
-		GameObject cheatArsenal = _container.InstantiatePrefab(arsenal,transform.position,
-								    _consts.quaternionIdentity) as GameObject;
+		GameObject cheatArsenal = _container.InstantiatePrefab(arsenal, transform.position,
+								    _consts.quaternionIdentity, null) as GameObject;
 									
 		if (cheatArsenal == null) return; // Failed!
 
