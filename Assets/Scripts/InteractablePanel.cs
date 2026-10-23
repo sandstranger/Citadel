@@ -102,13 +102,13 @@ public class InteractablePanel : MonoBehaviour {
 			DelayedSpawn despawner = ip.installationItem.GetComponent<DelayedSpawn>();
 			if (despawner != null) { // plastique
 				s1.Append(Utils.splitChar);
-				s1.Append(DelayedSpawn.Save(ip.installationItem));
+				s1.Append(DelayedSpawn.Save(stringBuilderPool, ip.installationItem));
 				Transform childTr = ip.installationItem.transform.GetChild(0);
 				if (childTr != null) {
 					DelayedSpawn despawner2 = childTr.gameObject.GetComponent<DelayedSpawn>();
 					if (despawner2 != null) { // plastique
 						s1.Append(Utils.splitChar);
-						s1.Append(DelayedSpawn.Save(childTr.gameObject));
+						s1.Append(DelayedSpawn.Save(stringBuilderPool, childTr.gameObject));
 					}
 				}
 			}
