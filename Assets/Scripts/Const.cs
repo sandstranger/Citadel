@@ -1802,7 +1802,7 @@ public class Const : MonoBehaviour
 
  		System.GC.Collect(); // Collect it all!
 		System.GC.WaitForPendingFinalizers();
-		AutoSplitterData.isLoading = false;
+		_autoSplitterData.isLoading = false;
 		loadTimer.Stop();
 		loading = false;
 		loadPercentText.text = "";
