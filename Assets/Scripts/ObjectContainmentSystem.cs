@@ -7,11 +7,11 @@ using UnityEngine.SceneManagement;
 internal sealed class ObjectContainmentSystem
 {
     private readonly List<GameObject> _floorChunks = new();
-    private readonly List<GameObject> _active_floorChunks = new();
+    private readonly List<GameObject> _activeFloorChunks = new();
 
     public void FindAllFloorGOs()
     {
-        FloorChunks.Clear();
+        _floorChunks.Clear();
 
         var allParents = SceneManager.GetActiveScene().GetRootGameObjects();
         for (int i = 0; i < allParents.Length; i++)
@@ -19,24 +19,24 @@ internal sealed class ObjectContainmentSystem
             Component[] compArray = allParents[i].GetComponentsInChildren(typeof(MarkAsFloor), true);
             for (int k = 0; k < compArray.Length; k++)
             {
-                FloorChunks.Add(compArray[k].gameObject);
+                _floorChunks.Add(compArray[k].gameObject);
             }
         }
     }
 
     public void UpdateActiveFlooring()
     {
-        if (FloorChunks.Count == 0)
+        if (_floorChunks.Count == 0)
         {
             FindAllFloorGOs();
         }
 
-        ActiveFloorChunks.Clear();
-        for (int i = 0; i < FloorChunks.Count; i++)
+        _activeFloorChunks.Clear();
+        for (int i = 0; i < _floorChunks.Count; i++)
         {
-            if (FloorChunks[i] == null) continue;
+            if (_floorChunks[i] == null) continue;
 
-            if (FloorChunks[i].activeInHierarchy) ActiveFloorChunks.Add(FloorChunks[i]);
+            if (_floorChunks[i].activeInHierarchy) _activeFloorChunks.Add(_floorChunks[i]);
         }
     }
 
@@ -44,9 +44,9 @@ internal sealed class ObjectContainmentSystem
     {
         Vector3 checkpos;
         float distMin = 1000000f;
-        for (int i = 0; i < ActiveFloorChunks.Count; i++)
+        for (int i = 0; i < _activeFloorChunks.Count; i++)
         {
-            checkpos = ActiveFloorChunks[i].transform.position;
+            checkpos = _activeFloorChunks[i].transform.position;
             float deltax = x - checkpos.x;
             float deltay = y - checkpos.z; // Stupid Unity
             if (deltax < distMin) distMin = deltax;
@@ -55,9 +55,9 @@ internal sealed class ObjectContainmentSystem
         }
 
         // Go back and find the floor closest to us.  Could have blasted away via explosion.
-        for (int i = 0; i < ActiveFloorChunks.Count; i++)
+        for (int i = 0; i < _activeFloorChunks.Count; i++)
         {
-            checkpos = ActiveFloorChunks[i].transform.position;
+            checkpos = _activeFloorChunks[i].transform.position;
             float deltax = x - checkpos.x;
             float deltay = y - checkpos.z; // Stupid Unity
             if (deltax - distMin < 1.28f) return checkpos;
@@ -69,7 +69,7 @@ internal sealed class ObjectContainmentSystem
 
     public void ClearLists()
     {
-        FloorChunks.Clear();
-        ActiveFloorChunks.Clear();
+        _floorChunks.Clear();
+        _activeFloorChunks.Clear();
     }
 }
