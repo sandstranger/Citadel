@@ -52,26 +52,19 @@ public static class StringBuilderPool
 /// <summary>
 /// Idempotent disposable lease for a StringBuilder borrowed from StringBuilderPool.
 /// </summary>
-public sealed class StringBuilderLease : IDisposable
+public readonly struct StringBuilderLease : IDisposable
 {
-    private bool _disposed;
     private readonly StringBuilder _builder;
 
-    internal StringBuilderLease(StringBuilder builder)
-    {
-        _builder = builder;
-    }
+    internal StringBuilderLease(StringBuilder builder) => _builder = builder;
 
     public StringBuilder Builder => _builder;
 
     public void Dispose()
     {
-        if (_disposed)
+        if (_builder is not null)
         {
-            return;
+            StringBuilderPool.Return(_builder);
         }
-
-        _disposed = true;
-        StringBuilderPool.Return(_builder);
     }
 }
