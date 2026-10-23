@@ -12,7 +12,6 @@ namespace Citadel.Game
     {
         public const string MainAudioSourceName = "main_menu_music";
         
-        private ScenesLoader _scenesLoader;
 
         [SerializeField] 
         private TexturesStorage texturesStorage;
@@ -48,6 +47,7 @@ namespace Citadel.Game
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
+            SceneManager.activeSceneChanged += OnActiveSceneChanged;
 
             DontDestroyOnLoad(_const.gameObject);
             DontDestroyOnLoad(_playerReference.gameObject);
@@ -106,9 +106,6 @@ namespace Citadel.Game
             Container.BindInstance(_weaponCurrent).AsSingle();
             Container.BindInstance(_questLogNotesManager).AsSingle();
 
-            
-            _scenesLoader = Container.Resolve<ScenesLoader>();
-            _scenesLoader.OnActiveSceneChanged += OnSceneChanged;
         }
 
         private void Start()
@@ -118,11 +115,11 @@ namespace Citadel.Game
 
         private void OnDestroy()
         {
-            if (_scenesLoader != null)
-            {
-                _scenesLoader.OnActiveSceneChanged -= OnSceneChanged;
-            }
+            SceneManager.activeSceneChanged -= OnActiveSceneChanged;
         }
+
+        private void OnActiveSceneChanged(Scene previousScene, Scene activeScene) =>
+            OnSceneChanged(activeScene.name);
 
         private void OnSceneChanged(string sceneName)
         {
