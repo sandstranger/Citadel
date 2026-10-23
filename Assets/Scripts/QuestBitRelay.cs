@@ -4,6 +4,7 @@ using Zenject;
 using UnityEngine;
 
 public class QuestBitRelay : MonoBehaviour {
+	[Inject] private AutoSplitterData _autoSplitterData;
 	[Header("Bits to enable or disable when this GameObject is Targetted, or To Test Against")]
 	public int lev1SecCode;
 	public int lev2SecCode;
