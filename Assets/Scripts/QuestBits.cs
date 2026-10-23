@@ -39,10 +39,11 @@ public class QuestBits {
 	private readonly Const _consts;
 	private readonly StringBuilderPool _stringBuilderPool;
 
-	public QuestBits(LevelManager levelManager,Const @const)
+	public QuestBits(LevelManager levelManager, Const @const, StringBuilderPool stringBuilderPool)
 	{
 		_levelManager = levelManager;
 		_consts = @const;
+		_stringBuilderPool = stringBuilderPool ?? throw new System.ArgumentNullException(nameof(stringBuilderPool));
 	}
 
 	public void ResetQuestData(QuestBits qD) {
