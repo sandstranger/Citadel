@@ -15,6 +15,14 @@ using UnityEditor.SceneManagement;
 #endif
 
 public class CitadelTests : MonoBehaviour {
+	private StringBuilderPool _stringBuilderPool;
+	private SaveLoad _saveLoad;
+
+	private void Awake()
+	{
+		_stringBuilderPool = new StringBuilderPool();
+		_saveLoad = new SaveLoad(_stringBuilderPool);
+	}
 	public Camera probeCam;
 	public Light cookieLight;
 	public GameObject[] geometryContainters;
@@ -187,7 +195,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<allStaticObjects.Count;i++) {				
-			//	sw.Write(SaveLoad.SavePrefab(allStaticObjects[i]));
+			//	sw.Write(_saveLoad.SavePrefab(allStaticObjects[i]));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();
@@ -230,7 +238,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<allStaticObjects.Count;i++) {				
-				sw.Write(SaveLoad.SavePrefab(allStaticObjects[i]));
+				sw.Write(_saveLoad.SavePrefab(allStaticObjects[i]));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();
@@ -267,7 +275,7 @@ public class CitadelTests : MonoBehaviour {
 			return;
 		}
 		
-		using var __stringBuilderLease1 = StringBuilderPool.Rent();
+		using var __stringBuilderLease1 = _stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		using (sw) {
 			PrefabIdentifier pid = null;
@@ -672,7 +680,7 @@ public class CitadelTests : MonoBehaviour {
 // 
 // 		using (sw) {
 // 			for (int i=0;i<lightsSaveableContainers[levelToOutputFrom].transform.childCount;i++) {
-// 				sw.Write(SaveLoad.SavePrefab(lightsSaveableContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
+// 				sw.Write(_saveLoad.SavePrefab(lightsSaveableContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
 // 				sw.Write(Environment.NewLine);
 // 			}
 // 			sw.Close();
@@ -682,7 +690,7 @@ public class CitadelTests : MonoBehaviour {
 	
 	public void GenerateDoorsDataFile() {
 		UnityEngine.Debug.Log("Outputting all lights saveable to StreamingAssets/CitadelScene_doors_level" + levelToOutputFrom.ToString() + ".txt");
-		using var __stringBuilderLease2 = StringBuilderPool.Rent();
+		using var __stringBuilderLease2 = _stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease2.Builder;
 		string lName = "CitadelScene_doors_level"
 					   + levelToOutputFrom.ToString() + ".txt";
@@ -698,7 +706,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<doorContainers[levelToOutputFrom].transform.childCount;i++) {
-				sw.Write(SaveLoad.SavePrefab(doorContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
+				sw.Write(_saveLoad.SavePrefab(doorContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();
@@ -708,7 +716,7 @@ public class CitadelTests : MonoBehaviour {
 	
 	public void GenerateNPCsDataFile() {
 		UnityEngine.Debug.Log("Outputting all lights saveable to StreamingAssets/CitadelScene_npcs_level" + levelToOutputFrom.ToString() + ".txt");
-		using var __stringBuilderLease3 = StringBuilderPool.Rent();
+		using var __stringBuilderLease3 = _stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease3.Builder;
 		string lName = "CitadelScene_npcs_level"
 					   + levelToOutputFrom.ToString() + ".txt";
@@ -724,7 +732,7 @@ public class CitadelTests : MonoBehaviour {
 
 		using (sw) {
 			for (int i=0;i<npcContainers[levelToOutputFrom].transform.childCount;i++) {
-				sw.Write(SaveLoad.SavePrefab(npcContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
+				sw.Write(_saveLoad.SavePrefab(npcContainers[levelToOutputFrom].transform.GetChild(i).gameObject));
 				sw.Write(Environment.NewLine);
 			}
 			sw.Close();
@@ -743,7 +751,7 @@ public class CitadelTests : MonoBehaviour {
 
 	public void GenerateDynamicObjectsDataFile() {
 		UnityEngine.Debug.Log("Outputting all dynamic objects to StreamingAssets/CitadelScene_dynamics_level" + levelToOutputFrom.ToString() + ".dat");
-		using var __stringBuilderLease4 = StringBuilderPool.Rent();
+		using var __stringBuilderLease4 = _stringBuilderPool.Rent();
 		var s1 = __stringBuilderLease4.Builder;
 		List<GameObject> allDynamicObjects = new List<GameObject>();
 		Component[] compArray = dynamicObjectContainers[levelToOutputFrom].GetComponentsInChildren(typeof(SaveObject),true);
