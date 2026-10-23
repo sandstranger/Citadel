@@ -47,6 +47,7 @@ public class Const : MonoBehaviour
     [Inject] private StringBuilderPool _stringBuilderPool;
     [Inject] private SaveLoad _saveLoad;
     [Inject] private ObjectContainmentSystem _objectContainmentSystem;
+    [Inject] private AutoSplitterData _autoSplitterData;
     [Inject] private DiContainer _container;
 	private const int StringBuilderSize = 500 * 1024;
 	public float shadowThreshold = 0.03f;
@@ -1136,7 +1137,7 @@ public class Const : MonoBehaviour
 
 		GameObject InstantiatePrefab(GameObject prefab)
 		{
-			return _container.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity);
+			return _container.InstantiatePrefab(prefab, Vector3.zero, quaternionIdentity, null);
 		}
 	}
 
@@ -1392,7 +1393,7 @@ public class Const : MonoBehaviour
 		_mfdManager.TabReset(false);
 		_mfdManager.DisableAllCenterTabs();
 		loadingScreen.SetActive(true);
-		AutoSplitterData.isLoading = true;
+		_autoSplitterData.isLoading = true;
 	}
 
 	// Load the Game
