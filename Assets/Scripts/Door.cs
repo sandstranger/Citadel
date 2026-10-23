@@ -372,8 +372,8 @@ public class Door : MonoBehaviour {
 		firstUpdateAfterLoad = true;
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go, PrefabIdentifier prefID) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 1024);
+	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
 		var s1 = __stringBuilderLease1.Builder;
 		Door dr = go.GetComponent<Door>();
 		var pauseScript = dr._pauseScript;

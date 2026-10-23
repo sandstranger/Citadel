@@ -58,8 +58,8 @@ public class LogicRelay : MonoBehaviour {
 	//
 	// Also I think I used this in a few places.  This is the relayEnabled by
 	// the way.
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 200);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 200);
 		var s1 = __stringBuilderLease1.Builder;
 		LogicRelay lr = go.GetComponent<LogicRelay>();
 		if (lr == null) {

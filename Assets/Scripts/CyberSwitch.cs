@@ -55,8 +55,8 @@ public class CyberSwitch : MonoBehaviour {
 		}
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go, PrefabIdentifier prefID) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 *500);
+	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 *500);
 		var s1 = __stringBuilderLease1.Builder;
 		CyberSwitch cs = go.GetComponent<CyberSwitch>();
 		s1.Clear();
@@ -72,7 +72,7 @@ public class CyberSwitch : MonoBehaviour {
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.BoolToString(cs.iceNode.activeSelf,"iceNode.activeSelf"));
 		s1.Append(Utils.splitChar);
-		s1.Append(HealthManager.Save(stringBuilderPool, cs.iceNode, prefID));
+		s1.Append(HealthManager.Save(cs.iceNode, prefID));
 		return s1.ToString();
 	}
 

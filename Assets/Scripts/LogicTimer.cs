@@ -46,8 +46,8 @@ public class LogicTimer : MonoBehaviour {
 		_consts.UseTargets(gameObject,ud,target);
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 *200);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 *200);
 		var s1 = __stringBuilderLease1.Builder;
 		LogicTimer lt = go.GetComponent<LogicTimer>();
 		s1.Clear();

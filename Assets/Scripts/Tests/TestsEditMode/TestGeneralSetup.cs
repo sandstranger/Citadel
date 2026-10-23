@@ -18,8 +18,7 @@ using UnityEditor.SceneManagement;
 
 namespace Tests {
     public class TestGeneralSetup {
-        private readonly StringBuilderPool _stringBuilderPool = new();
-        private readonly SaveLoad _saveLoad = new(new StringBuilderPool());
+        private readonly SaveLoad _saveLoad = new();
         public CitadelTests tester;
         public List<GameObject> allGOs;
         private List<GameObject> allParents;
@@ -1167,7 +1166,7 @@ namespace Tests {
         private string ParentChain(GameObject go) {
             if (go.transform.parent == null) return "none";
 
-            using var __stringBuilderLease1 = _stringBuilderPool.Rent();
+            using var __stringBuilderLease1 = StringBuilderPool.Rent();
             var s1 = __stringBuilderLease1.Builder;
             s1.Clear();
             Transform tr = go.transform;

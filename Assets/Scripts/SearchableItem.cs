@@ -50,8 +50,8 @@ public class SearchableItem : MonoBehaviour {
 	}
 
 	// Save searchable data
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go, PrefabIdentifier prefID) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent();
+	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		SearchableItem se;
 		if (go.name.Contains("se_corpse_eaten")) se = go.transform.GetChild(0).GetComponent<SearchableItem>(); // se_corpse_eaten

@@ -4,17 +4,16 @@ namespace Tests
 {
     public class StringBuilderPoolTests
     {
-        private readonly StringBuilderPool _pool = new();
         [Test]
         public void RentReturnsCleanBuilder()
         {
-            using (var firstLease = _pool.Rent())
+            using (var firstLease = StringBuilderPool.Rent())
             {
                 firstLease.Builder.Append("first");
                 Assert.That(firstLease.Builder.ToString(), Is.EqualTo("first"));
             }
 
-            using (var secondLease = _pool.Rent())
+            using (var secondLease = StringBuilderPool.Rent())
             {
                 Assert.That(secondLease.Builder.Length, Is.Zero);
             }
@@ -23,12 +22,12 @@ namespace Tests
         [Test]
         public void NestedLeasesUseDifferentBuilders()
         {
-            using (var outerLease = _pool.Rent())
+            using (var outerLease = StringBuilderPool.Rent())
             {
                 var outerBuilder = outerLease.Builder;
                 outerBuilder.Append("outer");
 
-                using (var innerLease = _pool.Rent())
+                using (var innerLease = StringBuilderPool.Rent())
                 {
                     var innerBuilder = innerLease.Builder;
 
@@ -46,7 +45,7 @@ namespace Tests
         {
             const int requestedCapacity = 4096;
 
-            using (var lease = _pool.Rent(requestedCapacity))
+            using (var lease = StringBuilderPool.Rent(requestedCapacity))
             {
                 Assert.That(lease.Builder.Capacity, Is.GreaterThanOrEqualTo(requestedCapacity));
             }

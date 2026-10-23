@@ -37,13 +37,11 @@ public class QuestBits {
 
 	private readonly LevelManager _levelManager;
 	private readonly Const _consts;
-	private readonly StringBuilderPool _stringBuilderPool;
 
-	public QuestBits(LevelManager levelManager, Const @const, StringBuilderPool stringBuilderPool)
+	public QuestBits(LevelManager levelManager, Const @const)
 	{
 		_levelManager = levelManager;
 		_consts = @const;
-		_stringBuilderPool = stringBuilderPool ?? throw new System.ArgumentNullException(nameof(stringBuilderPool));
 	}
 
 	public void ResetQuestData(QuestBits qD) {
@@ -89,8 +87,8 @@ public class QuestBits {
 		RunTargets(ud,tio,targ,arg);
 	}
 
-	public string Save(StringBuilderPool stringBuilderPool) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent();
+	public string Save() {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		s1.Clear();
 		s1.Append(Utils.IntToString(lev1SecCode,"lev1SecCode"));

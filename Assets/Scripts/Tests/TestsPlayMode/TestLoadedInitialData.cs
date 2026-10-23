@@ -18,7 +18,7 @@ using UnityEditor.SceneManagement;
 
 namespace Tests {
     public class TestLoadedInitialData {
-        private readonly SaveLoad _saveLoad = new(new StringBuilderPool());
+        private readonly SaveLoad _saveLoad = new();
         private bool sceneLoaded = false;
 
         public void RunBeforeAnyTests() {

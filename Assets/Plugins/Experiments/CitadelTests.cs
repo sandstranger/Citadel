@@ -15,13 +15,11 @@ using UnityEditor.SceneManagement;
 #endif
 
 public class CitadelTests : MonoBehaviour {
-	private StringBuilderPool _stringBuilderPool;
 	private SaveLoad _saveLoad;
 
 	private void Awake()
 	{
-		_stringBuilderPool = new StringBuilderPool();
-		_saveLoad = new SaveLoad(_stringBuilderPool);
+		_saveLoad = new SaveLoad();
 	}
 	public Camera probeCam;
 	public Light cookieLight;
@@ -275,7 +273,7 @@ public class CitadelTests : MonoBehaviour {
 			return;
 		}
 		
-		using var __stringBuilderLease1 = _stringBuilderPool.Rent();
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		using (sw) {
 			PrefabIdentifier pid = null;
@@ -690,7 +688,7 @@ public class CitadelTests : MonoBehaviour {
 	
 	public void GenerateDoorsDataFile() {
 		UnityEngine.Debug.Log("Outputting all lights saveable to StreamingAssets/CitadelScene_doors_level" + levelToOutputFrom.ToString() + ".txt");
-		using var __stringBuilderLease2 = _stringBuilderPool.Rent();
+		using var __stringBuilderLease2 = StringBuilderPool.Rent();
 		var s1 = __stringBuilderLease2.Builder;
 		string lName = "CitadelScene_doors_level"
 					   + levelToOutputFrom.ToString() + ".txt";
@@ -716,7 +714,7 @@ public class CitadelTests : MonoBehaviour {
 	
 	public void GenerateNPCsDataFile() {
 		UnityEngine.Debug.Log("Outputting all lights saveable to StreamingAssets/CitadelScene_npcs_level" + levelToOutputFrom.ToString() + ".txt");
-		using var __stringBuilderLease3 = _stringBuilderPool.Rent();
+		using var __stringBuilderLease3 = StringBuilderPool.Rent();
 		var s1 = __stringBuilderLease3.Builder;
 		string lName = "CitadelScene_npcs_level"
 					   + levelToOutputFrom.ToString() + ".txt";
@@ -751,7 +749,7 @@ public class CitadelTests : MonoBehaviour {
 
 	public void GenerateDynamicObjectsDataFile() {
 		UnityEngine.Debug.Log("Outputting all dynamic objects to StreamingAssets/CitadelScene_dynamics_level" + levelToOutputFrom.ToString() + ".dat");
-		using var __stringBuilderLease4 = _stringBuilderPool.Rent();
+		using var __stringBuilderLease4 = StringBuilderPool.Rent();
 		var s1 = __stringBuilderLease4.Builder;
 		List<GameObject> allDynamicObjects = new List<GameObject>();
 		Component[] compArray = dynamicObjectContainers[levelToOutputFrom].GetComponentsInChildren(typeof(SaveObject),true);

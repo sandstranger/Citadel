@@ -102,8 +102,8 @@ public class GravityLift : MonoBehaviour {
 		active = !active;
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(200 * 10);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 10);
 		var s1 = __stringBuilderLease1.Builder;
 		GravityLift gl = go.GetComponent<GravityLift>(); // Not quite Open, but hey
 		if (gl == null) {

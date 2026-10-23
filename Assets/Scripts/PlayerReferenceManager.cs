@@ -33,24 +33,24 @@ public class PlayerReferenceManager : MonoBehaviour {
 	public PlayerHealth PlayerHealth => _playerHealth;
 	public HealthManager HealthManager => _healthManager;
 	
-	public static string SavePlayerData(StringBuilderPool stringBuilderPool, GameObject plyr, PrefabIdentifier prefID) {
+	public static string SavePlayerData(GameObject plyr, PrefabIdentifier prefID) {
 		PlayerReferenceManager PRman = plyr.GetComponent<PlayerReferenceManager>();
-        using var __stringBuilderLease1 = stringBuilderPool.Rent(200);
+        using var __stringBuilderLease1 = StringBuilderPool.Rent(200);
         var s1 = __stringBuilderLease1.Builder;
         s1.Clear();
 		s1.Append("Hacker");//s1.Append(_consts.playerName);
-        s1.Append(Utils.splitChar); s1.Append(PlayerHealth.Save(stringBuilderPool, PRman.playerCapsule));
-        s1.Append(Utils.splitChar); s1.Append(PlayerEnergy.Save(stringBuilderPool, PRman.playerCapsule));
-        s1.Append(Utils.splitChar); s1.Append(PlayerMovement.Save(stringBuilderPool, PRman.playerCapsule));
-        s1.Append(Utils.splitChar); s1.Append(PlayerPatch.Save(stringBuilderPool, PRman.playerCapsule));
-        s1.Append(Utils.splitChar); s1.Append(MouseLookScript.Save(stringBuilderPool, PRman.playerCapsuleMainCamera));
-        s1.Append(Utils.splitChar); s1.Append(HealthManager.Save(stringBuilderPool, PRman.playerCapsule, prefID));
-        s1.Append(Utils.splitChar); s1.Append(GUIState.Save(stringBuilderPool, PRman.playerCanvas));
-        s1.Append(Utils.splitChar); s1.Append(Inventory.Save(stringBuilderPool, PRman.playerInventory));
-        s1.Append(Utils.splitChar); s1.Append(WeaponCurrent.Save(stringBuilderPool, PRman.playerInventory));
-        s1.Append(Utils.splitChar); s1.Append(WeaponFire.Save(stringBuilderPool, PRman.playerCapsuleMainCamera));
-        s1.Append(Utils.splitChar); s1.Append(MFDManager.Save(stringBuilderPool, PRman.playerMFDManager));
-        s1.Append(Utils.splitChar); s1.Append(Automap.Save(stringBuilderPool, PRman.playerMFDManager));
+        s1.Append(Utils.splitChar); s1.Append(PlayerHealth.Save(PRman.playerCapsule));
+        s1.Append(Utils.splitChar); s1.Append(PlayerEnergy.Save(PRman.playerCapsule));
+        s1.Append(Utils.splitChar); s1.Append(PlayerMovement.Save(PRman.playerCapsule));
+        s1.Append(Utils.splitChar); s1.Append(PlayerPatch.Save(PRman.playerCapsule));
+        s1.Append(Utils.splitChar); s1.Append(MouseLookScript.Save(PRman.playerCapsuleMainCamera));
+        s1.Append(Utils.splitChar); s1.Append(HealthManager.Save(PRman.playerCapsule, prefID));
+        s1.Append(Utils.splitChar); s1.Append(GUIState.Save(PRman.playerCanvas));
+        s1.Append(Utils.splitChar); s1.Append(Inventory.Save(PRman.playerInventory));
+        s1.Append(Utils.splitChar); s1.Append(WeaponCurrent.Save(PRman.playerInventory));
+        s1.Append(Utils.splitChar); s1.Append(WeaponFire.Save(PRman.playerCapsuleMainCamera));
+        s1.Append(Utils.splitChar); s1.Append(MFDManager.Save(PRman.playerMFDManager));
+        s1.Append(Utils.splitChar); s1.Append(Automap.Save(PRman.playerMFDManager));
 		return s1.ToString();
 	}
 

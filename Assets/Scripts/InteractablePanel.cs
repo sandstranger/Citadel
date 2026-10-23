@@ -83,8 +83,8 @@ public class InteractablePanel : MonoBehaviour {
 		}
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 200);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 200);
 		var s1 = __stringBuilderLease1.Builder;
 		InteractablePanel ip = go.GetComponent<InteractablePanel>();
 		s1.Clear();
@@ -102,13 +102,13 @@ public class InteractablePanel : MonoBehaviour {
 			DelayedSpawn despawner = ip.installationItem.GetComponent<DelayedSpawn>();
 			if (despawner != null) { // plastique
 				s1.Append(Utils.splitChar);
-				s1.Append(DelayedSpawn.Save(stringBuilderPool, ip.installationItem));
+				s1.Append(DelayedSpawn.Save(ip.installationItem));
 				Transform childTr = ip.installationItem.transform.GetChild(0);
 				if (childTr != null) {
 					DelayedSpawn despawner2 = childTr.gameObject.GetComponent<DelayedSpawn>();
 					if (despawner2 != null) { // plastique
 						s1.Append(Utils.splitChar);
-						s1.Append(DelayedSpawn.Save(stringBuilderPool, childTr.gameObject));
+						s1.Append(DelayedSpawn.Save(childTr.gameObject));
 					}
 				}
 			}

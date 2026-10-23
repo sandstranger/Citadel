@@ -331,8 +331,8 @@ public class PlayerPatch : MonoBehaviour,IInitializer {
 		patchActive = 0;
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
 		var s1 = __stringBuilderLease1.Builder;
 		PlayerPatch pp = go.GetComponent<PlayerPatch>();
 		var pauseScript = pp._pauseScript;
@@ -363,17 +363,17 @@ public class PlayerPatch : MonoBehaviour,IInitializer {
 		// Grayscale saved within each SaveCamera
 		// SaveCamera 2
 		// BerserkEffect 3
-		s1.Append(BerserkEffect.Save(stringBuilderPool, pp.berserk.gameObject));
+		s1.Append(BerserkEffect.Save(pp.berserk.gameObject));
 		s1.Append(Utils.splitChar);
-		s1.Append(BerserkEffect.Save(stringBuilderPool, pp.sensaroundCamCenterBerserk.gameObject));
+		s1.Append(BerserkEffect.Save(pp.sensaroundCamCenterBerserk.gameObject));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.SaveCamera(pp.sensaroundCamCenterBerserk.gameObject));
 		s1.Append(Utils.splitChar);
-		s1.Append(BerserkEffect.Save(stringBuilderPool, pp.sensaroundCamLeftBerserk.gameObject));
+		s1.Append(BerserkEffect.Save(pp.sensaroundCamLeftBerserk.gameObject));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.SaveCamera(pp.sensaroundCamLeftBerserk.gameObject));
 		s1.Append(Utils.splitChar);
-		s1.Append(BerserkEffect.Save(stringBuilderPool, pp.sensaroundCamRightBerserk.gameObject));
+		s1.Append(BerserkEffect.Save(pp.sensaroundCamRightBerserk.gameObject));
 		s1.Append(Utils.splitChar);
 		s1.Append(Utils.SaveCamera(pp.sensaroundCamRightBerserk.gameObject));
 		return s1.ToString();

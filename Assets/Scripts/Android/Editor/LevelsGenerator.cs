@@ -25,7 +25,7 @@ namespace Citadel.Android.Tools
                 return;
             }
             
-            var saveLoad = new SaveLoad(new StringBuilderPool());
+            var saveLoad = new SaveLoad();
 
             for (var i = 0; i <= MaxLevels; ++i)
             {

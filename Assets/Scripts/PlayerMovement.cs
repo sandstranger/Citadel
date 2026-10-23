@@ -1858,8 +1858,8 @@ public class PlayerMovement : MonoBehaviour {
 		}
     }
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(200 * 1024);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200 * 1024);
 		var s1 = __stringBuilderLease1.Builder;
 		PlayerMovement pm = go.GetComponent<PlayerMovement>();
 		Utils utils = pm._utils;

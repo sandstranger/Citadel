@@ -85,8 +85,8 @@ public class Trigger : MonoBehaviour {
 		//TriggerTripped (Collider col, bool initialEntry);
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100);
 		var s1 = __stringBuilderLease1.Builder;
 		Trigger trig = go.GetComponent<Trigger>();
 		var pauseScript = trig._pauseScript;

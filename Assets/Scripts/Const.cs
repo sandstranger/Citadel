@@ -43,9 +43,7 @@ using Debug = UnityEngine.Debug;
 
 public class Const : MonoBehaviour
 {
-    public StringBuilderPool StringBuilderPool => _stringBuilderPool;
     [Inject] private ScenesLoader _scenesLoader;
-    [Inject] private StringBuilderPool _stringBuilderPool;
     [Inject] private SaveLoad _saveLoad;
     [Inject] private ObjectContainmentSystem _objectContainmentSystem;
     [Inject] private AutoSplitterData _autoSplitterData;
@@ -594,7 +592,7 @@ public class Const : MonoBehaviour
 
 		LoadCreditsData();
 		StartCoroutine(InitializeEventSystem());
-		questData = new QuestBits (_levelManager, this, _stringBuilderPool);
+		questData = new QuestBits (_levelManager, this);
 // 		if (mainFont1 != null) { // Ensure text is crisp and readable.
 			mainFont1.material.mainTexture.filterMode = FilterMode.Point;
 // 		}
@@ -630,7 +628,7 @@ public class Const : MonoBehaviour
 	public void LoadAudioLogMetaData() {
 		// The following to be assigned to the arrays in the Unity Const data structure
 		int readIndexOfLog, readLogImageLHIndex, readLogImageRHIndex; // look-up index for assigning the following data on the line in the file to the arrays
-		using var __stringBuilderLease2 = _stringBuilderPool.Rent();
+		using var __stringBuilderLease2 = StringBuilderPool.Rent();
 		var readLogText = __stringBuilderLease2.Builder; // loaded into string audioLogSpeech2Text[]
 		string readline; // variable to hold each string read in from the file
 		char logSplitChar = ',';
@@ -752,7 +750,7 @@ public class Const : MonoBehaviour
 		string readline; // variable to hold each string read in from the file
 		int pagenum = 0;
 		creditsLength = 1;
-		using var __stringBuilderLease3 = _stringBuilderPool.Rent(StringBuilderSize);
+		using var __stringBuilderLease3 = StringBuilderPool.Rent(StringBuilderSize);
 		var page = __stringBuilderLease3.Builder;
 		StreamReader dataReader = Utils.ReadStreamingAsset("credits.txt");
 		using (dataReader) {
@@ -1228,7 +1226,7 @@ public class Const : MonoBehaviour
 
 		saveData.Add(savename);
 		
-		using (var __stringBuilderLease1 = _stringBuilderPool.Rent(StringBuilderSize))
+		using (var __stringBuilderLease1 = StringBuilderPool.Rent(StringBuilderSize))
 		{
 			var s1 = __stringBuilderLease1.Builder;
 			// Credit Stats and Times
@@ -1255,7 +1253,7 @@ public class Const : MonoBehaviour
 			s1.Clear();
 			s1.Append(_levelManager.Save());
 			s1.Append(Utils.splitChar);
-			s1.Append(questData.Save(_stringBuilderPool));
+			s1.Append(questData.Save());
 			s1.Append(Utils.splitChar);
 			s1.Append(_questLogNotesManager.Save());
 			s1.Append(Utils.splitChar);
@@ -1275,7 +1273,7 @@ public class Const : MonoBehaviour
 		// Save all the objects data
 		for (i=0;i<saveableGameObjects.Count;i++) {
 			// Take this object's data and add it to the array.
-			saveData.Add(SaveObject.Save(_saveLoad, _stringBuilderPool, _levelManager,saveableGameObjects[i])); // <<< THIS IS IT <<<
+			saveData.Add(SaveObject.Save(_saveLoad, _levelManager,saveableGameObjects[i])); // <<< THIS IS IT <<<
 		}
 		
 		foreach (var dynamicObjectsSaveList in LevelManager.DynamicObjectsSavestrings)
@@ -1612,7 +1610,7 @@ public class Const : MonoBehaviour
 						
 						entries = readFileList[i].Split(Utils.splitCharChar);
 						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(currentGameObjectInScene,true);
-						yield return SaveObject.Load(_saveLoad, _stringBuilderPool, this, _levelManager,currentGameObjectInScene, entries,i,prefID);
+						yield return SaveObject.Load(_saveLoad, this, _levelManager,currentGameObjectInScene, entries,i,prefID);
 						wasLoaded = true;
 						alreadyCheckedThisSaveableGameObjectInScene[j] = true; // Huge time saver right here!
 						break;
@@ -1711,7 +1709,7 @@ public class Const : MonoBehaviour
 						yield return taskToWait;
 						instGO = taskToWait.Result;
 						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
-						yield return SaveObject.Load(_saveLoad, _stringBuilderPool, this, _levelManager,instGO, entries,i,prefID); // Load NPC.
+						yield return SaveObject.Load(_saveLoad, this, _levelManager,instGO, entries,i,prefID); // Load NPC.
 					} else if (ConsoleEmulator.ConstIndexIsDynamicObject(constdex) && !isNpc) {
 						// For DynamicObjects, if current level, go ahead and Instantiate new Prefabs, else add string to LevelManager's list for other levels.
 						if (levID == LevelManager.CurrentLevel) {
@@ -1720,7 +1718,7 @@ public class Const : MonoBehaviour
 							yield return taskToWait;
 							instGO = taskToWait.Result;
 							PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
-							yield return SaveObject.Load(_saveLoad, _stringBuilderPool, this, _levelManager,instGO, entries,i,prefID); // Load NPC.
+							yield return SaveObject.Load(_saveLoad, this, _levelManager,instGO, entries,i,prefID); // Load NPC.
 						} else {
 							if (levID < LevelManager.DynamicObjectsSavestrings.Count && levID >= 0) { // levID < 14
 								if (i < (readFileList.Count - 1) && readFileList.Count > 0 && i >= 0) {
@@ -2124,7 +2122,7 @@ public class Const : MonoBehaviour
 	}
 
 	public string CreditsStats() {
-	    using var __stringBuilderLease4 = _stringBuilderPool.Rent();
+	    using var __stringBuilderLease4 = StringBuilderPool.Rent();
 	    var s1 = __stringBuilderLease4.Builder;
 	    s1.Clear();
 	    s1.Append("======================================================================");

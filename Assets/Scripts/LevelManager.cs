@@ -108,7 +108,6 @@ public class LevelManager : MonoBehaviour
 	[Inject] private readonly IResourcesLoader _resourcesLoader;
 	[Inject] private readonly ScenesLoader _scenesLoader;
 	[Inject] private SaveLoad _saveLoad;
-	[Inject] private StringBuilderPool _stringBuilderPool;
 	[Inject] private ObjectContainmentSystem _objectContainmentSystem;
 	[Inject] private AutoSplitterData _autoSplitterData;
 
@@ -693,7 +692,7 @@ public class LevelManager : MonoBehaviour
 
 			DynamicObjectsSavestrings[curlevel].Clear(); // Empty list.
 			for (int i=0;i<allDynamicObjects.Count;i++) {
-				DynamicObjectsSavestrings[curlevel].Add(SaveObject.Save(_saveLoad, _stringBuilderPool, this,allDynamicObjects[i]));
+				DynamicObjectsSavestrings[curlevel].Add(SaveObject.Save(_saveLoad, this,allDynamicObjects[i]));
 			}
 		}
 		
@@ -788,7 +787,7 @@ public class LevelManager : MonoBehaviour
 	}
 
 	public string Save() {
-		using var __stringBuilderLease1 = _stringBuilderPool.Rent(200*1024);
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200*1024);
 		var s1 = __stringBuilderLease1.Builder;
 		int i=0;
 		s1.Clear();
@@ -842,7 +841,7 @@ public class LevelManager : MonoBehaviour
 			{
 				var instGO = await _consoleEmulator.SpawnDynamicObject(constIndex,levNum,false,contnr,savID);
 				PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(instGO,true);
-				await SaveObject.Load(_saveLoad, _stringBuilderPool, _consts, this, instGO, entries, 0, prefID); // Load NPC.
+				await SaveObject.Load(_saveLoad, _consts, this, instGO, entries, 0, prefID); // Load NPC.
 			}
 			else
 			{
@@ -864,7 +863,7 @@ public class LevelManager : MonoBehaviour
 					if (currentSaveObjectInScene.SaveID == savID && currentSaveObjectInScene.SaveID != 0)
 					{
 						PrefabIdentifier prefID = _saveLoad.GetPrefabIdentifier(currentGameObjectInScene, true);
-						await SaveObject.Load(_saveLoad, _stringBuilderPool, _consts, this, currentGameObjectInScene, entries, i, prefID);
+						await SaveObject.Load(_saveLoad, _consts, this, currentGameObjectInScene, entries, i, prefID);
 						alreadyCheckedThisInstantiableGameObjectInScene[i] = true; // Huge time saver right here!
 						break;
 					}
@@ -921,7 +920,7 @@ public class LevelManager : MonoBehaviour
 		{
 			foreach (var saveObject in parent.GetComponentsInChildren<SaveObject>(true))
 			{
-				saveStringsStorage.Add(SaveObject.Save(_saveLoad, _stringBuilderPool, this,saveObject.gameObject));
+				saveStringsStorage.Add(SaveObject.Save(_saveLoad, this,saveObject.gameObject));
 			}
 		}
 	}

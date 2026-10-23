@@ -34,7 +34,6 @@ public class QuestLogNotesManager : MonoBehaviour
 	
 	[Inject] private readonly Const _consts;
 	[Inject] private readonly Inventory _inventory;
-	[Inject] private StringBuilderPool _stringBuilderPool;
 
 	void Awake()
 	{
@@ -277,7 +276,7 @@ public class QuestLogNotesManager : MonoBehaviour
 	}
 	
 	public string Save() {
-		using var __stringBuilderLease1 = _stringBuilderPool.Rent(200);
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(200);
 		var s1 = __stringBuilderLease1.Builder;
 		for (int i=0;i<18;i++) {
 			s1.Append(Utils.BoolToString(notes[i].activeSelf,"notes[" + i.ToString() + "].activeSelf"));

@@ -38,8 +38,8 @@ public class GUIState : MonoBehaviour {
 		EventSystem.current.SetSelectedGameObject(null);
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 1024);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 1024);
 		var s1 = __stringBuilderLease1.Builder;
 		GUIState guis = go.GetComponent<GUIState>();
 		if (guis == null) {

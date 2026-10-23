@@ -50,8 +50,8 @@ public class DelayedSpawn : MonoBehaviour {
 		}
     }
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent();
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		DelayedSpawn ds = go.GetComponent<DelayedSpawn>();
 		s1.Clear();

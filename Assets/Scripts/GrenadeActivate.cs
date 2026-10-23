@@ -134,8 +134,8 @@ public class GrenadeActivate : MonoBehaviour {
 	}
 
 	// Live grenades - These should only be up in the air or active running timer, but still...or it's a landmine
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent(100 * 500);
+	public static string Save(GameObject go) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent(100 * 500);
 		var s1 = __stringBuilderLease1.Builder;
 		s1.Clear();
 		GrenadeActivate ga = go.GetComponent<GrenadeActivate>();

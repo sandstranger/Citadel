@@ -11,12 +11,7 @@ using UnityEditor.SceneManagement;
 #endif
 
 public sealed class SaveLoad {
-    private readonly StringBuilderPool _stringBuilderPool;
 
-    public SaveLoad(StringBuilderPool stringBuilderPool)
-    {
-        _stringBuilderPool = stringBuilderPool ?? throw new ArgumentNullException(nameof(stringBuilderPool));
-    }
     public string commentIndicator = "//"; // Ignore anything after on a line.
     public string sectionIndicator = "#"; // Separates types of items in files.
     public string splitChar = "|"; // Common delimiter, not a comma as in csv.
@@ -108,17 +103,17 @@ public sealed class SaveLoad {
         Const consts = sobmain?.Consts;
         
         if (isGeom) {           return SaveGeometry(go,pid);
-        } else if (isDyn) {     return SaveObject.Save(this, _stringBuilderPool, levelManager,go);
-        } else if (isDor) {     return SaveObject.Save(this, _stringBuilderPool, levelManager,go);
-        } else if (isStatSav) { return SaveObject.Save(this, _stringBuilderPool, levelManager,go);
-        } else if (isNPC) {     return SaveObject.Save(this, _stringBuilderPool, levelManager,go);
+        } else if (isDyn) {     return SaveObject.Save(this, levelManager,go);
+        } else if (isDor) {     return SaveObject.Save(this, levelManager,go);
+        } else if (isStatSav) { return SaveObject.Save(this, levelManager,go);
+        } else if (isNPC) {     return SaveObject.Save(this, levelManager,go);
         } else if (isStatImm) { 
             if (go.transform.childCount > 1) {
                 PrefabIdentifier pidmain = go.GetComponent<PrefabIdentifier>();
                 if (pidmain == null) { // Ok we are a saveable container object most likely
                     if (sobmain != null) {
                         if (sobmain.saveType == SaveableType.Transform) { // Ok final check, most definitely a toggleable container that has nothing of its own.
-                            using var __stringBuilderLease1 = _stringBuilderPool.Rent();
+                            using var __stringBuilderLease1 = StringBuilderPool.Rent();
                             var nest = __stringBuilderLease1.Builder;
                             nest.Clear();
                             nest.Append("container " + go.name);
@@ -139,7 +134,7 @@ public sealed class SaveLoad {
             if (go.transform.childCount >= 1) {
                 if (sobmain != null) {
                     if (sobmain.saveType == SaveableType.Transform) { // Ok final check, most definitely a toggleable container that has nothing of its own.
-                        using var __stringBuilderLease2 = _stringBuilderPool.Rent();
+                        using var __stringBuilderLease2 = StringBuilderPool.Rent();
                         var nest = __stringBuilderLease2.Builder;
                         nest.Clear();
                         nest.Append("container " + go.name);
@@ -181,13 +176,13 @@ public sealed class SaveLoad {
             GameObject container = levelManager.GetRequestedLevelDynamicContainer(LevelManager.CurrentLevel);
 			GameObject newGO = await consoleEmulator.SpawnDynamicObject(constIndex,curlevel,false,container,saveID);
 			PrefabIdentifier prefID = GetPrefabIdentifier(newGO,true);
-			if (newGO != null) await SaveObject.Load(this, _stringBuilderPool, @const,levelManager,newGO,entries,lineNum,prefID);
+			if (newGO != null) await SaveObject.Load(this, @const,levelManager,newGO,entries,lineNum,prefID);
 			return newGO;
         } else if (ConsoleEmulator.ConstIndexIsStaticObjectImmutable(constIndex)) {
             return await LoadStaticImmutable(@const,consoleEmulator,entries,lineNum,curlevel);
         } else {
             // Something went wrong, rebuild the line and print it.
-            using var __stringBuilderLease3 = _stringBuilderPool.Rent(100 * 500);
+            using var __stringBuilderLease3 = StringBuilderPool.Rent(100 * 500);
             var s1 = __stringBuilderLease3.Builder;
             s1.Clear();
             for (int i=0;i<entries.Length;i++) {
@@ -207,7 +202,7 @@ public sealed class SaveLoad {
         if (!ConsoleEmulator.ConstIndexIsStaticObjectImmutable(pid.constIndex)) {
             Debug.LogError(go.name + " is not a static object immutable, has constIndex of " + pid.constIndex.ToString());
         }
-        using var __stringBuilderLease4 = _stringBuilderPool.Rent(100 * 500);
+        using var __stringBuilderLease4 = StringBuilderPool.Rent(100 * 500);
         var s1 = __stringBuilderLease4.Builder;
         s1.Clear();
         s1.Append(Utils.IntToString(pid.constIndex,"constIndex"));
@@ -224,7 +219,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.SaveString(cybacc.argvalue,"argvalue"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(_stringBuilderPool, go));
+            s1.Append(TargetIO.Save(go));
         } else if (pid.constIndex == 574) { // prop_healingbed
             HealingBed heb = go.GetComponent<HealingBed>();
             s1.Append(splitChar);
@@ -298,7 +293,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.BoolToString(em.autoPlayEmail,"autoPlayEmail"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(_stringBuilderPool, go));
+            s1.Append(TargetIO.Save(go));
         } else if (pid.constIndex == 709) { // info_message
             TriggeredSprintMessage msg = go.GetComponent<TriggeredSprintMessage>();
             s1.Append(splitChar);
@@ -306,7 +301,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.SaveString(msg.messageToDisplay,"messageToDisplay"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(_stringBuilderPool, go));
+            s1.Append(TargetIO.Save(go));
         } else if (pid.constIndex == 710) { // info_mission
             QuestBitRelay qbr = go.GetComponent<QuestBitRelay>();
             s1.Append(splitChar);
@@ -370,7 +365,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.SaveString(qbr.argvalueIfFalse,"argvalueIfFalse"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(_stringBuilderPool, go));
+            s1.Append(TargetIO.Save(go));
         } else if (pid.constIndex == 711) { // info_note
             Note nt = go.GetComponent<Note>();
             s1.Append(splitChar);
@@ -394,7 +389,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.IntToString(snd.burstemittcnt2,"burstemittcnt2"));
             s1.Append(splitChar);
-            s1.Append(TargetIO.Save(_stringBuilderPool, go));
+            s1.Append(TargetIO.Save(go));
             s1.Append(splitChar);
             s1.Append(Utils.SaveAudioSource(go));
         } else if (pid.constIndex == 714) { // info_screenshake
@@ -404,7 +399,7 @@ public sealed class SaveLoad {
             s1.Append(splitChar);
             s1.Append(Utils.FloatToString(eft.force,"force"));
         } else if (pid.constIndex == 715) { // info_spawnpoint
-            s1.Append(TargetIO.Save(_stringBuilderPool, go));
+            s1.Append(TargetIO.Save(go));
         } else if (pid.constIndex == 716) { // fx_reverbzone
             AudioReverbZone arz = go.GetComponent<AudioReverbZone>();
             s1.Append(splitChar);
@@ -637,7 +632,7 @@ public sealed class SaveLoad {
             } 
         #endif
         
-        using var __stringBuilderLease5 = _stringBuilderPool.Rent();
+        using var __stringBuilderLease5 = StringBuilderPool.Rent();
         var s1 = __stringBuilderLease5.Builder;
         s1.Clear();
         s1.Append(Utils.UintToString(pid.constIndex,"constIndex"));
@@ -976,7 +971,7 @@ public sealed class SaveLoad {
         Light lit = go.GetComponent<Light>();
         if (lit == null) { Debug.LogError("Missing Light component when trying to SaveLight on " + go.name); return ""; }
 
-        using var __stringBuilderLease6 = _stringBuilderPool.Rent();
+        using var __stringBuilderLease6 = StringBuilderPool.Rent();
         var s1 = __stringBuilderLease6.Builder;
         s1.Clear();
         Transform tr = go.transform;
@@ -1013,9 +1008,9 @@ public sealed class SaveLoad {
         if (sob != null) {
             if (sob.saveType == SaveableType.Light) {
                 s1.Append(Utils.splitChar);
-                s1.Append(LightAnimation.Save(_stringBuilderPool, go));
+                s1.Append(LightAnimation.Save(go));
                 s1.Append(Utils.splitChar);
-                s1.Append(TargetIO.Save(_stringBuilderPool, go));
+                s1.Append(TargetIO.Save(go));
             }
         }
         s1.Append(Utils.splitChar);

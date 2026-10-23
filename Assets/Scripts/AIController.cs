@@ -1877,8 +1877,8 @@ public class AIController : MonoBehaviour {
 		Alert(ud);
 	}
 
-	public static string Save(StringBuilderPool stringBuilderPool, GameObject go, PrefabIdentifier prefID) {
-		using var __stringBuilderLease1 = stringBuilderPool.Rent();
+	public static string Save(GameObject go, PrefabIdentifier prefID) {
+		using var __stringBuilderLease1 = StringBuilderPool.Rent();
 		var s1 = __stringBuilderLease1.Builder;
 		AIController aic = go.GetComponent<AIController>();
 		var pauseScript = aic._pauseScript;
@@ -2051,7 +2051,7 @@ public class AIController : MonoBehaviour {
 			s1.Append(Utils.splitChar);
 			s1.Append(Utils.BoolToString(aic.searchColliderGO.activeSelf,"searchColliderGO.activeSelf"));
 			s1.Append(Utils.splitChar);
-			s1.Append(SearchableItem.Save(stringBuilderPool, aic.searchColliderGO,prefID));
+			s1.Append(SearchableItem.Save(aic.searchColliderGO,prefID));
 
 			// Weird exclusion for hopper to not check 
 			// && !healthManager.vaporizeCorpse
@@ -2059,7 +2059,7 @@ public class AIController : MonoBehaviour {
 				|| prefID.constIndex == 421 /* avian mutant */) {
 
 				s1.Append(Utils.splitChar);
-				s1.Append(HealthManager.Save(stringBuilderPool, aic.searchColliderGO,prefID));
+				s1.Append(HealthManager.Save(aic.searchColliderGO,prefID));
 			}
 		}
 		return s1.ToString();
