@@ -1249,7 +1249,7 @@ public class Const : MonoBehaviour
 			s1.Clear();
 			s1.Append(_levelManager.Save());
 			s1.Append(Utils.splitChar);
-			s1.Append(questData.Save());
+			s1.Append(questData.Save(_stringBuilderPool));
 			s1.Append(Utils.splitChar);
 			s1.Append(_questLogNotesManager.Save());
 			s1.Append(Utils.splitChar);
