@@ -81,11 +81,12 @@ namespace Citadel.Game
             Container.BindInstance(_biomonitorGraphSystem).AsSingle();
             Container.BindInstance(_playerEnergy).AsSingle();
             var activeScene = SceneManager.GetActiveScene();
-            Container.Bind<DynamicCulling>().FromInstance(FindComponentInScene<DynamicCulling>(activeScene)).AsTransient();
-            Container.Bind<LevelManager>().FromInstance(FindComponentInScene<LevelManager>(activeScene)).AsTransient();
-            Container.Bind<LevelEditor>().FromInstance(FindComponentInScene<LevelEditor>(activeScene)).AsTransient();
-            Container.Bind<LightDistanceCuller>().FromInstance(FindComponentInScene<LightDistanceCuller>(activeScene))
-                .AsTransient();
+            FindSceneComponents(activeScene, out var dynamicCulling, out var levelManager,
+                out var levelEditor, out var lightsCuller);
+            Container.Bind<DynamicCulling>().FromInstance(dynamicCulling).AsTransient();
+            Container.Bind<LevelManager>().FromInstance(levelManager).AsTransient();
+            Container.Bind<LevelEditor>().FromInstance(levelEditor).AsTransient();
+            Container.Bind<LightDistanceCuller>().FromInstance(lightsCuller).AsTransient();
             Container.BindInstance(_const).AsSingle();
             Container.BindInstance(_mfdManager).AsSingle();
             Container.BindInstance(_automap).AsSingle();
@@ -129,10 +130,8 @@ namespace Citadel.Game
                 scene = SceneManager.GetActiveScene();
             }
 
-            var dynamicCulling = FindComponentInScene<DynamicCulling>(scene);
-            var levelManager = FindComponentInScene<LevelManager>(scene);
-            var levelEditor = FindComponentInScene<LevelEditor>(scene);
-            var lightsCuller = FindComponentInScene<LightDistanceCuller>(scene);
+            FindSceneComponents(scene, out var dynamicCulling, out var levelManager,
+                out var levelEditor, out var lightsCuller);
 
             if (lightsCuller != null)
                 Container.Rebind<LightDistanceCuller>().FromInstance(lightsCuller).AsTransient();
@@ -149,23 +148,48 @@ namespace Citadel.Game
             }
         }
 
-        private static T FindComponentInScene<T>(Scene scene) where T : Component
+        private static void FindSceneComponents(
+            Scene scene,
+            out DynamicCulling dynamicCulling,
+            out LevelManager levelManager,
+            out LevelEditor levelEditor,
+            out LightDistanceCuller lightsCuller)
         {
+            dynamicCulling = null;
+            levelManager = null;
+            levelEditor = null;
+            lightsCuller = null;
+
             if (!scene.IsValid() || !scene.isLoaded)
             {
-                return null;
+                return;
             }
 
+            // Traverse each scene hierarchy once instead of scanning it separately
+            // for every service that needs rebinding.
             foreach (var root in scene.GetRootGameObjects())
             {
-                var components = root.GetComponentsInChildren<T>(true);
-                if (components.Length > 0)
+                foreach (var behaviour in root.GetComponentsInChildren<MonoBehaviour>(true))
                 {
-                    return components[0];
+                    if (dynamicCulling == null && behaviour is DynamicCulling foundDynamicCulling)
+                    {
+                        dynamicCulling = foundDynamicCulling;
+                    }
+                    else if (levelManager == null && behaviour is LevelManager foundLevelManager)
+                    {
+                        levelManager = foundLevelManager;
+                    }
+                    else if (levelEditor == null && behaviour is LevelEditor foundLevelEditor)
+                    {
+                        levelEditor = foundLevelEditor;
+                    }
+                    else if (lightsCuller == null && behaviour is LightDistanceCuller foundLightsCuller)
+                    {
+                        lightsCuller = foundLightsCuller;
+                    }
                 }
             }
-
-            return null;
         }
+
     }
 }
