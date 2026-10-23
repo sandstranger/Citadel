@@ -355,8 +355,8 @@ public sealed class Utils {
                 return null;
             }
 
-            byte[] bytes = Encoding.ASCII.GetBytes(textAsset.text);
-            return new StreamReader(new MemoryStream(bytes), Encoding.ASCII);
+            byte[] bytes = Encoding.UTF8.GetBytes(textAsset.text);
+            return new StreamReader(new MemoryStream(bytes), Encoding.UTF8);
         }
         catch (Exception exception)
         {
@@ -391,8 +391,8 @@ public sealed class Utils {
                 return null;
             }
 
-            byte[] bytes = Encoding.ASCII.GetBytes(textAsset.text);
-            return new StreamReader(new MemoryStream(bytes), Encoding.ASCII);
+            byte[] bytes = Encoding.UTF8.GetBytes(textAsset.text);
+            return new StreamReader(new MemoryStream(bytes), Encoding.UTF8);
         }
         catch (Exception exception)
         {
