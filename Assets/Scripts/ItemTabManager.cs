@@ -25,6 +25,7 @@ public class ItemTabManager : MonoBehaviour {
 	[Inject] private readonly MFDManager _mfdManager;
 	[Inject] private readonly Inventory _inventory;
 	[Inject] private readonly ITexturesStorage _texturesStorage;
+	[Inject] private StringBuilderPool _stringBuilderPool;
 	
 	public void Reset() {
 		eReaderSectionsContainer.SetActive(false);
@@ -97,7 +98,7 @@ public class ItemTabManager : MonoBehaviour {
 			accessCardList.SetActive(true);
 			AccessCardType acc = AccessCardType.Standard;
 			Array cardTypes = Enum.GetValues(typeof(AccessCardType));
-			using var __stringBuilderLease1 = stringBuilderPool.Rent();
+			using var __stringBuilderLease1 = _stringBuilderPool.Rent();
 			var s1 = __stringBuilderLease1.Builder;
 			s1.Clear();
 			for (int i=0;i<cardTypes.Length;i++) {
