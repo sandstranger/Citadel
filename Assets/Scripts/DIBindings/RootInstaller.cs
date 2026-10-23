@@ -60,15 +60,20 @@ namespace Citadel.Game
                 // The previous scene's Const and PlayerReferenceManager were kept
                 // alive separately from the root installer. Replace those copies
                 // with the instances serialized in the newly loaded gameplay scene.
-                var previousConst = _instance._const;
-                var previousPlayerReference = _instance._playerReference;
+                var previousInstaller = _instance;
+                var previousConst = previousInstaller._const;
+                var previousPlayerReference = previousInstaller._playerReference;
 
-                if (previousConst != null && previousConst != _const)
+                if (previousConst != null &&
+                    previousConst.gameObject != _const.gameObject &&
+                    previousConst.gameObject != previousInstaller.gameObject)
                     DestroyImmediate(previousConst.gameObject);
-                if (previousPlayerReference != null && previousPlayerReference != _playerReference)
+                if (previousPlayerReference != null &&
+                    previousPlayerReference.gameObject != _playerReference.gameObject &&
+                    previousPlayerReference.gameObject != previousInstaller.gameObject)
                     DestroyImmediate(previousPlayerReference.gameObject);
 
-                DestroyImmediate(_instance.gameObject);
+                DestroyImmediate(previousInstaller.gameObject);
                 _instance = this;
                 DontDestroyOnLoad(gameObject);
             }
@@ -82,14 +87,16 @@ namespace Citadel.Game
                 var existingConst = _instance._const;
                 var existingPlayerReference = _instance._playerReference;
 
-                DestroyImmediate(gameObject);
-
-                if (duplicateConst != null && duplicateConst != existingConst)
+                if (duplicateConst != null &&
+                    duplicateConst.gameObject != existingConst.gameObject &&
+                    duplicateConst.gameObject != gameObject)
                     DestroyImmediate(duplicateConst.gameObject);
                 if (duplicatePlayerReference != null &&
-                    duplicatePlayerReference != existingPlayerReference)
+                    duplicatePlayerReference.gameObject != existingPlayerReference.gameObject &&
+                    duplicatePlayerReference.gameObject != gameObject)
                     DestroyImmediate(duplicatePlayerReference.gameObject);
 
+                DestroyImmediate(gameObject);
                 return;
             }
 
