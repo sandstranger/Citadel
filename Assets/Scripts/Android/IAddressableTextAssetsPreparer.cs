@@ -4,6 +4,6 @@ namespace Citadel.Game
 {
     internal interface IAddressableTextAssetsPreparer
     {
-        UniTask<bool> PrepareAsync();
+        UniTask<bool> CopyGameTextAssetsToDiskAsync();
     }
 }

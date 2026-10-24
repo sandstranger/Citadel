@@ -21,7 +21,7 @@ namespace Citadel.Game
         {
             try
             {
-                if (await _addressableTextAssetsPreparer.PrepareAsync())
+                if (await _addressableTextAssetsPreparer.CopyGameTextAssetsToDiskAsync())
                 {
                     await _scenesLoader.LoadLevelAsync(_scenesLoader.MainGameSceneIndex);
                 }
