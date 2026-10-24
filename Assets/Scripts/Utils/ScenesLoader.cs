@@ -38,7 +38,7 @@ namespace Citadel.SceneManagement
             "13-CyberspaceLevelScene"
         };
 
-        public ScenesLoader()
+        private ScenesLoader()
         {
             SceneManager.sceneLoaded += HandleSceneLoaded;
             SceneManager.activeSceneChanged += HandleActiveSceneChanged;
