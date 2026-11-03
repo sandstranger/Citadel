@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>ZLinq.FileSystem</id>
+    <version>1.6.1</version>
+    <authors>Cysharp</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>Icon.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/Cysharp/ZLinq</projectUrl>
+    <description>LINQ to FileSystem; FileSystem extensions of ZLinq's LINQ to Tree.</description>
+    <copyright>© Cysharp, Inc.</copyright>
+    <tags>linq</tags>
+    <repository type="git" url="https://github.com/Cysharp/ZLinq" commit="3362dc4363e6a772c3635d9bf31de2feeb8a72c7" />
+    <dependencies>
+      <group targetFramework="net10.0">
+        <dependency id="ZLinq" version="1.6.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net8.0">
+        <dependency id="ZLinq" version="1.6.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net9.0">
+        <dependency id="ZLinq" version="1.6.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="ZLinq" version="1.6.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.1">
+        <dependency id="ZLinq" version="1.6.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
